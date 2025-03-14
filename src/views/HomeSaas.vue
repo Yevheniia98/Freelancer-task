@@ -95,6 +95,42 @@
             mdi-web
           </v-icon>
         </div>
+        <!-- Cards Section -->
+        <v-row dense class="pa-3">
+          <v-col cols="3" class="mt-12" v-for="stat in stats" :key="stat.title">
+            <v-card class="mx-0 my-2 pa-4 custom-card">
+              <v-card-title class="card-title">{{ stat.title }}</v-card-title>
+              <v-card-subtitle class="card-subtitle d-flex align-center">
+                <div class="icon-circle">
+                  <v-icon class="card-icon">{{ stat.icon }}</v-icon>
+                </div>
+                <span class="card-value">{{ stat.value }}</span>
+              </v-card-subtitle>
+
+              <!-- ✅ Dropdown Button -->
+              <div class="dropdown-btn" @click="toggleMenu(stat.title)">
+                <span>{{ selectedOptions[stat.title] || 'From last week' }}</span>
+                <v-icon>{{ dropdowns[stat.title] ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+              </div>
+
+              <!-- ✅ Dropdown List -->
+              <v-expand-transition>
+                <div v-show="dropdowns[stat.title]" class="dropdown-list">
+                  <v-list>
+                    <v-list-item
+                      v-for="option in timeOptions"
+                      :key="option"
+                      @click="selectTime(stat.title, option)"
+                      class="dropdown-option"
+                    >
+                      <v-list-item-title>{{ option }}</v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </div>
+              </v-expand-transition>
+            </v-card>
+          </v-col>
+        </v-row>
       </v-main>
 
       <v-row>
@@ -109,24 +145,34 @@
                     cols="12"
                   >
                     <v-card class="meeting-card pa-4">
-                      <div class="d-flex align-center">
-                        <v-sheet class="date-badge pa-2">
-                          <div class="date-month">
-                            {{ formatMonth(meeting.date) }}
-                          </div>
-                          <div class="date-day">
-                            {{ formatDay(meeting.date) }}
-                          </div>
-                        </v-sheet>
-                        <div class="ml-3">
-                          <div class="event-type">
-                            Live event
-                          </div>
-                          <div class="meeting-title">
-                            {{ meeting.title }}
-                          </div>
-                        </div>
-                      </div>
+                      <div class="d-flex align-center justify-space-between">
+    <div class="d-flex align-center">
+      <v-sheet class="date-badge pa-2">
+        <div class="date-month">
+          {{ formatMonth(meeting.date) }}
+        </div>
+        <div class="date-day">
+          {{ formatDay(meeting.date) }}
+        </div>
+      </v-sheet>
+      <div class="ml-3">
+        <div class="event-type">
+          Live event
+        </div>
+        <div class="meeting-title">
+          {{ meeting.title }}
+        </div>
+      </div>
+    </div>
+    <v-btn 
+      icon 
+      small 
+      color="grey" 
+      @click="deleteMeeting(meeting.id)"
+    >
+      <v-icon>mdi-close</v-icon>
+    </v-btn>
+  </div>
                       <div class="time-container d-flex justify-space-between my-4">
                         <div class="time-text">
                           {{ meeting.startTime }}
@@ -243,6 +289,7 @@ export default {
     const drawerExpanded = ref(false);
     const searchQuery = ref("");
 
+    
     // Card stats data
     const stats = ref([
       { title: 'Active Projects', value: 5, icon: 'mdi-clipboard-text' },
@@ -290,6 +337,8 @@ export default {
         id: Date.now()
       });
     };
+
+    
 
     // Formatting functions
     const formatMonth = (date) => format(new Date(date), 'MMM');
