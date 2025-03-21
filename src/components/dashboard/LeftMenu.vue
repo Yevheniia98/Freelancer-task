@@ -73,8 +73,6 @@
           />
         </v-list>
       </v-navigation-drawer>
-
-    <!-- ✅ Основной контент -->
     </v-layout>
   </v-card>
 </template>

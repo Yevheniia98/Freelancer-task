@@ -30,10 +30,11 @@ export default {
 <style>
 #dashboard {
   
-  align-items: flex-start; /* Prevents unnecessary stretching */
-  justify-content: space-between;
+  align-items: center; /* Prevents unnecessary stretching */
+  justify-content: center;
   padding: 0;
   margin-top: 50px;
+  margin-left: 50px;
   min-height: auto; /* Ensures no extra space */
 }
 </style>

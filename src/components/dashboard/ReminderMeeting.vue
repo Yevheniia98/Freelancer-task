@@ -1,4 +1,4 @@
-<template> 
+<template>
   <v-row>
     <v-col
       cols="12"
@@ -309,8 +309,8 @@
           <!-- Create Event Button (hidden in the UI but functional) -->
           <v-btn
             color="teal"
-            class="white--text"
-            style="display: none"
+            class="black--text"
+            style="display: flex"
             @click="createEvent"
           >
             Create
@@ -701,7 +701,8 @@ export default {
 }
 
 .meeting {
-  margin-left: 70px;
+  margin-left: 170px;
+  
 }
 
 /* Event card styles */
