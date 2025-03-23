@@ -62,10 +62,7 @@
           />
               
           <!-- Date and Time -->
-          <v-card
-            outlined
-            class="mb-4 rounded-lg"
-          >
+          <v-card class="DateTime">
             <v-card-text class="pa-2">
               <div class="d-flex align-center">
                 <v-icon class="mr-2">
@@ -74,110 +71,111 @@
                 <span class="text-subtitle-2">Date and time</span>
               </div>
             </v-card-text>
-          </v-card>
+          
               
-          <!-- Date selection -->
-          <div class="d-flex align-center mb-3">
-            <div
-              class="mr-4 text-subtitle-2"
-              style="width: 50px"
-            >
-              On
-            </div>
-            <v-menu
-              ref="dateMenu"
-              v-model="dateMenu"
-              :close-on-content-click="false"
-              transition="scale-transition"
-              offset-y
-              max-width="290px"
-              min-width="290px"
-            >
-              <template #activator="{ on, attrs }">
-                <v-text-field
-                  v-model="formattedDate"
-                  dense
-                  outlined
-                  readonly
-                  hide-details
-                  v-bind="attrs"
-                  v-on="on"
+            <!-- Date selection -->
+            <div class="d-flex align-center mb-3">
+              <div
+                class="mr-4 text-subtitle-2"
+                style="width: 50px"
+              >
+                On
+              </div>
+              <v-menu
+                ref="dateMenu"
+                v-model="dateMenu"
+                :close-on-content-click="false"
+                transition="scale-transition"
+                offset-y
+                width="290px"
+                height="20px"
+              >
+                <template #activator="{ on, attrs }">
+                  <v-text-field
+                    v-model="formattedDate"
+                    dense
+                    outlined
+                    readonly
+                    hide-details
+                    v-bind="attrs"
+                    v-on="on"
+                  />
+                </template>
+                <v-date-picker
+                  v-model="newEvent.date"
+                  no-title
+                  @input="dateMenu = false"
                 />
-              </template>
-              <v-date-picker
-                v-model="newEvent.date"
-                no-title
-                @input="dateMenu = false"
-              />
-            </v-menu>
-          </div>
-              
-          <!-- Time selection -->
-          <div class="d-flex align-center mb-3">
-            <div
-              class="mr-4 text-subtitle-2"
-              style="width: 50px"
-            >
-              From
+              </v-menu>
             </div>
-            <v-menu
-              ref="timeFromMenu"
-              v-model="timeFromMenu"
-              :close-on-content-click="false"
-              transition="scale-transition"
-              offset-y
-            >
-              <template #activator="{ on, attrs }">
-                <v-text-field
+              
+            <!-- Time selection -->
+            <div class="d-flex align-center mb-3">
+              <div
+                class="mr-4 text-subtitle-2"
+                style="width: 50px"
+              >
+                From
+              </div>
+              <v-menu
+                ref="timeFromMenu"
+                v-model="timeFromMenu"
+                :close-on-content-click="false"
+                transition="scale-transition"
+                offset-y
+              >
+                <template #activator="{ on, attrs }">
+                  <v-text-field
+                    v-model="newEvent.timeFrom"
+                    dense
+                    outlined
+                    readonly
+                    hide-details
+                    v-bind="attrs"
+                    v-on="on"
+                  />
+                </template>
+                <v-time-picker
                   v-model="newEvent.timeFrom"
-                  dense
-                  outlined
-                  readonly
-                  hide-details
-                  v-bind="attrs"
-                  v-on="on"
+                  format="24hr"
+                  @input="timeFromMenu = false"
                 />
-              </template>
-              <v-time-picker
-                v-model="newEvent.timeFrom"
-                format="24hr"
-                @input="timeFromMenu = false"
-              />
-            </v-menu>
-          </div>
-              
-          <div class="d-flex align-center mb-4">
-            <div
-              class="mr-4 text-subtitle-2"
-              style="width: 50px"
-            >
-              To
+              </v-menu>
             </div>
-            <v-menu
-              ref="timeToMenu"
-              v-model="timeToMenu"
-              :close-on-content-click="false"
-              transition="scale-transition"
-              offset-y
-            >
-              <template #activator="{ on, attrs }">
-                <v-text-field
+              
+            <div class="d-flex align-center mb-4">
+              <div
+                class="mr-4 text-subtitle-2"
+                style="width: 50px"
+              >
+                To
+              </div>
+              <v-menu
+                ref="timeToMenu"
+                v-model="timeToMenu"
+                :close-on-content-click="false"
+                transition="scale-transition"
+                offset-y
+              >
+                <template #activator="{ on, attrs }">
+                  <v-text-field
+                    v-model="newEvent.timeTo"
+                    dense
+                    outlined
+                    readonly
+                    hide-details
+                    v-bind="attrs"
+                    v-on="on"
+                  />
+                </template>
+                <v-time-picker
                   v-model="newEvent.timeTo"
-                  dense
-                  outlined
-                  readonly
-                  hide-details
-                  v-bind="attrs"
-                  v-on="on"
+                  format="24hr"
+                  @input="timeToMenu = false"
                 />
-              </template>
-              <v-time-picker
-                v-model="newEvent.timeTo"
-                format="24hr"
-                @input="timeToMenu = false"
-              />
-            </v-menu>
-          </div>
+              </v-menu>
+            </div>
+          </v-card>
               
           <!-- People -->
           <v-card
@@ -189,7 +187,10 @@
                 <v-icon class="mr-2">
                   mdi-account-outline
                 </v-icon>
-                <span class="text-subtitle-2">Add people</span>
+                <span
+                  class="text-subtitle-2"
+                  placeholder="Add people"
+                />
               </div>
             </v-card-text>
           </v-card>
@@ -204,7 +205,10 @@
                 <v-icon class="mr-2">
                   mdi-link
                 </v-icon>
-                <span class="text-subtitle-2">Add meeting link</span>
+                <span
+                  class="text-subtitle-2"
+                  placeholder="Add meeting link"
+                />
               </div>
             </v-card-text>
           </v-card>
@@ -745,6 +749,10 @@ nav {
   font-size: 18px;
   font-weight: 700;
   color: #00897b;
+}
+
+.DateTime {
+  margin-bottom: 20px;
 }
 
 .event-type {

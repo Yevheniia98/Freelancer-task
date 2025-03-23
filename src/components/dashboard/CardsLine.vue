@@ -11,7 +11,9 @@
         <v-card class="custom-card">
           <v-card-title class="card-title">
             <div class="icon-circle">
-              <v-icon class="card-icon">{{ stat.icon }}</v-icon>
+              <v-icon class="card-icon">
+                {{ stat.icon }}
+              </v-icon>
             </div>
             {{ stat.title }}
           </v-card-title>

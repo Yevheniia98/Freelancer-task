@@ -12,7 +12,7 @@
     "@vue/compiler-sfc": "^3.5.13",
     "@vue/component-compiler-utils": "^3.3.0",
     "ajv": "^8.17.1",
-    "axios": "^1.8.3",
+    "axios": "^1.8.4",
     "braces": "^3.0.3",
     "core-js": "^3.8.3",
     "cross-spawn": "^7.0.6",

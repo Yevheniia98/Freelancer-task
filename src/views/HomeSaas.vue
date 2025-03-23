@@ -5,6 +5,8 @@
     <SearchBar />
     <CardsLine />
     <ReminderMeeting />
+    <ChatSection />
+    <TaxSection />
   </div>
 </template>
 
@@ -13,6 +15,8 @@ import LeftMenu from '../components/dashboard/LeftMenu.vue'; // Import HeaderSec
 import SearchBar from '../components/dashboard/SearchBar.vue'
 import CardsLine from '../components/dashboard/CardsLine.vue'
 import ReminderMeeting from '../components/dashboard/ReminderMeeting.vue';
+import ChatSection from '@/components/dashboard/ChatSection.vue';
+import TaxSection from '@/components/dashboard/TaxSection.vue';
 
 
 export default {
@@ -22,7 +26,8 @@ export default {
     SearchBar,
     CardsLine,
     ReminderMeeting,
-    
+    ChatSection,
+    TaxSection
   }
 }
 </script>
