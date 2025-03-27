@@ -7,6 +7,7 @@
     <ReminderMeeting />
     <ChatSection />
     <TaxSection />
+    <GranttChart />
   </div>
 </template>
 
@@ -17,6 +18,7 @@ import CardsLine from '../components/dashboard/CardsLine.vue'
 import ReminderMeeting from '../components/dashboard/ReminderMeeting.vue';
 import ChatSection from '@/components/dashboard/ChatSection.vue';
 import TaxSection from '@/components/dashboard/TaxSection.vue';
+import GranttChart from '@/components/dashboard/GranttChart.vue';
 
 
 export default {
@@ -27,7 +29,8 @@ export default {
     CardsLine,
     ReminderMeeting,
     ChatSection,
-    TaxSection
+    TaxSection,
+    GranttChart
   }
 }
 </script>

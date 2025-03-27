@@ -8,12 +8,15 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@syncfusion/ej2-gantt": "^29.1.33",
+    "@syncfusion/ej2-vue-gantt": "^29.1.33",
     "@vue/cli-service": "^5.0.8",
     "@vue/compiler-sfc": "^3.5.13",
     "@vue/component-compiler-utils": "^3.3.0",
     "ajv": "^8.17.1",
     "axios": "^1.8.4",
     "braces": "^3.0.3",
+    "chart.js": "^4.4.8",
     "core-js": "^3.8.3",
     "cross-spawn": "^7.0.6",
     "date-fns": "^4.1.0",

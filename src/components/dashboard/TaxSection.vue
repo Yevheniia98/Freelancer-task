@@ -1,160 +1,286 @@
 <template>
-    <div class="tax-calculator-container">
-      <div class="tax-calculator-card">
-        <h2 class="card-title">Tax calculator</h2>
+  <div class="tax-calculator-container">
+    <div class="tax-calculator-card">
+      <h2 class="card-title">
+        Tax calculator
+      </h2>
         
-        <div class="form-group">
-          <label>Which country do you live in?</label>
-          <div class="select-container">
-            <select v-model="country" class="form-select">
-              <option value="Germany">Germany</option>
-              <option value="France">France</option>
-              <option value="Spain">Spain</option>
-              <option value="Italy">Italy</option>
-            </select>
-            <span class="select-arrow">&#9662;</span>
-          </div>
+      <div class="form-group">
+        <label>Which country do you live in?</label>
+        <div class="select-container">
+          <select
+            v-model="country"
+            class="form-select"
+          >
+            <option value="Germany">
+              Germany
+            </option>
+            <option value="France">
+              France
+            </option>
+            <option value="Spain">
+              Spain
+            </option>
+            <option value="Italy">
+              Italy
+            </option>
+          </select>
+          <span class="select-arrow">&#9662;</span>
         </div>
+      </div>
         
-        <div class="form-group" v-if="country === 'Germany'">
-          <label>What state do you live in?</label>
-          <div class="select-container">
-            <select v-model="state" class="form-select">
-              <option value="Thuringia">Thuringia</option>
-              <option value="Schleswig-H.">Schleswig-H.</option>
-              <option value="Sachsen-Anh.">Sachsen-Anh.</option>
-              <option value="Sachsen">Sachsen</option>
-              <option value="Saarland">Saarland</option>
-              <option value="Rheinl.-Pfalz">Rheinl.-Pfalz</option>
-              <option value="Nord.-Westf.">Nord.-Westf.</option>
-              <option value="Niedersachsen">Niedersachsen</option>
-              <option value="Hessen">Hessen</option>
-              <option value="Hamburg">Hamburg</option>
-              <option value="Bremen">Bremen</option>
-              <option value="Brandenburg">Brandenburg</option>
-              <option value="Berlin">Berlin</option>
-              <option value="Bayern">Bayern</option>
-              <option value="Baden-Württ.">Baden-Württ.</option>
-
-            </select>
-            <span class="select-arrow">&#9662;</span>
-          </div>
+      <div
+        v-if="country === 'Germany'"
+        class="form-group"
+      >
+        <label>What state do you live in?</label>
+        <div class="select-container">
+          <select
+            v-model="state"
+            class="form-select"
+          >
+            <option value="Thuringia">
+              Thuringia
+            </option>
+            <option value="Schleswig-H.">
+              Schleswig-H.
+            </option>
+            <option value="Sachsen-Anh.">
+              Sachsen-Anh.
+            </option>
+            <option value="Sachsen">
+              Sachsen
+            </option>
+            <option value="Saarland">
+              Saarland
+            </option>
+            <option value="Rheinl.-Pfalz">
+              Rheinl.-Pfalz
+            </option>
+            <option value="Nord.-Westf.">
+              Nord.-Westf.
+            </option>
+            <option value="Niedersachsen">
+              Niedersachsen
+            </option>
+            <option value="Hessen">
+              Hessen
+            </option>
+            <option value="Hamburg">
+              Hamburg
+            </option>
+            <option value="Bremen">
+              Bremen
+            </option>
+            <option value="Brandenburg">
+              Brandenburg
+            </option>
+            <option value="Berlin">
+              Berlin
+            </option>
+            <option value="Bayern">
+              Bayern
+            </option>
+            <option value="Baden-Württ.">
+              Baden-Württ.
+            </option>
+          </select>
+          <span class="select-arrow">&#9662;</span>
         </div>
+      </div>
         
-        <div class="form-group">
-          <label>Tax Category:</label>
-          <div class="select-container">
-            <select v-model="taxCategory" class="form-select">
-              <option value="Category 1">Category 1</option>
-              <option value="Category 2">Category 2</option>
-              <option value="Category 3">Category 3</option>
-              <option value="Category 4">Category 4</option>
-              <option value="Category 5">Category 5</option>
-              <option value="Category 6">Category 6</option>
+      <div class="form-group">
+        <label>Tax Category:</label>
+        <div class="select-container">
+          <select
+            v-model="taxCategory"
+            class="form-select"
+          >
+            <option value="Category 1">
+              Category 1
+            </option>
+            <option value="Category 2">
+              Category 2
+            </option>
+            <option value="Category 3">
+              Category 3
+            </option>
+            <option value="Category 4">
+              Category 4
+            </option>
+            <option value="Category 5">
+              Category 5
+            </option>
+            <option value="Category 6">
+              Category 6
+            </option>
+          </select>
+          <span class="select-arrow">&#9662;</span>
+        </div>
+      </div>
+    </div>
+      
+    <div class="tax-breakdown-card">
+      <div class="salary-input">
+        <label>Salary:</label>
+        <div class="input-group">
+          <input
+            v-model="salary"
+            type="number"
+            class="form-input"
+          >
+          <span class="currency">$</span>
+          <div class="select-container period-select">
+            <select
+              v-model="salaryPeriod"
+              class="form-select"
+            >
+              <option value="month">
+                month
+              </option>
+              <option value="year">
+                year
+              </option>
             </select>
             <span class="select-arrow">&#9662;</span>
           </div>
         </div>
       </div>
+        
+      <!-- Tax Visualization - Pie Chart -->
+      <div class="tax-visualization">
+        <svg viewBox="0 0 100 100">
+          <circle
+            cx="50"
+            cy="50"
+            r="45"
+            fill="#f5f5f5"
+            stroke="#ddd"
+            stroke-width="1"
+          />
+          <path 
+            v-for="(slice, index) in pieSlices" 
+            :key="index" 
+            :d="slice.path" 
+            :fill="slice.color"
+          />
+        </svg>
+      </div>
+
+      <!-- Tax Breakdown Legend -->
+      <div class="tax-breakdown-legend">
+        <div
+          v-for="(tax, key) in filteredTaxBreakdown"
+          :key="key"
+          class="legend-item"
+        >
+          <span
+            class="legend-color"
+            :style="{ backgroundColor: colors[key], borderRadius: '50%', width: '10px', height: '10px', display: 'inline-block' }"
+          />
+          <span class="legend-label">{{ getTaxLabel(key) }} {{ tax.percentage.toFixed(2) }}%</span>
+          <span class="legend-dot" />
+        </div>
+      </div>
       
-      <div class="tax-breakdown-card">
-        <div class="salary-input">
-          <label>Salary:</label>
-          <div class="input-group">
-            <input type="number" v-model="salary" class="form-input" />
-            <span class="currency">$</span>
-            <div class="select-container period-select">
-              <select v-model="salaryPeriod" class="form-select">
-                <option value="month">month</option>
-                <option value="year">year</option>
-              </select>
-              <span class="select-arrow">&#9662;</span>
+        
+      <!-- Net Salary Display -->
+      <div class="net-salary-result">
+        <div class="net-label">
+          Net Salary:
+        </div>
+        <div class="net-amount">
+          {{ formatCurrency(taxBreakdown.netSalary.amount) }} €
+        </div>
+      </div>
+    </div>
+
+      
+    <div class="balance-card">
+      <h2 class="card-title">
+        My balance
+      </h2>
+      <div class="balance-amount">
+        <span class="currency-symbol">$</span>
+        <span class="amount">11,650</span>
+      </div>
+      <div class="balance-period">
+        Income in this month
+      </div>
+        
+      <div class="income-sources">
+        <div class="income-source">
+          <div
+            class="source-logo"
+            style="background-color: #3cb371;"
+          >
+            <span>Up</span>
+          </div>
+          <div class="source-details">
+            <div class="source-name">
+              UpWork
+            </div>
+            <div class="source-progress-container">
+              <div
+                class="source-progress"
+                style="width: 75%;"
+              />
             </div>
           </div>
+          <div class="source-amount">
+            4800$
+          </div>
         </div>
-        
-        <!-- Tax Visualization - Pie Chart -->
-    <div class="tax-visualization">
-      <svg viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r="45" fill="#f5f5f5" stroke="#ddd" stroke-width="1"></circle>
-        <path 
-          v-for="(slice, index) in pieSlices" 
-          :key="index" 
-          :d="slice.path" 
-          :fill="slice.color"
-        ></path>
-      </svg>
-    </div>
-
-    <!-- Tax Breakdown Legend -->
-    <div class="tax-breakdown-legend">
-      <div class="legend-item" v-for="(tax, key) in filteredTaxBreakdown" :key="key">
-        <span class="legend-color" :style="{ backgroundColor: colors[key], borderRadius: '50%', width: '10px', height: '10px', display: 'inline-block' }"></span>
-        <span class="legend-label">{{ getTaxLabel(key) }} {{ tax.percentage.toFixed(2) }}%</span>
-        <span class="legend-dot"></span>
+          
+        <div class="income-source">
+          <div
+            class="source-logo"
+            style="background-color: #0e76a8;"
+          >
+            <span>F</span>
+          </div>
+          <div class="source-details">
+            <div class="source-name">
+              Freelancer.com
+            </div>
+            <div class="source-progress-container">
+              <div
+                class="source-progress"
+                style="width: 25%;"
+              />
+            </div>
+          </div>
+          <div class="source-amount">
+            1250$
+          </div>
+        </div>
+          
+        <div class="income-source">
+          <div
+            class="source-logo"
+            style="background-color: #1dbf73;"
+          >
+            <span>F</span>
+          </div>
+          <div class="source-details">
+            <div class="source-name">
+              Fiverr
+            </div>
+            <div class="source-progress-container">
+              <div
+                class="source-progress"
+                style="width: 95%;"
+              />
+            </div>
+          </div>
+          <div class="source-amount">
+            5600$
+          </div>
+        </div>
       </div>
-    </div>
-      
-        
-        <!-- Net Salary Display -->
-    <div class="net-salary-result">
-      <div class="net-label">Net Salary:</div>
-      <div class="net-amount">{{ formatCurrency(taxBreakdown.netSalary.amount) }} €</div>
     </div>
   </div>
-
-      
-      <div class="balance-card">
-        <h2 class="card-title">My balance</h2>
-        <div class="balance-amount">
-          <span class= "currency-symbol" >$</span>
-          <span class="amount">11,650</span>
-        </div>
-        <div class="balance-period">Income in this month</div>
-        
-        <div class="income-sources">
-          <div class="income-source">
-            <div class="source-logo" style="background-color: #3cb371;">
-              <span>Up</span>
-            </div>
-            <div class="source-details">
-              <div class="source-name">UpWork</div>
-              <div class="source-progress-container">
-                <div class="source-progress" style="width: 75%;"></div>
-              </div>
-            </div>
-            <div class="source-amount">4800$</div>
-          </div>
-          
-          <div class="income-source">
-            <div class="source-logo" style="background-color: #0e76a8;">
-              <span>F</span>
-            </div>
-            <div class="source-details">
-              <div class="source-name">Freelancer.com</div>
-              <div class="source-progress-container">
-                <div class="source-progress" style="width: 25%;"></div>
-              </div>
-            </div>
-            <div class="source-amount">1250$</div>
-          </div>
-          
-          <div class="income-source">
-            <div class="source-logo" style="background-color: #1dbf73;">
-              <span>F</span>
-            </div>
-            <div class="source-details">
-              <div class="source-name">Fiverr</div>
-              <div class="source-progress-container">
-                <div class="source-progress" style="width: 95%;"></div>
-              </div>
-            </div>
-            <div class="source-amount">5600$</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </template>
+</template>
     
 
 
@@ -267,6 +393,26 @@
             }, {});
           }
         },
+  watch: {
+    country() {
+      this.calculateTaxes();
+    },
+    salary() {
+      this.calculateTaxes();
+    },
+    salaryPeriod() {
+      this.calculateTaxes();
+    },
+    taxBreakdown: {
+      deep: true,
+      handler() {
+        this.generatePieChart();
+      }
+    }
+  },
+  mounted() {
+    this.calculateTaxes();
+  },
 
   methods: {
     calculateIncomeTax(annualSalary, country) {
@@ -415,26 +561,6 @@
       };
       return labels[key] || key;
     }
-  },
-  watch: {
-    country() {
-      this.calculateTaxes();
-    },
-    salary() {
-      this.calculateTaxes();
-    },
-    salaryPeriod() {
-      this.calculateTaxes();
-    },
-    taxBreakdown: {
-      deep: true,
-      handler() {
-        this.generatePieChart();
-      }
-    }
-  },
-  mounted() {
-    this.calculateTaxes();
   }
 };
 </script>
@@ -603,7 +729,7 @@
       margin-top: 0px;
       padding-top: 0px;
       border-top: 1px solid #eee;
-      transform: translate(0px, 50px);
+      transform: translate(0px, -80px);
     }
     
     .net-label {
