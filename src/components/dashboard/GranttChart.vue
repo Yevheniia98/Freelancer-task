@@ -1,90 +1,86 @@
 <template>
-    <v-container fluid class="gantt-chart-container">
+    <v-container fluid class="pa-0">
       <v-card>
         <v-card-title class="d-flex align-center">
-          <h2>Project Management Gantt Chart</h2>
-          <v-spacer></v-spacer>
+          <h2>Project Management Dashboard</h2>
+          <v-spacer />
           
-          <!-- Toolbar -->
+          <!-- Toolbar from your original code -->
           <v-btn-toggle v-model="viewMode" mandatory>
             <v-btn value="day">Day</v-btn>
             <v-btn value="week">Week</v-btn>
             <v-btn value="month">Month</v-btn>
           </v-btn-toggle>
   
-          <v-btn 
-            color="primary" 
-            class="ml-3" 
-            @click="openTaskCreationDialog"
-          >
+          <v-btn color="primary" class="ml-3" @click="openTaskCreationDialog">
             <v-icon left>mdi-plus</v-icon>
             Create Task
           </v-btn>
         </v-card-title>
   
-        <!-- Gantt Chart Container -->
-        <div class="gantt-chart-wrapper">
-          <!-- Columns and Timeline Container -->
-          <div class="gantt-grid-container">
-            <!-- Left Side: Task Details -->
-            <div class="task-details-column">
-              <div class="task-details-header">
-                <div>Task Name</div>
-                <div>Assignee</div>
-                <div>Progress</div>
-              </div>
-              
-              <!-- Task Detail Rows -->
-              <div 
-                v-for="task in tasks" 
-                :key="task.id" 
-                class="task-detail-row"
-              >
-                <div class="task-name">
-                  <v-icon 
-                    :color="getTaskTypeColor(task.type)"
-                    class="mr-2"
-                  >
-                    {{ getTaskTypeIcon(task.type) }}
+        <!-- Resizable columns layout -->
+        <div class="resizable-container">
+          <!-- Left column (data table) -->
+          <div class="left-column" :style="{ width: leftColumnWidth + 'px' }">
+            <v-data-table
+              :headers="headers"
+              :items="tasks"
+              class="elevation-1"
+            >
+              <template #[`item.type`]="{ item }">
+                <div class="d-flex align-center">
+                  <v-icon :color="getTaskTypeColor(item.type)" class="mr-2">
+                    {{ getTaskTypeIcon(item.type) }}
                   </v-icon>
-                  {{ task.name }}
+                  {{ item.type }}
                 </div>
-                
-                <div class="task-assignee">
+              </template>
+              
+              <template #[`item.assignee`]="{ item }">
+                <div class="d-flex align-center">
                   <v-avatar size="32" class="mr-2">
-                    <img :src="task.assignee.avatar" :alt="task.assignee.name">
+                    <img :src="item.assignee.avatar" :alt="item.assignee.name">
                   </v-avatar>
-                  {{ task.assignee.name }}
+                  {{ item.assignee.name }}
                 </div>
-                
-                <div class="task-progress">
-                  <v-progress-linear
-                    :value="task.progress"
-                    height="20"
-                    color="primary"
-                  >
-                    <template v-slot:default="{ value }">
-                      {{ Math.round(value) }}%
-                    </template>
-                  </v-progress-linear>
-                </div>
+              </template>
+              
+              <template #[`item.progress`]="{ item }">
+                <v-progress-linear
+                  :value="item.progress"
+                  height="20"
+                  color="primary"
+                >
+                  <template #default="{ value }">
+                    {{ Math.round(value) }}%
+                  </template>
+                </v-progress-linear>
+              </template>
+            </v-data-table>
+          </div>
+          
+          <!-- Resizer handle -->
+          <div 
+            class="resizer" 
+            @mousedown="startResize"
+            @touchstart="startResize"
+          ></div>
+          
+          <!-- Right column (timeline) -->
+          <div class="right-column">
+            <!-- Timeline Header -->
+            <div class="timeline-header">
+              <div 
+                v-for="(date, index) in timelineDates" 
+                :key="index" 
+                class="timeline-date"
+              >
+                {{ formatDate(date) }}
               </div>
             </div>
   
-            <!-- Right Side: Timeline and Task Bars -->
-            <div class="timeline-container">
-              <!-- Timeline Header -->
-              <div class="timeline-header">
-                <div 
-                  v-for="(date, index) in timelineDates" 
-                  :key="index" 
-                  class="timeline-date"
-                >
-                  {{ formatDate(date) }}
-                </div>
-              </div>
-  
-              <!-- Task Timeline Rows -->
+            <!-- Task Timeline Rows -->
+            <div class="timeline-body">
               <div 
                 v-for="task in tasks" 
                 :key="task.id" 
@@ -95,9 +91,9 @@
                   :style="calculateTaskBarStyle(task)"
                   @click="openTaskEditDialog(task)"
                 >
-                  <v-tooltip bottom>
-                    <template v-slot:activator="{ on, attrs }">
-                      <span v-bind="attrs" v-on="on">
+                  <v-tooltip location="bottom">
+                    <template #activator="{ props }">
+                      <span v-bind="props">
                         {{ task.name }}
                       </span>
                     </template>
@@ -126,49 +122,56 @@
                 v-model="currentTask.name" 
                 label="Task Name" 
                 required
-              ></v-text-field>
-              
+              />
+                
               <v-select
                 v-model="currentTask.type"
                 :items="taskTypes"
                 label="Task Type"
-              ></v-select>
-              
+              />
+                
               <v-select
                 v-model="currentTask.assignee"
                 :items="teamMembers"
                 item-title="name"
                 item-value="id"
                 label="Assignee"
-              ></v-select>
-              
+              />
+                
               <v-slider
                 v-model="currentTask.progress"
                 label="Progress"
                 min="0"
                 max="100"
-              ></v-slider>
-              
+              />
+                
               <v-row>
                 <v-col cols="6">
                   <v-date-picker 
                     v-model="currentTask.startDate"
                     label="Start Date"
-                  ></v-date-picker>
+                  />
                 </v-col>
                 <v-col cols="6">
                   <v-date-picker 
                     v-model="currentTask.endDate"
                     label="End Date"
-                  ></v-date-picker>
+                  />
                 </v-col>
               </v-row>
             </v-form>
           </v-card-text>
           <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn @click="taskDialog = false">Cancel</v-btn>
-            <v-btn color="primary" @click="saveTask">Save</v-btn>
+            <v-spacer />
+            <v-btn @click="taskDialog = false">
+              Cancel
+            </v-btn>
+            <v-btn
+              color="primary"
+              @click="saveTask"
+            >
+              Save
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -176,7 +179,23 @@
   </template>
   
   <script setup>
-  import { ref, reactive, computed } from 'vue'
+  import { ref, reactive, computed, onUnmounted } from 'vue'
+  
+  // Initial column width
+  const MIN_COLUMN_WIDTH = 250
+  const MAX_COLUMN_WIDTH = 800
+  const leftColumnWidth = ref(350)
+  const isResizing = ref(false)
+  
+  // Data table headers
+  const headers = [
+    { title: 'Task Name', key: 'name' },
+    { title: 'Type', key: 'type' },
+    { title: 'Assignee', key: 'assignee' },
+    { title: 'Progress', key: 'progress' },
+    { title: 'Start Date', key: 'startDate' },
+    { title: 'End Date', key: 'endDate' },
+  ]
   
   // Task Types
   const taskTypes = [
@@ -260,6 +279,53 @@
     return dates
   })
   
+  // Resize functionality
+  function startResize(event) {
+    isResizing.value = true
+    
+    // Prevent text selection during resize
+    document.body.style.userSelect = 'none'
+    
+    // Store initial mouse/touch position
+    const clientX = event.touches ? event.touches[0].clientX : event.clientX
+    const initialX = clientX
+    const initialWidth = leftColumnWidth.value
+    
+    function onResize(e) {
+      if (isResizing.value) {
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX
+        const newWidth = initialWidth + (clientX - initialX)
+        
+        // Apply min/max constraints
+        leftColumnWidth.value = Math.max(MIN_COLUMN_WIDTH, Math.min(MAX_COLUMN_WIDTH, newWidth))
+      }
+    }
+    
+    function stopResize() {
+      isResizing.value = false
+      document.body.style.userSelect = ''
+      
+      document.removeEventListener('mousemove', onResize)
+      document.removeEventListener('touchmove', onResize)
+      document.removeEventListener('mouseup', stopResize)
+      document.removeEventListener('touchend', stopResize)
+    }
+    
+    document.addEventListener('mousemove', onResize)
+    document.addEventListener('touchmove', onResize)
+    document.addEventListener('mouseup', stopResize)
+    document.addEventListener('touchend', stopResize)
+  }
+  
+  // Clean up event listeners
+  onUnmounted(() => {
+    document.body.style.userSelect = ''
+    document.removeEventListener('mousemove', () => {})
+    document.removeEventListener('touchmove', () => {})
+    document.removeEventListener('mouseup', () => {})
+    document.removeEventListener('touchend', () => {})
+  })
+  
   // Utility Functions
   function getTaskTypeColor(type) {
     const colorMap = {
@@ -303,7 +369,7 @@
       left: `${left}%`,
       width: `${width}%`,
       backgroundColor: getTaskTypeColor(task.type),
-      opacity: task.progress / 100
+      opacity: 0.7 + (task.progress / 300) // Make higher progress tasks slightly more opaque
     }
   }
   
@@ -348,49 +414,56 @@
   </script>
   
   <style scoped>
-  .gantt-chart-container {
-    background-color: #f5f5f5;
-  }
-  
-  .gantt-chart-wrapper {
-    overflow-x: auto;
-  }
-  
-  .gantt-grid-container {
+  .resizable-container {
     display: flex;
-    min-width: 1200px;
-  }
-  
-  .task-details-column {
-    width: 300px;
-    background-color: #f0f0f0;
-    border-right: 1px solid #e0e0e0;
-  }
-  
-  .task-details-header {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    font-weight: bold;
-    padding: 10px;
-    background-color: #e0e0e0;
-  }
-  
-  .task-detail-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    align-items: center;
-    padding: 10px;
-    border-bottom: 1px solid #e0e0e0;
-  }
-  
-  .timeline-container {
-    flex-grow: 1;
+    overflow: hidden;
+    height: calc(100vh - 150px);
+    min-height: 500px;
     position: relative;
+  }
+  
+  .left-column {
+    overflow-y: auto;
+    background-color: #f5f5f5;
+    transition: width 0.05s ease;
+  }
+  
+  .right-column {
+    flex: 1;
+    overflow-x: auto;
+    background-color: #fafafa;
+    min-width: 400px;
+  }
+  
+  .resizer {
+    width: 8px;
+    background-color: #e0e0e0;
+    cursor: col-resize;
+    position: relative;
+    z-index: 2;
+  }
+  
+  .resizer:hover, .resizer:active {
+    background-color: #bbdefb;
+  }
+  
+  .resizer::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 30px;
+    width: 2px;
+    background-color: #90a4ae;
   }
   
   .timeline-header {
     display: flex;
     background-color: #e0e0e0;
+    position: sticky;
+    top: 0;
+    z-index: 1;
   }
   
   .timeline-date {
@@ -398,6 +471,11 @@
     padding: 10px;
     text-align: center;
     border-right: 1px solid #d0d0d0;
+    min-width: 100px;
+  }
+  
+  .timeline-body {
+    position: relative;
   }
   
   .task-timeline-row {
@@ -416,5 +494,15 @@
     align-items: center;
     padding: 0 10px;
     cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .task-bar:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    transform: translateY(-1px);
   }
   </style>
