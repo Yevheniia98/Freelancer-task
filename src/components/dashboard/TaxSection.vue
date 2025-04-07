@@ -564,10 +564,6 @@
   }
 };
 </script>
-
-   
-    
-  
   
     <style scoped>
     .tax-calculator-container {

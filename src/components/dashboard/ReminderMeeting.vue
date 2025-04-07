@@ -1073,13 +1073,14 @@ onMounted(() => {
 <style scoped>
 .reminder-container {
   display: flex;
-  width: 1000px;
+  width: 1200px;
   height: 700px;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   background-color: white;
+  margin-left: 20px;
 }
 
 /* Left Column - Meeting Cards */

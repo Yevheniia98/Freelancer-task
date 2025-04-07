@@ -1,541 +1,1310 @@
 <template>
-  <v-container
-    fluid
-    class="pa-0"
-  >
-    <v-card>
-      <v-card-title class="d-flex align-center">
-        <h2>Project Management Dashboard</h2>
-        <v-spacer />
-          
-        <!-- Toolbar from your original code -->
-        <v-btn-toggle
-          v-model="viewMode"
-          mandatory
-        >
-          <v-btn value="day">
-            Day
-          </v-btn>
-          <v-btn value="week">
-            Week
-          </v-btn>
-          <v-btn value="month">
-            Month
-          </v-btn>
-        </v-btn-toggle>
-  
-        <v-btn
-          color="primary"
-          class="ml-3"
-          @click="openTaskCreationDialog"
-        >
-          <v-icon left>
-            mdi-plus
-          </v-icon>
-          Create Task
-        </v-btn>
-      </v-card-title>
-  
-      <!-- Resizable columns layout -->
-      <div class="resizable-container">
-        <!-- Left column (data table) -->
-        <div
-          class="left-column"
-          :style="{ width: leftColumnWidth + 'px' }"
-        >
-          <v-data-table
-            :headers="headers"
-            :items="tasks"
-            class="elevation-1"
+  <div class="gantt-chart-container">
+    <!-- Header and control area -->
+    <div class="gantt-header">
+      <h2>Gantt Chart</h2>
+      
+      <div class="controls">
+        <!-- Timeline view controls -->
+        <div class="view-controls">
+          <button 
+            class="view-button" 
+            :class="{ active: viewMode === 'week' }"
+            @click="setViewMode('week')"
           >
-            <template #[`item.type`]="{ item }">
-              <div class="d-flex align-center">
-                <v-icon
-                  :color="getTaskTypeColor(item.type)"
-                  class="mr-2"
-                >
-                  {{ getTaskTypeIcon(item.type) }}
-                </v-icon>
-                {{ item.type }}
-              </div>
-            </template>
-              
-            <template #[`item.assignee`]="{ item }">
-              <div class="d-flex align-center">
-                <v-avatar
-                  size="32"
-                  class="mr-2"
-                >
-                  <img
-                    :src="item.assignee.avatar"
-                    :alt="item.assignee.name"
-                  >
-                </v-avatar>
-                {{ item.assignee.name }}
-              </div>
-            </template>
-              
-            <template #[`item.progress`]="{ item }">
-              <v-progress-linear
-                :value="item.progress"
-                height="20"
-                color="primary"
-              >
-                <template #default="{ value }">
-                  {{ Math.round(value) }}%
-                </template>
-              </v-progress-linear>
-            </template>
-          </v-data-table>
+            Week
+          </button>
+          <button 
+            class="view-button" 
+            :class="{ active: viewMode === 'month' }"
+            @click="setViewMode('month')"
+          >
+            Month
+          </button>
+          <button 
+            class="view-button" 
+            :class="{ active: viewMode === 'year' }"
+            @click="setViewMode('year')"
+          >
+            Year
+          </button>
         </div>
-          
-        <!-- Resizer handle -->
-        <div 
-          class="resizer" 
-          @mousedown="startResize"
-          @touchstart="startResize"
-        />
-          
-        <!-- Right column (timeline) -->
-        <div class="right-column">
-          <!-- Timeline Header -->
-          <div class="timeline-header">
-            <div 
-              v-for="(date, index) in timelineDates" 
-              :key="index" 
-              class="timeline-date"
-            >
-              {{ formatDate(date) }}
+        
+        <!-- Create task button -->
+        <button class="create-button" @click="openCreateDialog">
+          <v-icon small class="mr-1">mdi-plus</v-icon> Create Release
+        </button>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="toolbar-buttons">
+        <button class="toolbar-button"><v-icon>mdi-file-document-outline</v-icon></button>
+        <button class="toolbar-button"><v-icon>mdi-content-copy</v-icon></button>
+        <button class="toolbar-button"><v-icon>mdi-magnify-plus-outline</v-icon></button>
+        <button class="toolbar-button"><v-icon>mdi-magnify-minus-outline</v-icon></button>
+        <button class="toolbar-button"><v-icon>mdi-arrow-expand-all</v-icon></button>
+        <button class="toolbar-button"><v-icon>mdi-filter-outline</v-icon></button>
+        <button class="toolbar-button"><v-icon>mdi-eye-outline</v-icon></button>
+        <button class="toolbar-button"><v-icon>mdi-export</v-icon></button>
+      </div>
+    </div>
+
+    <!-- Main gantt container -->
+    <div class="gantt-table-container">
+      <!-- Left side table -->
+      <div 
+        class="left-column" 
+        :style="{ width: leftColumnWidth + 'px' }"
+      >
+        <table class="gantt-table">
+          <thead>
+            <tr class="header-row">
+              <th class="column-header">
+                Product Release
+                <div class="column-actions">
+                  
+                  <v-icon small @click="showColumnMenu('product', $event)">mdi-dots-vertical</v-icon>
+                </div>
+              </th>
+              <th class="column-header">
+                Assignee
+                <div class="column-actions">
+                  <v-icon small @click="showColumnMenu('assignee', $event)">mdi-dots-vertical</v-icon>
+                </div>
+              </th>
+              <th class="column-header">
+                Status
+                <div class="column-actions">
+                  <v-icon small @click="showColumnMenu('status', $event)">mdi-dots-vertical</v-icon>
+                </div>
+              </th>
+              <th class="column-header">
+                Priority
+                <div class="column-actions">
+                  <v-icon small @click="showColumnMenu('priority', $event)">mdi-dots-vertical</v-icon>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(task, index) in tasks" :key="index" class="task-row">
+              <td class="task-cell" @dblclick="openEditDialog(task)">
+                {{ task.name }}
+                <div class="row-actions">
+                  <button class="edit-btn" @click="openEditDialog(task)">
+                    <v-icon small>mdi-pencil</v-icon>
+                  </button>
+                  <button class="delete-btn" @click="deleteTask(task)">
+                    <v-icon small>mdi-delete</v-icon>
+                  </button>
+                </div>
+              </td>
+              <td class="task-cell">
+                <div class="assignee" v-if="task.assignee">
+                  <img :src="task.assignee.avatar" class="avatar" />
+                  {{ task.assignee.name }}
+                </div>
+              </td>
+              <td class="task-cell">
+                <div v-if="task.status" class="status-badge" :class="getStatusClass(task.status)">
+                  {{ task.status }}
+                </div>
+              </td>
+              <td class="task-cell">
+                <div v-if="task.priority" class="priority-badge" :class="getPriorityClass(task.priority)">
+                  {{ task.priority }}
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Resizer handle -->
+      <div 
+        class="resizer" 
+        @mousedown="startResize"
+        @touchstart="startResize"
+      ></div>
+
+      <!-- Right side timeline -->
+      <div class="right-column">
+        <div class="timeline-header">
+          <div class="month-headers">
+            <div v-for="month in visibleMonths" :key="month.id" class="month-column">
+              <div class="month-name">{{ month.name }} {{ month.year }}</div>
+              <div class="date-columns">
+                <div v-for="date in month.dates" :key="date" class="date-column">
+                  {{ date }}
+                </div>
+              </div>
             </div>
           </div>
-  
-          <!-- Task Timeline Rows -->
-          <div class="timeline-body">
+        </div>
+
+        <div class="timeline-body">
+          <div v-for="(task, index) in tasks" :key="index" class="timeline-row">
             <div 
-              v-for="task in tasks" 
-              :key="task.id" 
-              class="task-timeline-row"
+              v-for="bar in task.bars" 
+              :key="bar.id" 
+              class="task-bar" 
+              :class="bar.colorClass"
+              :style="getBarStyle(bar)"
+              @mousedown.left="startBarResize($event, bar, 'left')"
+              @mousedown.right="startBarResize($event, bar, 'right')"
+              @dblclick="openEditDialog(task)"
             >
-              <div 
-                class="task-bar" 
-                :style="calculateTaskBarStyle(task)"
-                @click="openTaskEditDialog(task)"
-              >
-                <v-tooltip location="bottom">
-                  <template #activator="{ props }">
-                    <span v-bind="props">
-                      {{ task.name }}
-                    </span>
-                  </template>
-                  <span>
-                    Start: {{ formatDate(task.startDate) }}<br>
-                    End: {{ formatDate(task.endDate) }}<br>
-                    Progress: {{ task.progress }}%
-                  </span>
-                </v-tooltip>
-              </div>
+              <div class="progress-indicator" :style="{ width: bar.progress + '%' }"></div>
+              <div class="bar-label">{{ bar.progress }}%</div>
+              <div class="resize-handle left"></div>
+              <div class="resize-handle right"></div>
             </div>
+            <div v-if="task.assignee" class="assignee-name">{{ task.assignee.name }}</div>
           </div>
         </div>
       </div>
-    </v-card>
-  
-    <!-- Task Creation/Edit Dialog -->
-    <v-dialog
-      v-model="taskDialog"
-      max-width="600px"
-    >
-      <v-card>
-        <v-card-title>
-          {{ isEditing ? 'Edit Task' : 'Create New Task' }}
-        </v-card-title>
-        <v-card-text>
-          <v-form ref="taskForm">
-            <v-text-field 
-              v-model="currentTask.name" 
-              label="Task Name" 
-              required
-            />
-                
-            <v-select
-              v-model="currentTask.type"
-              :items="taskTypes"
-              label="Task Type"
-            />
-                
-            <v-select
-              v-model="currentTask.assignee"
-              :items="teamMembers"
-              item-title="name"
-              item-value="id"
-              label="Assignee"
-            />
-                
-            <v-slider
-              v-model="currentTask.progress"
-              label="Progress"
-              min="0"
-              max="100"
-            />
-                
-            <v-row>
-              <v-col cols="6">
-                <v-date-picker 
-                  v-model="currentTask.startDate"
-                  label="Start Date"
-                />
-              </v-col>
-              <v-col cols="6">
-                <v-date-picker 
-                  v-model="currentTask.endDate"
-                  label="End Date"
-                />
-              </v-col>
-            </v-row>
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn @click="taskDialog = false">
-            Cancel
-          </v-btn>
-          <v-btn
-            color="primary"
-            @click="saveTask"
-          >
-            Save
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-container>
-</template>
-  
-  <script setup>
-  import { ref, reactive, computed, onUnmounted } from 'vue'
-  
-  // Initial column width
-  const MIN_COLUMN_WIDTH = 250
-  const MAX_COLUMN_WIDTH = 800
-  const leftColumnWidth = ref(350)
-  const isResizing = ref(false)
-  
-  // Data table headers
-  const headers = [
-    { title: 'Task Name', key: 'name' },
-    { title: 'Type', key: 'type' },
-    { title: 'Assignee', key: 'assignee' },
-    { title: 'Progress', key: 'progress' },
-    { title: 'Start Date', key: 'startDate' },
-    { title: 'End Date', key: 'endDate' },
-  ]
-  
-  // Task Types
-  const taskTypes = [
-    'Development', 
-    'Design', 
-    'Testing', 
-    'Deployment', 
-    'Meeting'
-  ]
-  
-  // Team Members
-  const teamMembers = [
-    { 
-      id: 1, 
-      name: 'John Doe', 
-      avatar: 'https://randomuser.me/api/portraits/men/1.jpg' 
-    },
-    { 
-      id: 2, 
-      name: 'Jane Smith', 
-      avatar: 'https://randomuser.me/api/portraits/women/1.jpg' 
-    }
-  ]
-  
-  // Initial Tasks
-  const tasks = ref([
-    {
-      id: 1,
-      name: 'Frontend Development',
-      type: 'Development',
-      assignee: teamMembers[0],
-      startDate: '2024-03-01',
-      endDate: '2024-04-15',
-      progress: 60,
-    },
-    {
-      id: 2,
-      name: 'Backend API',
-      type: 'Development',
-      assignee: teamMembers[1],
-      startDate: '2024-04-01',
-      endDate: '2024-05-20',
-      progress: 40,
-    }
-  ])
-  
-  // View and Dialog State
-  const viewMode = ref('week')
-  const taskDialog = ref(false)
-  const isEditing = ref(false)
-  
-  // Current Task for Dialog
-  const currentTask = reactive({
-    name: '',
-    type: '',
-    assignee: null,
-    startDate: null,
-    endDate: null,
-    progress: 0
-  })
-  
-  // Timeline Generation
-  const timelineDates = computed(() => {
-    const dates = []
-    const startDate = new Date('2024-03-01')
-    const endDate = new Date('2024-06-30')
+    </div>
+
+    <!-- Column menu popup -->
+    <div v-if="columnMenu.visible" class="column-menu" :style="columnMenu.position">
+      <div class="menu-item">
+        <v-icon small>mdi-arrow-expand-horizontal</v-icon> Auto Fit all columns
+      </div>
+      <div class="menu-item">
+        <v-icon small>mdi-arrow-expand</v-icon> Auto Fit this column
+      </div>
+      <div class="menu-item">
+        <v-icon small>mdi-sort-ascending</v-icon> Sort Ascending
+      </div>
+      <div class="menu-item disabled">
+        <v-icon small>mdi-sort-descending</v-icon> Sort Descending
+      </div>
+      <div class="menu-item">
+        <v-icon small>mdi-view-column</v-icon> Columns
+        <v-icon small class="ml-auto">mdi-chevron-right</v-icon>
+      </div>
+      <div class="menu-item">
+        <v-icon small>mdi-filter</v-icon> Filter
+        <v-icon small class="ml-auto">mdi-chevron-right</v-icon>
+      </div>
+    </div>
     
-    let currentDate = new Date(startDate)
-    while (currentDate <= endDate) {
-      dates.push(new Date(currentDate))
-      
-      if (viewMode.value === 'day') {
-        currentDate.setDate(currentDate.getDate() + 1)
-      } else if (viewMode.value === 'week') {
-        currentDate.setDate(currentDate.getDate() + 7)
-      } else {
-        currentDate.setMonth(currentDate.getMonth() + 1)
-      }
-    }
-    
-    return dates
-  })
-  
-  // Resize functionality
-  function startResize(event) {
-    isResizing.value = true
-    
-    // Prevent text selection during resize
-    document.body.style.userSelect = 'none'
-    
-    // Store initial mouse/touch position
-    const clientX = event.touches ? event.touches[0].clientX : event.clientX
-    const initialX = clientX
-    const initialWidth = leftColumnWidth.value
-    
-    function onResize(e) {
-      if (isResizing.value) {
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX
-        const newWidth = initialWidth + (clientX - initialX)
+    <!-- Task Create/Edit Dialog -->
+    <div v-if="taskDialog.visible" class="task-dialog">
+      <div class="dialog-content">
+        <div class="dialog-header">
+          <h3>{{ taskDialog.isEdit ? 'Edit Release' : 'Create New Release' }}</h3>
+          <button class="close-button" @click="closeTaskDialog">
+            <v-icon>mdi-close</v-icon>
+          </button>
+        </div>
         
-        // Apply min/max constraints
-        leftColumnWidth.value = Math.max(MIN_COLUMN_WIDTH, Math.min(MAX_COLUMN_WIDTH, newWidth))
-      }
-    }
-    
-    function stopResize() {
-      isResizing.value = false
-      document.body.style.userSelect = ''
-      
-      document.removeEventListener('mousemove', onResize)
-      document.removeEventListener('touchmove', onResize)
-      document.removeEventListener('mouseup', stopResize)
-      document.removeEventListener('touchend', stopResize)
-    }
-    
-    document.addEventListener('mousemove', onResize)
-    document.addEventListener('touchmove', onResize)
-    document.addEventListener('mouseup', stopResize)
-    document.addEventListener('touchend', stopResize)
-  }
-  
-  // Clean up event listeners
-  onUnmounted(() => {
-    document.body.style.userSelect = ''
-    document.removeEventListener('mousemove', () => {})
-    document.removeEventListener('touchmove', () => {})
-    document.removeEventListener('mouseup', () => {})
-    document.removeEventListener('touchend', () => {})
-  })
-  
-  // Utility Functions
-  function getTaskTypeColor(type) {
-    const colorMap = {
-      'Development': 'blue',
-      'Design': 'green',
-      'Testing': 'orange',
-      'Deployment': 'purple',
-      'Meeting': 'red'
-    }
-    return colorMap[type] || 'grey'
-  }
-  
-  function getTaskTypeIcon(type) {
-    const iconMap = {
-      'Development': 'mdi-code-tags',
-      'Design': 'mdi-palette',
-      'Testing': 'mdi-bug',
-      'Deployment': 'mdi-cloud-upload',
-      'Meeting': 'mdi-calendar-multiple'
-    }
-    return iconMap[type] || 'mdi-checkbox-blank-circle'
-  }
-  
-  function formatDate(date) {
-    return new Date(date).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric'
-    })
-  }
-  
-  function calculateTaskBarStyle(task) {
-    const startDate = new Date(task.startDate)
-    const endDate = new Date(task.endDate)
-    const totalProjectDuration = new Date('2024-06-30') - new Date('2024-03-01')
-    const taskDuration = endDate - startDate
-    
-    const left = (startDate - new Date('2024-03-01')) / totalProjectDuration * 100
-    const width = (taskDuration / totalProjectDuration) * 100
-    
+        <div class="dialog-form">
+          <div class="form-group">
+            <label>Release Name</label>
+            <input type="text" v-model="taskDialog.task.name" placeholder="Enter release name">
+          </div>
+          
+          <div class="form-group">
+            <label>Assignee</label>
+            <select v-model="taskDialog.task.assigneeId">
+              <option :value="null">-- No Assignee --</option>
+              <option v-for="member in teamMembers" :key="member.id" :value="member.id">
+                {{ member.name }}
+              </option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Status</label>
+            <select v-model="taskDialog.task.status">
+              <option value="">-- No Status --</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+              <option value="Blocked">Blocked</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Priority</label>
+            <select v-model="taskDialog.task.priority">
+              <option value="">-- No Priority --</option>
+              <option value="Normal">Normal</option>
+              <option value="Critical">Critical</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Progress (%)</label>
+            <input type="number" v-model="taskDialog.task.progress" min="0" max="100">
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group half">
+              <label>Start Date</label>
+              <input type="date" v-model="taskDialog.task.startDate">
+            </div>
+            
+            <div class="form-group half">
+              <label>End Date</label>
+              <input type="date" v-model="taskDialog.task.endDate">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Color</label>
+            <select v-model="taskDialog.task.colorClass">
+              <option value="bar-dark-gray">Dark Gray</option>
+              <option value="bar-purple">Purple</option>
+              <option value="bar-blue">Blue</option>
+              <option value="bar-green">Green</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="dialog-footer">
+          <button class="cancel-button" @click="closeTaskDialog">Cancel</button>
+          <button class="save-button" @click="saveTask">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'GranttChart',
+  data() {
     return {
-      left: `${left}%`,
-      width: `${width}%`,
-      backgroundColor: getTaskTypeColor(task.type),
-      opacity: 0.7 + (task.progress / 300) // Make higher progress tasks slightly more opaque
-    }
-  }
-  
-  // Dialog Methods
-  function openTaskCreationDialog() {
-    resetCurrentTask()
-    isEditing.value = false
-    taskDialog.value = true
-  }
-  
-  function openTaskEditDialog(task) {
-    Object.assign(currentTask, { ...task })
-    isEditing.value = true
-    taskDialog.value = true
-  }
-  
-  function resetCurrentTask() {
-    currentTask.name = ''
-    currentTask.type = ''
-    currentTask.assignee = null
-    currentTask.startDate = null
-    currentTask.endDate = null
-    currentTask.progress = 0
-  }
-  
-  function saveTask() {
-    if (isEditing.value) {
-      // Update existing task
-      const index = tasks.value.findIndex(t => t.id === currentTask.id)
-      if (index !== -1) {
-        tasks.value[index] = { ...currentTask }
+      viewMode: 'month',
+      isResizing: false,
+      resizingBar: null,
+      resizingEdge: null,
+      startX: 0,
+      startWidth: 0,
+      startLeft: 0,
+      leftColumnWidth: 300,
+      
+      columnMenu: {
+        visible: false,
+        position: { top: '0px', left: '0px' },
+        column: null
+      },
+      
+      taskDialog: {
+        visible: false,
+        isEdit: false,
+        task: {
+          id: null,
+          name: '',
+          assigneeId: null,
+          status: '',
+          priority: '',
+          progress: 0,
+          startDate: '',
+          endDate: '',
+          colorClass: 'bar-dark-gray'
+        },
+        originalTask: null
+      },
+      
+      teamMembers: [
+        { id: 1, name: 'Rose Fuller', avatar: '/api/placeholder/32/32' },
+        { id: 2, name: 'Martin Tamer', avatar: '/api/placeholder/32/32' },
+        { id: 3, name: 'John Doe', avatar: '/api/placeholder/32/32' },
+        { id: 4, name: 'Jane Smith', avatar: '/api/placeholder/32/32' }
+      ],
+      
+      months: [
+        {
+          id: 'jul2024',
+          name: 'Jul',
+          year: 2024,
+          dates: ['26', '30', '04', '08', '12', '16', '20', '24', '28']
+        },
+        {
+          id: 'aug2024',
+          name: 'Aug',
+          year: 2024,
+          dates: ['01', '05', '09', '13', '17', '21', '25', '29']
+        },
+        {
+          id: 'sep2024',
+          name: 'Sep',
+          year: 2024,
+          dates: ['02', '06', '10', '14', '18', '22', '26', '30']
+        },
+        {
+          id: 'oct2024',
+          name: 'Oct',
+          year: 2024,
+          dates: ['04', '08', '12', '16', '20', '24', '28']
+        }
+      ],
+      
+      tasks: [
+        {
+          id: 1,
+          name: 'Release Roll-out',
+          assigneeId: 1,
+          status: 'In Progress',
+          priority: 'Normal',
+          startDate: '2024-07-04',
+          endDate: '2024-08-25',
+          progress: 47,
+          colorClass: 'bar-dark-gray',
+          bars: [
+            {
+              id: 'bar1',
+              progress: 47,
+              colorClass: 'bar-dark-gray',
+              left: 100,
+              width: 600
+            }
+          ]
+        },
+        {
+          id: 2,
+          name: 'Q-2 Release',
+          assigneeId: null,
+          status: '',
+          priority: '',
+          startDate: '2024-07-12',
+          endDate: '2024-08-21',
+          progress: 30,
+          colorClass: 'bar-dark-gray',
+          bars: [
+            {
+              id: 'bar2',
+              progress: 30,
+              colorClass: 'bar-dark-gray',
+              left: 220,
+              width: 400
+            }
+          ]
+        },
+        {
+          id: 3,
+          name: 'Testing',
+          assigneeId: 1,
+          status: 'In Progress',
+          priority: 'Normal',
+          startDate: '2024-07-24',
+          endDate: '2024-08-17',
+          progress: 20,
+          colorClass: 'bar-purple',
+          bars: [
+            {
+              id: 'bar3',
+              progress: 20,
+              colorClass: 'bar-purple',
+              left: 340,
+              width: 300
+            }
+          ]
+        },
+        {
+          id: 4,
+          name: 'Phase-2',
+          assigneeId: 2,
+          status: 'In Progress',
+          priority: 'Critical',
+          startDate: '2024-07-28',
+          endDate: '2024-08-21',
+          progress: 40,
+          colorClass: 'bar-purple',
+          bars: [
+            {
+              id: 'bar4',
+              progress: 40,
+              colorClass: 'bar-purple',
+              left: 380,
+              width: 320
+            }
+          ]
+        },
+        {
+          id: 5,
+          name: 'Phase-1',
+          assigneeId: null,
+          status: '',
+          priority: '',
+          startDate: '2024-07-16',
+          endDate: '2024-08-01',
+          progress: 34,
+          colorClass: 'bar-dark-gray',
+          bars: [
+            {
+              id: 'bar5',
+              progress: 34,
+              colorClass: 'bar-dark-gray',
+              left: 260,
+              width: 180
+            }
+          ]
+        },
+        {
+          id: 6,
+          name: 'Grid',
+          assigneeId: 2,
+          status: 'In Progress',
+          priority: 'Normal',
+          startDate: '2024-07-24',
+          endDate: '2024-08-05',
+          progress: 50,
+          colorClass: 'bar-purple',
+          bars: [
+            {
+              id: 'bar6',
+              progress: 50,
+              colorClass: 'bar-purple',
+              left: 340,
+              width: 140
+            }
+          ]
+        }
+      ],
+      
+      nextTaskId: 7
+    };
+  },
+  computed: {
+    visibleMonths() {
+      // In a real implementation, this would filter months based on viewMode
+      switch(this.viewMode) {
+        case 'week':
+          // For demo we'll just return the first month with fewer dates
+          return [
+            {
+              ...this.months[0],
+              dates: this.months[0].dates.slice(0, 4)
+            }
+          ];
+        case 'year':
+          // For demo we'll return all months
+          return this.months;
+        case 'month':
+        default:
+          // Default view shows the first two months
+          return this.months.slice(0, 2);
       }
-    } else {
-      // Create new task
-      tasks.value.push({
-        id: tasks.value.length + 1,
-        ...currentTask
-      })
     }
-    taskDialog.value = false
+  },
+  mounted() {
+    // Add event listeners for resizing
+    document.addEventListener('mousemove', this.onMouseMove);
+    document.addEventListener('mouseup', this.stopResize);
+    document.addEventListener('click', this.closeColumnMenu);
+    
+    // Process tasks to add assignee objects
+    this.processTasks();
+  },
+  beforeUnmount() {
+    // Clean up event listeners
+    document.removeEventListener('mousemove', this.onMouseMove);
+    document.removeEventListener('mouseup', this.stopResize);
+    document.removeEventListener('click', this.closeColumnMenu);
+  },
+  methods: {
+    processTasks() {
+      // Add assignee objects to tasks based on assigneeId
+      this.tasks.forEach(task => {
+        if (task.assigneeId) {
+          task.assignee = this.teamMembers.find(member => member.id === task.assigneeId);
+        } else {
+          task.assignee = null;
+        }
+      });
+    },
+    
+    // View mode methods
+    setViewMode(mode) {
+      this.viewMode = mode;
+    },
+    
+    // Column resizer methods
+    startResize(event) {
+      this.isResizing = true;
+      this.resizingBar = null;
+      
+      // Get initial positions
+      const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+      this.startX = clientX;
+      this.startWidth = this.leftColumnWidth;
+      
+      // Prevent default behaviors
+      event.preventDefault();
+      document.body.style.userSelect = 'none';
+    },
+    
+    // Bar resizing methods
+    startBarResize(event, bar, edge) {
+      event.stopPropagation();
+      this.isResizing = true;
+      this.resizingBar = bar;
+      this.resizingEdge = edge;
+      
+      // Get initial positions
+      const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+      this.startX = clientX;
+      this.startWidth = bar.width;
+      this.startLeft = bar.left;
+      
+      // Prevent default behaviors
+      event.preventDefault();
+      document.body.style.userSelect = 'none';
+    },
+    
+    onMouseMove(event) {
+      if (!this.isResizing) return;
+      
+      const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+      const deltaX = clientX - this.startX;
+      
+      if (this.resizingBar) {
+        // Resizing a task bar
+        if (this.resizingEdge === 'right') {
+          // Resize the right edge (width)
+          const newWidth = Math.max(30, this.startWidth + deltaX);
+          this.resizingBar.width = newWidth;
+        } else if (this.resizingEdge === 'left') {
+          // Resize the left edge (position and width)
+          const maxLeftDelta = this.startWidth - 30;
+          const limitedDelta = Math.min(maxLeftDelta, Math.max(-this.startLeft, deltaX));
+          
+          this.resizingBar.left = this.startLeft + limitedDelta;
+          this.resizingBar.width = this.startWidth - limitedDelta;
+        }
+      } else {
+        // Resizing the column width
+        const MIN_WIDTH = 200;
+        const MAX_WIDTH = 600;
+        this.leftColumnWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, this.startWidth + deltaX));
+      }
+    },
+    
+    stopResize() {
+      this.isResizing = false;
+      this.resizingBar = null;
+      this.resizingEdge = null;
+      document.body.style.userSelect = '';
+    },
+    
+    // UI helpers
+    getBarStyle(bar) {
+      return {
+        left: bar.left + 'px',
+        width: bar.width + 'px'
+      };
+    },
+    
+    getStatusClass(status) {
+      const map = {
+        'In Progress': 'status-progress',
+        'Completed': 'status-complete',
+        'Blocked': 'status-blocked'
+      };
+      return map[status] || '';
+    },
+    
+    getPriorityClass(priority) {
+      const map = {
+        'Normal': 'priority-normal',
+        'Critical': 'priority-critical',
+        'Low': 'priority-low'
+      };
+      return map[priority] || '';
+    },
+    
+    // Column menu functions
+    showColumnMenu(column, event) {
+      if (event) {
+        const rect = event.target.getBoundingClientRect();
+        
+        this.columnMenu.visible = true;
+        this.columnMenu.column = column;
+        this.columnMenu.position = {
+          top: (rect.bottom + 5) + 'px',
+          left: rect.left + 'px'
+        };
+        
+        event.stopPropagation();
+      }
+    },
+    
+    closeColumnMenu() {
+      this.columnMenu.visible = false;
+    },
+    
+    // Task CRUD operations
+    openCreateDialog() {
+      // Reset task dialog data
+      this.taskDialog.task = {
+        id: null,
+        name: 'New Release',
+        assigneeId: null,
+        status: 'In Progress',
+        priority: 'Normal',
+        progress: 0,
+        startDate: this.formatDateForInput(new Date()),
+        endDate: this.formatDateForInput(new Date(Date.now() + 14*24*60*60*1000)), // +14 days
+        colorClass: 'bar-dark-gray'
+      };
+      
+      this.taskDialog.isEdit = false;
+      this.taskDialog.visible = true;
+    },
+    
+    openEditDialog(task) {
+      // Clone the task to avoid direct mutation
+      this.taskDialog.task = {
+        id: task.id,
+        name: task.name,
+        assigneeId: task.assigneeId,
+        status: task.status,
+        priority: task.priority,
+        progress: task.progress,
+        startDate: task.startDate,
+        endDate: task.endDate,
+        colorClass: task.colorClass
+      };
+      
+      this.taskDialog.isEdit = true;
+      this.taskDialog.originalTask = task;
+      this.taskDialog.visible = true;
+    },
+    
+    closeTaskDialog() {
+      this.taskDialog.visible = false;
+    },
+    
+    saveTask() {
+      const taskData = this.taskDialog.task;
+      
+      if (this.taskDialog.isEdit) {
+        // Update existing task
+        const task = this.taskDialog.originalTask;
+        task.name = taskData.name;
+        task.assigneeId = taskData.assigneeId;
+        task.assignee = taskData.assigneeId ? 
+          this.teamMembers.find(m => m.id === taskData.assigneeId) : null;
+        task.status = taskData.status;
+        task.priority = taskData.priority;
+        task.progress = taskData.progress;
+        task.startDate = taskData.startDate;
+        task.endDate = taskData.endDate;
+        task.colorClass = taskData.colorClass;
+        
+        // Update the bar data
+        if (task.bars && task.bars.length > 0) {
+          task.bars[0].progress = taskData.progress;
+          task.bars[0].colorClass = taskData.colorClass;
+        }
+      } else {
+        // Create new task
+        const newTask = {
+          id: this.nextTaskId++,
+          name: taskData.name,
+          assigneeId: taskData.assigneeId,
+          assignee: taskData.assigneeId ? 
+            this.teamMembers.find(m => m.id === taskData.assigneeId) : null,
+          status: taskData.status,
+          priority: taskData.priority,
+          progress: taskData.progress,
+          startDate: taskData.startDate,
+          endDate: taskData.endDate,
+          colorClass: taskData.colorClass,
+          bars: [
+            {
+              id: 'bar' + this.nextTaskId,
+              progress: taskData.progress,
+              colorClass: taskData.colorClass,
+              left: 200, // Default position - would calculate based on dates in real app
+              width: 300  // Default width - would calculate based on date range in real app
+            }
+          ]
+        };
+        
+        this.tasks.push(newTask);
+      }
+      
+      this.closeTaskDialog();
+    },
+    
+    deleteTask(task) {
+      if (confirm('Are you sure you want to delete this release?')) {
+        const index = this.tasks.findIndex(t => t.id === task.id);
+        if (index !== -1) {
+          this.tasks.splice(index, 1);
+        }
+      }
+    },
+    
+    // Helper function to format date for input[type=date]
+    formatDateForInput(date) {
+      const d = new Date(date);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
   }
-  </script>
-  
-  <style scoped>
-  .resizable-container {
-    display: flex;
-    overflow: hidden;
-    height: calc(100vh - 150px);
-    min-height: 500px;
-    position: relative;
-  }
-  
-  .left-column {
-    overflow-y: auto;
-    background-color: #f5f5f5;
-    transition: width 0.05s ease;
-  }
-  
-  .right-column {
-    flex: 1;
-    overflow-x: auto;
-    background-color: #fafafa;
-    min-width: 400px;
-  }
-  
-  .resizer {
-    width: 8px;
-    background-color: #e0e0e0;
-    cursor: col-resize;
-    position: relative;
-    z-index: 2;
-  }
-  
-  .resizer:hover, .resizer:active {
-    background-color: #bbdefb;
-  }
-  
-  .resizer::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    height: 30px;
-    width: 2px;
-    background-color: #90a4ae;
-  }
-  
-  .timeline-header {
-    display: flex;
-    background-color: #e0e0e0;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-  }
-  
-  .timeline-date {
-    flex: 1;
-    padding: 10px;
-    text-align: center;
-    border-right: 1px solid #d0d0d0;
-    min-width: 100px;
-  }
-  
-  .timeline-body {
-    position: relative;
-  }
-  
-  .task-timeline-row {
-    height: 50px;
-    position: relative;
-    border-bottom: 1px solid #e0e0e0;
-  }
-  
-  .task-bar {
-    position: absolute;
-    height: 30px;
-    margin-top: 10px;
-    border-radius: 4px;
-    color: white;
-    display: flex;
-    align-items: center;
-    padding: 0 10px;
-    cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    font-size: 0.85rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  
-  .task-bar:hover {
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    transform: translateY(-1px);
-  }
-  </style>
+};
+</script>
+
+<style scoped>
+.gantt-chart-container {
+  position: relative;
+  max-width: 1350px;
+  max-height: 600px;
+  margin-left: 30px;
+  margin-bottom: 100px;
+  padding: 0;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Poppins, Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header area with controls */
+.gantt-header {
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e0e0e0;
+  flex-shrink: 0;
+}
+
+.gantt-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.view-controls {
+  display: flex;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.view-button {
+  padding: 8px 16px;
+  background: #f5f5f5;
+  border: none;
+  border-right: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.view-button:last-child {
+  border-right: none;
+}
+
+.view-button.active {
+  background: #0C9C8D;
+  color: whitesmoke;
+  font-weight: 500;
+}
+
+.create-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+}
+
+.create-button {
+  background: #CEEBE8;
+  border-color: #bfeae6;
+  color: #0C9C8D;
+}
+
+.create-button:hover {
+  background: #e6f2ff;
+}
+
+/* Toolbar */
+.toolbar {
+  padding: 6px 8px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+  flex-shrink: 0;
+}
+
+.toolbar-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.toolbar-button {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: darkgrey;
+}
+
+.toolbar-button:hover {
+  background-color: #85CDC6;
+  color: white;
+}
+
+/* Gantt table container */
+.gantt-table-container {
+  display: flex;
+  height: calc(100% - 100px); /* Subtract header and toolbar heights */
+  min-height: 200px;
+  max-height: 380px; /* Ensure it fits within the 500px container with headers */
+  overflow: hidden;
+}
+
+/* Left column styles */
+.left-column {
+  background-color: #fff;
+  border-right: 1px solid #e0e0e0;
+  transition: width 0.05s ease;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 100%;
+}
+
+.gantt-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.column-header {
+  position: relative;
+  padding: 12px 20px;
+  background-color: #f9f9f9;
+  font-weight: 500;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+  cursor: pointer;
+}
+
+.column-actions {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 8px;
+}
+
+.column-actions i {
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.column-actions i:hover {
+  opacity: 1;
+}
+
+.task-row {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.task-row:hover {
+  background-color: #f9f9f9;
+}
+
+.task-cell {
+  padding: 10px 16px;
+  vertical-align: middle;
+  position: relative;
+  text-align: left;
+}
+
+.row-actions {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: none;
+  gap: 4px;
+}
+
+.task-row:hover .row-actions {
+  display: flex;
+}
+
+.edit-btn{
+  margin-left: 50px;
+}
+
+.edit-btn, .delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px;
+  border-radius: 3px;
+}
+
+.edit-btn:hover, .delete-btn:hover {
+  background-color: #85CDC6;
+  color: whitesmoke;
+}
+ 
+.assignee {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.status-badge, .priority-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 12px;
+}
+
+.status-progress {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.status-complete {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-blocked {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.priority-normal {
+  background-color: #f3e5f5;
+  color: #9c27b0;
+}
+
+.priority-critical {
+  background-color: #ffebee;
+  color: #d32f2f;
+}
+
+.priority-low {
+  background-color: #e0f2f1;
+  color: #00796b;
+}
+
+/* Resizer */
+.resizer {
+  width: 6px;
+  background-color: #f0f0f0;
+  cursor: col-resize;
+  transition: background-color 0.2s;
+}
+
+.resizer:hover, .resizer:active {
+  background-color: #2196f3;
+}
+
+/* Right column styles */
+.right-column {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+  background-color: #fff;
+  max-height: 100%;
+}
+
+.timeline-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #e0e0e0;
+  width: fit-content;
+  min-width: 100%;
+}
+
+.month-headers {
+  display: flex;
+}
+
+.month-column {
+  flex: 1;
+}
+
+.month-name {
+  padding: 8px;
+  text-align: center;
+  font-weight: 500;
+  border-right: 1px solid #e0e0e0;
+}
+
+.date-columns {
+  display: flex;
+}
+
+.date-column {
+  flex: 1;
+  min-width: 40px;
+  padding: 8px 0;
+  text-align: center;
+  border-right: 1px solid #e0e0e0;
+  font-size: 12px;
+  color: #666;
+}
+
+.timeline-body {
+  position: relative;
+  width: fit-content;
+  min-width: 100%;
+}
+
+.timeline-row {
+  position: relative;
+  height: 50px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.task-bar {
+  position: absolute;
+  height: 30px;
+  top: 10px;
+  border-radius: 4px;
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.bar-dark-gray {
+  background-color: #424242;
+}
+
+.bar-purple {
+  background-color: #673ab7;
+}
+
+.bar-blue {
+  background-color: #1976d2;
+}
+
+.bar-green {
+  background-color: #388e3c;
+}
+
+.progress-indicator {
+  position: absolute;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background-color: rgba(255, 255, 255, 0.15);
+  z-index: 1;
+}
+
+.bar-label {
+  position: relative;
+  z-index: 2;
+  color: white;
+  font-weight: bold;
+}
+
+.resize-handle {
+  position: absolute;
+  width: 8px;
+  height: 100%;
+  top: 0;
+  cursor: ew-resize;
+  z-index: 3;
+}
+
+.resize-handle.left {
+  left: 0;
+}
+
+.resize-handle.right {
+  right: 0;
+}
+
+.assignee-name {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: #666;
+}
+
+/* Column menu popup */
+.column-menu {
+  position: fixed;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  min-width: 180px;
+}
+
+.menu-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.menu-item:hover {
+  background-color: #f5f5f5;
+}
+
+.menu-item.disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.menu-item i {
+  font-size: 14px;
+  width: 18px;
+  text-align: center;
+}
+
+.icon-chevron-right {
+  margin-left: auto;
+}
+
+/* Task Dialog */
+.task-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dialog-content {
+  background-color: white;
+  border-radius: 8px;
+  width: 500px;
+  max-width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.dialog-header h3 {
+  margin: 0;
+  font-weight: 500;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+}
+
+.dialog-form {
+  padding: 16px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.form-group.half {
+  flex: 1;
+}
+
+.dialog-footer {
+  padding: 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.cancel-button, .save-button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.cancel-button {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  color: #666;
+}
+
+.save-button {
+  background-color: #1976d2;
+  border: 1px solid #0d47a1;
+  color: white;
+}
+</style>
