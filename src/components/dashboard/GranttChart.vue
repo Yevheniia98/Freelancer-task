@@ -1,182 +1,215 @@
 <template>
-    <v-container fluid class="pa-0">
-      <v-card>
-        <v-card-title class="d-flex align-center">
-          <h2>Project Management Dashboard</h2>
-          <v-spacer />
+  <v-container
+    fluid
+    class="pa-0"
+  >
+    <v-card>
+      <v-card-title class="d-flex align-center">
+        <h2>Project Management Dashboard</h2>
+        <v-spacer />
           
-          <!-- Toolbar from your original code -->
-          <v-btn-toggle v-model="viewMode" mandatory>
-            <v-btn value="day">Day</v-btn>
-            <v-btn value="week">Week</v-btn>
-            <v-btn value="month">Month</v-btn>
-          </v-btn-toggle>
-  
-          <v-btn color="primary" class="ml-3" @click="openTaskCreationDialog">
-            <v-icon left>mdi-plus</v-icon>
-            Create Task
+        <!-- Toolbar from your original code -->
+        <v-btn-toggle
+          v-model="viewMode"
+          mandatory
+        >
+          <v-btn value="day">
+            Day
           </v-btn>
-        </v-card-title>
+          <v-btn value="week">
+            Week
+          </v-btn>
+          <v-btn value="month">
+            Month
+          </v-btn>
+        </v-btn-toggle>
   
-        <!-- Resizable columns layout -->
-        <div class="resizable-container">
-          <!-- Left column (data table) -->
-          <div class="left-column" :style="{ width: leftColumnWidth + 'px' }">
-            <v-data-table
-              :headers="headers"
-              :items="tasks"
-              class="elevation-1"
-            >
-              <template #[`item.type`]="{ item }">
-                <div class="d-flex align-center">
-                  <v-icon :color="getTaskTypeColor(item.type)" class="mr-2">
-                    {{ getTaskTypeIcon(item.type) }}
-                  </v-icon>
-                  {{ item.type }}
-                </div>
-              </template>
-              
-              <template #[`item.assignee`]="{ item }">
-                <div class="d-flex align-center">
-                  <v-avatar size="32" class="mr-2">
-                    <img :src="item.assignee.avatar" :alt="item.assignee.name">
-                  </v-avatar>
-                  {{ item.assignee.name }}
-                </div>
-              </template>
-              
-              <template #[`item.progress`]="{ item }">
-                <v-progress-linear
-                  :value="item.progress"
-                  height="20"
-                  color="primary"
+        <v-btn
+          color="primary"
+          class="ml-3"
+          @click="openTaskCreationDialog"
+        >
+          <v-icon left>
+            mdi-plus
+          </v-icon>
+          Create Task
+        </v-btn>
+      </v-card-title>
+  
+      <!-- Resizable columns layout -->
+      <div class="resizable-container">
+        <!-- Left column (data table) -->
+        <div
+          class="left-column"
+          :style="{ width: leftColumnWidth + 'px' }"
+        >
+          <v-data-table
+            :headers="headers"
+            :items="tasks"
+            class="elevation-1"
+          >
+            <template #[`item.type`]="{ item }">
+              <div class="d-flex align-center">
+                <v-icon
+                  :color="getTaskTypeColor(item.type)"
+                  class="mr-2"
                 >
-                  <template #default="{ value }">
-                    {{ Math.round(value) }}%
-                  </template>
-                </v-progress-linear>
-              </template>
-            </v-data-table>
-          </div>
-          
-          <!-- Resizer handle -->
-          <div 
-            class="resizer" 
-            @mousedown="startResize"
-            @touchstart="startResize"
-          ></div>
-          
-          <!-- Right column (timeline) -->
-          <div class="right-column">
-            <!-- Timeline Header -->
-            <div class="timeline-header">
-              <div 
-                v-for="(date, index) in timelineDates" 
-                :key="index" 
-                class="timeline-date"
-              >
-                {{ formatDate(date) }}
+                  {{ getTaskTypeIcon(item.type) }}
+                </v-icon>
+                {{ item.type }}
               </div>
-            </div>
-  
-            <!-- Task Timeline Rows -->
-            <div class="timeline-body">
-              <div 
-                v-for="task in tasks" 
-                :key="task.id" 
-                class="task-timeline-row"
-              >
-                <div 
-                  class="task-bar" 
-                  :style="calculateTaskBarStyle(task)"
-                  @click="openTaskEditDialog(task)"
+            </template>
+              
+            <template #[`item.assignee`]="{ item }">
+              <div class="d-flex align-center">
+                <v-avatar
+                  size="32"
+                  class="mr-2"
                 >
-                  <v-tooltip location="bottom">
-                    <template #activator="{ props }">
-                      <span v-bind="props">
-                        {{ task.name }}
-                      </span>
-                    </template>
-                    <span>
-                      Start: {{ formatDate(task.startDate) }}<br>
-                      End: {{ formatDate(task.endDate) }}<br>
-                      Progress: {{ task.progress }}%
+                  <img
+                    :src="item.assignee.avatar"
+                    :alt="item.assignee.name"
+                  >
+                </v-avatar>
+                {{ item.assignee.name }}
+              </div>
+            </template>
+              
+            <template #[`item.progress`]="{ item }">
+              <v-progress-linear
+                :value="item.progress"
+                height="20"
+                color="primary"
+              >
+                <template #default="{ value }">
+                  {{ Math.round(value) }}%
+                </template>
+              </v-progress-linear>
+            </template>
+          </v-data-table>
+        </div>
+          
+        <!-- Resizer handle -->
+        <div 
+          class="resizer" 
+          @mousedown="startResize"
+          @touchstart="startResize"
+        />
+          
+        <!-- Right column (timeline) -->
+        <div class="right-column">
+          <!-- Timeline Header -->
+          <div class="timeline-header">
+            <div 
+              v-for="(date, index) in timelineDates" 
+              :key="index" 
+              class="timeline-date"
+            >
+              {{ formatDate(date) }}
+            </div>
+          </div>
+  
+          <!-- Task Timeline Rows -->
+          <div class="timeline-body">
+            <div 
+              v-for="task in tasks" 
+              :key="task.id" 
+              class="task-timeline-row"
+            >
+              <div 
+                class="task-bar" 
+                :style="calculateTaskBarStyle(task)"
+                @click="openTaskEditDialog(task)"
+              >
+                <v-tooltip location="bottom">
+                  <template #activator="{ props }">
+                    <span v-bind="props">
+                      {{ task.name }}
                     </span>
-                  </v-tooltip>
-                </div>
+                  </template>
+                  <span>
+                    Start: {{ formatDate(task.startDate) }}<br>
+                    End: {{ formatDate(task.endDate) }}<br>
+                    Progress: {{ task.progress }}%
+                  </span>
+                </v-tooltip>
               </div>
             </div>
           </div>
         </div>
-      </v-card>
+      </div>
+    </v-card>
   
-      <!-- Task Creation/Edit Dialog -->
-      <v-dialog v-model="taskDialog" max-width="600px">
-        <v-card>
-          <v-card-title>
-            {{ isEditing ? 'Edit Task' : 'Create New Task' }}
-          </v-card-title>
-          <v-card-text>
-            <v-form ref="taskForm">
-              <v-text-field 
-                v-model="currentTask.name" 
-                label="Task Name" 
-                required
-              />
+    <!-- Task Creation/Edit Dialog -->
+    <v-dialog
+      v-model="taskDialog"
+      max-width="600px"
+    >
+      <v-card>
+        <v-card-title>
+          {{ isEditing ? 'Edit Task' : 'Create New Task' }}
+        </v-card-title>
+        <v-card-text>
+          <v-form ref="taskForm">
+            <v-text-field 
+              v-model="currentTask.name" 
+              label="Task Name" 
+              required
+            />
                 
-              <v-select
-                v-model="currentTask.type"
-                :items="taskTypes"
-                label="Task Type"
-              />
+            <v-select
+              v-model="currentTask.type"
+              :items="taskTypes"
+              label="Task Type"
+            />
                 
-              <v-select
-                v-model="currentTask.assignee"
-                :items="teamMembers"
-                item-title="name"
-                item-value="id"
-                label="Assignee"
-              />
+            <v-select
+              v-model="currentTask.assignee"
+              :items="teamMembers"
+              item-title="name"
+              item-value="id"
+              label="Assignee"
+            />
                 
-              <v-slider
-                v-model="currentTask.progress"
-                label="Progress"
-                min="0"
-                max="100"
-              />
+            <v-slider
+              v-model="currentTask.progress"
+              label="Progress"
+              min="0"
+              max="100"
+            />
                 
-              <v-row>
-                <v-col cols="6">
-                  <v-date-picker 
-                    v-model="currentTask.startDate"
-                    label="Start Date"
-                  />
-                </v-col>
-                <v-col cols="6">
-                  <v-date-picker 
-                    v-model="currentTask.endDate"
-                    label="End Date"
-                  />
-                </v-col>
-              </v-row>
-            </v-form>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer />
-            <v-btn @click="taskDialog = false">
-              Cancel
-            </v-btn>
-            <v-btn
-              color="primary"
-              @click="saveTask"
-            >
-              Save
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </v-container>
-  </template>
+            <v-row>
+              <v-col cols="6">
+                <v-date-picker 
+                  v-model="currentTask.startDate"
+                  label="Start Date"
+                />
+              </v-col>
+              <v-col cols="6">
+                <v-date-picker 
+                  v-model="currentTask.endDate"
+                  label="End Date"
+                />
+              </v-col>
+            </v-row>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn @click="taskDialog = false">
+            Cancel
+          </v-btn>
+          <v-btn
+            color="primary"
+            @click="saveTask"
+          >
+            Save
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </v-container>
+</template>
   
   <script setup>
   import { ref, reactive, computed, onUnmounted } from 'vue'

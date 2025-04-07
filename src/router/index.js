@@ -6,6 +6,7 @@ import LoginPage from '@/views/LoginPage.vue';
 import PricingSection from '@/components/PricingSection.vue'; // ✅ Correct import
 import CardPayment from '@/views/CardPayment.vue';
 import HomeSaas from '@/views/HomeSaas.vue';
+import ProjectSection from '@/views/ProjectSection.vue';
 
 const routes = [
   {
@@ -43,7 +44,14 @@ const routes = [
     path: '/home-saas',
     name: 'HomeSaas',
     component: HomeSaas 
+  },
+
+  { 
+    path: '/projects',
+    name: 'Projects',
+    component: ProjectSection 
   } 
+
 ];
 
 const router = createRouter({
