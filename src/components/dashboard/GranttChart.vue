@@ -31,8 +31,16 @@
         </div>
         
         <!-- Create task button -->
-        <button class="create-button" @click="openCreateDialog">
-          <v-icon small class="mr-1">mdi-plus</v-icon> Create Release
+        <button
+          class="create-button"
+          @click="openCreateDialog"
+        >
+          <v-icon
+            small
+            class="mr-1"
+          >
+            mdi-plus
+          </v-icon> Create Release
         </button>
       </div>
     </div>
@@ -40,14 +48,30 @@
     <!-- Toolbar -->
     <div class="toolbar">
       <div class="toolbar-buttons">
-        <button class="toolbar-button"><v-icon>mdi-file-document-outline</v-icon></button>
-        <button class="toolbar-button"><v-icon>mdi-content-copy</v-icon></button>
-        <button class="toolbar-button"><v-icon>mdi-magnify-plus-outline</v-icon></button>
-        <button class="toolbar-button"><v-icon>mdi-magnify-minus-outline</v-icon></button>
-        <button class="toolbar-button"><v-icon>mdi-arrow-expand-all</v-icon></button>
-        <button class="toolbar-button"><v-icon>mdi-filter-outline</v-icon></button>
-        <button class="toolbar-button"><v-icon>mdi-eye-outline</v-icon></button>
-        <button class="toolbar-button"><v-icon>mdi-export</v-icon></button>
+        <button class="toolbar-button">
+          <v-icon>mdi-file-document-outline</v-icon>
+        </button>
+        <button class="toolbar-button">
+          <v-icon>mdi-content-copy</v-icon>
+        </button>
+        <button class="toolbar-button">
+          <v-icon>mdi-magnify-plus-outline</v-icon>
+        </button>
+        <button class="toolbar-button">
+          <v-icon>mdi-magnify-minus-outline</v-icon>
+        </button>
+        <button class="toolbar-button">
+          <v-icon>mdi-arrow-expand-all</v-icon>
+        </button>
+        <button class="toolbar-button">
+          <v-icon>mdi-filter-outline</v-icon>
+        </button>
+        <button class="toolbar-button">
+          <v-icon>mdi-eye-outline</v-icon>
+        </button>
+        <button class="toolbar-button">
+          <v-icon>mdi-export</v-icon>
+        </button>
       </div>
     </div>
 
@@ -64,56 +88,106 @@
               <th class="column-header">
                 Product Release
                 <div class="column-actions">
-                  
-                  <v-icon small @click="showColumnMenu('product', $event)">mdi-dots-vertical</v-icon>
+                  <v-icon
+                    small
+                    @click="showColumnMenu('product', $event)"
+                  >
+                    mdi-dots-vertical
+                  </v-icon>
                 </div>
               </th>
               <th class="column-header">
                 Assignee
                 <div class="column-actions">
-                  <v-icon small @click="showColumnMenu('assignee', $event)">mdi-dots-vertical</v-icon>
+                  <v-icon
+                    small
+                    @click="showColumnMenu('assignee', $event)"
+                  >
+                    mdi-dots-vertical
+                  </v-icon>
                 </div>
               </th>
               <th class="column-header">
                 Status
                 <div class="column-actions">
-                  <v-icon small @click="showColumnMenu('status', $event)">mdi-dots-vertical</v-icon>
+                  <v-icon
+                    small
+                    @click="showColumnMenu('status', $event)"
+                  >
+                    mdi-dots-vertical
+                  </v-icon>
                 </div>
               </th>
               <th class="column-header">
                 Priority
                 <div class="column-actions">
-                  <v-icon small @click="showColumnMenu('priority', $event)">mdi-dots-vertical</v-icon>
+                  <v-icon
+                    small
+                    @click="showColumnMenu('priority', $event)"
+                  >
+                    mdi-dots-vertical
+                  </v-icon>
                 </div>
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(task, index) in tasks" :key="index" class="task-row">
-              <td class="task-cell" @dblclick="openEditDialog(task)">
+            <tr
+              v-for="(task, index) in tasks"
+              :key="index"
+              class="task-row"
+            >
+              <td
+                class="task-cell"
+                @dblclick="openEditDialog(task)"
+              >
                 {{ task.name }}
                 <div class="row-actions">
-                  <button class="edit-btn" @click="openEditDialog(task)">
-                    <v-icon small>mdi-pencil</v-icon>
+                  <button
+                    class="edit-btn"
+                    @click="openEditDialog(task)"
+                  >
+                    <v-icon small>
+                      mdi-pencil
+                    </v-icon>
                   </button>
-                  <button class="delete-btn" @click="deleteTask(task)">
-                    <v-icon small>mdi-delete</v-icon>
+                  <button
+                    class="delete-btn"
+                    @click="deleteTask(task)"
+                  >
+                    <v-icon small>
+                      mdi-delete
+                    </v-icon>
                   </button>
                 </div>
               </td>
               <td class="task-cell">
-                <div class="assignee" v-if="task.assignee">
-                  <img :src="task.assignee.avatar" class="avatar" />
+                <div
+                  v-if="task.assignee"
+                  class="assignee"
+                >
+                  <img
+                    :src="task.assignee.avatar"
+                    class="avatar"
+                  >
                   {{ task.assignee.name }}
                 </div>
               </td>
               <td class="task-cell">
-                <div v-if="task.status" class="status-badge" :class="getStatusClass(task.status)">
+                <div
+                  v-if="task.status"
+                  class="status-badge"
+                  :class="getStatusClass(task.status)"
+                >
                   {{ task.status }}
                 </div>
               </td>
               <td class="task-cell">
-                <div v-if="task.priority" class="priority-badge" :class="getPriorityClass(task.priority)">
+                <div
+                  v-if="task.priority"
+                  class="priority-badge"
+                  :class="getPriorityClass(task.priority)"
+                >
                   {{ task.priority }}
                 </div>
               </td>
@@ -127,16 +201,26 @@
         class="resizer" 
         @mousedown="startResize"
         @touchstart="startResize"
-      ></div>
+      />
 
       <!-- Right side timeline -->
       <div class="right-column">
         <div class="timeline-header">
           <div class="month-headers">
-            <div v-for="month in visibleMonths" :key="month.id" class="month-column">
-              <div class="month-name">{{ month.name }} {{ month.year }}</div>
+            <div
+              v-for="month in visibleMonths"
+              :key="month.id"
+              class="month-column"
+            >
+              <div class="month-name">
+                {{ month.name }} {{ month.year }}
+              </div>
               <div class="date-columns">
-                <div v-for="date in month.dates" :key="date" class="date-column">
+                <div
+                  v-for="date in month.dates"
+                  :key="date"
+                  class="date-column"
+                >
                   {{ date }}
                 </div>
               </div>
@@ -145,7 +229,11 @@
         </div>
 
         <div class="timeline-body">
-          <div v-for="(task, index) in tasks" :key="index" class="timeline-row">
+          <div
+            v-for="(task, index) in tasks"
+            :key="index"
+            class="timeline-row"
+          >
             <div 
               v-for="bar in task.bars" 
               :key="bar.id" 
@@ -156,47 +244,89 @@
               @mousedown.right="startBarResize($event, bar, 'right')"
               @dblclick="openEditDialog(task)"
             >
-              <div class="progress-indicator" :style="{ width: bar.progress + '%' }"></div>
-              <div class="bar-label">{{ bar.progress }}%</div>
-              <div class="resize-handle left"></div>
-              <div class="resize-handle right"></div>
+              <div
+                class="progress-indicator"
+                :style="{ width: bar.progress + '%' }"
+              />
+              <div class="bar-label">
+                {{ bar.progress }}%
+              </div>
+              <div class="resize-handle left" />
+              <div class="resize-handle right" />
             </div>
-            <div v-if="task.assignee" class="assignee-name">{{ task.assignee.name }}</div>
+            <div
+              v-if="task.assignee"
+              class="assignee-name"
+            >
+              {{ task.assignee.name }}
+            </div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Column menu popup -->
-    <div v-if="columnMenu.visible" class="column-menu" :style="columnMenu.position">
+    <div
+      v-if="columnMenu.visible"
+      class="column-menu"
+      :style="columnMenu.position"
+    >
       <div class="menu-item">
-        <v-icon small>mdi-arrow-expand-horizontal</v-icon> Auto Fit all columns
+        <v-icon small>
+          mdi-arrow-expand-horizontal
+        </v-icon> Auto Fit all columns
       </div>
       <div class="menu-item">
-        <v-icon small>mdi-arrow-expand</v-icon> Auto Fit this column
+        <v-icon small>
+          mdi-arrow-expand
+        </v-icon> Auto Fit this column
       </div>
       <div class="menu-item">
-        <v-icon small>mdi-sort-ascending</v-icon> Sort Ascending
+        <v-icon small>
+          mdi-sort-ascending
+        </v-icon> Sort Ascending
       </div>
       <div class="menu-item disabled">
-        <v-icon small>mdi-sort-descending</v-icon> Sort Descending
+        <v-icon small>
+          mdi-sort-descending
+        </v-icon> Sort Descending
       </div>
       <div class="menu-item">
-        <v-icon small>mdi-view-column</v-icon> Columns
-        <v-icon small class="ml-auto">mdi-chevron-right</v-icon>
+        <v-icon small>
+          mdi-view-column
+        </v-icon> Columns
+        <v-icon
+          small
+          class="ml-auto"
+        >
+          mdi-chevron-right
+        </v-icon>
       </div>
       <div class="menu-item">
-        <v-icon small>mdi-filter</v-icon> Filter
-        <v-icon small class="ml-auto">mdi-chevron-right</v-icon>
+        <v-icon small>
+          mdi-filter
+        </v-icon> Filter
+        <v-icon
+          small
+          class="ml-auto"
+        >
+          mdi-chevron-right
+        </v-icon>
       </div>
     </div>
     
     <!-- Task Create/Edit Dialog -->
-    <div v-if="taskDialog.visible" class="task-dialog">
+    <div
+      v-if="taskDialog.visible"
+      class="task-dialog"
+    >
       <div class="dialog-content">
         <div class="dialog-header">
           <h3>{{ taskDialog.isEdit ? 'Edit Release' : 'Create New Release' }}</h3>
-          <button class="close-button" @click="closeTaskDialog">
+          <button
+            class="close-button"
+            @click="closeTaskDialog"
+          >
             <v-icon>mdi-close</v-icon>
           </button>
         </div>
@@ -204,14 +334,24 @@
         <div class="dialog-form">
           <div class="form-group">
             <label>Release Name</label>
-            <input type="text" v-model="taskDialog.task.name" placeholder="Enter release name">
+            <input
+              v-model="taskDialog.task.name"
+              type="text"
+              placeholder="Enter release name"
+            >
           </div>
           
           <div class="form-group">
             <label>Assignee</label>
             <select v-model="taskDialog.task.assigneeId">
-              <option :value="null">-- No Assignee --</option>
-              <option v-for="member in teamMembers" :key="member.id" :value="member.id">
+              <option :value="null">
+                -- No Assignee --
+              </option>
+              <option
+                v-for="member in teamMembers"
+                :key="member.id"
+                :value="member.id"
+              >
                 {{ member.name }}
               </option>
             </select>
@@ -220,54 +360,99 @@
           <div class="form-group">
             <label>Status</label>
             <select v-model="taskDialog.task.status">
-              <option value="">-- No Status --</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Completed">Completed</option>
-              <option value="Blocked">Blocked</option>
+              <option value="">
+                -- No Status --
+              </option>
+              <option value="In Progress">
+                In Progress
+              </option>
+              <option value="Completed">
+                Completed
+              </option>
+              <option value="Blocked">
+                Blocked
+              </option>
             </select>
           </div>
           
           <div class="form-group">
             <label>Priority</label>
             <select v-model="taskDialog.task.priority">
-              <option value="">-- No Priority --</option>
-              <option value="Normal">Normal</option>
-              <option value="Critical">Critical</option>
-              <option value="Low">Low</option>
+              <option value="">
+                -- No Priority --
+              </option>
+              <option value="Normal">
+                Normal
+              </option>
+              <option value="Critical">
+                Critical
+              </option>
+              <option value="Low">
+                Low
+              </option>
             </select>
           </div>
           
           <div class="form-group">
             <label>Progress (%)</label>
-            <input type="number" v-model="taskDialog.task.progress" min="0" max="100">
+            <input
+              v-model="taskDialog.task.progress"
+              type="number"
+              min="0"
+              max="100"
+            >
           </div>
           
           <div class="form-row">
             <div class="form-group half">
               <label>Start Date</label>
-              <input type="date" v-model="taskDialog.task.startDate">
+              <input
+                v-model="taskDialog.task.startDate"
+                type="date"
+              >
             </div>
             
             <div class="form-group half">
               <label>End Date</label>
-              <input type="date" v-model="taskDialog.task.endDate">
+              <input
+                v-model="taskDialog.task.endDate"
+                type="date"
+              >
             </div>
           </div>
           
           <div class="form-group">
             <label>Color</label>
             <select v-model="taskDialog.task.colorClass">
-              <option value="bar-dark-gray">Dark Gray</option>
-              <option value="bar-purple">Purple</option>
-              <option value="bar-blue">Blue</option>
-              <option value="bar-green">Green</option>
+              <option value="bar-dark-gray">
+                Dark Gray
+              </option>
+              <option value="bar-purple">
+                Purple
+              </option>
+              <option value="bar-blue">
+                Blue
+              </option>
+              <option value="bar-green">
+                Green
+              </option>
             </select>
           </div>
         </div>
         
         <div class="dialog-footer">
-          <button class="cancel-button" @click="closeTaskDialog">Cancel</button>
-          <button class="save-button" @click="saveTask">Save</button>
+          <button
+            class="cancel-button"
+            @click="closeTaskDialog"
+          >
+            Cancel
+          </button>
+          <button
+            class="save-button"
+            @click="saveTask"
+          >
+            Save
+          </button>
         </div>
       </div>
     </div>
@@ -759,13 +944,15 @@ export default {
 .gantt-chart-container {
   position: relative;
   max-width: 1350px;
-  max-height: 600px;
-  margin-left: 30px;
+  max-height: 1000px;
+  margin-left: 20px;
   margin-bottom: 100px;
+  margin-top: 50px;
   padding: 0;
   background-color: #fff;
   border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Poppins, Arial, sans-serif;
   display: flex;

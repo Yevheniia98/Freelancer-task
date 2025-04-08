@@ -574,12 +574,14 @@
       margin-top: 50px;
       margin-bottom: 50px;
       height: 400px ;
+      margin-left: 20px;
     }
     
     .tax-calculator-card, .tax-breakdown-card, .balance-card {
       background-color: white;
       border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e0e0e0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       padding: 20px;
     }
     
@@ -590,6 +592,7 @@
     
     .tax-breakdown-card {
       flex: 2;
+      max-width: 717px;
     }
     
     .balance-card {

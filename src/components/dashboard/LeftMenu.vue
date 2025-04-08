@@ -38,37 +38,37 @@
             title="Projects"
           />
           <v-list-item
-            to="/clients"
+            
             class="list"
             prepend-icon="mdi-account-multiple"
             title="Clients"
           />
           <v-list-item
-            to="/tasks"
+            
             class="list"
             prepend-icon="mdi-format-list-checkbox"
             title="Tasks"
           />
           <v-list-item
-            to="/finance"
+            
             class="list"
             prepend-icon="mdi-currency-usd"
             title="Finance"
           />
           <v-list-item
-            to="/calendar"
+            
             class="list"
             prepend-icon="mdi-calendar"
             title="Calendar"
           />
           <v-list-item
-            to="/tools"
+            
             class="list"
             prepend-icon="mdi-tools"
             title="Tools"
           />
           <v-list-item
-            to="/settings"
+            
             class="list"
             prepend-icon="mdi-cog"
             title="Settings"

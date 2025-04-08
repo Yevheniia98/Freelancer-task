@@ -7,6 +7,7 @@ import PricingSection from '@/components/PricingSection.vue'; // ✅ Correct imp
 import CardPayment from '@/views/CardPayment.vue';
 import HomeSaas from '@/views/HomeSaas.vue';
 import ProjectSection from '@/views/ProjectSection.vue';
+import ProjectTaskVue from '@/views/ProjectTaskVue.vue';
 
 const routes = [
   {
@@ -50,7 +51,14 @@ const routes = [
     path: '/projects',
     name: 'Projects',
     component: ProjectSection 
-  } 
+  }, 
+
+  { 
+    path: '/project-task',
+    name: 'ProjectTask',
+    component: ProjectTaskVue 
+  }
+
 
 ];
 

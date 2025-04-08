@@ -169,22 +169,32 @@
       />
 
       <!-- Date and Time Section -->
-      <v-card class="reminder-section" variant="outlined">
+      <v-card
+        class="reminder-section"
+        variant="outlined"
+      >
         <div class="section-header">
-          <v-icon size="small" class="mr-2">mdi-clock-outline</v-icon>
+          <v-icon
+            size="small"
+            class="mr-2"
+          >
+            mdi-clock-outline
+          </v-icon>
           <span class="section-title">Date and time</span>
         </div>
 
         <!-- Date Selection -->
         <div class="input-row">
-          <div class="input-label">On</div>
+          <div class="input-label">
+            On
+          </div>
           <v-menu
             v-model="dateMenu"
             :close-on-content-click="false"
             transition="scale-transition"
             location="bottom"
           >
-            <template v-slot:activator="{ props }">
+            <template #activator="{ props }">
               <v-text-field
                 v-model="formattedDate"
                 density="compact"
@@ -203,14 +213,16 @@
 
         <!-- Time From -->
         <div class="input-row">
-          <div class="input-label">From</div>
+          <div class="input-label">
+            From
+          </div>
           <v-menu
             v-model="timeFromMenu"
             :close-on-content-click="false"
             transition="scale-transition"
             location="bottom"
           >
-            <template v-slot:activator="{ props }">
+            <template #activator="{ props }">
               <v-text-field
                 v-model="formattedTimeFrom"
                 density="compact"
@@ -229,14 +241,16 @@
 
         <!-- Time To -->
         <div class="input-row">
-          <div class="input-label">To</div>
+          <div class="input-label">
+            To
+          </div>
           <v-menu
             v-model="timeToMenu"
             :close-on-content-click="false"
             transition="scale-transition"
             location="bottom"
           >
-            <template v-slot:activator="{ props }">
+            <template #activator="{ props }">
               <v-text-field
                 v-model="formattedTimeTo"
                 density="compact"
@@ -422,7 +436,10 @@
         </div>
 
         <!-- Repeat Days -->
-        <div class="input-row" v-if="newEvent.repeatEvery === 'Weekly'">
+        <div
+          v-if="newEvent.repeatEvery === 'Weekly'"
+          class="input-row"
+        >
           <div class="input-label">
             On
           </div>
@@ -448,7 +465,10 @@
         </div>
         
         <!-- End Repeat (New) -->
-        <div class="input-row" v-if="newEvent.repeatEvery !== 'On'">
+        <div
+          v-if="newEvent.repeatEvery !== 'On'"
+          class="input-row"
+        >
           <div class="input-label">
             Until
           </div>
@@ -458,7 +478,7 @@
             transition="scale-transition"
             location="bottom"
           >
-            <template v-slot:activator="{ props }">
+            <template #activator="{ props }">
               <v-text-field
                 v-model="formattedEndDate"
                 density="compact"
@@ -475,6 +495,17 @@
           </v-menu>
         </div>
       </v-card>
+
+      <!-- Create Button -->
+      <v-btn 
+          block 
+          color="#0C9C8D" 
+          class="create-btn text-white"
+          :disabled="!newEvent.title"
+          @click="createEvent"
+        >
+          Create
+        </v-btn>
     </div>
 
     <!-- Right Column - Calendar -->
@@ -539,29 +570,32 @@
             <div class="day-number">
               {{ day.dayNumber }}
             </div>
-            <div v-if="hasEvent(day.date)" class="event-indicator"></div>
+            <div
+              v-if="hasEvent(day.date)"
+              class="event-indicator"
+            />
           </div>
         </div>
 
         <!-- Events for Selected Day (New) -->
-        <div v-if="eventsForSelectedDay.length > 0" class="selected-day-events">
+        <div
+          v-if="eventsForSelectedDay.length > 0"
+          class="selected-day-events"
+        >
           <h4>Events on {{ formattedSelectedDate }}</h4>
-          <div v-for="event in eventsForSelectedDay" :key="event.id" class="selected-day-event">
-            <div class="event-time">{{ formatTime(event.timeFrom) }} {{ getTimePeriod(event.timeFrom) }}</div>
-            <div class="event-title">{{ event.title }}</div>
+          <div
+            v-for="event in eventsForSelectedDay"
+            :key="event.id"
+            class="selected-day-event"
+          >
+            <div class="event-time">
+              {{ formatTime(event.timeFrom) }} {{ getTimePeriod(event.timeFrom) }}
+            </div>
+            <div class="event-title">
+              {{ event.title }}
+            </div>
           </div>
         </div>
-
-        <!-- Create Button -->
-        <v-btn 
-          block 
-          color="teal" 
-          class="create-btn text-white"
-          @click="createEvent"
-          :disabled="!newEvent.title"
-        >
-          Create
-        </v-btn>
       </div>
     </div>
   </div>
@@ -1073,7 +1107,7 @@ onMounted(() => {
 <style scoped>
 .reminder-container {
   display: flex;
-  width: 1200px;
+  width: 1000px;
   height: 700px;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
@@ -1267,10 +1301,20 @@ onMounted(() => {
   color: rgba(0, 0, 0, 0.6);
 }
 
-.people-input, .link-input {
+.people-input {
   margin: 0;
   padding: 0;
+  transform: translate(5px,5px);
+  
 }
+
+.link-input{
+  margin: 0;
+  padding: 0;
+  transform: translate(5px,-5px);
+  
+}
+
 
 .day-toggles {
   display: flex;
@@ -1290,6 +1334,7 @@ onMounted(() => {
   height: 28px !important;
   margin-right: 4px;
 }
+
 
 /* Right Column - Calendar */
 .calendar-section {
@@ -1407,6 +1452,8 @@ onMounted(() => {
   text-transform: none;
   letter-spacing: 0;
   margin-top: 16px;
+  font-size: 16px;
+  
 }
 
 /* Selected people chips */
