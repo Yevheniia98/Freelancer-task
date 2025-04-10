@@ -1,28 +1,30 @@
 <template>
-  <div id="dashboard">
-    <!-- No need to add HeaderSection here again -->
-    <LeftMenu /> <!-- Only here -->
-    <SearchBar />
-    <CardsLine />
-    <ReminderMeeting />
-    <ChatSection />
-    <TaxSection />
-    <GranttChart />
-  </div>
+  <v-app>
+    <LeftMenu />
+    <v-main class="main-content">
+      <div class="dashboard-container">
+        <SearchBar />
+        <CardsLine />
+        <ReminderMeeting />
+        <ChatSection />
+        <TaxSection />
+        <GranttChart />
+      </div>
+    </v-main>
+  </v-app>
 </template>
 
 <script>
-import LeftMenu from '../components/dashboard/LeftMenu.vue'; // Import HeaderSection here
-import SearchBar from '../components/dashboard/SearchBar.vue'
-import CardsLine from '../components/dashboard/CardsLine.vue'
-import ReminderMeeting from '../components/dashboard/ReminderMeeting.vue';
+import LeftMenu from '@/components/dashboard/LeftMenu.vue';
+import SearchBar from '@/components/dashboard/SearchBar.vue';
+import CardsLine from '@/components/dashboard/CardsLine.vue';
+import ReminderMeeting from '@/components/dashboard/ReminderMeeting.vue';
 import ChatSection from '@/components/dashboard/ChatSection.vue';
 import TaxSection from '@/components/dashboard/TaxSection.vue';
 import GranttChart from '@/components/dashboard/GranttChart.vue';
 
-
 export default {
-  name: 'HomeSaas',
+  name: 'HomeSaasLayout',
   components: {
     LeftMenu,
     SearchBar,
@@ -36,13 +38,23 @@ export default {
 </script>
 
 <style>
-#dashboard {
-  
-  align-items: center; /* Prevents unnecessary stretching */
-  justify-content: center;
+.main-content {
+  padding-left: 80px !important; /* Width of collapsed sidebar */
+}
+
+.dashboard-container {
+  padding: 20px;
+}
+
+/* Ensure the app takes full height */
+html, body, #app {
+  height: 100%;
+  margin: 0;
   padding: 0;
-  margin-top: 50px;
-  margin-left: 50px;
-  min-height: auto; /* Ensures no extra space */
+}
+
+/* Make sure v-app fills the viewport */
+.v-application {
+  min-height: 100vh;
 }
 </style>

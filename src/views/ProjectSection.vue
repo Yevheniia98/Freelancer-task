@@ -1,8 +1,8 @@
 <!-- ProjectSection.vue -->
 <template>
   <div>
-    <LeftMenu />
     <v-app>
+        <LeftMenu />
       <v-navigation-drawer
         color="teal-darken-4"
         permanent
