@@ -498,14 +498,14 @@
 
       <!-- Create Button -->
       <v-btn 
-          block 
-          color="#0C9C8D" 
-          class="create-btn text-white"
-          :disabled="!newEvent.title"
-          @click="createEvent"
-        >
-          Create
-        </v-btn>
+        block 
+        color="#0C9C8D" 
+        class="create-btn text-white"
+        :disabled="!newEvent.title"
+        @click="createEvent"
+      >
+        Create
+      </v-btn>
     </div>
 
     <!-- Right Column - Calendar -->

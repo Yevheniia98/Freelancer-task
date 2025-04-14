@@ -10,204 +10,332 @@
   >
     <!-- Top Logo Section -->
     <v-list>
-      <v-list-item :class="drawerExpanded ? 'expanded' : 'collapsed'" class="logo-container">
-        <template v-slot:prepend>
+      <v-list-item
+        :class="drawerExpanded ? 'expanded' : 'collapsed'"
+        class="logo-container"
+      >
+        <template #prepend>
           <div class="logo-circle">
             <span class="logo-text">FT</span>
           </div>
         </template>
-        <v-list-item-title v-show="drawerExpanded" class="title-text">
+        <v-list-item-title
+          v-show="drawerExpanded"
+          class="title-text"
+        >
           Freelance Task
         </v-list-item-title>
       </v-list-item>
     </v-list>
 
     <!-- Main Navigation -->
-    <v-list density="compact" nav>
+    <v-list
+      density="compact"
+      nav
+    >
       <v-list-item
         to="/"
+        link
         class="menu-list-item"
         active-class="active-menu-item"
       >
-        <template v-slot:prepend>
-          <v-icon class="menu-icon">mdi-view-dashboard-outline</v-icon>
+        <template #prepend>
+          <v-icon class="menu-icon">
+            mdi-view-dashboard-outline
+          </v-icon>
         </template>
         <v-list-item-title>Dashboard</v-list-item-title>
       </v-list-item>
 
       <v-list-group class="menu-group">
-        <template v-slot:activator="{ props }">
+        <template #activator="{ props }">
           <v-list-item
             class="menu-list-item"
             v-bind="props"
           >
-            <template v-slot:prepend>
-              <v-icon class="menu-icon">mdi-folder-outline</v-icon>
+            <template #prepend>
+              <v-icon class="menu-icon">
+                mdi-folder-outline
+              </v-icon>
             </template>
             <v-list-item-title>Projects</v-list-item-title>
           </v-list-item>
         </template>
-        <v-list-item class="submenu-item">
+        <v-list-item
+          class="submenu-item"
+          link
+          to="/projects"
+        >
           <v-list-item-title>Projects list</v-list-item-title>
         </v-list-item>
-        <v-list-item class="submenu-item">
+        <v-list-item
+          class="submenu-item"
+          link
+          to="/projects/create"
+        >
           <v-list-item-title>Create projects</v-list-item-title>
         </v-list-item>
       </v-list-group>
 
       <v-list-group class="menu-group">
-        <template v-slot:activator="{ props }">
+        <template #activator="{ props }">
           <v-list-item
             class="menu-list-item"
             v-bind="props"
           >
-            <template v-slot:prepend>
-              <v-icon class="menu-icon">mdi-account-outline</v-icon>
+            <template #prepend>
+              <v-icon class="menu-icon">
+                mdi-account-outline
+              </v-icon>
             </template>
             <v-list-item-title>Clients</v-list-item-title>
           </v-list-item>
         </template>
-        <v-list-item class="submenu-item">
+        <v-list-item
+          class="submenu-item"
+          link
+          to="/clients"
+        >
           <v-list-item-title>Clients</v-list-item-title>
         </v-list-item>
-        <v-list-item class="submenu-item">
+        <v-list-item
+          class="submenu-item"
+          link
+          to="/clients/invite"
+        >
           <v-list-item-title>Invite freelancer</v-list-item-title>
         </v-list-item>
-        <v-list-item class="submenu-item">
+        <v-list-item
+          class="submenu-item"
+          link
+          to="/clients/team"
+        >
           <v-list-item-title>My team</v-list-item-title>
         </v-list-item>
       </v-list-group>
 
-      <v-list-item class="menu-list-item">
-        <template v-slot:prepend>
-          <v-icon class="menu-icon">mdi-clipboard-text-outline</v-icon>
+      <v-list-item
+        class="menu-list-item"
+        link
+        to="/tasks"
+      >
+        <template #prepend>
+          <v-icon class="menu-icon">
+            mdi-clipboard-text-outline
+          </v-icon>
         </template>
         <v-list-item-title>Tasks</v-list-item-title>
       </v-list-item>
 
-      <v-list-item class="menu-list-item">
-        <template v-slot:prepend>
-          <v-icon class="menu-icon">mdi-chart-line</v-icon>
+      <v-list-item
+        class="menu-list-item"
+        link
+        to="/finance"
+      >
+        <template #prepend>
+          <v-icon class="menu-icon">
+            mdi-chart-line
+          </v-icon>
         </template>
         <v-list-item-title>Finance</v-list-item-title>
       </v-list-item>
 
-      <v-list-item class="menu-list-item">
-        <template v-slot:prepend>
-          <v-icon class="menu-icon">mdi-calendar-blank-outline</v-icon>
+      <v-list-item
+        class="menu-list-item"
+        link
+        to="/calendar"
+      >
+        <template #prepend>
+          <v-icon class="menu-icon">
+            mdi-calendar-blank-outline
+          </v-icon>
         </template>
         <v-list-item-title>Calendar</v-list-item-title>
       </v-list-item>
 
-      <v-list-item class="menu-list-item">
-        <template v-slot:prepend>
-          <v-icon class="menu-icon">mdi-tools</v-icon>
+      <v-list-item
+        class="menu-list-item"
+        link
+        to="/tools"
+      >
+        <template #prepend>
+          <v-icon class="menu-icon">
+            mdi-tools
+          </v-icon>
         </template>
         <v-list-item-title>Tools</v-list-item-title>
       </v-list-item>
 
       <v-list-group class="menu-group">
-        <template v-slot:activator="{ props }">
+        <template #activator="{ props }">
           <v-list-item
             class="menu-list-item"
             v-bind="props"
           >
-            <template v-slot:prepend>
-              <v-icon class="menu-icon">mdi-cog-outline</v-icon>
+            <template #prepend>
+              <v-icon class="menu-icon">
+                mdi-cog-outline
+              </v-icon>
             </template>
             <v-list-item-title>Settings</v-list-item-title>
           </v-list-item>
         </template>
-        <v-list-item class="submenu-item">
+        <v-list-item
+          class="submenu-item"
+          link
+          to="/settings/account"
+        >
           <v-list-item-title>Account Settings</v-list-item-title>
         </v-list-item>
-        <v-list-item class="submenu-item">
+        <v-list-item
+          class="submenu-item"
+          link
+          to="/settings/billing"
+        >
           <v-list-item-title>Subscription & Billing</v-list-item-title>
         </v-list-item>
-        <v-list-item class="submenu-item">
+        <v-list-item
+          class="submenu-item"
+          link
+          to="/settings/customization"
+        >
           <v-list-item-title>Customization</v-list-item-title>
         </v-list-item>
-        <v-list-item class="submenu-item">
+        <v-list-item
+          class="submenu-item"
+          link
+          to="/settings/security"
+        >
           <v-list-item-title>Security & Privacy</v-list-item-title>
         </v-list-item>
-        <v-list-item class="submenu-item">
+        <v-list-item
+          class="submenu-item"
+          link
+          to="/settings/integrations"
+        >
           <v-list-item-title>Integrations</v-list-item-title>
         </v-list-item>
-        <v-list-item class="submenu-item">
+        <v-list-item
+          class="submenu-item"
+          link
+          to="/settings/backup"
+        >
           <v-list-item-title>Backup & Data M.</v-list-item-title>
         </v-list-item>
-        <v-list-item class="submenu-item">
+        <v-list-item
+          class="submenu-item"
+          link
+          to="/settings/support"
+        >
           <v-list-item-title>Support & Feedback</v-list-item-title>
         </v-list-item>
       </v-list-group>
     </v-list>
 
     <!-- User Profiles Section -->
-    <template v-slot:append>
+    <template #append>
       <div class="user-profiles">
         <v-list>
           <v-list-item class="user-item">
-            <template v-slot:prepend>
-              <v-avatar size="40" class="user-avatar">
+            <template #prepend>
+              <v-avatar
+                size="40"
+                class="user-avatar"
+              >
                 <v-img src="https://randomuser.me/api/portraits/men/32.jpg" />
-                <div class="status-dot online"></div>
+                <div class="status-dot online" />
               </v-avatar>
             </template>
-            <div v-if="drawerExpanded" class="user-info">
+            <div
+              v-if="drawerExpanded"
+              class="user-info"
+            >
               <v-list-item-title>Daniele</v-list-item-title>
-              <v-list-item-subtitle class="user-email">dan.109@gmail.com</v-list-item-subtitle>
+              <v-list-item-subtitle class="user-email">
+                dan.109@gmail.com
+              </v-list-item-subtitle>
             </div>
           </v-list-item>
           
           <v-list-item class="user-item">
-            <template v-slot:prepend>
-              <v-avatar size="40" class="user-avatar">
+            <template #prepend>
+              <v-avatar
+                size="40"
+                class="user-avatar"
+              >
                 <v-img src="https://randomuser.me/api/portraits/women/32.jpg" />
-                <div class="status-dot offline"></div>
+                <div class="status-dot offline" />
               </v-avatar>
             </template>
-            <div v-if="drawerExpanded" class="user-info">
+            <div
+              v-if="drawerExpanded"
+              class="user-info"
+            >
               <v-list-item-title>Bella</v-list-item-title>
-              <v-list-item-subtitle class="user-email">ella_5@gmail.com</v-list-item-subtitle>
+              <v-list-item-subtitle class="user-email">
+                ella_5@gmail.com
+              </v-list-item-subtitle>
             </div>
           </v-list-item>
           
           <v-list-item class="user-item">
-            <template v-slot:prepend>
-              <v-avatar size="40" class="user-avatar">
+            <template #prepend>
+              <v-avatar
+                size="40"
+                class="user-avatar"
+              >
                 <v-img src="https://randomuser.me/api/portraits/men/41.jpg" />
-                <div class="status-dot online"></div>
+                <div class="status-dot online" />
               </v-avatar>
             </template>
-            <div v-if="drawerExpanded" class="user-info">
+            <div
+              v-if="drawerExpanded"
+              class="user-info"
+            >
               <v-list-item-title>Ali</v-list-item-title>
-              <v-list-item-subtitle class="user-email">it.smart@gmail.com</v-list-item-subtitle>
+              <v-list-item-subtitle class="user-email">
+                it.smart@gmail.com
+              </v-list-item-subtitle>
             </div>
           </v-list-item>
           
           <v-list-item class="user-item">
-            <template v-slot:prepend>
-              <v-avatar size="40" class="user-avatar">
+            <template #prepend>
+              <v-avatar
+                size="40"
+                class="user-avatar"
+              >
                 <v-img src="https://randomuser.me/api/portraits/men/22.jpg" />
-                <div class="status-dot online"></div>
+                <div class="status-dot online" />
               </v-avatar>
             </template>
-            <div v-if="drawerExpanded" class="user-info">
+            <div
+              v-if="drawerExpanded"
+              class="user-info"
+            >
               <v-list-item-title>Jack</v-list-item-title>
-              <v-list-item-subtitle class="user-email">jack.j@gmail.com</v-list-item-subtitle>
+              <v-list-item-subtitle class="user-email">
+                jack.j@gmail.com
+              </v-list-item-subtitle>
             </div>
           </v-list-item>
           
           <v-list-item class="user-item">
-            <template v-slot:prepend>
-              <v-avatar size="40" class="user-avatar">
+            <template #prepend>
+              <v-avatar
+                size="40"
+                class="user-avatar"
+              >
                 <v-img src="https://randomuser.me/api/portraits/women/42.jpg" />
-                <div class="status-dot online"></div>
+                <div class="status-dot online" />
               </v-avatar>
             </template>
-            <div v-if="drawerExpanded" class="user-info">
+            <div
+              v-if="drawerExpanded"
+              class="user-info"
+            >
               <v-list-item-title>me (Isabella)</v-list-item-title>
-              <v-list-item-subtitle class="user-email"></v-list-item-subtitle>
+              <v-list-item-subtitle class="user-email" />
             </div>
           </v-list-item>
         </v-list>
@@ -286,6 +414,7 @@ export default {
   color: #e5e5e5;
   height: 36px;
   font-size: 14px;
+  text-align: left;
 }
 
 .active-menu-item {

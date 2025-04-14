@@ -8,6 +8,7 @@ import CardPayment from '@/views/CardPayment.vue';
 import HomeSaas from '@/views/HomeSaas.vue';
 import ProjectSection from '@/views/ProjectSection.vue';
 import ProjectTaskVue from '@/views/ProjectTaskVue.vue';
+import ProjectCreate from '@/views/ProjectCreate.vue';
 
 const routes = [
   {
@@ -57,7 +58,14 @@ const routes = [
     path: '/project-task',
     name: 'ProjectTask',
     component: ProjectTaskVue 
+  },
+
+  { 
+    path: '/project-create',
+    name: 'ProjectCreate',
+    component: ProjectCreate 
   }
+
 
 
 ];

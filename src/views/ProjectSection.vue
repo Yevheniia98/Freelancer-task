@@ -2,7 +2,7 @@
 <template>
   <div>
     <v-app>
-        <LeftMenu />
+      <LeftMenu />
       <v-navigation-drawer
         color="teal-darken-4"
         permanent
@@ -72,6 +72,7 @@
                 class="mr-4"
                 prepend-icon="mdi-plus"
                 variant="flat"
+                @click="navigateToProjectCreate"
               >
                 Add New
               </v-btn>
@@ -130,7 +131,6 @@
                 class="rounded-lg mb-4 pa-6"
                 :class="{ 'cursor-pointer': task.id === 1 }"
                 @click="task.id === 1 ? $router.push('/project-task') : null"
-                
               >
                 <div class="d-flex align-center mb-4">
                   <v-avatar
@@ -397,6 +397,8 @@
   import LeftMenu from '@/components/dashboard/LeftMenu.vue';
   import DetailedTaskCard from '@/components/DetailedTaskCard.vue';
   
+
+  
   export default {
     name: 'ProjectSection',
     components: {
@@ -415,7 +417,7 @@
           { icon: 'mdi-puzzle-outline' },
           { icon: 'mdi-cog-outline' },
         ],
-        
+  
         teamMembers: [
           { id: 1, name: 'John', avatar: 'https://randomuser.me/api/portraits/men/1.jpg' },
           { id: 2, name: 'Sarah', avatar: 'https://randomuser.me/api/portraits/women/2.jpg' },
@@ -571,15 +573,19 @@
       }
     },
     methods: {
-      getTeamMemberAvatar(memberId) {
-        const member = this.teamMembers.find(m => m.id === memberId);
-        return member ? member.avatar : '';
-      },
-      handleTaskClick(task) {
+  getTeamMemberAvatar(memberId) {
+    const member = this.teamMembers.find(m => m.id === memberId);
+    return member ? member.avatar : '';
+  },
+  handleTaskClick(task) {
     if (task.id === 1) {
       this.$router.push('/project-task');
     }
-}, 
+  },
+  navigateToProjectCreate() {
+    this.$router.push({ name: 'ProjectCreate' });
+  },
+
       getStatusColor(status) {
         const colors = {
           'new': 'blue',
