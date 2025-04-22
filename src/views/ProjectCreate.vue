@@ -403,7 +403,7 @@
   
   <script setup>
   import { ref } from 'vue';
-  import LeftMenu from '@/components/dashboard/LeftMenu.vue';
+  import LeftMenu from '@/dashboard/LeftMenu.vue';
   
   // Form data
   const projectTitle = ref('');

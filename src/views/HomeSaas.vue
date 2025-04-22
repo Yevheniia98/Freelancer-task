@@ -1,27 +1,25 @@
 <template>
-  <v-app>
-    <LeftMenu />
-    <v-main class="main-content">
-      <div class="dashboard-container">
-        <SearchBar />
-        <CardsLine />
-        <ReminderMeeting />
-        <ChatSection />
-        <TaxSection />
-        <GranttChart />
-      </div>
-    </v-main>
-  </v-app>
+  <LeftMenu />
+  <v-main class="main-content">
+    <div class="dashboard-container">
+      <SearchBar />
+      <CardsLine />
+      <ReminderMeeting />
+      <ChatSection />
+      <TaxSection />
+      <GranttChart />
+    </div>
+  </v-main>
 </template>
 
 <script>
-import LeftMenu from '@/components/dashboard/LeftMenu.vue';
-import SearchBar from '@/components/dashboard/SearchBar.vue';
-import CardsLine from '@/components/dashboard/CardsLine.vue';
-import ReminderMeeting from '@/components/dashboard/ReminderMeeting.vue';
-import ChatSection from '@/components/dashboard/ChatSection.vue';
-import TaxSection from '@/components/dashboard/TaxSection.vue';
-import GranttChart from '@/components/dashboard/GranttChart.vue';
+import LeftMenu from '@/dashboard/LeftMenu.vue';
+import SearchBar from '@/dashboard/SearchBar.vue';
+import CardsLine from '@/dashboard/CardsLine.vue';
+import ReminderMeeting from '@/dashboard/ReminderMeeting.vue';
+import ChatSection from '@/dashboard/ChatSection.vue';
+import TaxSection from '@/dashboard/TaxSection.vue';
+import GranttChart from '@/dashboard/GranttChart.vue';
 
 export default {
   name: 'HomeSaasLayout',

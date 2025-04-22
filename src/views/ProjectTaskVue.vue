@@ -674,7 +674,7 @@
 </template>
 
 <script>
-import LeftMenu from '@/components/dashboard/LeftMenu.vue';
+import LeftMenu from '@/dashboard/LeftMenu.vue';
 
 export default {
   name: 'ProjectManagementUI',

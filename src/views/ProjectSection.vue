@@ -394,7 +394,7 @@
 </template>
   
   <script>
-  import LeftMenu from '@/components/dashboard/LeftMenu.vue';
+  import LeftMenu from '@/dashboard/LeftMenu.vue';
   import DetailedTaskCard from '@/components/DetailedTaskCard.vue';
   
 

@@ -71,7 +71,7 @@
         <v-list-item
           class="submenu-item"
           link
-          to="/projects/create"
+          to="/project-create"
         >
           <v-list-item-title>Create projects</v-list-item-title>
         </v-list-item>
@@ -94,21 +94,24 @@
         <v-list-item
           class="submenu-item"
           link
-          to="/clients"
+          to="/client-main"
+          @click="navigateTo('/client-main')"
         >
           <v-list-item-title>Clients</v-list-item-title>
         </v-list-item>
         <v-list-item
           class="submenu-item"
           link
-          to="/clients/invite"
+          to="/invite-member"
+          @click="navigateTo('/invite-member')"
         >
           <v-list-item-title>Invite freelancer</v-list-item-title>
         </v-list-item>
         <v-list-item
           class="submenu-item"
           link
-          to="/clients/team"
+          to="/my-team"
+          @click="navigateTo('/my-team')"
         >
           <v-list-item-title>My team</v-list-item-title>
         </v-list-item>

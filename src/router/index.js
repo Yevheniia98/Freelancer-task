@@ -9,6 +9,12 @@ import HomeSaas from '@/views/HomeSaas.vue';
 import ProjectSection from '@/views/ProjectSection.vue';
 import ProjectTaskVue from '@/views/ProjectTaskVue.vue';
 import ProjectCreate from '@/views/ProjectCreate.vue';
+import ClientMain from '@/Clients Section/ClientMain.vue';
+import CreateClient from '@/Clients Section/CreateClient.vue';
+import MyTeam from '@/Clients Section/MyTeam.vue';
+import InviteMember from '@/Invite member/InviteMember.vue';
+import InviteEmail from '@/Invite member/InviteEmail.vue';
+import InviteApp from '@/Invite member/InviteApp.vue';
 
 const routes = [
   {
@@ -64,7 +70,43 @@ const routes = [
     path: '/project-create',
     name: 'ProjectCreate',
     component: ProjectCreate 
-  }
+  },
+
+  {
+    path: '/client-main',
+    name: 'ClientMain',
+    component: ClientMain,
+  },
+
+  {
+    path: '/invite-member',
+    name: 'InviteMember',
+    component: InviteMember,
+  },
+
+  { 
+    path: '/invite-email',
+    name: 'InviteEmail',
+    component: InviteEmail 
+  },
+
+  {
+    path: '/invite-app',
+    name: 'InviteApp',
+    component: InviteApp,
+  },
+
+  {
+    path: '/create-client',
+    name: 'CreateClient',
+    component: CreateClient,
+  },
+
+  {
+    path: '/my-team',
+    name: 'MyTeam',
+    component: MyTeam,
+  },
 
 
 

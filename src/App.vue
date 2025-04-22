@@ -1,7 +1,9 @@
 <template>
+  <v-app>
   <div id="app">
     <router-view /> <!-- Здесь будет рендериться страница в зависимости от маршрута -->
   </div>
+</v-app>
 </template>
 
 <script>
