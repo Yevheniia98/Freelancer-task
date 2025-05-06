@@ -1,7 +1,14 @@
+<!--DetailedTaskCard-->
 <template>
-  <v-card class="rounded-lg mb-4 pa-6">
-    <div class="d-flex justify-space-between align-center mb-4">
-      <div class="text-subtitle-1 font-weight-bold">
+  <v-card
+    class="rounded-lg mb-4 pa-4 pa-sm-6"
+    elevation="1"
+  >
+    <div class="d-flex justify-space-between align-center mb-4 flex-wrap">
+      <div
+        class="text-subtitle-1 font-weight-bold mb-2 mb-sm-0 text-truncate pr-2"
+        style="max-width: 100%;"
+      >
         {{ task.title }}
       </div>
       <v-chip 
@@ -84,40 +91,41 @@
 </template>
   
   <script>
-  export default {
-    name: 'DetailedTaskCard',
-    props: {
-      task: {
-        type: Object,
-        required: true
-      },
-      memberAvatars: {
-        type: Object,
-        default: () => ({
-          1: 'https://randomuser.me/api/portraits/men/1.jpg',
-          2: 'https://randomuser.me/api/portraits/women/2.jpg',
-          3: 'https://randomuser.me/api/portraits/men/3.jpg',
-          4: 'https://randomuser.me/api/portraits/women/4.jpg'
-        })
-      }
+  
+export default {
+  name: 'DetailedTaskCard',
+  props: {
+    task: {
+      type: Object,
+      required: true
     },
-    methods: {
-      getStatusColor(status) {
-        const colors = {
-          'new': 'blue',
-          'planning': 'indigo',
-          'in progress': 'amber-darken-1',
-          'completed': 'teal-darken-1',
-          'on hold': 'grey'
-        };
-        return colors[status.toLowerCase()] || 'blue';
-      },
-      getProgressColor(progress) {
-        if (progress >= 75) return 'teal-darken-1';
-        if (progress >= 50) return 'amber-darken-1';
-        if (progress >= 25) return 'orange';
-        return 'red';
-      }
+    memberAvatars: {
+      type: Object,
+      default: () => ({
+        1: 'https://randomuser.me/api/portraits/men/1.jpg',
+        2: 'https://randomuser.me/api/portraits/women/2.jpg',
+        3: 'https://randomuser.me/api/portraits/men/3.jpg',
+        4: 'https://randomuser.me/api/portraits/women/4.jpg'
+      })
+    }
+  },
+  methods: {
+    getStatusColor(status) {
+      const colors = {
+        'new': 'blue',
+        'planning': 'indigo',
+        'in progress': 'amber-darken-1',
+        'completed': 'teal-darken-1',
+        'on hold': 'grey'
+      };
+      return colors[status.toLowerCase()] || 'blue';
+    },
+    getProgressColor(progress) {
+      if (progress >= 75) return 'teal-darken-1';
+      if (progress >= 50) return 'amber-darken-1';
+      if (progress >= 25) return 'orange';
+      return 'red';
     }
   }
+}
   </script>

@@ -44,8 +44,8 @@
             variant="outlined"
             color="teal"
             min-width="150px"
-            @click="inviteViaPlatform"
             to="/invite-app"
+            @click="inviteViaPlatform"
           >
             Invite via platform
           </v-btn>
@@ -54,8 +54,8 @@
             color="teal"
             class="text-white"
             min-width="150px"
-            @click="inviteViaEmail"
             to="/invite-email"
+            @click="inviteViaEmail"
           >
             Invite via email
           </v-btn>

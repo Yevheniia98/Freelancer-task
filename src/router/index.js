@@ -15,6 +15,21 @@ import MyTeam from '@/Clients Section/MyTeam.vue';
 import InviteMember from '@/Invite member/InviteMember.vue';
 import InviteEmail from '@/Invite member/InviteEmail.vue';
 import InviteApp from '@/Invite member/InviteApp.vue';
+import TaskDashboard from '@/Tasks/TaskDashboard.vue';
+import FinanceDashboard from '@/Finance/FinanceDashboard.vue';
+import CalendarSection from '@/Calendar/CalendarSection.vue';
+import DesignTools from '@/Tool/DesignTools.vue';
+import AccountSetting from '@/setting/AccountSetting.vue';
+import PasswordSecurity from '@/setting/PasswordSecurity.vue';
+import NotificationPage from '@/setting/NotificationPage.vue';
+import DataExport from '@/setting/DataExport.vue';
+import LogOut from '@/setting/LogOut.vue';
+import SubscriptionPage from '@/setting/SubscriptionPage.vue';
+import CustomizationPage from '@/setting/CustomizationPage.vue';
+import SecurityPage from '@/setting/SecurityPage.vue';
+import IntegretionPage from '@/setting/IntegretionPage.vue';
+import BackUp from '@/setting/BackUp.vue';
+import SupportPage from '@/setting/SupportPage.vue';
 
 const routes = [
   {
@@ -108,7 +123,95 @@ const routes = [
     component: MyTeam,
   },
 
+  {
+    path: '/task-dashboard',
+    name: 'TaskDashboard',
+    component: TaskDashboard,
+  },
 
+  {
+    path: '/finance-dashboard',
+    name: 'FinanceDashboard',
+    component: FinanceDashboard,
+  },
+   
+  {
+    path: '/calendar',
+    name: 'CalendarSection',
+    component: CalendarSection,
+  },
+
+  {
+    path: '/tools',
+    name: 'DesignTools',
+    component: DesignTools,
+  },
+
+  {
+    path: '/account',
+    name: 'AccountSetting',
+    component: AccountSetting,
+  },
+
+  {
+    path: '/password1',
+    name: 'PasswordSecurity',
+    component: PasswordSecurity,
+  },
+
+  {
+    path: '/notification',
+    name: 'NotificationPage',
+    component: NotificationPage,
+  },
+
+  { 
+    path: '/data-export',
+    name: 'DataExport',
+    component: DataExport 
+  },
+
+  { 
+    path: '/log-out',
+    name: 'LogOut',
+    component: LogOut 
+  },
+
+  { 
+    path: '/sub',
+    name: 'Subscription',
+    component: SubscriptionPage 
+  },
+
+  { 
+    path: '/custom',
+    name: 'Customization',
+    component: CustomizationPage 
+  },
+
+  { 
+    path: '/secure',
+    name: 'Security',
+    component: SecurityPage 
+  },
+
+  { 
+    path: '/integrate',
+    name: 'Integration',
+    component: IntegretionPage 
+  },
+
+  { 
+    path: '/backup',
+    name: 'BackUp',
+    component: BackUp 
+  },
+
+  { 
+    path: '/support',
+    name: 'Support',
+    component: SupportPage 
+  },
 
 ];
 

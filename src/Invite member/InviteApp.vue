@@ -1,71 +1,88 @@
 <template>
-    <v-dialog v-model="dialog" max-width="500" content-class="invite-dialog">
-      <v-card class="invite-card">
-        <div class="dialog-header d-flex align-center">
-          <v-avatar size="36" color="#004D40" class="mr-2">
-            <span class="text-h6 font-weight-bold white--text">FT</span>
-          </v-avatar>
-          <span class="text-h6">Freelance Task</span>
-          <v-spacer></v-spacer>
-          <v-btn icon @click="dialog = false">
-            <v-icon>mdi-close</v-icon>
+  <v-dialog
+    v-model="dialog"
+    max-width="500"
+    content-class="invite-dialog"
+  >
+    <v-card class="invite-card">
+      <div class="dialog-header d-flex align-center">
+        <v-avatar
+          size="36"
+          color="#004D40"
+          class="mr-2"
+        >
+          <span class="text-h6 font-weight-bold white--text">FT</span>
+        </v-avatar>
+        <span class="text-h6">Freelance Task</span>
+        <v-spacer />
+        <v-btn
+          icon
+          @click="dialog = false"
+        >
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </div>
+        
+      <v-card-text class="invite-content text-center pa-6">
+        <div class="gradient-background" />
+          
+        <h2 class="text-h5 font-weight-bold mb-8">
+          Invite people to your<br>Workspace:
+        </h2>
+          
+        <div class="d-flex align-center mb-4">
+          <div class="text-subtitle-1 mr-4 invite-label">
+            Search via Name
+          </div>
+          <v-text-field
+            v-model="nameSearch"
+            variant="outlined"
+            hide-details
+            bg-color="white"
+            class="search-field"
+          />
+        </div>
+          
+        <div class="text-subtitle-1 my-4">
+          or
+        </div>
+          
+        <div class="d-flex align-center mb-8">
+          <div class="text-subtitle-1 mr-4 invite-label">
+            Search by Email
+          </div>
+          <v-text-field
+            v-model="emailSearch"
+            variant="outlined"
+            hide-details
+            bg-color="white"
+            class="search-field"
+          />
+        </div>
+          
+        <div class="d-flex justify-space-between mt-8">
+          <v-btn
+            variant="outlined"
+            color="#FF5252"
+            text-color="#FF5252"
+            class="skip-btn"
+            @click="dialog = false"
+          >
+            Skip
+          </v-btn>
+            
+          <v-btn
+            color="teal"
+            class="find-btn px-6"
+            @click="findUsers"
+          >
+            Find
           </v-btn>
         </div>
-        
-        <v-card-text class="invite-content text-center pa-6">
-          <div class="gradient-background"></div>
-          
-          <h2 class="text-h5 font-weight-bold mb-8">
-            Invite people to your<br>Workspace:
-          </h2>
-          
-          <div class="d-flex align-center mb-4">
-            <div class="text-subtitle-1 mr-4 invite-label">Search via Name</div>
-            <v-text-field
-              v-model="nameSearch"
-              variant="outlined"
-              hide-details
-              bg-color="white"
-              class="search-field"
-            ></v-text-field>
-          </div>
-          
-          <div class="text-subtitle-1 my-4">or</div>
-          
-          <div class="d-flex align-center mb-8">
-            <div class="text-subtitle-1 mr-4 invite-label">Search by Email</div>
-            <v-text-field
-              v-model="emailSearch"
-              variant="outlined"
-              hide-details
-              bg-color="white"
-              class="search-field"
-            ></v-text-field>
-          </div>
-          
-          <div class="d-flex justify-space-between mt-8">
-            <v-btn
-              variant="outlined"
-              color="#FF5252"
-              text-color="#FF5252"
-              class="skip-btn"
-              @click="dialog = false"
-            >
-              Skip
-            </v-btn>
-            
-            <v-btn
-              color="teal"
-              class="find-btn px-6"
-              @click="findUsers"
-            >
-              Find
-            </v-btn>
-          </div>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
-  </template>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+</template>
   
   <script>
   export default {
