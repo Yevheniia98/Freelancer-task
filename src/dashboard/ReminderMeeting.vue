@@ -603,6 +603,9 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
+// Remove this import since you're defining your own implementation
+// import { isSameDay } from 'vuetify/lib/util/dateTimeUtils' 
+
 
 // State
 const eventType = ref('event');
@@ -622,13 +625,17 @@ const endDateMenu = ref(false);
 const todayDate = new Date();
 const todayISOString = todayDate.toISOString().slice(0, 10);
 
+// Set default time values
+const defaultTimeFrom = '09:00';
+const defaultTimeTo = '10:00';
+
 // Initialize newEvent with default values
 const newEvent = ref({
   title: '',
   description: '', // New field
   date: todayISOString,
-  timeFrom: '09:00',
-  timeTo: '10:00',
+  timeFrom: defaultTimeFrom,
+  timeTo: defaultTimeTo,
   meetingLink: '',
   repeatEvery: 'On',
   repeatDays: [],
@@ -636,12 +643,105 @@ const newEvent = ref({
   attendees: []
 });
 
+// Define your own isSameDay function
+function isSameDay(date, comparing) {
+  // Check if both are valid dates
+  if (!(date instanceof Date) || !(comparing instanceof Date) || isNaN(date) || isNaN(comparing)) {
+    return false;
+  }
+  
+  // Compare year, month, and day
+  return date.getDate() === comparing.getDate() && 
+         date.getMonth() === comparing.getMonth() && 
+         date.getFullYear() === comparing.getFullYear();
+}
+
+// Helper function to convert Date objects to ISO string format
+function dateToISO(date) {
+  if (!date) return '';
+  if (date instanceof Date) {
+    return date.toISOString().slice(0, 10);
+  }
+  return String(date);
+}
+
 // Set end repeat date to 1 month from start date by default
 const setDefaultEndDate = () => {
   const endDate = new Date(newEvent.value.date);
   endDate.setMonth(endDate.getMonth() + 1);
   newEvent.value.endRepeatDate = endDate.toISOString().slice(0, 10);
 };
+
+function formatDateString(year, month, day) {
+  const adjustedMonth = month < 0 ? 11 : month > 11 ? 0 : month;
+  const adjustedYear = month < 0 ? year - 1 : month > 11 ? year + 1 : year;
+
+  return `${adjustedYear}-${String(adjustedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+
+// Helper function for date formatting
+function formatDateForDisplay(dateString, options = {}) {
+  if (!dateString) return '';
+  
+  try {
+    const date = new Date(dateString);
+    const formatOptions = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    };
+    
+    if (options.includeDay) {
+      formatOptions.weekday = 'long';
+    }
+    
+    return new Intl.DateTimeFormat('en-US', formatOptions).format(date);
+  } catch (error) {
+    console.error('Date formatting error:', error);
+    return dateString;
+  }
+}
+
+// Helper function for time formatting
+function formatTimeForDisplay(timeString) {
+  if (!timeString) return '';
+  
+  try {
+    const [hours, minutes] = timeString.split(':');
+    const h = parseInt(hours);
+    if (isNaN(h)) return '';
+    
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const hour = h % 12 || 12;
+    return `${hour}:${minutes} ${ampm}`;
+  } catch (error) {
+    console.error('Time formatting error:', error);
+    return '';
+  }
+}
+
+// Reset form function
+function resetForm() {
+  newEvent.value = {
+    title: '',
+    description: '',
+    date: todayISOString,
+    timeFrom: defaultTimeFrom, // Use default time values when resetting
+    timeTo: defaultTimeTo,     // Use default time values when resetting
+    meetingLink: '',
+    repeatEvery: 'On',
+    repeatDays: [],
+    endRepeatDate: ''
+  };
+  // Close any open menus
+  dateMenu.value = false;
+  timeFromMenu.value = false;
+  timeToMenu.value = false;
+  endDateMenu.value = false;
+  
+  selectedPeople.value = [];
+  eventType.value = 'event';
+}
 
 // Call this when repeat option changes
 watch(() => newEvent.value.repeatEvery, (newValue) => {
@@ -656,6 +756,9 @@ const formattedTimeFrom = computed(() => formatTimeForDisplay(newEvent.value.tim
 const formattedTimeTo = computed(() => formatTimeForDisplay(newEvent.value.timeTo));
 const formattedEndDate = computed(() => formatDateForDisplay(newEvent.value.endRepeatDate));
 const formattedSelectedDate = computed(() => formatDateForDisplay(newEvent.value.date, { includeDay: true }));
+
+const todayISO = dateToISO(new Date());
+newEvent.value.date = todayISO;
 
 // Get events for the selected day
 const eventsForSelectedDay = computed(() => {
@@ -717,47 +820,6 @@ function selectDateFromCalendar(date) {
   newEvent.value.date = date;
 }
 
-// Helper function for date formatting
-function formatDateForDisplay(dateString, options = {}) {
-  if (!dateString) return '';
-  
-  try {
-    const date = new Date(dateString);
-    const formatOptions = {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    };
-    
-    if (options.includeDay) {
-      formatOptions.weekday = 'long';
-    }
-    
-    return new Intl.DateTimeFormat('en-US', formatOptions).format(date);
-  } catch (error) {
-    console.error('Date formatting error:', error);
-    return dateString;
-  }
-}
-
-// Helper function for time formatting
-function formatTimeForDisplay(timeString) {
-  if (!timeString) return '';
-  
-  try {
-    const [hours, minutes] = timeString.split(':');
-    const h = parseInt(hours);
-    if (isNaN(h)) return '';
-    
-    const ampm = h >= 12 ? 'PM' : 'AM';
-    const hour = h % 12 || 12;
-    return `${hour}:${minutes} ${ampm}`;
-  } catch (error) {
-    console.error('Time formatting error:', error);
-    return '';
-  }
-}
-
 const currentMonthText = computed(() => {
   try {
     const date = new Date(currentYear.value, currentMonth.value, 1);
@@ -789,7 +851,7 @@ const calendarDays = computed(() => {
       days.push({
         dayNumber: prevLastDay - i,
         currentMonth: false,
-        date: `${prevYear}-${String(prevMonth + 1).padStart(2, '0')}-${String(prevLastDay - i).padStart(2, '0')}`
+        date: formatDateString(prevYear, prevMonth, prevLastDay - i)
       });
     }
     
@@ -798,7 +860,7 @@ const calendarDays = computed(() => {
       days.push({
         dayNumber: i,
         currentMonth: true,
-        date: `${currentYear.value}-${String(currentMonth.value + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`
+        date: formatDateString(currentYear.value, currentMonth.value, i)
       });
     }
     
@@ -811,7 +873,7 @@ const calendarDays = computed(() => {
       days.push({
         dayNumber: i,
         currentMonth: false,
-        date: `${nextYear}-${String(nextMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`
+        date: formatDateString(nextYear, nextMonth, i)
       });
     }
     
@@ -871,7 +933,10 @@ function isToday(date) {
   if (!date) return false;
   
   try {
-    return date === todayISOString;
+    // Use the isSameDay function to compare with today's date
+    const today = new Date();
+    const dateObj = new Date(date);
+    return isSameDay(today, dateObj);
   } catch (error) {
     console.error('Date comparison error:', error);
     return false;
@@ -950,30 +1015,6 @@ function getTimePeriod(timeString) {
     console.error('Time period error:', error);
     return '';
   }
-}
-
-// Reset form function
-function resetForm() {
-  newEvent.value = {
-    title: '',
-    description: '',
-    date: todayISOString,
-    timeFrom: '09:00',
-    timeTo: '10:00',
-    meetingLink: '',
-    repeatEvery: 'On',
-    repeatDays: [],
-    endRepeatDate: ''
-  };
-  
-  // Close any open menus
-  dateMenu.value = false;
-  timeFromMenu.value = false;
-  timeToMenu.value = false;
-  endDateMenu.value = false;
-  
-  selectedPeople.value = [];
-  eventType.value = 'event';
 }
 
 // Form validation
@@ -1101,20 +1142,31 @@ function generateRecurringEvents(sourceEvent) {
 onMounted(() => {
   // Default to today's date
   goToToday();
+
+  if (!newEvent.value.timeFrom) {
+    newEvent.value.timeFrom = defaultTimeFrom;
+  }
+  
+  if (!newEvent.value.timeTo) {
+    newEvent.value.timeTo = defaultTimeTo;
+  }
+  
+  // Set default end repeat date
+  setDefaultEndDate();
 });
 </script>
 
 <style scoped>
 .reminder-container {
   display: flex;
-  width: 1000px;
+  width: 1305px;
   height: 700px;
   border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   background-color: white;
-  margin-left: 20px;
+  margin-left: 0px;
 }
 
 /* Left Column - Meeting Cards */
@@ -1239,7 +1291,7 @@ onMounted(() => {
 
 /* Middle Column - Create Reminder */
 .reminder-create {
-  width: 300px;
+  width: 400px;
   height: 100%;
   padding: 16px;
   overflow-y: auto;
@@ -1345,7 +1397,7 @@ onMounted(() => {
 
 /* Calendar Section - Updated position */
 .calendar-container {
-  width: 350px;
+  width: 550px;
   margin: 24px auto 0;
   transform: none; /* Remove transform property */
 }
@@ -1382,12 +1434,13 @@ onMounted(() => {
 
 .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, 10fr);
   grid-template-rows: repeat(5, 1fr);
-  height: 200px;
+  height: 350px;
   gap: 1px;
   border: 1px solid #e0e0e0;
   border-radius: 4px;
+  
 }
 
 .calendar-day {

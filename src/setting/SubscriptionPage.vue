@@ -52,17 +52,27 @@
         
         <!-- Current Subscription Section -->
         <div class="subscription-container mb-10">
-          <h1 class="text-h4 font-weight-bold mb-6">Current subscription</h1>
+          <h1 class="text-h4 font-weight-bold mb-6">
+            Current subscription
+          </h1>
           
           <div class="mb-8">
-            <div class="text-h6 font-weight-bold mb-1">Starter</div>
-            <div class="text-subtitle-1">Free trial 7-days</div>
+            <div class="text-h6 font-weight-bold mb-1">
+              Starter
+            </div>
+            <div class="text-subtitle-1">
+              Free trial 7-days
+            </div>
           </div>
           
           <div class="mb-4">
             <div class="d-flex align-center mb-1">
-              <div class="text-h6 font-weight-bold">Monthly subscription</div>
-              <div class="text-h6 font-weight-bold ml-2">15$</div>
+              <div class="text-h6 font-weight-bold">
+                Monthly subscription
+              </div>
+              <div class="text-h6 font-weight-bold ml-2">
+                15$
+              </div>
             </div>
             <div class="text-body-1">
               You're on free trial that ends on October 28. You can manage your payment methods, upgrade plans or cancel your subscription.
@@ -72,10 +82,14 @@
         
         <!-- Payment Methods Section -->
         <div class="payment-methods-container mb-10">
-          <h2 class="text-h5 font-weight-bold mb-6">Payment methods</h2>
+          <h2 class="text-h5 font-weight-bold mb-6">
+            Payment methods
+          </h2>
           
           <div class="d-flex justify-space-between align-center">
-            <div class="text-body-1">Modify your payment method for future payments</div>
+            <div class="text-body-1">
+              Modify your payment method for future payments
+            </div>
             
             <v-btn
               color="primary"
@@ -89,7 +103,9 @@
         
         <!-- Subscription Plans Section -->
         <div class="subscription-plans-container mb-10">
-          <h2 class="text-h5 font-weight-bold mb-6">Subscription Plans</h2>
+          <h2 class="text-h5 font-weight-bold mb-6">
+            Subscription Plans
+          </h2>
           
           <div class="d-flex gap-6">
             <!-- Monthly Plan Card -->
@@ -99,10 +115,14 @@
               variant="outlined"
               rounded="lg"
             >
-              <h3 class="text-h5 font-weight-bold text-center mb-6">Monthly plan</h3>
+              <h3 class="text-h5 font-weight-bold text-center mb-6">
+                Monthly plan
+              </h3>
               
               <ul class="plan-features pl-6">
-                <li class="mb-2">15$ per month</li>
+                <li class="mb-2">
+                  15$ per month
+                </li>
                 <li>Full access.</li>
               </ul>
             </v-card>
@@ -114,11 +134,17 @@
               variant="outlined"
               rounded="lg"
             >
-              <h3 class="text-h5 font-weight-bold text-center mb-6">6-Months plan</h3>
+              <h3 class="text-h5 font-weight-bold text-center mb-6">
+                6-Months plan
+              </h3>
               
               <ul class="plan-features pl-6">
-                <li class="mb-2">60$ per month</li>
-                <li class="mb-2">Full access</li>
+                <li class="mb-2">
+                  60$ per month
+                </li>
+                <li class="mb-2">
+                  Full access
+                </li>
                 <li>Save 30%</li>
               </ul>
             </v-card>
@@ -127,7 +153,9 @@
         
         <!-- Billing History Section -->
         <div class="billing-history-container mb-10">
-          <h2 class="text-h5 font-weight-bold mb-6">Billing History</h2>
+          <h2 class="text-h5 font-weight-bold mb-6">
+            Billing History
+          </h2>
           
           <v-table>
             <thead>
@@ -140,7 +168,10 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in billingHistory" :key="index">
+              <tr
+                v-for="(item, index) in billingHistory"
+                :key="index"
+              >
                 <td>{{ item.date }}</td>
                 <td>{{ item.type }}</td>
                 <td>{{ item.status }}</td>
@@ -162,10 +193,14 @@
         
         <!-- Cancel Subscription Section -->
         <div class="cancel-subscription-container">
-          <h2 class="text-h5 font-weight-bold mb-4">Pause or cancel subscription</h2>
+          <h2 class="text-h5 font-weight-bold mb-4">
+            Pause or cancel subscription
+          </h2>
           
           <div class="d-flex justify-space-between align-center">
-            <div class="text-body-1">By canceling your account you will lose all your data.</div>
+            <div class="text-body-1">
+              By canceling your account you will lose all your data.
+            </div>
             
             <v-btn
               color="error"
@@ -195,7 +230,7 @@
             </v-card-text>
             
             <v-card-actions class="pt-4">
-              <v-spacer></v-spacer>
+              <v-spacer />
               <v-btn
                 color="grey-darken-1"
                 variant="text"
@@ -228,13 +263,17 @@
             <v-card-text>
               <div class="cancellation-reasons">
                 <v-radio-group v-model="cancellationReason">
-                  <div class="mb-4" v-for="(reason, index) in cancellationReasons" :key="index">
+                  <div
+                    v-for="(reason, index) in cancellationReasons"
+                    :key="index"
+                    class="mb-4"
+                  >
                     <v-radio
                       :value="reason"
                       color="primary"
                       class="pa-0 ma-0"
                     >
-                      <template v-slot:label>
+                      <template #label>
                         <span class="ml-2">{{ reason }}</span>
                       </template>
                     </v-radio>
@@ -265,7 +304,7 @@
           timeout="5000"
         >
           Your subscription has been successfully canceled.
-          <template v-slot:actions>
+          <template #actions>
             <v-btn
               color="white"
               variant="text"

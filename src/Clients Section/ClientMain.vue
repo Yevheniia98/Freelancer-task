@@ -1,6 +1,7 @@
 <template>
   <v-app>
     <LeftMenu />
+    <SearchBar />
       
     <v-main class="bg-grey-lighten-4">
       <v-container
@@ -254,11 +255,13 @@
   <script>
   import { defineComponent, ref, reactive, onMounted } from 'vue';
   import LeftMenu from '@/dashboard/LeftMenu.vue';
+  import SearchBar from '@/dashboard/SearchBar.vue';
 
 export default defineComponent({
   name: 'ClientsPage',
   components: {
-    LeftMenu
+    LeftMenu,
+    SearchBar
   },
   setup() {
     // Responsive state

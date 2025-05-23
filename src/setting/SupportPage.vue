@@ -1,422 +1,492 @@
 <template>
-    <v-app>
-      <LeftMenu
-        :rail="!sidebarExpanded"
-        @update:rail="sidebarExpanded = !$event"
-      />
+  <v-app>
+    <LeftMenu
+      :rail="!sidebarExpanded"
+      @update:rail="sidebarExpanded = !$event"
+    />
       
-      <v-main
-        :class="{ 'ml-60': sidebarExpanded, 'ml-14': !sidebarExpanded }"
-        class="transition-all duration-300"
+    <v-main
+      :class="{ 'ml-60': sidebarExpanded, 'ml-14': !sidebarExpanded }"
+      class="transition-all duration-300"
+    >
+      <v-container
+        fluid
+        class="pa-6"
       >
-        <v-container
-          fluid
-          class="pa-6"
-        >
-          <!-- Header with Search -->
-          <div class="d-flex justify-space-between align-center mb-10">
-            <div class="logo">
-              <!-- You can add your logo here if needed -->
-            </div>
-            
-            <div class="d-flex align-center gap-4">
-              <div class="search-container">
-                <v-text-field
-                  density="compact"
-                  placeholder="Search"
-                  prepend-inner-icon="mdi-magnify"
-                  variant="outlined"
-                  hide-details
-                  class="rounded-pill"
-                  style="max-width: 240px;"
-                />
-              </div>
-              
-              <v-btn
-                icon
-                class="bg-purple-lighten-4"
-                color="purple"
-              >
-                <v-icon>mdi-earth</v-icon>
-              </v-btn>
-              
-              <v-btn
-                icon
-                class="bg-amber-lighten-4"
-                color="amber"
-              >
-                <v-icon>mdi-bell</v-icon>
-              </v-btn>
-            </div>
+        <!-- Header with Search -->
+        <div class="d-flex justify-space-between align-center mb-10">
+          <div class="logo">
+            <!-- You can add your logo here if needed -->
           </div>
-          
-          <!-- Main Content -->
-          <div class="support-container">
-            <h1 class="text-h4 font-weight-bold mb-2">Support & Feedback</h1>
-            <p class="text-subtitle-1 text-grey mb-8">Get help, share your thoughts, and help us improve Freelance Task</p>
             
-            <!-- Help & Support Section -->
-            <div class="mb-10">
-              <h2 class="text-h5 font-weight-bold mb-6">Help & Support</h2>
-              
-              <div class="d-flex flex-wrap gap-6 mb-8">
-                <!-- Quick Help Card -->
-                <v-card
-                  width="320"
-                  height="220"
-                  class="support-card"
-                  variant="outlined"
-                >
-                  <v-card-item>
-                    <v-card-title class="d-flex align-center gap-2 text-primary">
-                      <v-icon color="primary" size="large">mdi-help-circle</v-icon>
-                      Quick Help
-                    </v-card-title>
-                  </v-card-item>
-                  
-                  <v-card-text>
-                    <p class="mb-4">Find quick answers to common questions and issues.</p>
-                    <v-list>
-                      <v-list-item
-                        v-for="(item, index) in helpItems"
-                        :key="index"
-                        :title="item.title"
-                        density="compact"
-                        class="pl-0"
-                        @click="openKnowledgeBase(item)"
-                      >
-                        <template v-slot:prepend>
-                          <v-icon color="primary" size="small">mdi-arrow-right</v-icon>
-                        </template>
-                      </v-list-item>
-                    </v-list>
-                  </v-card-text>
-                </v-card>
-                
-                <!-- Knowledge Base Card -->
-                <v-card
-                  width="320"
-                  height="220"
-                  class="support-card"
-                  variant="outlined"
-                >
-                  <v-card-item>
-                    <v-card-title class="d-flex align-center gap-2 text-primary">
-                      <v-icon color="primary" size="large">mdi-book-open-page-variant</v-icon>
-                      Knowledge Base
-                    </v-card-title>
-                  </v-card-item>
-                  
-                  <v-card-text>
-                    <p class="mb-4">Browse our comprehensive documentation and tutorials.</p>
-                    <v-btn
-                      color="primary"
-                      variant="text"
-                      class="px-0"
-                      @click="openDocumentation"
-                    >
-                      Browse documentation
-                      <v-icon end>mdi-arrow-right</v-icon>
-                    </v-btn>
-                  </v-card-text>
-                </v-card>
-                
-                <!-- Contact Support Card -->
-                <v-card
-                  width="320"
-                  height="220"
-                  class="support-card"
-                  variant="outlined"
-                >
-                  <v-card-item>
-                    <v-card-title class="d-flex align-center gap-2 text-primary">
-                      <v-icon color="primary" size="large">mdi-headset</v-icon>
-                      Contact Support
-                    </v-card-title>
-                  </v-card-item>
-                  
-                  <v-card-text>
-                    <p class="mb-4">Need personalized help? Our support team is ready to assist you.</p>
-                    <v-btn
-                      color="primary"
-                      variant="flat"
-                      @click="openContactForm"
-                    >
-                      Contact Support
-                    </v-btn>
-                  </v-card-text>
-                </v-card>
-              </div>
+          <div class="d-flex align-center gap-4">
+            <div class="search-container">
+              <v-text-field
+                density="compact"
+                placeholder="Search"
+                prepend-inner-icon="mdi-magnify"
+                variant="outlined"
+                hide-details
+                class="rounded-pill"
+                style="max-width: 240px;"
+              />
             </div>
-            
-            <!-- Submit Feedback Section -->
-            <div class="mb-10">
-              <h2 class="text-h5 font-weight-bold mb-6">Submit Feedback</h2>
               
-              <v-card class="mb-6 pa-6" variant="outlined">
-                <p class="text-body-1 mb-6">
-                  Your feedback helps us improve Freelance Task. Tell us what you love, what could be better, or suggest new features.
-                </p>
-                
-                <v-form @submit.prevent="submitFeedback">
-                  <v-select
-                    v-model="feedbackType"
-                    :items="feedbackTypes"
-                    label="Feedback Type"
-                    variant="outlined"
-                    class="mb-4"
-                    required
-                  />
-                  
-                  <v-text-field
-                    v-model="feedbackSubject"
-                    label="Subject"
-                    variant="outlined"
-                    class="mb-4"
-                    required
-                  />
-                  
-                  <v-textarea
-                    v-model="feedbackMessage"
-                    label="Your Feedback"
-                    variant="outlined"
-                    rows="4"
-                    counter="500"
-                    :maxlength="500"
-                    class="mb-4"
-                    required
-                  />
-                  
-                  <div class="mb-4">
-                    <p class="mb-2 text-body-2">Rate your overall experience</p>
-                    <v-rating
-                      v-model="feedbackRating"
-                      hover
-                      half-increments
-                      size="large"
-                      color="amber"
-                    />
-                  </div>
-                  
-                  <v-file-input
-                    v-model="attachments"
-                    label="Attach Screenshots or Files"
-                    variant="outlined"
-                    prepend-icon="mdi-paperclip"
-                    show-size
-                    counter
-                    multiple
-                    class="mb-6"
-                    accept="image/*, application/pdf"
-                  />
-                  
-                  <div class="d-flex justify-end">
-                    <v-btn
+            <v-btn
+              icon
+              class="bg-purple-lighten-4"
+              color="purple"
+            >
+              <v-icon>mdi-earth</v-icon>
+            </v-btn>
+              
+            <v-btn
+              icon
+              class="bg-amber-lighten-4"
+              color="amber"
+            >
+              <v-icon>mdi-bell</v-icon>
+            </v-btn>
+          </div>
+        </div>
+          
+        <!-- Main Content -->
+        <div class="support-container">
+          <h1 class="text-h4 font-weight-bold mb-2">
+            Support & Feedback
+          </h1>
+          <p class="text-subtitle-1 text-grey mb-8">
+            Get help, share your thoughts, and help us improve Freelance Task
+          </p>
+            
+          <!-- Help & Support Section -->
+          <div class="mb-10">
+            <h2 class="text-h5 font-weight-bold mb-6">
+              Help & Support
+            </h2>
+              
+            <div class="d-flex flex-wrap gap-6 mb-8">
+              <!-- Quick Help Card -->
+              <v-card
+                width="320"
+                height="220"
+                class="support-card"
+                variant="outlined"
+              >
+                <v-card-item>
+                  <v-card-title class="d-flex align-center gap-2 text-primary">
+                    <v-icon
                       color="primary"
-                      variant="flat"
-                      type="submit"
-                      :loading="submitting"
+                      size="large"
                     >
-                      Submit Feedback
-                    </v-btn>
-                  </div>
-                </v-form>
+                      mdi-help-circle
+                    </v-icon>
+                    Quick Help
+                  </v-card-title>
+                </v-card-item>
+                  
+                <v-card-text>
+                  <p class="mb-4">
+                    Find quick answers to common questions and issues.
+                  </p>
+                  <v-list>
+                    <v-list-item
+                      v-for="(item, index) in helpItems"
+                      :key="index"
+                      :title="item.title"
+                      density="compact"
+                      class="pl-0"
+                      @click="openKnowledgeBase(item)"
+                    >
+                      <template #prepend>
+                        <v-icon
+                          color="primary"
+                          size="small"
+                        >
+                          mdi-arrow-right
+                        </v-icon>
+                      </template>
+                    </v-list-item>
+                  </v-list>
+                </v-card-text>
+              </v-card>
+                
+              <!-- Knowledge Base Card -->
+              <v-card
+                width="320"
+                height="220"
+                class="support-card"
+                variant="outlined"
+              >
+                <v-card-item>
+                  <v-card-title class="d-flex align-center gap-2 text-primary">
+                    <v-icon
+                      color="primary"
+                      size="large"
+                    >
+                      mdi-book-open-page-variant
+                    </v-icon>
+                    Knowledge Base
+                  </v-card-title>
+                </v-card-item>
+                  
+                <v-card-text>
+                  <p class="mb-4">
+                    Browse our comprehensive documentation and tutorials.
+                  </p>
+                  <v-btn
+                    color="primary"
+                    variant="text"
+                    class="px-0"
+                    @click="openDocumentation"
+                  >
+                    Browse documentation
+                    <v-icon end>
+                      mdi-arrow-right
+                    </v-icon>
+                  </v-btn>
+                </v-card-text>
+              </v-card>
+                
+              <!-- Contact Support Card -->
+              <v-card
+                width="320"
+                height="220"
+                class="support-card"
+                variant="outlined"
+              >
+                <v-card-item>
+                  <v-card-title class="d-flex align-center gap-2 text-primary">
+                    <v-icon
+                      color="primary"
+                      size="large"
+                    >
+                      mdi-headset
+                    </v-icon>
+                    Contact Support
+                  </v-card-title>
+                </v-card-item>
+                  
+                <v-card-text>
+                  <p class="mb-4">
+                    Need personalized help? Our support team is ready to assist you.
+                  </p>
+                  <v-btn
+                    color="primary"
+                    variant="flat"
+                    @click="openContactForm"
+                  >
+                    Contact Support
+                  </v-btn>
+                </v-card-text>
               </v-card>
             </div>
+          </div>
             
-            <!-- Community & Resources Section -->
-            <div>
-              <h2 class="text-h5 font-weight-bold mb-6">Community & Resources</h2>
+          <!-- Submit Feedback Section -->
+          <div class="mb-10">
+            <h2 class="text-h5 font-weight-bold mb-6">
+              Submit Feedback
+            </h2>
               
-              <div class="d-flex flex-wrap gap-6">
-                <!-- Community Forums Card -->
-                <v-card
-                  width="320"
-                  class="support-card"
-                  variant="outlined"
-                >
-                  <v-card-item>
-                    <v-card-title class="d-flex align-center gap-2">
-                      <v-icon color="primary" size="large">mdi-forum</v-icon>
-                      Community Forums
-                    </v-card-title>
-                  </v-card-item>
-                  
-                  <v-card-text>
-                    <p class="mb-4">Connect with other freelancers, share tips, and get advice from the community.</p>
-                    <v-btn
-                      color="primary"
-                      variant="text"
-                      class="px-0"
-                      @click="openForums"
-                    >
-                      Join the conversation
-                      <v-icon end>mdi-arrow-right</v-icon>
-                    </v-btn>
-                  </v-card-text>
-                </v-card>
+            <v-card
+              class="mb-6 pa-6"
+              variant="outlined"
+            >
+              <p class="text-body-1 mb-6">
+                Your feedback helps us improve Freelance Task. Tell us what you love, what could be better, or suggest new features.
+              </p>
                 
-                <!-- Tutorials Card -->
-                <v-card
-                  width="320"
-                  class="support-card"
+              <v-form @submit.prevent="submitFeedback">
+                <v-select
+                  v-model="feedbackType"
+                  :items="feedbackTypes"
+                  label="Feedback Type"
                   variant="outlined"
-                >
-                  <v-card-item>
-                    <v-card-title class="d-flex align-center gap-2">
-                      <v-icon color="primary" size="large">mdi-video</v-icon>
-                      Video Tutorials
-                    </v-card-title>
-                  </v-card-item>
+                  class="mb-4"
+                  required
+                />
                   
-                  <v-card-text>
-                    <p class="mb-4">Watch step-by-step video guides to master Freelance Task features.</p>
-                    <v-btn
+                <v-text-field
+                  v-model="feedbackSubject"
+                  label="Subject"
+                  variant="outlined"
+                  class="mb-4"
+                  required
+                />
+                  
+                <v-textarea
+                  v-model="feedbackMessage"
+                  label="Your Feedback"
+                  variant="outlined"
+                  rows="4"
+                  counter="500"
+                  :maxlength="500"
+                  class="mb-4"
+                  required
+                />
+                  
+                <div class="mb-4">
+                  <p class="mb-2 text-body-2">
+                    Rate your overall experience
+                  </p>
+                  <v-rating
+                    v-model="feedbackRating"
+                    hover
+                    half-increments
+                    size="large"
+                    color="amber"
+                  />
+                </div>
+                  
+                <v-file-input
+                  v-model="attachments"
+                  label="Attach Screenshots or Files"
+                  variant="outlined"
+                  prepend-icon="mdi-paperclip"
+                  show-size
+                  counter
+                  multiple
+                  class="mb-6"
+                  accept="image/*, application/pdf"
+                />
+                  
+                <div class="d-flex justify-end">
+                  <v-btn
+                    color="primary"
+                    variant="flat"
+                    type="submit"
+                    :loading="submitting"
+                  >
+                    Submit Feedback
+                  </v-btn>
+                </div>
+              </v-form>
+            </v-card>
+          </div>
+            
+          <!-- Community & Resources Section -->
+          <div>
+            <h2 class="text-h5 font-weight-bold mb-6">
+              Community & Resources
+            </h2>
+              
+            <div class="d-flex flex-wrap gap-6">
+              <!-- Community Forums Card -->
+              <v-card
+                width="320"
+                class="support-card"
+                variant="outlined"
+              >
+                <v-card-item>
+                  <v-card-title class="d-flex align-center gap-2">
+                    <v-icon
                       color="primary"
-                      variant="text"
-                      class="px-0"
-                      @click="openTutorials"
+                      size="large"
                     >
-                      View tutorials
-                      <v-icon end>mdi-arrow-right</v-icon>
-                    </v-btn>
-                  </v-card-text>
-                </v-card>
+                      mdi-forum
+                    </v-icon>
+                    Community Forums
+                  </v-card-title>
+                </v-card-item>
+                  
+                <v-card-text>
+                  <p class="mb-4">
+                    Connect with other freelancers, share tips, and get advice from the community.
+                  </p>
+                  <v-btn
+                    color="primary"
+                    variant="text"
+                    class="px-0"
+                    @click="openForums"
+                  >
+                    Join the conversation
+                    <v-icon end>
+                      mdi-arrow-right
+                    </v-icon>
+                  </v-btn>
+                </v-card-text>
+              </v-card>
                 
-                <!-- Blog Card -->
-                <v-card
-                  width="320"
-                  class="support-card"
-                  variant="outlined"
-                >
-                  <v-card-item>
-                    <v-card-title class="d-flex align-center gap-2">
-                      <v-icon color="primary" size="large">mdi-newspaper</v-icon>
-                      Blog & Updates
-                    </v-card-title>
-                  </v-card-item>
-                  
-                  <v-card-text>
-                    <p class="mb-4">Stay updated with the latest features, tips, and freelancing trends.</p>
-                    <v-btn
+              <!-- Tutorials Card -->
+              <v-card
+                width="320"
+                class="support-card"
+                variant="outlined"
+              >
+                <v-card-item>
+                  <v-card-title class="d-flex align-center gap-2">
+                    <v-icon
                       color="primary"
-                      variant="text"
-                      class="px-0"
-                      @click="openBlog"
+                      size="large"
                     >
-                      Read our blog
-                      <v-icon end>mdi-arrow-right</v-icon>
-                    </v-btn>
-                  </v-card-text>
-                </v-card>
-              </div>
+                      mdi-video
+                    </v-icon>
+                    Video Tutorials
+                  </v-card-title>
+                </v-card-item>
+                  
+                <v-card-text>
+                  <p class="mb-4">
+                    Watch step-by-step video guides to master Freelance Task features.
+                  </p>
+                  <v-btn
+                    color="primary"
+                    variant="text"
+                    class="px-0"
+                    @click="openTutorials"
+                  >
+                    View tutorials
+                    <v-icon end>
+                      mdi-arrow-right
+                    </v-icon>
+                  </v-btn>
+                </v-card-text>
+              </v-card>
+                
+              <!-- Blog Card -->
+              <v-card
+                width="320"
+                class="support-card"
+                variant="outlined"
+              >
+                <v-card-item>
+                  <v-card-title class="d-flex align-center gap-2">
+                    <v-icon
+                      color="primary"
+                      size="large"
+                    >
+                      mdi-newspaper
+                    </v-icon>
+                    Blog & Updates
+                  </v-card-title>
+                </v-card-item>
+                  
+                <v-card-text>
+                  <p class="mb-4">
+                    Stay updated with the latest features, tips, and freelancing trends.
+                  </p>
+                  <v-btn
+                    color="primary"
+                    variant="text"
+                    class="px-0"
+                    @click="openBlog"
+                  >
+                    Read our blog
+                    <v-icon end>
+                      mdi-arrow-right
+                    </v-icon>
+                  </v-btn>
+                </v-card-text>
+              </v-card>
             </div>
           </div>
+        </div>
           
-          <!-- Contact Support Dialog -->
-          <v-dialog
-            v-model="showContactDialog"
-            max-width="600"
-            persistent
-          >
-            <v-card class="pa-6">
-              <v-card-title class="text-h5 font-weight-bold">
-                Contact Support
-              </v-card-title>
+        <!-- Contact Support Dialog -->
+        <v-dialog
+          v-model="showContactDialog"
+          max-width="600"
+          persistent
+        >
+          <v-card class="pa-6">
+            <v-card-title class="text-h5 font-weight-bold">
+              Contact Support
+            </v-card-title>
               
-              <v-card-text class="pt-4">
-                <v-form @submit.prevent="submitSupportRequest">
-                  <v-text-field
-                    v-model="supportName"
-                    label="Name"
-                    variant="outlined"
-                    class="mb-4"
-                    required
-                  />
+            <v-card-text class="pt-4">
+              <v-form @submit.prevent="submitSupportRequest">
+                <v-text-field
+                  v-model="supportName"
+                  label="Name"
+                  variant="outlined"
+                  class="mb-4"
+                  required
+                />
                   
-                  <v-text-field
-                    v-model="supportEmail"
-                    label="Email"
-                    variant="outlined"
-                    class="mb-4"
-                    required
-                    type="email"
-                  />
+                <v-text-field
+                  v-model="supportEmail"
+                  label="Email"
+                  variant="outlined"
+                  class="mb-4"
+                  required
+                  type="email"
+                />
                   
-                  <v-select
-                    v-model="supportCategory"
-                    :items="supportCategories"
-                    label="Issue Category"
-                    variant="outlined"
-                    class="mb-4"
-                    required
-                  />
+                <v-select
+                  v-model="supportCategory"
+                  :items="supportCategories"
+                  label="Issue Category"
+                  variant="outlined"
+                  class="mb-4"
+                  required
+                />
                   
-                  <v-textarea
-                    v-model="supportMessage"
-                    label="Describe your issue"
-                    variant="outlined"
-                    rows="4"
-                    class="mb-4"
-                    required
-                  />
+                <v-textarea
+                  v-model="supportMessage"
+                  label="Describe your issue"
+                  variant="outlined"
+                  rows="4"
+                  class="mb-4"
+                  required
+                />
                   
-                  <v-file-input
-                    v-model="supportAttachments"
-                    label="Attach Screenshots or Files"
-                    variant="outlined"
-                    prepend-icon="mdi-paperclip"
-                    show-size
-                    counter
-                    multiple
-                    class="mb-6"
-                    accept="image/*, application/pdf"
-                  />
-                </v-form>
-              </v-card-text>
+                <v-file-input
+                  v-model="supportAttachments"
+                  label="Attach Screenshots or Files"
+                  variant="outlined"
+                  prepend-icon="mdi-paperclip"
+                  show-size
+                  counter
+                  multiple
+                  class="mb-6"
+                  accept="image/*, application/pdf"
+                />
+              </v-form>
+            </v-card-text>
               
-              <v-card-actions class="pt-4">
-                <v-spacer></v-spacer>
-                <v-btn
-                  color="grey-darken-1"
-                  variant="text"
-                  @click="showContactDialog = false"
-                >
-                  Cancel
-                </v-btn>
-                <v-btn
-                  color="primary"
-                  variant="flat"
-                  @click="submitSupportRequest"
-                  :loading="submittingSupport"
-                >
-                  Submit Request
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-          
-          <!-- Success Snackbar -->
-          <v-snackbar
-            v-model="successSnackbar"
-            color="success"
-            timeout="3000"
-          >
-            {{ snackbarMessage }}
-            <template v-slot:actions>
+            <v-card-actions class="pt-4">
+              <v-spacer />
               <v-btn
-                color="white"
+                color="grey-darken-1"
                 variant="text"
-                @click="successSnackbar = false"
+                @click="showContactDialog = false"
               >
-                Close
+                Cancel
               </v-btn>
-            </template>
-          </v-snackbar>
-        </v-container>
-      </v-main>
-    </v-app>
-  </template>
+              <v-btn
+                color="primary"
+                variant="flat"
+                :loading="submittingSupport"
+                @click="submitSupportRequest"
+              >
+                Submit Request
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+          
+        <!-- Success Snackbar -->
+        <v-snackbar
+          v-model="successSnackbar"
+          color="success"
+          timeout="3000"
+        >
+          {{ snackbarMessage }}
+          <template #actions>
+            <v-btn
+              color="white"
+              variant="text"
+              @click="successSnackbar = false"
+            >
+              Close
+            </v-btn>
+          </template>
+        </v-snackbar>
+      </v-container>
+    </v-main>
+  </v-app>
+</template>
   
   <script>
   import LeftMenu from '@/dashboard/LeftMenu.vue'

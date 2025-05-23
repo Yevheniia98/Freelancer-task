@@ -943,9 +943,9 @@ export default {
 <style scoped>
 .gantt-chart-container {
   position: relative;
-  max-width: 1350px;
+  max-width: 1300px;
   max-height: 1000px;
-  margin-left: 20px;
+  margin-left: 0px;
   margin-bottom: 100px;
   margin-top: 50px;
   padding: 0;

@@ -4,6 +4,7 @@
       :rail="!sidebarExpanded"
       @update:rail="sidebarExpanded = !$event"
     />
+    <SearchBar />
     
     <v-main
       :class="{ 'ml-60': sidebarExpanded, 'ml-14': !sidebarExpanded }"
@@ -52,14 +53,20 @@
         
         <!-- Customization Title -->
         <div class="customization-container mb-10">
-          <h1 class="text-h4 font-weight-bold mb-8">Customization</h1>
+          <h1 class="text-h4 font-weight-bold mb-8">
+            Customization
+          </h1>
           
           <!-- Theme & Appearance Section -->
           <div class="mb-8">
-            <h2 class="text-h5 font-weight-bold mb-6">Theme & Appearance</h2>
+            <h2 class="text-h5 font-weight-bold mb-6">
+              Theme & Appearance
+            </h2>
             
             <div class="mb-8">
-              <h3 class="text-subtitle-1 font-weight-bold mb-4">Color Schemes</h3>
+              <h3 class="text-subtitle-1 font-weight-bold mb-4">
+                Color Schemes
+              </h3>
               
               <div class="d-flex gap-4">
                 <v-btn
@@ -87,21 +94,29 @@
           
           <!-- Notifications & Alerts Section -->
           <div class="mb-8">
-            <h2 class="text-h5 font-weight-bold mb-6">Notifications & Alerts</h2>
+            <h2 class="text-h5 font-weight-bold mb-6">
+              Notifications & Alerts
+            </h2>
             
             <div class="mb-8">
-              <h3 class="text-subtitle-1 font-weight-bold mb-2">Notification Preferences</h3>
-              <p class="text-body-2 mb-6 text-grey">Manage how, when, and where you receive notifications.</p>
+              <h3 class="text-subtitle-1 font-weight-bold mb-2">
+                Notification Preferences
+              </h3>
+              <p class="text-body-2 mb-6 text-grey">
+                Manage how, when, and where you receive notifications.
+              </p>
               
               <div class="notification-item d-flex justify-space-between align-center mb-4">
-                <div class="notification-label">In-App Notifications</div>
+                <div class="notification-label">
+                  In-App Notifications
+                </div>
                 <v-switch
                   v-model="inAppNotifications"
                   color="primary"
                   hide-details
                   class="custom-switch"
                 >
-                  <template v-slot:label>
+                  <template #label>
                     <span :class="{ 'text-grey': !inAppNotifications }">
                       {{ inAppNotifications ? 'On' : 'Off' }}
                     </span>
@@ -110,14 +125,16 @@
               </div>
               
               <div class="notification-item d-flex justify-space-between align-center mb-4">
-                <div class="notification-label">Email Notifications</div>
+                <div class="notification-label">
+                  Email Notifications
+                </div>
                 <v-switch
                   v-model="emailNotifications"
                   color="primary"
                   hide-details
                   class="custom-switch"
                 >
-                  <template v-slot:label>
+                  <template #label>
                     <span :class="{ 'text-grey': !emailNotifications }">
                       {{ emailNotifications ? 'On' : 'Off' }}
                     </span>
@@ -126,14 +143,16 @@
               </div>
               
               <div class="notification-item d-flex justify-space-between align-center mb-4">
-                <div class="notification-label">Push Notifications</div>
+                <div class="notification-label">
+                  Push Notifications
+                </div>
                 <v-switch
                   v-model="pushNotifications"
                   color="primary"
                   hide-details
                   class="custom-switch"
                 >
-                  <template v-slot:label>
+                  <template #label>
                     <span :class="{ 'text-grey': !pushNotifications }">
                       {{ pushNotifications ? 'On' : 'Off' }}
                     </span>
@@ -143,19 +162,25 @@
             </div>
             
             <div>
-              <h3 class="text-subtitle-1 font-weight-bold mb-2">Custom Alerts</h3>
-              <p class="text-body-2 mb-6 text-grey">Set up alerts for specific events or updates.</p>
+              <h3 class="text-subtitle-1 font-weight-bold mb-2">
+                Custom Alerts
+              </h3>
+              <p class="text-body-2 mb-6 text-grey">
+                Set up alerts for specific events or updates.
+              </p>
               
               <div class="d-flex flex-column gap-4">
                 <div class="notification-item d-flex justify-space-between align-center">
-                  <div class="notification-label">New Task Assigned</div>
+                  <div class="notification-label">
+                    New Task Assigned
+                  </div>
                   <v-switch
                     v-model="newTaskAlert"
                     color="primary"
                     hide-details
                     class="custom-switch"
                   >
-                    <template v-slot:label>
+                    <template #label>
                       <span :class="{ 'text-grey': !newTaskAlert }">
                         {{ newTaskAlert ? 'On' : 'Off' }}
                       </span>
@@ -164,7 +189,9 @@
                 </div>
                 
                 <div class="notification-item d-flex justify-space-between align-center">
-                  <div class="notification-label">Due Date Approaching</div>
+                  <div class="notification-label">
+                    Due Date Approaching
+                  </div>
                   <div class="d-flex align-center gap-4">
                     <v-switch
                       v-model="dueDateAlert"
@@ -172,7 +199,7 @@
                       hide-details
                       class="custom-switch"
                     >
-                      <template v-slot:label>
+                      <template #label>
                         <span :class="{ 'text-grey': !dueDateAlert }">
                           {{ dueDateAlert ? 'On' : 'Off' }}
                         </span>
@@ -195,14 +222,16 @@
                 </div>
                 
                 <div class="notification-item d-flex justify-space-between align-center">
-                  <div class="notification-label">Status Change on Important Tasks</div>
+                  <div class="notification-label">
+                    Status Change on Important Tasks
+                  </div>
                   <v-switch
                     v-model="statusChangeAlert"
                     color="primary"
                     hide-details
                     class="custom-switch"
                   >
-                    <template v-slot:label>
+                    <template #label>
                       <span :class="{ 'text-grey': !statusChangeAlert }">
                         {{ statusChangeAlert ? 'On' : 'Off' }}
                       </span>
@@ -219,12 +248,15 @@
 </template>
 
 <script>
-import LeftMenu from '@/dashboard/LeftMenu.vue'
+import LeftMenu from '@/dashboard/LeftMenu.vue';
+import SearchBar from '@/dashboard/SearchBar.vue';
+  
 
 export default {
   name: 'CustomizationPage',
   components: {
-    LeftMenu
+    LeftMenu,
+    SearchBar
   },
   data() {
     return {
@@ -247,6 +279,20 @@ export default {
         '2 days before',
         '1 week before'
       ]
+    }
+  },
+  watch: {
+    // Auto-save settings when any notification option changes
+    inAppNotifications() { this.saveNotificationSettings(); },
+    emailNotifications() { this.saveNotificationSettings(); },
+    pushNotifications() { this.saveNotificationSettings(); },
+    newTaskAlert() { this.saveNotificationSettings(); },
+    dueDateAlert() { this.saveNotificationSettings(); },
+    statusChangeAlert() { this.saveNotificationSettings(); },
+    reminderTime() { 
+      if (this.dueDateAlert) {
+        this.saveNotificationSettings(); 
+      }
     }
   },
   methods: {
@@ -288,20 +334,6 @@ export default {
       //     statusChange: this.statusChangeAlert
       //   }
       // });
-    }
-  },
-  watch: {
-    // Auto-save settings when any notification option changes
-    inAppNotifications() { this.saveNotificationSettings(); },
-    emailNotifications() { this.saveNotificationSettings(); },
-    pushNotifications() { this.saveNotificationSettings(); },
-    newTaskAlert() { this.saveNotificationSettings(); },
-    dueDateAlert() { this.saveNotificationSettings(); },
-    statusChangeAlert() { this.saveNotificationSettings(); },
-    reminderTime() { 
-      if (this.dueDateAlert) {
-        this.saveNotificationSettings(); 
-      }
     }
   }
 }

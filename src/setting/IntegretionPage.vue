@@ -1,263 +1,289 @@
 <template>
-    <v-app>
-      <LeftMenu
-        :rail="!sidebarExpanded"
-        @update:rail="sidebarExpanded = !$event"
-      />
+  <v-app>
+    <LeftMenu
+      :rail="!sidebarExpanded"
+      @update:rail="sidebarExpanded = !$event"
+    />
+    <SearchBar />
       
-      <v-main
-        :class="{ 'ml-60': sidebarExpanded, 'ml-14': !sidebarExpanded }"
-        class="transition-all duration-300"
+    <v-main
+      :class="{ 'ml-60': sidebarExpanded, 'ml-14': !sidebarExpanded }"
+      class="transition-all duration-300"
+    >
+      <v-container
+        fluid
+        class="pa-6"
       >
-        <v-container
-          fluid
-          class="pa-6"
-        >
-          <!-- Header with Search -->
-          <div class="d-flex justify-space-between align-center mb-10">
-            <div class="logo">
-              <!-- You can add your logo here if needed -->
-            </div>
-            
-            <div class="d-flex align-center gap-4">
-              <div class="search-container">
-                <v-text-field
-                  density="compact"
-                  placeholder="Search"
-                  prepend-inner-icon="mdi-magnify"
-                  variant="outlined"
-                  hide-details
-                  class="rounded-pill"
-                  style="max-width: 240px;"
-                />
-              </div>
-              
-              <v-btn
-                icon
-                class="bg-purple-lighten-4"
-                color="purple"
-              >
-                <v-icon>mdi-earth</v-icon>
-              </v-btn>
-              
-              <v-btn
-                icon
-                class="bg-amber-lighten-4"
-                color="amber"
-              >
-                <v-icon>mdi-bell</v-icon>
-              </v-btn>
-            </div>
+        <!-- Header with Search -->
+        <div class="d-flex justify-space-between align-center mb-10">
+          <div class="logo">
+            <!-- You can add your logo here if needed -->
           </div>
-          
-          <!-- Integrations Title -->
-          <div class="integrations-container">
-            <h1 class="text-h4 font-weight-bold mb-8">Integrations</h1>
             
-            <!-- Available Integrations Section -->
-            <div class="mb-8">
-              <h2 class="text-h5 font-weight-bold mb-3">Available Integrations</h2>
-              <p class="text-body-1 mb-6">Connect powerful tools to enhance your experience.</p>
+          <div class="d-flex align-center gap-4">
+            <div class="search-container">
+              <v-text-field
+                density="compact"
+                placeholder="Search"
+                prepend-inner-icon="mdi-magnify"
+                variant="outlined"
+                hide-details
+                class="rounded-pill"
+                style="max-width: 240px;"
+              />
+            </div>
               
-              <div class="d-flex gap-6 mb-8">
-                <v-text-field
-                  v-model="searchIntegrations"
-                  placeholder="Search Integrations"
-                  prepend-inner-icon="mdi-magnify"
-                  variant="outlined"
-                  hide-details
-                  class="flex-grow-1"
-                />
+            <v-btn
+              icon
+              class="bg-purple-lighten-4"
+              color="purple"
+            >
+              <v-icon>mdi-earth</v-icon>
+            </v-btn>
+              
+            <v-btn
+              icon
+              class="bg-amber-lighten-4"
+              color="amber"
+            >
+              <v-icon>mdi-bell</v-icon>
+            </v-btn>
+          </div>
+        </div>
+          
+        <!-- Integrations Title -->
+        <div class="integrations-container">
+          <h1 class="text-h4 font-weight-bold mb-8">
+            Integrations
+          </h1>
+            
+          <!-- Available Integrations Section -->
+          <div class="mb-8">
+            <h2 class="text-h5 font-weight-bold mb-3">
+              Available Integrations
+            </h2>
+            <p class="text-body-1 mb-6">
+              Connect powerful tools to enhance your experience.
+            </p>
+              
+            <div class="d-flex gap-6 mb-8">
+              <v-text-field
+                v-model="searchIntegrations"
+                placeholder="Search Integrations"
+                prepend-inner-icon="mdi-magnify"
+                variant="outlined"
+                hide-details
+                class="flex-grow-1"
+              />
                 
-                <v-select
-                  v-model="selectedCategory"
-                  :items="categories"
-                  placeholder="Category"
-                  variant="outlined"
-                  hide-details
-                  class="flex-grow-0"
-                  style="width: 200px;"
-                  append-icon="mdi-chevron-down"
-                />
-              </div>
-            </div>
-            
-            <!-- Featured Integrations Section -->
-            <div class="mb-8">
-              <h2 class="text-h5 font-weight-bold mb-6">Featured Integrations</h2>
-              
-              <v-table class="rounded-lg">
-                <thead class="table-header bg-teal-lighten-3">
-                  <tr>
-                    <th>Integration</th>
-                    <th>Description</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(integration, index) in featuredIntegrations" :key="index">
-                    <td>{{ integration.name }}</td>
-                    <td>{{ integration.description }}</td>
-                    <td>
-                      <v-btn
-                        variant="text"
-                        :color="integration.connected ? 'error' : 'primary'"
-                        @click="toggleConnection(integration)"
-                      >
-                        {{ integration.connected ? 'Disconnect' : 'Connect' }}
-                      </v-btn>
-                    </td>
-                  </tr>
-                </tbody>
-              </v-table>
-            </div>
-            
-            <!-- Integration Cards Section -->
-            <div class="mb-8">
-              <h2 class="text-h5 font-weight-bold mb-6">Integration Cards</h2>
-              
-              <v-table class="rounded-lg">
-                <thead class="table-header bg-teal-lighten-3">
-                  <tr>
-                    <th>Logo</th>
-                    <th>Integration Name</th>
-                    <th>Short Description</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(card, index) in integrationCards" :key="index">
-                    <td class="text-center">
-                      <v-img
-                        :src="card.logo"
-                        width="24"
-                        height="24"
-                        class="mx-auto"
-                      />
-                    </td>
-                    <td>{{ card.name }}</td>
-                    <td>{{ card.description }}</td>
-                    <td>
-                      <span :class="card.connected ? 'text-primary' : 'text-grey'">
-                        {{ card.connected ? 'Connected' : 'Disconnected' }}
-                      </span>
-                    </td>
-                    <td>
-                      <v-btn
-                        variant="text"
-                        :color="card.connected ? 'error' : 'primary'"
-                        @click="toggleCardConnection(card)"
-                      >
-                        {{ card.connected ? 'Disconnect' : 'Connect' }}
-                      </v-btn>
-                    </td>
-                  </tr>
-                </tbody>
-              </v-table>
-            </div>
-            
-            <!-- Connection & Setup Guide Section -->
-            <div>
-              <h2 class="text-h5 font-weight-bold mb-6">Connection & Setup Guide</h2>
-              
-              <v-table class="rounded-lg">
-                <thead class="table-header bg-teal-lighten-3">
-                  <tr>
-                    <th>Step-by-Step Guide</th>
-                    <th>Troubleshooting Help</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>1. Click Connect</td>
-                    <td>Common Issues FAQ</td>
-                  </tr>
-                  <tr>
-                    <td>2. Sign into [Integration]</td>
-                    <td>- Can't connect? Check permissions.</td>
-                  </tr>
-                  <tr>
-                    <td>3. Allow permissions</td>
-                    <td>- Data not syncing? Reconnect</td>
-                  </tr>
-                  <tr>
-                    <td>4. Adjust settings in Settings</td>
-                    <td>Support: <a href="#" class="text-primary">Contact Us</a></td>
-                  </tr>
-                </tbody>
-              </v-table>
+              <v-select
+                v-model="selectedCategory"
+                :items="categories"
+                placeholder="Category"
+                variant="outlined"
+                hide-details
+                class="flex-grow-0"
+                style="width: 200px;"
+                append-icon="mdi-chevron-down"
+              />
             </div>
           </div>
-          
-          <!-- Connection Dialog -->
-          <v-dialog
-            v-model="connectionDialog"
-            max-width="500"
-          >
-            <v-card class="pa-6">
-              <v-card-title class="text-h5 font-weight-bold">
-                {{ dialogAction === 'connect' ? 'Connect to' : 'Disconnect from' }} {{ selectedIntegration?.name }}
-              </v-card-title>
+            
+          <!-- Featured Integrations Section -->
+          <div class="mb-8">
+            <h2 class="text-h5 font-weight-bold mb-6">
+              Featured Integrations
+            </h2>
               
-              <v-card-text class="pt-4">
-                <p v-if="dialogAction === 'connect'">
-                  You are about to connect to {{ selectedIntegration?.name }}. This will allow the application to access your {{ selectedIntegration?.name }} data according to the permissions you approve.
-                </p>
-                <p v-else>
-                  You are about to disconnect from {{ selectedIntegration?.name }}. This will revoke all permissions and stop syncing data. You can reconnect at any time.
-                </p>
-              </v-card-text>
+            <v-table class="rounded-lg">
+              <thead class="table-header bg-teal-lighten-3">
+                <tr>
+                  <th>Integration</th>
+                  <th>Description</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="(integration, index) in featuredIntegrations"
+                  :key="index"
+                >
+                  <td>{{ integration.name }}</td>
+                  <td>{{ integration.description }}</td>
+                  <td>
+                    <v-btn
+                      variant="text"
+                      :color="integration.connected ? 'error' : 'primary'"
+                      @click="toggleConnection(integration)"
+                    >
+                      {{ integration.connected ? 'Disconnect' : 'Connect' }}
+                    </v-btn>
+                  </td>
+                </tr>
+              </tbody>
+            </v-table>
+          </div>
+            
+          <!-- Integration Cards Section -->
+          <div class="mb-8">
+            <h2 class="text-h5 font-weight-bold mb-6">
+              Integration Cards
+            </h2>
               
-              <v-card-actions class="pt-4">
-                <v-spacer></v-spacer>
-                <v-btn
-                  color="grey-darken-1"
-                  variant="text"
-                  @click="connectionDialog = false"
+            <v-table class="rounded-lg">
+              <thead class="table-header bg-teal-lighten-3">
+                <tr>
+                  <th>Logo</th>
+                  <th>Integration Name</th>
+                  <th>Short Description</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="(card, index) in integrationCards"
+                  :key="index"
                 >
-                  Cancel
-                </v-btn>
-                <v-btn
-                  :color="dialogAction === 'connect' ? 'primary' : 'error'"
-                  variant="flat"
-                  @click="confirmConnection"
-                >
-                  {{ dialogAction === 'connect' ? 'Connect' : 'Disconnect' }}
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
+                  <td class="text-center">
+                    <v-img
+                      :src="card.logo"
+                      width="24"
+                      height="24"
+                      class="mx-auto"
+                    />
+                  </td>
+                  <td>{{ card.name }}</td>
+                  <td>{{ card.description }}</td>
+                  <td>
+                    <span :class="card.connected ? 'text-primary' : 'text-grey'">
+                      {{ card.connected ? 'Connected' : 'Disconnected' }}
+                    </span>
+                  </td>
+                  <td>
+                    <v-btn
+                      variant="text"
+                      :color="card.connected ? 'error' : 'primary'"
+                      @click="toggleCardConnection(card)"
+                    >
+                      {{ card.connected ? 'Disconnect' : 'Connect' }}
+                    </v-btn>
+                  </td>
+                </tr>
+              </tbody>
+            </v-table>
+          </div>
+            
+          <!-- Connection & Setup Guide Section -->
+          <div>
+            <h2 class="text-h5 font-weight-bold mb-6">
+              Connection & Setup Guide
+            </h2>
+              
+            <v-table class="rounded-lg">
+              <thead class="table-header bg-teal-lighten-3">
+                <tr>
+                  <th>Step-by-Step Guide</th>
+                  <th>Troubleshooting Help</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1. Click Connect</td>
+                  <td>Common Issues FAQ</td>
+                </tr>
+                <tr>
+                  <td>2. Sign into [Integration]</td>
+                  <td>- Can't connect? Check permissions.</td>
+                </tr>
+                <tr>
+                  <td>3. Allow permissions</td>
+                  <td>- Data not syncing? Reconnect</td>
+                </tr>
+                <tr>
+                  <td>4. Adjust settings in Settings</td>
+                  <td>
+                    Support: <a
+                      href="#"
+                      class="text-primary"
+                    >Contact Us</a>
+                  </td>
+                </tr>
+              </tbody>
+            </v-table>
+          </div>
+        </div>
           
-          <!-- Success Snackbar -->
-          <v-snackbar
-            v-model="successSnackbar"
-            color="success"
-            timeout="3000"
-          >
-            {{ snackbarMessage }}
-            <template v-slot:actions>
+        <!-- Connection Dialog -->
+        <v-dialog
+          v-model="connectionDialog"
+          max-width="500"
+        >
+          <v-card class="pa-6">
+            <v-card-title class="text-h5 font-weight-bold">
+              {{ dialogAction === 'connect' ? 'Connect to' : 'Disconnect from' }} {{ selectedIntegration?.name }}
+            </v-card-title>
+              
+            <v-card-text class="pt-4">
+              <p v-if="dialogAction === 'connect'">
+                You are about to connect to {{ selectedIntegration?.name }}. This will allow the application to access your {{ selectedIntegration?.name }} data according to the permissions you approve.
+              </p>
+              <p v-else>
+                You are about to disconnect from {{ selectedIntegration?.name }}. This will revoke all permissions and stop syncing data. You can reconnect at any time.
+              </p>
+            </v-card-text>
+              
+            <v-card-actions class="pt-4">
+              <v-spacer />
               <v-btn
-                color="white"
+                color="grey-darken-1"
                 variant="text"
-                @click="successSnackbar = false"
+                @click="connectionDialog = false"
               >
-                Close
+                Cancel
               </v-btn>
-            </template>
-          </v-snackbar>
-        </v-container>
-      </v-main>
-    </v-app>
-  </template>
+              <v-btn
+                :color="dialogAction === 'connect' ? 'primary' : 'error'"
+                variant="flat"
+                @click="confirmConnection"
+              >
+                {{ dialogAction === 'connect' ? 'Connect' : 'Disconnect' }}
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+          
+        <!-- Success Snackbar -->
+        <v-snackbar
+          v-model="successSnackbar"
+          color="success"
+          timeout="3000"
+        >
+          {{ snackbarMessage }}
+          <template #actions>
+            <v-btn
+              color="white"
+              variant="text"
+              @click="successSnackbar = false"
+            >
+              Close
+            </v-btn>
+          </template>
+        </v-snackbar>
+      </v-container>
+    </v-main>
+  </v-app>
+</template>
   
   <script>
-  import LeftMenu from '@/dashboard/LeftMenu.vue'
+  import LeftMenu from '@/dashboard/LeftMenu.vue';
+  import SearchBar from '@/dashboard/SearchBar.vue';
   
   export default {
     name: 'IntegrationsPage',
     components: {
-      LeftMenu
+      LeftMenu,
+      SearchBar 
     },
     data() {
       return {
@@ -317,6 +343,14 @@
         snackbarMessage: ''
       }
     },
+    watch: {
+      searchIntegrations() {
+        this.filterIntegrations();
+      },
+      selectedCategory() {
+        this.filterIntegrations();
+      }
+    },
     methods: {
       toggleConnection(integration) {
         this.selectedIntegration = integration;
@@ -365,14 +399,6 @@
           search: this.searchIntegrations,
           category: this.selectedCategory
         });
-      }
-    },
-    watch: {
-      searchIntegrations() {
-        this.filterIntegrations();
-      },
-      selectedCategory() {
-        this.filterIntegrations();
       }
     }
   }

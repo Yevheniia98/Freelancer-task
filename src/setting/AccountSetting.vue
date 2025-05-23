@@ -4,6 +4,7 @@
       :rail="!sidebarExpanded"
       @update:rail="sidebarExpanded = !$event"
     />
+    <SearchBar />
     
     <v-main
       :class="{ 'ml-60': sidebarExpanded, 'ml-14': !sidebarExpanded }"
@@ -268,6 +269,8 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import LeftMenu from '@/dashboard/LeftMenu.vue'
+import SearchBar from '@/dashboard/SearchBar.vue';
+  
 
 // Get router and route
 const router = useRouter()

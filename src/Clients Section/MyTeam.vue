@@ -1,6 +1,7 @@
 <template>
   <v-app>
     <LeftMenu />
+    <SearchBar />
       
     <v-main class="bg-grey-lighten-4">
       <v-container
@@ -725,11 +726,13 @@
   <script>
   import { defineComponent, ref, computed, nextTick, onMounted, watch } from 'vue';
 import LeftMenu from '@/dashboard/LeftMenu.vue';
+import SearchBar from '@/dashboard/SearchBar.vue';
   
 export default defineComponent({
   name: 'MyTeamPage',
   components: {
-    LeftMenu
+    LeftMenu,
+    SearchBar
   },
   setup() {
     // Responsive handling

@@ -2,6 +2,7 @@
 <template>
   <v-app>
     <LeftMenu />
+    <SearchBar />
       
     <v-main class="bg-grey-lighten-4">
       <v-container
@@ -370,12 +371,14 @@
   import { defineComponent, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import LeftMenu from '@/dashboard/LeftMenu.vue';
+ import SearchBar from '@/dashboard/SearchBar.vue';
 import DetailedTaskCard from '@/components/DetailedTaskCard.vue';
 
 export default defineComponent({
   name: 'ProjectSection',
   components: {
     LeftMenu,
+    SearchBar,
     DetailedTaskCard
   },
   setup() {

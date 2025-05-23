@@ -1,141 +1,149 @@
 <template>
-    <v-app>
-      <LeftMenu
-        :rail="!sidebarExpanded"
-        @update:rail="sidebarExpanded = !$event"
-      />
+  <v-app>
+    <LeftMenu
+      :rail="!sidebarExpanded"
+      @update:rail="sidebarExpanded = !$event"
+    />
+    <SearchBar />
       
-      <v-main
-        :class="{ 'ml-60': sidebarExpanded, 'ml-14': !sidebarExpanded }"
-        class="transition-all duration-300"
+    <v-main
+      :class="{ 'ml-60': sidebarExpanded, 'ml-14': !sidebarExpanded }"
+      class="transition-all duration-300"
+    >
+      <v-container
+        fluid
+        class="pa-6"
       >
-        <v-container
-          fluid
-          class="pa-6"
+        <!-- Header -->
+        <div class="d-flex justify-space-between align-center mb-6">
+          <h1 class="text-h4 font-weight-bold">
+            Account Settings
+          </h1>
+            
+          <div class="d-flex align-center ga-4">
+            <v-text-field
+              density="compact"
+              placeholder="Search"
+              prepend-inner-icon="mdi-magnify"
+              variant="outlined"
+              hide-details
+              style="max-width: 240px;"
+            />
+              
+            <v-btn
+              icon
+              class="bg-purple-lighten-4"
+              color="purple"
+            >
+              <v-icon>mdi-earth</v-icon>
+            </v-btn>
+              
+            <v-btn
+              icon
+              class="bg-amber-lighten-4"
+              color="amber"
+            >
+              <v-icon>mdi-bell</v-icon>
+            </v-btn>
+          </div>
+        </div>
+          
+        <!-- Navigation Tabs -->
+        <v-tabs
+          v-model="tab"
+          bg-color="white"
+          color="primary"
+          class="mb-10"
         >
-          <!-- Header -->
-          <div class="d-flex justify-space-between align-center mb-6">
-            <h1 class="text-h4 font-weight-bold">
-              Account Settings
-            </h1>
-            
-            <div class="d-flex align-center ga-4">
-              <v-text-field
-                density="compact"
-                placeholder="Search"
-                prepend-inner-icon="mdi-magnify"
-                variant="outlined"
-                hide-details
-                style="max-width: 240px;"
-              />
-              
-              <v-btn
-                icon
-                class="bg-purple-lighten-4"
-                color="purple"
-              >
-                <v-icon>mdi-earth</v-icon>
-              </v-btn>
-              
-              <v-btn
-                icon
-                class="bg-amber-lighten-4"
-                color="amber"
-              >
-                <v-icon>mdi-bell</v-icon>
-              </v-btn>
-            </div>
-          </div>
-          
-          <!-- Navigation Tabs -->
-          <v-tabs
-            v-model="tab"
-            bg-color="white"
-            color="primary"
-            class="mb-10"
+          <v-tab
+            value="profile"
+            @click="navigateTo('AccountSetting')"
           >
-            <v-tab
-              value="profile"
-              @click="navigateTo('AccountSetting')"
-            >
-              Profile Information
-            </v-tab>
-            <v-tab
-              value="password"
-              @click="navigateTo('PasswordSecurity')"
-            >
-              Password and security
-            </v-tab>
-            <v-tab
-              value="notification"
-              @click="navigateTo('NotificationPage')"
-            >
-              Notifications
-            </v-tab>
-            <v-tab
-              value="export"
-              @click="navigateTo('DataExport')"
-            >
-              Data Export
-            </v-tab>
-            <v-tab
-              value="logout"
-              @click="navigateTo('LogoutPage')"
-            >
-              Logout
-            </v-tab>
-          </v-tabs>
+            Profile Information
+          </v-tab>
+          <v-tab
+            value="password"
+            @click="navigateTo('PasswordSecurity')"
+          >
+            Password and security
+          </v-tab>
+          <v-tab
+            value="notification"
+            @click="navigateTo('NotificationPage')"
+          >
+            Notifications
+          </v-tab>
+          <v-tab
+            value="export"
+            @click="navigateTo('DataExport')"
+          >
+            Data Export
+          </v-tab>
+          <v-tab
+            value="logout"
+            @click="navigateTo('LogoutPage')"
+          >
+            Logout
+          </v-tab>
+        </v-tabs>
           
-          <!-- Logout Confirmation Section -->
-          <div class="logout-section">
-            <h2 class="text-h5 font-weight-bold mb-16">Logout Confirmation Page</h2>
+        <!-- Logout Confirmation Section -->
+        <div class="logout-section">
+          <h2 class="text-h5 font-weight-bold mb-16">
+            Logout Confirmation Page
+          </h2>
             
-            <div class="logout-confirmation d-flex flex-column align-center">
-              <h3 class="text-h5 font-weight-bold mb-6 text-center">
-                Are You Sure You Want to Log Out?
-              </h3>
+          <div class="logout-confirmation d-flex flex-column align-center">
+            <h3 class="text-h5 font-weight-bold mb-6 text-center">
+              Are You Sure You Want to Log Out?
+            </h3>
               
-              <p class="text-body-1 text-center mb-10 text-grey" style="max-width: 400px;">
-                Logging out will end your current session, and you'll need to log in again to access your account.
-              </p>
+            <p
+              class="text-body-1 text-center mb-10 text-grey"
+              style="max-width: 400px;"
+            >
+              Logging out will end your current session, and you'll need to log in again to access your account.
+            </p>
               
-              <div class="d-flex ga-6">
-                <v-btn
-                  color="error"
-                  width="160"
-                  height="48"
-                  rounded="lg"
-                  @click="logout"
-                >
-                  Logout
-                </v-btn>
+            <div class="d-flex ga-6">
+              <v-btn
+                color="error"
+                width="160"
+                height="48"
+                rounded="lg"
+                @click="logout"
+              >
+                Logout
+              </v-btn>
                 
-                <v-btn
-                  color="white"
-                  width="160"
-                  height="48"
-                  rounded="lg"
-                  variant="outlined"
-                  class="border-grey"
-                  @click="cancel"
-                >
-                  Cancel
-                </v-btn>
-              </div>
+              <v-btn
+                color="white"
+                width="160"
+                height="48"
+                rounded="lg"
+                variant="outlined"
+                class="border-grey"
+                @click="cancel"
+              >
+                Cancel
+              </v-btn>
             </div>
           </div>
-        </v-container>
-      </v-main>
-    </v-app>
-  </template>
+        </div>
+      </v-container>
+    </v-main>
+  </v-app>
+</template>
   
   <script>
-  import LeftMenu from '@/dashboard/LeftMenu.vue'
+  import LeftMenu from '@/dashboard/LeftMenu.vue';
+  import  SearchBar from '@/dashboard/SearchBar.vue';
   
   export default {
     name: 'LogoutPage',
     components: {
-      LeftMenu
+      LeftMenu,
+      SearchBar
     },
     data() {
       return {

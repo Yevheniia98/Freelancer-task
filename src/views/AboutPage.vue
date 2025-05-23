@@ -19,7 +19,7 @@
           src="/MyPhoto.png"
           alt="Freelancer Task Team"
         >
-        <p>Product owner | UX designer,<br> Yevheniia Suprun</p>
+        <p>Product owner | UX designer | Frontend,<br> Yevheniia Suprun</p>
       </div>
   
       <div class="image-item">

@@ -1,73 +1,48 @@
+<!-- FinanceDashboard.vue -->
 <template>
   <v-app>
     <LeftMenu />
+    <SearchBar />
     
-    <v-main class="bg-grey-lighten-5">
+    <v-main class="bg-surface-subtle">
       <v-container
         fluid
-        class="pa-4 pa-sm-6"
+        class="pa-6 pa-sm-8"
       >
         <!-- Header -->
-        <div class="d-flex justify-space-between align-center mb-6">
-          <h1 class="text-h5 font-weight-bold">
-            Finance
+        <div class="d-flex justify-space-between align-center mb-8">
+          <h1 class="text-h4 font-weight-bold text-primary">
+            Finance Overview
           </h1>
-          <div class="d-flex align-center">
-            <v-text-field
-              v-model="search"
-              placeholder="Search"
-              prepend-inner-icon="mdi-magnify"
-              variant="outlined"
-              density="compact"
-              hide-details
-              class="mr-2"
-              style="max-width: 200px"
-              bg-color="white"
-            />
-            <v-btn
-              icon
-              color="primary"
-              class="ml-2"
-              variant="text"
-            >
-              <v-icon>mdi-refresh</v-icon>
-            </v-btn>
-            <v-btn
-              icon
-              color="primary"
-              class="ml-2"
-              variant="text"
-            >
-              <v-icon>mdi-bell</v-icon>
-            </v-btn>
-          </div>
         </div>
         
         <!-- Summary Cards -->
-        <v-row class="mb-6">
+        <v-row class="mb-8">
           <v-col
             cols="12"
             md="4"
           >
             <v-card
-              rounded="lg"
+              rounded="xl"
               class="summary-card"
-              elevation="1"
+              flat
+              border
             >
-              <v-card-text class="pa-4">
+              <v-card-text class="pa-6">
                 <div class="d-flex flex-column">
                   <div class="d-flex justify-space-between">
-                    <span class="text-subtitle-1 text-medium-emphasis">Total Balance</span>
+                    <span class="text-subtitle-1 text-medium-emphasis font-weight-medium">Total Balance</span>
                     <span class="text-caption">
                       <v-icon
                         size="small"
                         color="success"
+                        class="mb-1"
                       >mdi-arrow-up-thin</v-icon> 
                       <span class="text-success">+3.3%</span>
                       <span class="text-medium-emphasis ml-1">than last month</span>
                     </span>
                   </div>
-                  <span class="text-h4 font-weight-bold mt-2">32 363.75₽</span>
+                  <span class="text-h3 font-weight-bold mt-2">32 363.75€</span>
                 </div>
               </v-card-text>
             </v-card>
@@ -78,24 +53,26 @@
             md="4"
           >
             <v-card
-              rounded="lg"
+              rounded="xl"
               class="summary-card"
-              elevation="1"
+              flat
+              border
             >
-              <v-card-text class="pa-4">
+              <v-card-text class="pa-6">
                 <div class="d-flex flex-column">
                   <div class="d-flex justify-space-between">
-                    <span class="text-subtitle-1 text-medium-emphasis">Income</span>
+                    <span class="text-subtitle-1 text-medium-emphasis font-weight-medium">Income</span>
                     <span class="text-caption">
                       <v-icon
                         size="small"
                         color="success"
+                        class="mb-1"
                       >mdi-arrow-up-thin</v-icon> 
                       <span class="text-success">+1.2%</span>
                       <span class="text-medium-emphasis ml-1">than last month</span>
                     </span>
                   </div>
-                  <span class="text-h4 font-weight-bold mt-2 text-success">+30 645₽</span>
+                  <span class="text-h3 font-weight-bold mt-2 text-success">+30 645€</span>
                 </div>
               </v-card-text>
             </v-card>
@@ -106,24 +83,26 @@
             md="4"
           >
             <v-card
-              rounded="lg"
+              rounded="xl"
               class="summary-card"
-              elevation="1"
+              flat
+              border
             >
-              <v-card-text class="pa-4">
+              <v-card-text class="pa-6">
                 <div class="d-flex flex-column">
                   <div class="d-flex justify-space-between">
-                    <span class="text-subtitle-1 text-medium-emphasis">Expenses</span>
+                    <span class="text-subtitle-1 text-medium-emphasis font-weight-medium">Expenses</span>
                     <span class="text-caption">
                       <v-icon
                         size="small"
                         color="error"
+                        class="mb-1"
                       >mdi-arrow-down-thin</v-icon> 
                       <span class="text-error">-8.3%</span>
                       <span class="text-medium-emphasis ml-1">than last month</span>
                     </span>
                   </div>
-                  <span class="text-h4 font-weight-bold mt-2 text-error">-21 465.90₽</span>
+                  <span class="text-h3 font-weight-bold mt-2 text-error">-21 465.90€</span>
                 </div>
               </v-card-text>
             </v-card>
@@ -136,32 +115,35 @@
           <v-col
             cols="12"
             lg="6"
-            class="mb-6"
+            class="mb-8"
           >
             <v-card
-              rounded="lg"
-              elevation="1"
+              rounded="xl"
+              flat
+              border
+              class="h-100"
             >
-              <v-card-text class="pa-4">
-                <div class="d-flex justify-space-between align-center mb-4">
-                  <h2 class="text-h6 font-weight-medium">
+              <v-card-text class="pa-6">
+                <div class="d-flex justify-space-between align-center mb-6">
+                  <h2 class="text-h5 font-weight-medium text-primary">
                     Income & Expenses
                   </h2>
                   <v-select
                     v-model="selectedTimeframe"
                     :items="timeframes"
-                    label="Months"
+                    label="Time Period"
                     variant="outlined"
                     density="compact"
                     hide-details
                     style="max-width: 150px"
-                    bg-color="white"
+                    bg-color="surface"
+                    class="text-body-1"
                   />
                 </div>
                 
                 <div
                   class="chart-container"
-                  style="position: relative; height: 300px;"
+                  style="position: relative; height: 320px;"
                 >
                   <bar-chart 
                     v-if="chartDataLoaded"
@@ -170,14 +152,14 @@
                   />
                 </div>
                 
-                <div class="d-flex mt-4">
-                  <div class="d-flex align-center mr-4">
-                    <div class="color-dot blue-dot mr-2" />
-                    <span class="text-body-2">Income</span>
+                <div class="d-flex mt-6">
+                  <div class="d-flex align-center mr-6">
+                    <div class="color-dot primary-dot mr-2" />
+                    <span class="text-body-1 font-weight-medium">Income</span>
                   </div>
                   <div class="d-flex align-center">
                     <div class="color-dot light-blue-dot mr-2" />
-                    <span class="text-body-2">Expenses</span>
+                    <span class="text-body-1 font-weight-medium">Expenses</span>
                   </div>
                 </div>
               </v-card-text>
@@ -188,32 +170,35 @@
           <v-col
             cols="12"
             lg="6"
-            class="mb-6"
+            class="mb-8"
           >
             <v-card
-              rounded="lg"
-              elevation="1"
+              rounded="xl"
+              flat
+              border
+              class="h-100"
             >
-              <v-card-text class="pa-4">
-                <div class="d-flex justify-space-between align-center mb-4">
-                  <h2 class="text-h6 font-weight-medium">
-                    Expenses by categories
+              <v-card-text class="pa-6">
+                <div class="d-flex justify-space-between align-center mb-6">
+                  <h2 class="text-h5 font-weight-medium text-primary">
+                    Expenses by Categories
                   </h2>
                   <v-select
                     v-model="selectedExpenseView"
                     :items="expenseViews"
-                    label="Expenses"
+                    label="View"
                     variant="outlined"
                     density="compact"
                     hide-details
                     style="max-width: 150px"
-                    bg-color="white"
+                    bg-color="surface"
+                    class="text-body-1"
                   />
                 </div>
                 
                 <div
                   class="chart-container"
-                  style="position: relative; height: 300px;"
+                  style="position: relative; height: 320px;"
                 >
                   <doughnut-chart 
                     v-if="chartDataLoaded"
@@ -221,27 +206,27 @@
                     :options="doughnutOptions"
                   />
                   <div class="chart-center-text">
-                    <div class="text-subtitle-1 font-weight-medium">
+                    <div class="text-subtitle-1 font-weight-medium text-medium-emphasis">
                       Food
                     </div>
-                    <div class="text-h5 font-weight-bold text-error">
-                      -7 654.57₽
+                    <div class="text-h4 font-weight-bold text-error">
+                      -7 654.57€
                     </div>
                   </div>
                 </div>
                 
-                <div class="d-flex flex-wrap mt-4 justify-center">
+                <div class="d-flex flex-wrap mt-6 justify-center">
                   <div
                     v-for="(category, index) in expenseCategories"
                     :key="index"
-                    class="d-flex align-center mx-2 mb-2"
+                    class="d-flex align-center mx-3 mb-3"
                   >
                     <div
                       class="color-dot mr-2"
                       :style="{ backgroundColor: category.color }"
                     />
-                    <span class="text-body-2">{{ category.name }}</span>
-                    <span class="text-body-2 ml-2 font-weight-medium">{{ category.percentage }}%</span>
+                    <span class="text-body-1 font-weight-medium">{{ category.name }}</span>
+                    <span class="text-body-1 ml-2 text-medium-emphasis">{{ category.percentage }}%</span>
                   </div>
                 </div>
               </v-card-text>
@@ -252,21 +237,25 @@
           <v-col
             cols="12"
             lg="6"
-            class="mb-6"
+            class="mb-8"
           >
             <v-card
-              rounded="lg"
-              elevation="1"
+              rounded="xl"
+              flat
+              border
+              class="h-100"
             >
-              <v-card-text class="pa-4">
-                <div class="d-flex justify-space-between align-center mb-4">
-                  <h2 class="text-h6 font-weight-medium">
+              <v-card-text class="pa-6">
+                <div class="d-flex justify-space-between align-center mb-6">
+                  <h2 class="text-h5 font-weight-medium text-primary">
                     Recent Transactions
                   </h2>
                   <v-btn
                     icon
                     color="primary"
                     variant="text"
+                    class="rounded-xl"
+                    @click="openAddExpenseDialog"
                   >
                     <v-icon>mdi-plus</v-icon>
                   </v-btn>
@@ -274,15 +263,16 @@
                 
                 <div class="transaction-table">
                   <div class="transaction-header d-flex">
-                    <div class="transaction-column-category">
-                      Category name
+                    <div class="transaction-column-category font-weight-medium">
+                      Category
                     </div>
-                    <div class="transaction-column-date">
+                    <div class="transaction-column-date font-weight-medium">
                       Date
                     </div>
-                    <div class="transaction-column-amount">
+                    <div class="transaction-column-amount font-weight-medium">
                       Amount
                     </div>
+                    <div class="transaction-column-actions" />
                   </div>
                   
                   <div
@@ -291,23 +281,38 @@
                     class="transaction-row d-flex"
                   >
                     <div class="transaction-column-category d-flex align-center">
-                      <v-icon
-                        :color="transaction.iconColor"
-                        size="24"
-                        class="mr-3"
-                      >
-                        {{ transaction.icon }}
-                      </v-icon>
-                      {{ transaction.category }}
+                      <div class="transaction-icon-container mr-3">
+                        <v-icon
+                          size="20"
+                          color="white"
+                        >
+                          {{ transaction.icon }}
+                        </v-icon>
+                      </div>
+                      <span class="font-weight-medium">{{ transaction.category }}</span>
                     </div>
                     <div class="transaction-column-date">
                       {{ transaction.date }}
                     </div>
                     <div
-                      class="transaction-column-amount"
+                      class="transaction-column-amount font-weight-medium"
                       :class="transaction.amount.startsWith('-') ? 'text-error' : 'text-success'"
                     >
-                      {{ transaction.amount }}
+                      {{ transaction.amount }}€
+                    </div>
+                    <div class="transaction-column-actions">
+                      <v-btn
+                        icon
+                        size="small"
+                        color="error"
+                        variant="text"
+                        class="transaction-delete-btn"
+                        @click="deleteTransaction(index)"
+                      >
+                        <v-icon size="small">
+                          mdi-delete
+                        </v-icon>
+                      </v-btn>
                     </div>
                   </div>
                 </div>
@@ -322,19 +327,21 @@
           >
             <!-- Spending Limits -->
             <v-card
-              rounded="lg"
-              elevation="1"
-              class="mb-6"
+              rounded="xl"
+              flat
+              border
+              class="mb-8"
             >
-              <v-card-text class="pa-4">
-                <div class="d-flex justify-space-between align-center mb-4">
-                  <h2 class="text-h6 font-weight-medium">
-                    Spending limits
+              <v-card-text class="pa-6">
+                <div class="d-flex justify-space-between align-center mb-6">
+                  <h2 class="text-h5 font-weight-medium text-primary">
+                    Spending Limits
                   </h2>
                   <v-btn
                     icon
                     color="primary"
                     variant="text"
+                    class="rounded-xl"
                   >
                     <v-icon>mdi-cog</v-icon>
                   </v-btn>
@@ -343,34 +350,28 @@
                 <div
                   v-for="(limit, index) in spendingLimits"
                   :key="index"
-                  class="mb-4"
+                  class="mb-6"
                 >
-                  <div class="d-flex justify-space-between mb-1">
-                    <span class="text-subtitle-1">{{ limit.category }}</span>
+                  <div class="d-flex justify-space-between mb-2">
+                    <span class="text-subtitle-1 font-weight-medium">{{ limit.category }}</span>
                     <span class="text-subtitle-1">
-                      <span class="font-weight-medium">{{ formatNumber(limit.current) }}</span>
-                      <span class="text-medium-emphasis">of {{ formatNumber(limit.max) }}₽</span>
+                      <span class="font-weight-bold">{{ formatNumber(limit.current) }}</span>
+                      <span class="text-medium-emphasis">of {{ formatNumber(limit.max) }}€</span>
                     </span>
                   </div>
-                  <v-progress-linear
-                    :model-value="(limit.current / limit.max) * 100"
-                    height="10"
-                    rounded
-                    :color="limit.color"
-                    bg-color="grey-lighten-3"
-                  />
                 </div>
               </v-card-text>
             </v-card>
             
             <!-- Upcoming Payments -->
             <v-card
-              rounded="lg"
-              elevation="1"
+              rounded="xl"
+              flat
+              border
             >
-              <v-card-text class="pa-4">
-                <h2 class="text-h6 font-weight-medium mb-4">
-                  Upcoming payments
+              <v-card-text class="pa-6">
+                <h2 class="text-h5 font-weight-medium text-primary mb-6">
+                  Upcoming Payments
                 </h2>
                 
                 <div class="upcoming-payments">
@@ -379,8 +380,8 @@
                     :key="index"
                     class="upcoming-payment-item d-flex align-center"
                   >
-                    <div class="payment-icon-container mr-3">
-                      <v-icon :color="payment.iconColor">
+                    <div class="payment-icon-container mr-4">
+                      <v-icon color="white">
                         {{ payment.icon }}
                       </v-icon>
                     </div>
@@ -392,8 +393,8 @@
                         {{ payment.date }}
                       </div>
                     </div>
-                    <div class="payment-amount font-weight-medium">
-                      {{ payment.amount }}₽
+                    <div class="payment-amount font-weight-bold">
+                      {{ payment.amount }}€
                     </div>
                   </div>
                 </div>
@@ -403,12 +404,92 @@
         </v-row>
       </v-container>
     </v-main>
+    
+    <!-- Add Expense Dialog -->
+    <v-dialog
+      v-model="showAddExpenseDialog"
+      max-width="500px"
+    >
+      <v-card
+        rounded="xl"
+        flat
+        border
+      >
+        <v-card-title class="text-h5 font-weight-medium pt-6 pb-2 px-6">
+          Add New Expense
+        </v-card-title>
+        
+        <v-card-text class="px-6">
+          <v-form
+            ref="expenseForm"
+            @submit.prevent="addNewExpense"
+          >
+            <v-select
+              v-model="newExpense.category"
+              :items="availableCategories"
+              label="Category"
+              variant="outlined"
+              density="comfortable"
+              class="mb-4"
+              :rules="[v => !!v || 'Category is required']"
+              required
+            />
+            
+            <v-text-field
+              v-model="newExpense.amount"
+              label="Amount (€)"
+              variant="outlined"
+              density="comfortable"
+              type="number"
+              class="mb-4"
+              :rules="[
+                v => !!v || 'Amount is required',
+                v => v > 0 || 'Amount must be greater than 0'
+              ]"
+              required
+            />
+            
+            <v-text-field
+              v-model="newExpense.date"
+              label="Date"
+              type="date"
+              variant="outlined"
+              density="comfortable"
+              class="mb-4"
+              :rules="[v => !!v || 'Date is required']"
+              required
+            />
+          </v-form>
+        </v-card-text>
+        
+        <v-card-actions class="px-6 pb-6">
+          <v-spacer />
+          <v-btn
+            color="grey-darken-1"
+            variant="text"
+            class="mr-2"
+            @click="showAddExpenseDialog = false"
+          >
+            Cancel
+          </v-btn>
+          <v-btn
+            color="primary"
+            variant="flat"
+            rounded="lg"
+            @click="addNewExpense"
+          >
+            Add Expense
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
 <script>
 import { defineComponent, ref, onMounted } from 'vue';
 import LeftMenu from '@/dashboard/LeftMenu.vue';
+import SearchBar from '@/dashboard/SearchBar.vue';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
 import { Bar, Doughnut } from 'vue-chartjs';
 
@@ -419,6 +500,7 @@ export default defineComponent({
   name: 'FinanceDashboard',
   components: {
     LeftMenu,
+    SearchBar,
     'bar-chart': Bar,
     'doughnut-chart': Doughnut
   },
@@ -445,19 +527,19 @@ export default defineComponent({
       datasets: [
         {
           label: 'Income',
-          backgroundColor: '#4361EE',
+          backgroundColor: '#4B9E91',
           data: incomeData,
           barPercentage: 0.5,
           categoryPercentage: 0.7,
-          borderRadius: 4
+          borderRadius: 8
         },
         {
           label: 'Expenses',
-          backgroundColor: '#BFDBFE',
+          backgroundColor: '#95B5E0',
           data: expenseData,
           barPercentage: 0.5,
           categoryPercentage: 0.7,
-          borderRadius: 4
+          borderRadius: 8
         }
       ]
     });
@@ -471,7 +553,16 @@ export default defineComponent({
         },
         tooltip: {
           mode: 'index',
-          intersect: false
+          intersect: false,
+          padding: 12,
+          cornerRadius: 8,
+          titleFont: {
+            size: 14,
+            weight: 'bold'
+          },
+          bodyFont: {
+            size: 13
+          }
         }
       },
       scales: {
@@ -481,29 +572,36 @@ export default defineComponent({
             callback: function(value) {
               return value / 1000 + 'k';
             },
-            stepSize: 10000
+            stepSize: 10000,
+            font: {
+              size: 12
+            }
           },
           grid: {
-            color: 'rgba(0, 0, 0, 0.05)'
+            color: 'rgba(0, 0, 0, 0.04)'
           }
         },
         x: {
           grid: {
             display: false
+          },
+          ticks: {
+            font: {
+              size: 12
+            }
           }
         }
       }
     };
     
-    // Expense categories for doughnut chart with added Home category
+    // Expense categories for doughnut chart
     const expenseCategories = [
-      { name: 'Food', percentage: 37.5, color: '#3730A3' },
+      { name: 'Food', percentage: 37.5, color: '#4B9E91' },
       { name: 'Clothes', percentage: 16.7, color: '#C7D2FE' },
       { name: 'Transport', percentage: 16.7, color: '#818CF8' },
-      { name: 'Home', percentage: 12.5, color: '#2563EB' },
-      { name: 'Subscriptions', percentage: 8.3, color: '#1E3A8A' },
-      { name: 'Bills', percentage: 4.15, color: '#22D3EE' },
-      { name: 'Hobby', percentage: 4.15, color: '#0E7490' }
+      { name: 'Subscriptions', percentage: 12.5, color: '#3B75D9' },
+      { name: 'Bills', percentage: 8.3, color: '#65C7D9' },
+      { name: 'Hobby', percentage: 8.3, color: '#1E6A85' }
     ];
     
     const expensesByCategoryData = ref({
@@ -528,6 +626,15 @@ export default defineComponent({
             label: (context) => {
               return `${context.label}: ${context.raw}%`;
             }
+          },
+          padding: 12,
+          cornerRadius: 8,
+          titleFont: {
+            size: 14,
+            weight: 'bold'
+          },
+          bodyFont: {
+            size: 13
           }
         }
       },
@@ -535,80 +642,198 @@ export default defineComponent({
     };
     
     // Recent transactions
-    const recentTransactions = [
+    const recentTransactions = ref([
       { 
         category: 'Food', 
         date: '1st December, 2023', 
         amount: '-245.00', 
         icon: 'mdi-food', 
-        iconColor: 'blue'
+        iconColor: '#4B9E91'
       },
       { 
         category: 'Cafe', 
         date: '30th November, 2023', 
-        amount: '-2665.12', 
+        amount: '-665.12', 
         icon: 'mdi-coffee', 
-        iconColor: 'blue'
+        iconColor: '#C7D2FE'
       },
       { 
         category: 'Internet', 
         date: '29th November, 2023', 
-        amount: '-2335.12', 
+        amount: '-235.12', 
         icon: 'mdi-web', 
-        iconColor: 'blue'
+        iconColor: '#818CF8'
       },
       { 
         category: 'Transport', 
         date: '27th November, 2023', 
-        amount: '-23336.12', 
+        amount: '-336.12', 
         icon: 'mdi-car', 
-        iconColor: 'blue'
+        iconColor: '#3B75D9'
       }
-    ];
+    ]);
     
     // Spending limits
     const spendingLimits = [
-      { category: 'Food & Cafe', current: 4832, max: 10000, color: 'primary' },
-      { category: 'Clothes', current: 2254, max: 3000, color: 'primary' },
-      { category: 'Games', current: 2000, max: 2000, color: 'primary' },
-      { category: 'Board games', current: 1111, max: 4000, color: 'primary' }
+      { category: 'Food & Cafe', current: 4832, max: 10000, color: '#4B9E91' },
+      { category: 'Clothes', current: 2254, max: 3000, color: '#818CF8' },
+      { category: 'Games', current: 2000, max: 2000, color: '#3B75D9' },
+      { category: 'Board games', current: 1111, max: 4000, color: '#65C7D9' }
     ];
     
-    // Upcoming payments for freelancer websites
+    // Upcoming payments
     const upcomingPayments = [
       { 
         service: 'Upwork', 
         date: '13th December', 
         amount: '235', 
         icon: 'mdi-briefcase-outline', 
-        iconColor: 'primary' 
-      },
-      { 
-        service: 'Fiverr', 
-        date: '21th December', 
-        amount: '265', 
-        icon: 'mdi-currency-usd', 
-        iconColor: 'primary' 
+        iconColor: '#4B9E91' 
       },
       { 
         service: 'Freelancer.com', 
-        date: '26th December', 
-        amount: '176', 
+        date: '21th December', 
+        amount: '265', 
         icon: 'mdi-account-tie', 
-        iconColor: 'primary' 
+        iconColor: '#C7D2FE' 
       },
       { 
-        service: 'Toptal', 
+        service: 'ChatGPT', 
+        date: '26th December', 
+        amount: '176', 
+        icon: 'mdi-robot', 
+        iconColor: '#818CF8' 
+      },
+      { 
+        service: 'Claude', 
         date: '15th December', 
+        amount: '147', 
+        icon: 'mdi-message-assistant', 
+        iconColor: '#3B75D9' 
+      },
+      { 
+        service: 'Adobe', 
+        date: '18th December', 
         amount: '547', 
-        icon: 'mdi-professional-hexagon', 
-        iconColor: 'primary' 
+        icon: 'mdi-adobe', 
+        iconColor: '#65C7D9' 
       }
     ];
     
     // Format numbers with spaces for thousands
     const formatNumber = (value) => {
       return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    };
+    
+    // Add Expense Dialog
+    const showAddExpenseDialog = ref(false);
+    const expenseForm = ref(null);
+    
+    const newExpense = ref({
+      category: '',
+      amount: '',
+      date: new Date().toISOString().substr(0, 10)
+    });
+    
+    const availableCategories = [
+      'Food',
+      'Cafe',
+      'Transport',
+      'Internet',
+      'Clothes',
+      'Subscriptions',
+      'Bills',
+      'Hobby'
+    ];
+    
+    // Format date for display
+    const formatDate = (dateString) => {
+      const date = new Date(dateString);
+      const day = date.getDate();
+      const month = new Intl.DateTimeFormat('en', { month: 'long' }).format(date);
+      const year = date.getFullYear();
+      
+      const ordinal = (d) => {
+        if (d > 3 && d < 21) return 'th';
+        switch (d % 10) {
+          case 1: return 'st';
+          case 2: return 'nd';
+          case 3: return 'rd';
+          default: return 'th';
+        }
+      };
+      
+      return `${day}${ordinal(day)} ${month}, ${year}`;
+    };
+    
+    // Open add expense dialog
+    const openAddExpenseDialog = () => {
+      newExpense.value = {
+        category: '',
+        amount: '',
+        date: new Date().toISOString().substr(0, 10)
+      };
+      showAddExpenseDialog.value = true;
+    };
+    
+    // Add new expense
+    const addNewExpense = () => {
+      // Basic validation
+      if (!newExpense.value.category || !newExpense.value.amount || !newExpense.value.date) {
+        return;
+      }
+      
+      // Create new transaction
+      const transaction = {
+        category: newExpense.value.category,
+        date: formatDate(newExpense.value.date),
+        amount: `-${parseFloat(newExpense.value.amount).toFixed(2)}`,
+        icon: getCategoryIcon(newExpense.value.category),
+        iconColor: getCategoryColor(newExpense.value.category)
+      };
+      
+      // Add to transactions
+      recentTransactions.value.unshift(transaction);
+      
+      // Close dialog
+      showAddExpenseDialog.value = false;
+    };
+    
+    // Get category icon
+    const getCategoryIcon = (category) => {
+      const categoryIcons = {
+        'Food': 'mdi-food',
+        'Cafe': 'mdi-coffee',
+        'Transport': 'mdi-car',
+        'Internet': 'mdi-web',
+        'Clothes': 'mdi-hanger',
+        'Subscriptions': 'mdi-account-cash',
+        'Bills': 'mdi-file-document',
+        'Hobby': 'mdi-gamepad-variant'
+      };
+      
+      return categoryIcons[category] || 'mdi-cash';
+    };
+    
+    // Get category color
+    const getCategoryColor = (category) => {
+      const categoryColors = {
+        'Food': '#4B9E91',
+        'Cafe': '#C7D2FE',
+        'Transport': '#818CF8',
+        'Internet': '#3B75D9',
+        'Clothes': '#65C7D9',
+        'Subscriptions': '#1E6A85',
+        'Bills': '#4B9E91',
+        'Hobby': '#C7D2FE'
+      };
+      
+      return categoryColors[category] || '#4B9E91';
+    };
+    
+    // Delete transaction
+    const deleteTransaction = (index) => {
+      recentTransactions.value.splice(index, 1);
     };
     
     // Initialize when component is mounted
@@ -635,22 +860,30 @@ export default defineComponent({
       recentTransactions,
       spendingLimits,
       upcomingPayments,
-      formatNumber
+      formatNumber,
+      showAddExpenseDialog,
+      expenseForm,
+      newExpense,
+      availableCategories,
+      openAddExpenseDialog,
+      addNewExpense,
+      deleteTransaction
     };
   }
 });
 </script>
 
 <style scoped>
-.bg-grey-lighten-5 {
-  background-color: #f8fafc !important;
+.bg-surface-subtle {
+  background-color: #f9fafb !important;
 }
 
 /* Summary cards styling */
 .summary-card {
   background-color: white;
-  border-radius: 12px;
+  border-radius: 16px;
   height: 100%;
+  border-color: rgba(0, 0, 0, 0.08) !important;
 }
 
 /* Text color classes */
@@ -662,6 +895,10 @@ export default defineComponent({
   color: #EF4444 !important;
 }
 
+.text-primary {
+  color: #1E293B !important;
+}
+
 /* Chart and visualization components */
 .chart-container {
   width: 100%;
@@ -669,17 +906,17 @@ export default defineComponent({
 }
 
 .color-dot {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
 }
 
-.blue-dot {
-  background-color: #4361EE;
+.primary-dot {
+  background-color: #4B9E91;
 }
 
 .light-blue-dot {
-  background-color: #BFDBFE;
+  background-color: #95B5E0;
 }
 
 .chart-center-text {
@@ -700,14 +937,14 @@ export default defineComponent({
   color: rgba(0, 0, 0, 0.6);
   font-size: 0.875rem;
   font-weight: 500;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  margin-bottom: 8px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  margin-bottom: 12px;
 }
 
 .transaction-row {
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 .transaction-column-category {
@@ -722,9 +959,49 @@ export default defineComponent({
 }
 
 .transaction-column-amount {
-  width: 90px;
+  width: 100px;
   text-align: right;
   font-weight: 500;
+}
+
+.transaction-column-actions {
+  width: 60px;
+  text-align: right;
+}
+
+.transaction-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background-color: var(--v-primary-base);
+}
+
+.transaction-row:nth-child(1) .transaction-icon-container {
+  background-color: #4B9E91;
+}
+
+.transaction-row:nth-child(2) .transaction-icon-container {
+  background-color: #C7D2FE;
+}
+
+.transaction-row:nth-child(3) .transaction-icon-container {
+  background-color: #818CF8;
+}
+
+.transaction-row:nth-child(4) .transaction-icon-container {
+  background-color: #3B75D9;
+}
+
+.transaction-delete-btn {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.transaction-row:hover .transaction-delete-btn {
+  opacity: 1;
 }
 
 /* Upcoming payments styling */
@@ -733,8 +1010,8 @@ export default defineComponent({
 }
 
 .upcoming-payment-item {
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 .upcoming-payment-item:last-child {
@@ -747,8 +1024,27 @@ export default defineComponent({
   justify-content: center;
   width: 40px;
   height: 40px;
-  background-color: rgba(79, 70, 229, 0.1);
-  border-radius: 8px;
+  border-radius: 10px;
+}
+
+.upcoming-payment-item:nth-child(1) .payment-icon-container {
+  background-color: #4B9E91;
+}
+
+.upcoming-payment-item:nth-child(2) .payment-icon-container {
+  background-color: #C7D2FE;
+}
+
+.upcoming-payment-item:nth-child(3) .payment-icon-container {
+  background-color: #818CF8;
+}
+
+.upcoming-payment-item:nth-child(4) .payment-icon-container {
+  background-color: #3B75D9;
+}
+
+.upcoming-payment-item:nth-child(5) .payment-icon-container {
+  background-color: #65C7D9;
 }
 
 .payment-service {
@@ -763,14 +1059,24 @@ export default defineComponent({
   font-size: 0.9375rem;
 }
 
-/* Progress bar styling */
-:deep(.v-progress-linear) {
-  border-radius: 10px !important;
-  height: 10px !important;
+
+
+/* Card styling */
+:deep(.v-card) {
+  transition: transform 0.2s ease;
 }
 
-:deep(.v-progress-linear__background) {
-  opacity: 0.2 !important;
+:deep(.v-card:hover) {
+  transform: translateY(-2px);
+}
+
+:deep(.v-btn) {
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+:deep(.v-btn--icon) {
+  border-radius: 10px;
 }
 
 /* Responsive adjustments */
@@ -778,11 +1084,27 @@ export default defineComponent({
   .transaction-column-date {
     display: none;
   }
+  
+  .summary-card {
+    margin-bottom: 16px;
+  }
 }
 
 @media (max-width: 600px) {
+  .text-h3 {
+    font-size: 1.75rem !important;
+  }
+  
   .text-h4 {
     font-size: 1.5rem !important;
+  }
+  
+  .text-h5 {
+    font-size: 1.25rem !important;
+  }
+  
+  .pa-6 {
+    padding: 16px !important;
   }
 }
 </style>

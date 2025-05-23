@@ -574,7 +574,7 @@
       margin-top: 50px;
       margin-bottom: 50px;
       height: 400px ;
-      margin-left: 20px;
+      margin-left: 0px;
     }
     
     .tax-calculator-card, .tax-breakdown-card, .balance-card {
@@ -592,7 +592,7 @@
     
     .tax-breakdown-card {
       flex: 2;
-      max-width: 717px;
+      max-width: 670px !important;
     }
     
     .balance-card {
@@ -728,7 +728,7 @@
       margin-top: 0px;
       padding-top: 0px;
       border-top: 1px solid #eee;
-      transform: translate(0px, -80px);
+      transform: translate(0px, -150px);
     }
     
     .net-label {

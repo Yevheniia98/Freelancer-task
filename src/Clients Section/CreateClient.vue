@@ -1,6 +1,7 @@
 <template>
   <div class="app-container">
     <LeftMenu />
+    <SearchBar />
       
     <div class="content-container">
       <div class="clients-page">
@@ -135,11 +136,13 @@
   <script>
   import { defineComponent, ref, reactive } from 'vue';
   import LeftMenu from '@/dashboard/LeftMenu.vue';
+  import SearchBar from '@/dashboard/SearchBar.vue';
   
   export default defineComponent({
     name: 'ClientsPage',
     components: {
-      LeftMenu
+      LeftMenu,
+      SearchBar
     },
     setup() {
       // Client data

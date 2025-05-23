@@ -90,19 +90,20 @@ export default {
 <style scoped>
 .custom-card {
   border-radius: 12px;
+  border: 1px solid #e0e0e0;
   transition: all 0.3s;
   position: relative;
   margin-right: 30px !important;
   justify-content: center;
   width: 300px !important;
-  margin-left: 20px !important;
+  margin-left: 0px !important;
   padding: 16px;
   margin-top: 50px;
   margin-bottom: 50px;
 }
 
 .custom-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-3px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 

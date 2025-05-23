@@ -1,255 +1,275 @@
 <template>
-    <v-app>
-      <LeftMenu
-        :rail="!sidebarExpanded"
-        @update:rail="sidebarExpanded = !$event"
-      />
+  <v-app>
+    <LeftMenu
+      :rail="!sidebarExpanded"
+      @update:rail="sidebarExpanded = !$event"
+    />
       
-      <v-main
-        :class="{ 'ml-60': sidebarExpanded, 'ml-14': !sidebarExpanded }"
-        class="transition-all duration-300"
+    <v-main
+      :class="{ 'ml-60': sidebarExpanded, 'ml-14': !sidebarExpanded }"
+      class="transition-all duration-300"
+    >
+      <v-container
+        fluid
+        class="pa-6"
       >
-        <v-container
-          fluid
-          class="pa-6"
-        >
-          <!-- Header with Search -->
-          <div class="d-flex justify-space-between align-center mb-10">
-            <div class="logo">
-              <!-- You can add your logo here if needed -->
-            </div>
-            
-            <div class="d-flex align-center gap-4">
-              <div class="search-container">
-                <v-text-field
-                  density="compact"
-                  placeholder="Search"
-                  prepend-inner-icon="mdi-magnify"
-                  variant="outlined"
-                  hide-details
-                  class="rounded-pill"
-                  style="max-width: 240px;"
-                />
-              </div>
-              
-              <v-btn
-                icon
-                class="bg-purple-lighten-4"
-                color="purple"
-              >
-                <v-icon>mdi-earth</v-icon>
-              </v-btn>
-              
-              <v-btn
-                icon
-                class="bg-amber-lighten-4"
-                color="amber"
-              >
-                <v-icon>mdi-bell</v-icon>
-              </v-btn>
-            </div>
+        <!-- Header with Search -->
+        <div class="d-flex justify-space-between align-center mb-10">
+          <div class="logo">
+            <!-- You can add your logo here if needed -->
           </div>
+            
+          <div class="d-flex align-center gap-4">
+            <div class="search-container">
+              <v-text-field
+                density="compact"
+                placeholder="Search"
+                prepend-inner-icon="mdi-magnify"
+                variant="outlined"
+                hide-details
+                class="rounded-pill"
+                style="max-width: 240px;"
+              />
+            </div>
+              
+            <v-btn
+              icon
+              class="bg-purple-lighten-4"
+              color="purple"
+            >
+              <v-icon>mdi-earth</v-icon>
+            </v-btn>
+              
+            <v-btn
+              icon
+              class="bg-amber-lighten-4"
+              color="amber"
+            >
+              <v-icon>mdi-bell</v-icon>
+            </v-btn>
+          </div>
+        </div>
           
-          <!-- Security & Privacy Title -->
-          <div class="security-container mb-10">
-            <h1 class="text-h4 font-weight-bold mb-8">Security & Privacy</h1>
+        <!-- Security & Privacy Title -->
+        <div class="security-container mb-10">
+          <h1 class="text-h4 font-weight-bold mb-8">
+            Security & Privacy
+          </h1>
             
-            <!-- Connected Devices Section -->
-            <div class="mb-10">
-              <h2 class="text-h5 font-weight-bold mb-3">Connected Devices</h2>
+          <!-- Connected Devices Section -->
+          <div class="mb-10">
+            <h2 class="text-h5 font-weight-bold mb-3">
+              Connected Devices
+            </h2>
               
-              <div class="mb-6">
-                <h3 class="text-subtitle-1 font-weight-bold mb-2">Active Sessions</h3>
-                <p class="text-body-2 mb-4 text-grey">
-                  Displays all devices currently logged into the user's account, including information like device type, location, and last active time.
-                </p>
+            <div class="mb-6">
+              <h3 class="text-subtitle-1 font-weight-bold mb-2">
+                Active Sessions
+              </h3>
+              <p class="text-body-2 mb-4 text-grey">
+                Displays all devices currently logged into the user's account, including information like device type, location, and last active time.
+              </p>
                 
-                <v-table class="rounded-lg">
-                  <thead class="table-header bg-teal-lighten-4">
-                    <tr>
-                      <th>Device</th>
-                      <th>Location</th>
-                      <th>Last Active</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(device, index) in activeDevices" :key="index">
-                      <td>{{ device.name }}</td>
-                      <td>{{ device.location }}</td>
-                      <td>{{ device.lastActive }}</td>
-                      <td>
-                        <v-btn
-                          variant="text"
-                          color="error"
-                          density="compact"
-                          @click="signOutDevice(device)"
-                        >
-                          Sign Out
-                        </v-btn>
-                      </td>
-                    </tr>
-                  </tbody>
-                </v-table>
-              </div>
-            </div>
-            
-            <!-- App Permissions Section -->
-            <div class="mb-10">
-              <h2 class="text-h5 font-weight-bold mb-3">App Permissions & Integrations</h2>
-              
-              <div class="mb-6">
-                <h3 class="text-subtitle-1 font-weight-bold mb-2">Connected Third-Party Apps</h3>
-                <p class="text-body-2 mb-4 text-grey">
-                  Here you can see all the apps and services connected to your account. Each one shows what type of access it has (like your profile or files) and when it was connected. If you no longer use an app, you can easily remove its access with the 'Revoke Access' button next to it.
-                </p>
-                
-                <v-table class="rounded-lg">
-                  <thead class="table-header bg-teal-lighten-4">
-                    <tr>
-                      <th>App Name</th>
-                      <th>Access Granted</th>
-                      <th>Connected Since</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(app, index) in connectedApps" :key="index">
-                      <td>{{ app.name }}</td>
-                      <td>{{ app.access }}</td>
-                      <td>{{ app.connectedSince }}</td>
-                      <td>
-                        <v-btn
-                          variant="text"
-                          color="error"
-                          density="compact"
-                          @click="revokeAccess(app)"
-                        >
-                          Revoke Access
-                        </v-btn>
-                      </td>
-                    </tr>
-                  </tbody>
-                </v-table>
-              </div>
-            </div>
-            
-            <!-- Security Notifications Section -->
-            <div>
-              <h2 class="text-h5 font-weight-bold mb-3">Security Notifications</h2>
-              
-              <div>
-                <h3 class="text-subtitle-1 font-weight-bold mb-2">Email Alerts for Suspicious Activity</h3>
-                <p class="text-body-2 mb-4 text-grey">
-                  Toggle to receive notifications about suspicious login attempts or changes to account security settings.
-                </p>
-                
-                <div class="d-flex align-center">
-                  <v-switch
-                    v-model="securityNotifications"
-                    color="primary"
-                    hide-details
-                    class="custom-switch mr-4"
+              <v-table class="rounded-lg">
+                <thead class="table-header bg-teal-lighten-4">
+                  <tr>
+                    <th>Device</th>
+                    <th>Location</th>
+                    <th>Last Active</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(device, index) in activeDevices"
+                    :key="index"
                   >
-                    <template v-slot:label>
-                      <span :class="{ 'text-grey': !securityNotifications }">
-                        {{ securityNotifications ? 'On' : 'Off' }}
-                      </span>
-                    </template>
-                  </v-switch>
-                </div>
+                    <td>{{ device.name }}</td>
+                    <td>{{ device.location }}</td>
+                    <td>{{ device.lastActive }}</td>
+                    <td>
+                      <v-btn
+                        variant="text"
+                        color="error"
+                        density="compact"
+                        @click="signOutDevice(device)"
+                      >
+                        Sign Out
+                      </v-btn>
+                    </td>
+                  </tr>
+                </tbody>
+              </v-table>
+            </div>
+          </div>
+            
+          <!-- App Permissions Section -->
+          <div class="mb-10">
+            <h2 class="text-h5 font-weight-bold mb-3">
+              App Permissions & Integrations
+            </h2>
+              
+            <div class="mb-6">
+              <h3 class="text-subtitle-1 font-weight-bold mb-2">
+                Connected Third-Party Apps
+              </h3>
+              <p class="text-body-2 mb-4 text-grey">
+                Here you can see all the apps and services connected to your account. Each one shows what type of access it has (like your profile or files) and when it was connected. If you no longer use an app, you can easily remove its access with the 'Revoke Access' button next to it.
+              </p>
+                
+              <v-table class="rounded-lg">
+                <thead class="table-header bg-teal-lighten-4">
+                  <tr>
+                    <th>App Name</th>
+                    <th>Access Granted</th>
+                    <th>Connected Since</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(app, index) in connectedApps"
+                    :key="index"
+                  >
+                    <td>{{ app.name }}</td>
+                    <td>{{ app.access }}</td>
+                    <td>{{ app.connectedSince }}</td>
+                    <td>
+                      <v-btn
+                        variant="text"
+                        color="error"
+                        density="compact"
+                        @click="revokeAccess(app)"
+                      >
+                        Revoke Access
+                      </v-btn>
+                    </td>
+                  </tr>
+                </tbody>
+              </v-table>
+            </div>
+          </div>
+            
+          <!-- Security Notifications Section -->
+          <div>
+            <h2 class="text-h5 font-weight-bold mb-3">
+              Security Notifications
+            </h2>
+              
+            <div>
+              <h3 class="text-subtitle-1 font-weight-bold mb-2">
+                Email Alerts for Suspicious Activity
+              </h3>
+              <p class="text-body-2 mb-4 text-grey">
+                Toggle to receive notifications about suspicious login attempts or changes to account security settings.
+              </p>
+                
+              <div class="d-flex align-center">
+                <v-switch
+                  v-model="securityNotifications"
+                  color="primary"
+                  hide-details
+                  class="custom-switch mr-4"
+                >
+                  <template #label>
+                    <span :class="{ 'text-grey': !securityNotifications }">
+                      {{ securityNotifications ? 'On' : 'Off' }}
+                    </span>
+                  </template>
+                </v-switch>
               </div>
             </div>
           </div>
+        </div>
           
-          <!-- Confirmation Dialogs -->
-          <v-dialog
-            v-model="confirmSignOutDialog"
-            max-width="500"
-          >
-            <v-card class="pa-6">
-              <v-card-title class="text-h5 font-weight-bold">
-                Sign Out Device
-              </v-card-title>
+        <!-- Confirmation Dialogs -->
+        <v-dialog
+          v-model="confirmSignOutDialog"
+          max-width="500"
+        >
+          <v-card class="pa-6">
+            <v-card-title class="text-h5 font-weight-bold">
+              Sign Out Device
+            </v-card-title>
               
-              <v-card-text class="pt-4">
-                Are you sure you want to sign out of {{ selectedDevice?.name }} in {{ selectedDevice?.location }}?
-              </v-card-text>
+            <v-card-text class="pt-4">
+              Are you sure you want to sign out of {{ selectedDevice?.name }} in {{ selectedDevice?.location }}?
+            </v-card-text>
               
-              <v-card-actions class="pt-4">
-                <v-spacer></v-spacer>
-                <v-btn
-                  color="grey-darken-1"
-                  variant="text"
-                  @click="confirmSignOutDialog = false"
-                >
-                  Cancel
-                </v-btn>
-                <v-btn
-                  color="error"
-                  variant="flat"
-                  @click="confirmSignOut"
-                >
-                  Sign Out
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-          
-          <v-dialog
-            v-model="confirmRevokeDialog"
-            max-width="500"
-          >
-            <v-card class="pa-6">
-              <v-card-title class="text-h5 font-weight-bold">
-                Revoke Access
-              </v-card-title>
-              
-              <v-card-text class="pt-4">
-                Are you sure you want to revoke access for {{ selectedApp?.name }}? This app will no longer have access to your {{ selectedApp?.access.toLowerCase() }}.
-              </v-card-text>
-              
-              <v-card-actions class="pt-4">
-                <v-spacer></v-spacer>
-                <v-btn
-                  color="grey-darken-1"
-                  variant="text"
-                  @click="confirmRevokeDialog = false"
-                >
-                  Cancel
-                </v-btn>
-                <v-btn
-                  color="error"
-                  variant="flat"
-                  @click="confirmRevoke"
-                >
-                  Revoke Access
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-          
-          <!-- Success Snackbar -->
-          <v-snackbar
-            v-model="successSnackbar"
-            color="success"
-            timeout="3000"
-          >
-            {{ snackbarMessage }}
-            <template v-slot:actions>
+            <v-card-actions class="pt-4">
+              <v-spacer />
               <v-btn
-                color="white"
+                color="grey-darken-1"
                 variant="text"
-                @click="successSnackbar = false"
+                @click="confirmSignOutDialog = false"
               >
-                Close
+                Cancel
               </v-btn>
-            </template>
-          </v-snackbar>
-        </v-container>
-      </v-main>
-    </v-app>
-  </template>
+              <v-btn
+                color="error"
+                variant="flat"
+                @click="confirmSignOut"
+              >
+                Sign Out
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+          
+        <v-dialog
+          v-model="confirmRevokeDialog"
+          max-width="500"
+        >
+          <v-card class="pa-6">
+            <v-card-title class="text-h5 font-weight-bold">
+              Revoke Access
+            </v-card-title>
+              
+            <v-card-text class="pt-4">
+              Are you sure you want to revoke access for {{ selectedApp?.name }}? This app will no longer have access to your {{ selectedApp?.access.toLowerCase() }}.
+            </v-card-text>
+              
+            <v-card-actions class="pt-4">
+              <v-spacer />
+              <v-btn
+                color="grey-darken-1"
+                variant="text"
+                @click="confirmRevokeDialog = false"
+              >
+                Cancel
+              </v-btn>
+              <v-btn
+                color="error"
+                variant="flat"
+                @click="confirmRevoke"
+              >
+                Revoke Access
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+          
+        <!-- Success Snackbar -->
+        <v-snackbar
+          v-model="successSnackbar"
+          color="success"
+          timeout="3000"
+        >
+          {{ snackbarMessage }}
+          <template #actions>
+            <v-btn
+              color="white"
+              variant="text"
+              @click="successSnackbar = false"
+            >
+              Close
+            </v-btn>
+          </template>
+        </v-snackbar>
+      </v-container>
+    </v-main>
+  </v-app>
+</template>
   
   <script>
   import LeftMenu from '@/dashboard/LeftMenu.vue'
@@ -319,6 +339,11 @@
         snackbarMessage: ''
       }
     },
+    watch: {
+      securityNotifications() {
+        this.toggleSecurityNotifications();
+      }
+    },
     methods: {
       signOutDevice(device) {
         this.selectedDevice = device;
@@ -382,11 +407,6 @@
         // this.$api.user.updateSecuritySettings({
         //   emailAlerts: this.securityNotifications
         // });
-      }
-    },
-    watch: {
-      securityNotifications() {
-        this.toggleSecurityNotifications();
       }
     }
   }

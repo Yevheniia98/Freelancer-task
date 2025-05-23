@@ -44,7 +44,9 @@
             mdi-view-dashboard-outline
           </v-icon>
         </template>
-        <v-list-item-title>Dashboard</v-list-item-title>
+        <v-list-item-title class="d">
+          Dashboard
+        </v-list-item-title>
       </v-list-item>
   
       <v-list-group class="menu-group">
@@ -58,7 +60,9 @@
                 mdi-folder-outline
               </v-icon>
             </template>
-            <v-list-item-title>Projects</v-list-item-title>
+            <v-list-item-title class="p">
+              Projects
+            </v-list-item-title>
           </v-list-item>
         </template>
         <v-list-item 
@@ -66,14 +70,18 @@
           link
           to="/projects"
         >
-          <v-list-item-title>Projects list</v-list-item-title>
+          <v-list-item-title class="l">
+            Projects list
+          </v-list-item-title>
         </v-list-item>
         <v-list-item 
           class="submenu-item" 
           link
           to="/project-create"
         >
-          <v-list-item-title>Create projects</v-list-item-title>
+          <v-list-item-title class="l">
+            Create projects
+          </v-list-item-title>
         </v-list-item>
       </v-list-group>
   
@@ -88,7 +96,9 @@
                 mdi-account-outline
               </v-icon>
             </template>
-            <v-list-item-title>Clients</v-list-item-title>
+            <v-list-item-title class="c">
+              Clients
+            </v-list-item-title>
           </v-list-item>
         </template>
         <v-list-item 
@@ -96,21 +106,27 @@
           link
           to="/client-main"
         >
-          <v-list-item-title>Clients</v-list-item-title>
+          <v-list-item-title class="l">
+            Clients
+          </v-list-item-title>
         </v-list-item>
         <v-list-item 
           class="submenu-item" 
           link
           to="/invite-member"
         >
-          <v-list-item-title>Invite freelancer</v-list-item-title>
+          <v-list-item-title class="l">
+            Invite freelancer
+          </v-list-item-title>
         </v-list-item>
         <v-list-item 
           class="submenu-item" 
           link
           to="/my-team"
         >
-          <v-list-item-title>My team</v-list-item-title>
+          <v-list-item-title class="l">
+            My team
+          </v-list-item-title>
         </v-list-item>
       </v-list-group>
   
@@ -124,7 +140,9 @@
             mdi-clipboard-text-outline
           </v-icon>
         </template>
-        <v-list-item-title>Tasks</v-list-item-title>
+        <v-list-item-title class="t">
+          Tasks
+        </v-list-item-title>
       </v-list-item>
   
       <v-list-item 
@@ -137,7 +155,9 @@
             mdi-chart-line
           </v-icon>
         </template>
-        <v-list-item-title>Finance</v-list-item-title>
+        <v-list-item-title class="f">
+          Finance
+        </v-list-item-title>
       </v-list-item>
   
       <v-list-item 
@@ -150,7 +170,9 @@
             mdi-calendar-blank-outline
           </v-icon>
         </template>
-        <v-list-item-title>Calendar</v-list-item-title>
+        <v-list-item-title class="c">
+          Calendar
+        </v-list-item-title>
       </v-list-item>
   
       <v-list-item 
@@ -163,7 +185,9 @@
             mdi-tools
           </v-icon>
         </template>
-        <v-list-item-title>Tools</v-list-item-title>
+        <v-list-item-title class="t">
+          Tools
+        </v-list-item-title>
       </v-list-item>
   
       <v-list-group class="menu-group">
@@ -177,7 +201,9 @@
                 mdi-cog-outline
               </v-icon>
             </template>
-            <v-list-item-title>Settings</v-list-item-title>
+            <v-list-item-title class="s">
+              Settings
+            </v-list-item-title>
           </v-list-item>
         </template>
         <v-list-item
@@ -185,28 +211,36 @@
           link
           to="/account"
         >
-          <v-list-item-title>Account Settings</v-list-item-title>
+          <v-list-item-title class="l">
+            Account Settings
+          </v-list-item-title>
         </v-list-item>
         <v-list-item
           class="submenu-item"
           link
           to="/sub"
         >
-          <v-list-item-title>Subscription & Billing</v-list-item-title>
+          <v-list-item-title class="l">
+            Subscription & Billing
+          </v-list-item-title>
         </v-list-item>
         <v-list-item
           class="submenu-item"
           link
           to="/custom"
         >
-          <v-list-item-title>Customization</v-list-item-title>
+          <v-list-item-title class="l">
+            Customization
+          </v-list-item-title>
         </v-list-item>
         <v-list-item
           class="submenu-item"
           link
           to="/secure"
         >
-          <v-list-item-title>Security & Privacy</v-list-item-title>
+          <v-list-item-title class="l">
+            Security & Privacy
+          </v-list-item-title>
         </v-list-item>
         <v-list-item
           class="submenu-item"
@@ -220,14 +254,18 @@
           link
           to="/backup"
         >
-          <v-list-item-title>Backup & Data M.</v-list-item-title>
+          <v-list-item-title class="l">
+            Backup & Data M.
+          </v-list-item-title>
         </v-list-item>
         <v-list-item
           class="submenu-item"
           link
           to="/support"
         >
-          <v-list-item-title>Support & Feedback</v-list-item-title>
+          <v-list-item-title class="l">
+            Support & Feedback
+          </v-list-item-title>
         </v-list-item>
       </v-list-group>
     </v-list>
@@ -428,6 +466,34 @@
   .menu-group {
     margin: 0;
     padding: 0;
+  }
+
+  .d {
+    text-align: left;
+  }
+
+  .t {
+    text-align: left;
+  }
+  
+  .c {
+    text-align: left;
+  }
+
+  .f {
+    text-align: left;
+  }
+
+  .p {
+    text-align: left;
+  }
+
+  .s {
+    text-align: left;
+  }
+
+  .l {
+    text-align: left;
   }
   
   /* User profiles section */
