@@ -886,47 +886,31 @@ export default {
 </script>
   
 <style scoped>
-/* --- Navigation Drawer (LeftMenu) --- */
-.v-application--wrap {
-  display: flex;
-  min-height: 100vh;
-  height: 100vh;
-  overflow: hidden;
-  background: #f8fafc;
+/* Fixed styles for left menu */
+:deep(.left-menu-fixed) {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  height: 100vh !important; /* Changed from 102vh to 100vh */
+  z-index: 999 !important;
+  width: 72px ;
+  overflow-y: hidden !important; /* Prevent scrolling within the menu itself */
+  background: linear-gradient(180deg, #1a237e 0%, #283593 100%) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-.left-menu-fixed {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: auto;
-  bottom: 0;
-  height: 100vh;
-  width: 72px;
-  background: linear-gradient(180deg, #1a237e 0%, #283593 100%);
-  z-index: 1100;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border-right: none;
-  padding: 12px 0;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.left-menu-fixed.expanded {
-  width: 240px;
-  align-items: flex-start;
+:deep(.left-menu-fixed.expanded) {
+  width: 240px !important;
 }
 
 /* --- Main Content --- */
 .v-main {
   margin-left: 0px !important;
-  min-height: 100vh;
   background: #f8f9fb;
   border-radius: 0 0 0 0;
   overflow-y: auto;
-  height: 100vh;
+  height: 99vh !important;
   transition: margin-left 0.2s cubic-bezier(.4,0,.2,1);
 }
 

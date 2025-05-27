@@ -3,55 +3,21 @@
     <LeftMenu
       :rail="!sidebarExpanded"
       @update:rail="sidebarExpanded = !$event"
+      class="left-menu-fixed"
+      :class="{ 'expanded': sidebarExpanded }"
     />
+    <SearchBar />
     
     <v-main
-      :class="{ 'ml-60': sidebarExpanded, 'ml-14': !sidebarExpanded }"
+      :class="{ 'main-expanded': sidebarExpanded, 'main-collapsed': !sidebarExpanded }"
       class="transition-all duration-300"
     >
       <v-container
         fluid
         class="pa-6"
       >
-        <!-- Header with Search -->
-        <div class="d-flex justify-space-between align-center mb-10">
-          <div class="logo">
-            <!-- You can add your logo here if needed -->
-          </div>
-          
-          <div class="d-flex align-center gap-4">
-            <div class="search-container">
-              <v-text-field
-                density="compact"
-                placeholder="Search"
-                prepend-inner-icon="mdi-magnify"
-                variant="outlined"
-                hide-details
-                class="rounded-pill"
-                style="max-width: 240px;"
-              />
-            </div>
-            
-            <v-btn
-              icon
-              class="bg-purple-lighten-4"
-              color="purple"
-            >
-              <v-icon>mdi-earth</v-icon>
-            </v-btn>
-            
-            <v-btn
-              icon
-              class="bg-amber-lighten-4"
-              color="amber"
-            >
-              <v-icon>mdi-bell</v-icon>
-            </v-btn>
-          </div>
-        </div>
-        
         <!-- Current Subscription Section -->
-        <div class="subscription-container mb-10">
+        <div class="mb-10">
           <h1 class="text-h4 font-weight-bold mb-6">
             Current subscription
           </h1>
@@ -74,144 +40,414 @@
                 15$
               </div>
             </div>
-            <div class="text-body-1">
+            <div class="pol text-body-1">
               You're on free trial that ends on October 28. You can manage your payment methods, upgrade plans or cancel your subscription.
             </div>
           </div>
         </div>
         
         <!-- Payment Methods Section -->
-        <div class="payment-methods-container mb-10">
+        <div class="mb-10">
           <h2 class="text-h5 font-weight-bold mb-6">
             Payment methods
           </h2>
           
-          <div class="d-flex justify-space-between align-center">
-            <div class="text-body-1">
-              Modify your payment method for future payments
+          <v-card class="payment-methods-card pa-6">
+            <div class="d-flex justify-space-between align-center mb-6">
+              <div class="text-body-1 font-weight-medium">
+                Current payment method
+              </div>
+              <v-btn
+                color="primary"
+                variant="outlined"
+                rounded="lg"
+                class="px-6"
+                @click="openPaymentDialog"
+              >
+                Change payment method
+              </v-btn>
             </div>
-            
-            <v-btn
-              color="primary"
-              rounded="lg"
-              class="px-6"
-            >
-              Change payment method
-            </v-btn>
-          </div>
+
+            <div class="current-payment-method d-flex align-center pa-4 rounded-lg">
+              <v-img
+                :src="currentPaymentMethod.image"
+                width="40"
+                height="40"
+                class="mr-4"
+              />
+              <div>
+                <div class="text-subtitle-1 font-weight-medium">{{ currentPaymentMethod.name }}</div>
+                <div class="text-caption text-medium-emphasis">Expires {{ currentPaymentMethod.expiry }}</div>
+              </div>
+            </div>
+          </v-card>
         </div>
+
+        <!-- Payment Method Dialog -->
+        <v-dialog
+          v-model="showPaymentDialog"
+          max-width="600"
+          persistent
+        >
+          <v-card class="pa-6">
+            <v-card-title class="text-h5 font-weight-bold mb-6">
+              Change Payment Method
+            </v-card-title>
+
+            <v-card-text>
+              <div class="payment-options mb-6">
+                <div
+                  v-for="method in paymentMethods"
+                  :key="method.id"
+                  class="payment-option mb-4"
+                  :class="{ 'selected': selectedPaymentMethod === method.id }"
+                  @click="selectedPaymentMethod = method.id"
+                >
+                  <div class="d-flex align-center">
+                    <v-img
+                      :src="method.image"
+                      width="40"
+                      height="40"
+                      class="mr-4"
+                    />
+                    <div class="text-subtitle-1">{{ method.name }}</div>
+                  </div>
+                  <v-radio
+                    v-model="selectedPaymentMethod"
+                    :value="method.id"
+                    color="primary"
+                    hide-details
+                  />
+                </div>
+              </div>
+
+              <v-expand-transition>
+                <div v-if="selectedPaymentMethod === 'card'">
+                  <v-text-field
+                    v-model="cardNumber"
+                    label="Card number"
+                    variant="outlined"
+                    placeholder="1234 5678 9012 3456"
+                    class="mb-4"
+                    :rules="[rules.required, rules.cardNumber]"
+                  />
+                  <div class="d-flex gap-4 mb-4">
+                    <v-text-field
+                      v-model="cardExpiry"
+                      label="MM/YY"
+                      variant="outlined"
+                      placeholder="MM/YY"
+                      class="flex-grow-0"
+                      style="width: 100px;"
+                      :rules="[rules.required, rules.expiry]"
+                    />
+                    <v-text-field
+                      v-model="cardCvv"
+                      label="CVV"
+                      variant="outlined"
+                      placeholder="123"
+                      type="password"
+                      class="flex-grow-0"
+                      style="width: 100px;"
+                      :rules="[rules.required, rules.cvv]"
+                    />
+                  </div>
+                  <v-text-field
+                    v-model="cardName"
+                    label="Name on card"
+                    variant="outlined"
+                    placeholder="John Doe"
+                    :rules="[rules.required]"
+                  />
+                </div>
+              </v-expand-transition>
+            </v-card-text>
+
+            <v-card-actions class="pt-4">
+              <v-spacer />
+              <v-btn
+                color="grey-darken-1"
+                variant="text"
+                @click="showPaymentDialog = false"
+              >
+                Cancel
+              </v-btn>
+              <v-btn
+                color="primary"
+                @click="updatePaymentMethod"
+                :loading="updating"
+              >
+                Update Payment Method
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
         
         <!-- Subscription Plans Section -->
-        <div class="subscription-plans-container mb-10">
+        <div class="mb-10">
           <h2 class="text-h5 font-weight-bold mb-6">
-            Subscription Plans
+            Choose Your Plan
           </h2>
           
-          <div class="d-flex gap-6">
-            <!-- Monthly Plan Card -->
+          <div class="ws d-flex gap-4 justify-center">
             <v-card
               width="400"
-              class="pa-6"
-              variant="outlined"
-              rounded="lg"
+              elevation="0"
+              class="plan-card"
+              :class="{ 'plan-card-selected': selectedPlan === 'monthly' }"
+              @click="selectedPlan = 'monthly'"
             >
-              <h3 class="text-h5 font-weight-bold text-center mb-6">
-                Monthly plan
-              </h3>
+              <div class="plan-badge">
+                Popular Choice
+              </div>
               
-              <ul class="plan-features pl-6">
-                <li class="mb-2">
-                  15$ per month
-                </li>
-                <li>Full access.</li>
-              </ul>
+              <v-card-item class="ws">
+                <div class="d-flex flex-column align-center text-center">
+                  <v-icon
+                    size="64"
+                    color="primary"
+                    class="mb-4"
+                  >
+                    mdi-rocket-launch
+                  </v-icon>
+                  <div class="text-h5 font-weight-bold mb-2">Monthly plan</div>
+                  <div class="text-body-2 text-medium-emphasis">Perfect for getting started</div>
+                  
+                  <div class="mt-6 price-display">
+                    <span class="currency">$</span>
+                    <span class="amount">15</span>
+                    <span class="period">/month</span>
+                  </div>
+                </div>
+              </v-card-item>
+              
+              <v-divider class="my-4" />
+              
+              <v-card-text>
+                <div class="features-list">
+                  <div class="feature-item">
+                    <v-icon color="success" size="20">mdi-folder-multiple</v-icon>
+                    <span>Unlimited projects</span>
+                  </div>
+                  <div class="feature-item">
+                    <v-icon color="success" size="20">mdi-shield-check</v-icon>
+                    <span>Full access to features</span>
+                  </div>
+                  <div class="feature-item">
+                    <v-icon color="success" size="20">mdi-headphones</v-icon>
+                    <span>Priority support</span>
+                  </div>
+                  <div class="feature-item">
+                    <v-icon color="success" size="20">mdi-update</v-icon>
+                    <span>Regular updates</span>
+                  </div>
+                </div>
+              </v-card-text>
+              
+              <v-card-actions class="pa-6">
+                <v-btn
+                  color="primary"
+                  block
+                  rounded="lg"
+                  height="48"
+                  :variant="selectedPlan === 'monthly' ? 'flat' : 'outlined'"
+                >
+                  Start Monthly Plan
+                </v-btn>
+              </v-card-actions>
             </v-card>
             
-            <!-- 6-Month Plan Card -->
             <v-card
               width="400"
-              class="pa-6"
-              variant="outlined"
-              rounded="lg"
+              elevation="0"
+              class="plan-card"
+              :class="{ 'plan-card-selected': selectedPlan === 'biannual' }"
+              @click="selectedPlan = 'biannual'"
             >
-              <h3 class="text-h5 font-weight-bold text-center mb-6">
-                6-Months plan
-              </h3>
+              <div class="plan-badge bg-success">
+                Save 33%
+              </div>
               
-              <ul class="plan-features pl-6">
-                <li class="mb-2">
-                  60$ per month
-                </li>
-                <li class="mb-2">
-                  Full access
-                </li>
-                <li>Save 30%</li>
-              </ul>
+              <v-card-item>
+                <div class="d-flex flex-column align-center text-center">
+                  <v-icon
+                    size="64"
+                    color="success"
+                    class="mb-4"
+                  >
+                    mdi-diamond-stone
+                  </v-icon>
+                  <div class="text-h5 font-weight-bold mb-2">6-Months plan</div>
+                  <div class="text-body-2 text-medium-emphasis">Best value for professionals</div>
+                  
+                  <div class="mt-6 price-display">
+                    <span class="currency">$</span>
+                    <span class="amount">60</span>
+                    <span class="period">/6 months</span>
+                  </div>
+                </div>
+              </v-card-item>
+              
+              <v-divider class="my-4" />
+              
+              <v-card-text>
+                <div class="features-list">
+                  <div class="feature-item">
+                    <v-icon color="success" size="20">mdi-check-decagram</v-icon>
+                    <span>Everything in Monthly</span>
+                  </div>
+                  <div class="feature-item">
+                    <v-icon color="success" size="20">mdi-chart-bell-curve</v-icon>
+                    <span>Advanced analytics</span>
+                  </div>
+                  <div class="feature-item">
+                    <v-icon color="success" size="20">mdi-puzzle</v-icon>
+                    <span>Custom integrations</span>
+                  </div>
+                  <div class="feature-item">
+                    <v-icon color="success" size="20">mdi-account-group</v-icon>
+                    <span>Dedicated support team</span>
+                  </div>
+                  <div class="feature-item">
+                    <v-icon color="success" size="20">mdi-star</v-icon>
+                    <span>Early access to features</span>
+                  </div>
+                </div>
+              </v-card-text>
+              
+              <v-card-actions class="pa-6">
+                <v-btn
+                  color="success"
+                  block
+                  rounded="lg"
+                  height="48"
+                  :variant="selectedPlan === 'biannual' ? 'flat' : 'outlined'"
+                >
+                  Start 6-Month Plan
+                </v-btn>
+              </v-card-actions>
             </v-card>
           </div>
         </div>
         
         <!-- Billing History Section -->
-        <div class="billing-history-container mb-10">
+        <div class="billing-history-container mt-12">
           <h2 class="text-h5 font-weight-bold mb-6">
             Billing History
           </h2>
-          
-          <v-table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Price</th>
-                <th>Invoice</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="(item, index) in billingHistory"
-                :key="index"
-              >
-                <td>{{ item.date }}</td>
-                <td>{{ item.type }}</td>
-                <td>{{ item.status }}</td>
-                <td>${{ item.price }}</td>
-                <td>
-                  <v-btn
-                    variant="text"
-                    color="primary"
-                    density="compact"
-                    @click="downloadInvoice(item)"
-                  >
-                    Download
-                  </v-btn>
-                </td>
-              </tr>
-            </tbody>
-          </v-table>
+
+          <v-card elevation="0" class="billing-table">
+            <v-table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Description</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Invoice</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Aug 1, 2023</td>
+                  <td>6-Month Subscription</td>
+                  <td>$60.00</td>
+                  <td>
+                    <v-chip
+                      color="success"
+                      size="small"
+                      variant="flat"
+                      class="status-chip"
+                    >
+                      Paid
+                    </v-chip>
+                  </td>
+                  <td>
+                    <v-btn
+                      variant="text"
+                      density="comfortable"
+                      color="primary"
+                      prepend-icon="mdi-download"
+                      class="download-btn"
+                    >
+                      Download
+                    </v-btn>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Jul 1, 2023</td>
+                  <td>Monthly Subscription</td>
+                  <td>$15.00</td>
+                  <td>
+                    <v-chip
+                      color="success"
+                      size="small"
+                      variant="flat"
+                      class="status-chip"
+                    >
+                      Paid
+                    </v-chip>
+                  </td>
+                  <td>
+                    <v-btn
+                      variant="text"
+                      density="comfortable"
+                      color="primary"
+                      prepend-icon="mdi-download"
+                      class="download-btn"
+                    >
+                      Download
+                    </v-btn>
+                  </td>
+                </tr>
+              </tbody>
+            </v-table>
+          </v-card>
         </div>
         
         <!-- Cancel Subscription Section -->
-        <div class="cancel-subscription-container">
-          <h2 class="text-h5 font-weight-bold mb-4">
-            Pause or cancel subscription
+        <div class="mb-10">
+          <h2 class="text-h5 font-weight-bold mb-6">
+            Manage subscription
           </h2>
           
-          <div class="d-flex justify-space-between align-center">
-            <div class="text-body-1">
-              By canceling your account you will lose all your data.
+          <v-card class="payment-methods-card pa-6">
+            <div class="d-flex justify-space-between align-center mb-6">
+              <div>
+                <div class="text-h6 font-weight-medium mb-2">Cancel or pause subscription</div>
+                <div class="text-body-2 text-medium-emphasis">
+                  By canceling your subscription, you will lose access to premium features after your current billing period ends.
+                </div>
+              </div>
+              
+              <div class="d-flex gap-4">
+                <v-btn
+                  color="secondary"
+                  variant="outlined"
+                  rounded="lg"
+                  class="px-6"
+                >
+                  Pause subscription
+                </v-btn>
+                <v-btn
+                  color="error"
+                  variant="flat"
+                  rounded="lg"
+                  class="px-6"
+                  @click="confirmCancelSubscription"
+                >
+                  Cancel subscription
+                </v-btn>
+              </div>
             </div>
-            
-            <v-btn
-              color="error"
-              variant="flat"
-              rounded="lg"
-              class="px-6"
-              @click="confirmCancelSubscription"
-            >
-              Cancel subscription
-            </v-btn>
-          </div>
+
+            <v-divider class="my-4" />
+
+            <div class="text-body-2 text-medium-emphasis">
+              <v-icon color="warning" class="mr-2" size="small">mdi-information</v-icon>
+              Your data will be securely stored for 30 days after cancellation.
+            </div>
+          </v-card>
         </div>
         
         <!-- Initial Cancel Confirmation Dialog -->
@@ -221,19 +457,35 @@
           persistent
         >
           <v-card class="pa-6">
-            <v-card-title class="text-h5 font-weight-bold">
-              Are you sure you want to cancel?
-            </v-card-title>
+            <div class="d-flex align-center mb-6">
+              <v-icon
+                color="error"
+                size="32"
+                class="mr-4"
+              >
+                mdi-alert-circle
+              </v-icon>
+              <v-card-title class="text-h5 font-weight-bold pa-0">
+                Cancel subscription?
+              </v-card-title>
+            </div>
             
-            <v-card-text class="pt-4">
-              Canceling your subscription will end all services and your data will be removed after 30 days.
+            <v-card-text class="text-body-1 pa-0 mb-6">
+              <p class="mb-4">Are you sure you want to cancel your subscription? You will:</p>
+              <ul class="cancel-impacts">
+                <li class="mb-2">Lose access to premium features after current billing period</li>
+                <li class="mb-2">Keep access to your data for 30 days after cancellation</li>
+                <li>Be able to reactivate your subscription at any time</li>
+              </ul>
             </v-card-text>
             
-            <v-card-actions class="pt-4">
+            <v-card-actions class="pa-0">
               <v-spacer />
               <v-btn
                 color="grey-darken-1"
-                variant="text"
+                variant="outlined"
+                rounded="lg"
+                class="px-6 mr-4"
                 @click="cancelDialog = false"
               >
                 Keep Subscription
@@ -241,9 +493,11 @@
               <v-btn
                 color="error"
                 variant="flat"
+                rounded="lg"
+                class="px-6"
                 @click="showCancelReasonDialog"
               >
-                Yes, Cancel
+                Continue Cancellation
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -256,25 +510,29 @@
           persistent
         >
           <v-card class="pa-6">
-            <v-card-title class="text-h5 font-weight-bold text-center mb-8">
-              Why are you canceling?
+            <v-card-title class="text-h5 font-weight-bold mb-6">
+              Help us improve
             </v-card-title>
             
-            <v-card-text>
+            <v-card-text class="pa-0">
+              <p class="text-body-1 mb-6">What's the main reason for canceling your subscription?</p>
               <div class="cancellation-reasons">
-                <v-radio-group v-model="cancellationReason">
+                <v-radio-group
+                  v-model="cancellationReason"
+                  class="cancel-reason-group"
+                >
                   <div
                     v-for="(reason, index) in cancellationReasons"
                     :key="index"
-                    class="mb-4"
+                    class="cancel-reason-option mb-4"
                   >
                     <v-radio
                       :value="reason"
                       color="primary"
-                      class="pa-0 ma-0"
+                      hide-details
                     >
                       <template #label>
-                        <span class="ml-2">{{ reason }}</span>
+                        <span class="ml-2 text-body-1">{{ reason }}</span>
                       </template>
                     </v-radio>
                   </div>
@@ -282,16 +540,25 @@
               </div>
             </v-card-text>
             
-            <v-card-actions class="pt-6">
+            <v-card-actions class="pt-6 pa-0">
               <v-btn
-                color="#ff9999"
+                color="grey-darken-1"
+                variant="outlined"
+                rounded="lg"
+                class="px-6 mr-4"
+                @click="cancelReasonDialog = false"
+              >
+                Back
+              </v-btn>
+              <v-btn
+                color="error"
                 variant="flat"
                 rounded="lg"
-                block
-                height="48"
+                class="px-6"
+                :disabled="!cancellationReason"
                 @click="finalizeCancel"
               >
-                Finalize canceling
+                Confirm Cancellation
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -321,11 +588,13 @@
 
 <script>
 import LeftMenu from '@/dashboard/LeftMenu.vue'
+import SearchBar from '@/dashboard/SearchBar.vue';
 
 export default {
   name: 'SubscriptionPage',
   components: {
-    LeftMenu
+    LeftMenu,
+    SearchBar
   },
   data() {
     return {
@@ -334,6 +603,42 @@ export default {
       cancelReasonDialog: false,
       cancellationSuccessful: false,
       cancellationReason: '',
+      selectedPlan: 'monthly',
+      showPaymentDialog: false,
+      selectedPaymentMethod: 'card',
+      updating: false,
+      cardNumber: '',
+      cardExpiry: '',
+      cardCvv: '',
+      cardName: '',
+      currentPaymentMethod: {
+        name: 'Visa ending in 4242',
+        image: '/card-visa.png',
+        expiry: '12/25'
+      },
+      paymentMethods: [
+        {
+          id: 'card',
+          name: 'Credit / Debit Card',
+          image: '/card-generic.png'
+        },
+        {
+          id: 'paypal',
+          name: 'PayPal',
+          image: '/paypal.png'
+        },
+        {
+          id: 'revolut',
+          name: 'Revolut',
+          image: '/revolut.png'
+        }
+      ],
+      rules: {
+        required: v => !!v || 'This field is required',
+        cardNumber: v => /^[\d\s]{16,19}$/.test(v.replace(/\s/g, '')) || 'Invalid card number',
+        expiry: v => /^(0[1-9]|1[0-2])\/([0-9]{2})$/.test(v) || 'Invalid expiry date',
+        cvv: v => /^[0-9]{3,4}$/.test(v) || 'Invalid CVV'
+      },
       cancellationReasons: [
         'I no longer need the service for my freelancing work.',
         'I\'m not using the platform as much as I expected.',
@@ -412,73 +717,343 @@ export default {
     },
     downloadInvoice(item) {
       console.log('Downloading invoice:', item.invoiceId);
-      // Implement download logic here
-      // Example:
-      // this.$api.invoices.download(item.invoiceId)
-      //   .then(response => {
-      //     // Create blob from response and trigger download
-      //     const blob = new Blob([response.data], { type: 'application/pdf' });
-      //     const link = document.createElement('a');
-      //     link.href = window.URL.createObjectURL(blob);
-      //     link.download = `invoice-${item.invoiceId}.pdf`;
-      //     link.click();
-      //   })
-      //   .catch(error => {
-      //     console.error('Error downloading invoice:', error);
-      //     this.$toast.error('Failed to download invoice');
-      //   });
+      // Implementation remains the same
+    },
+
+    openPaymentDialog() {
+      this.showPaymentDialog = true;
+      this.selectedPaymentMethod = 'card';
+      this.cardNumber = '';
+      this.cardExpiry = '';
+      this.cardCvv = '';
+      this.cardName = '';
+    },
+
+    async updatePaymentMethod() {
+      if (this.selectedPaymentMethod === 'card') {
+        // Validate card inputs
+        if (!this.cardNumber || !this.cardExpiry || !this.cardCvv || !this.cardName) {
+          // Show error message
+          return;
+        }
+      }
+
+      this.updating = true;
+
+      try {
+        // Example API call to update payment method
+        // await this.$api.payments.updateMethod({
+        //   type: this.selectedPaymentMethod,
+        //   data: this.selectedPaymentMethod === 'card' ? {
+        //     number: this.cardNumber.replace(/\s/g, ''),
+        //     expiry: this.cardExpiry,
+        //     cvv: this.cardCvv,
+        //     name: this.cardName
+        //   } : {}
+        // });
+
+        // Update the current payment method display
+        this.currentPaymentMethod = {
+          name: this.selectedPaymentMethod === 'card' 
+            ? `Card ending in ${this.cardNumber.slice(-4)}` 
+            : this.paymentMethods.find(m => m.id === this.selectedPaymentMethod).name,
+          image: this.paymentMethods.find(m => m.id === this.selectedPaymentMethod).image,
+          expiry: this.cardExpiry || 'N/A'
+        };
+
+        this.showPaymentDialog = false;
+        // Show success message
+        // this.$toast.success('Payment method updated successfully');
+      } catch (error) {
+        console.error('Error updating payment method:', error);
+        // Show error message
+        // this.$toast.error('Failed to update payment method');
+      } finally {
+        this.updating = false;
+      }
+    },
+
+    formatCardNumber(e) {
+      let v = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+      if (v.length > 16) v = v.slice(0, 16);
+      const parts = [];
+      for (let i = 0; i < v.length; i += 4) {
+        parts.push(v.slice(i, i + 4));
+      }
+      e.target.value = parts.join(' ');
     }
   }
 }
 </script>
 
 <style scoped>
-.plan-features {
-  list-style-type: disc;
+.status-chip {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
 }
 
-/* Table styling */
-:deep(.v-table) {
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  border-radius: 8px;
+.status-chip.completed {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.status-chip.pending {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+:deep(.left-menu-fixed) {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  height: 100vh !important;
+  z-index: 999 !important;
+  width: 72px 
+  /* other styles... */
+}
+
+.left-menu-fixed {
+  background: linear-gradient(180deg, #1a237e 0%, #283593 100%);
+  z-index: 1100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-right: none;
+  padding: 12px 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Custom scrollbar styling */
+.left-menu-fixed::-webkit-scrollbar {
+  width: 4px;
+}
+
+.left-menu-fixed::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.left-menu-fixed::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+.left-menu-fixed::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Firefox scrollbar */
+.left-menu-fixed {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.1);
+}
+
+.left-menu-fixed.expanded {
+  width: 240px;
+}
+
+.main-expanded {
+  margin-left: 240px !important;
+  width: calc(100% - 240px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.main-collapsed {
+  margin-left: 72px !important;
+  width: calc(100% - 72px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ws {
+  margin-left:10px;
+}
+
+/* Adding to existing styles */
+.billing-table {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
   overflow: hidden;
+}
+
+.status-chip {
+  min-width: 80px;
+  justify-content: center;
+}
+
+.download-btn {
+  text-transform: none;
+}
+
+:deep(.v-table) {
+  background: transparent;
 }
 
 :deep(.v-table th) {
   font-weight: 600;
-  background-color: #f5f5f5;
-  text-transform: none;
-  font-size: 14px;
+  color: #64748b;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
 }
 
-/* Radio button styling */
-:deep(.v-radio) {
-  margin-top: 0;
-  margin-bottom: 0;
+:deep(.v-table td) {
+  height: 60px;
+  color: #475569;
 }
 
-:deep(.v-radio .v-selection-control) {
-  min-height: 32px;
+/* Payment Methods Styles */
+.payment-methods-card {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
 }
 
-:deep(.v-radio .v-label) {
-  font-size: 16px;
-  opacity: 1;
-  color: rgba(0, 0, 0, 0.87);
+.current-payment-method {
+  background: #f8fafc;
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-/* Button styling */
-:deep(.v-btn) {
-  text-transform: none;
-  font-weight: 500;
+.pol {
+text-align: left; 
 }
 
-/* Rounded search field */
-:deep(.v-text-field .v-field__outline__start) {
-  border-radius: 20px 0 0 20px;
+.ws {
+  
 }
 
-:deep(.v-text-field .v-field__outline__end) {
-  border-radius: 0 20px 20px 0;
+.payment-option {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 1rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.payment-option:hover {
+  border-color: var(--v-primary-base);
+  background: rgba(var(--v-primary-base), 0.05);
+}
+
+.payment-option.selected {
+  border-color: var(--v-primary-base);
+  background: rgba(var(--v-primary-base), 0.05);
+}
+
+/* Cancellation Section Styles */
+.cancel-impacts {
+  list-style: none;
+  padding-left: 24px;
+}
+
+.cancel-impacts li {
+  position: relative;
+  color: #475569;
+}
+
+.cancel-impacts li::before {
+  content: "•";
+  position: absolute;
+  left: -20px;
+  color: #ef4444;
+}
+
+.cancel-reason-group {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 0.5rem;
+}
+
+.cancel-reason-option {
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  padding: 0.5rem;
+}
+
+.cancel-reason-option:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+/* Plan Cards Styles */
+.plan-card {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 24px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.plan-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
+}
+
+.plan-card-selected {
+  border: 2px solid var(--v-primary-base);
+  background: linear-gradient(to bottom, rgba(var(--v-primary-base), 0.05), transparent);
+}
+
+.plan-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--v-primary-base);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.plan-badge.bg-success {
+  background: var(--v-success-base);
+}
+
+.price-display {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px;
+}
+
+.price-display .currency {
+  font-size: 1.5rem;
+  color: #64748b;
+}
+
+.price-display .amount {
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1;
+}
+
+.price-display .period {
+  font-size: 1rem;
+  color: #64748b;
+  margin-left: 2px;
+}
+
+.features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #475569;
+}
+
+.feature-item span {
+  font-size: 0.9375rem;
 }
 </style>
