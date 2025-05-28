@@ -1,7 +1,9 @@
 <!-- FinanceDashboard.vue -->
 <template>
   <v-app>
-    <LeftMenu />
+    <LeftMenu 
+      сlass="left-menu-component"
+    />
     <SearchBar />
     
     <v-main class="bg-surface-subtle">
@@ -874,6 +876,27 @@ export default defineComponent({
 </script>
 
 <style scoped>
+
+
+:deep(.left-menu-component),
+  :deep(.v-navigation-drawer) {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    height: 100vh !important;
+    z-index: 999 !important;
+    overflow-y: hidden !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  }
+ :deep(.v-navigation-drawer--rail) {
+    width: 72px ;
+  }
+  
+  :deep(.v-navigation-drawer:not(.v-navigation-drawer--rail)) {
+    width: 240px !important;
+  }
+
+
 .bg-surface-subtle {
   background-color: #f9fafb !important;
 }

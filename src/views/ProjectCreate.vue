@@ -2,7 +2,11 @@
 <template>
   <v-app>
     <!-- Left Sidebar -->
-    <LeftMenu />
+    <LeftMenu 
+      class="left-menu-component"
+      :style="{ position: 'fixed !important', zIndex: 1000 }"
+    />
+    <SearchBar />
   
     <!-- Main Content -->
     <v-main>
@@ -17,32 +21,7 @@
           <v-col
             cols="6"
             class="d-flex justify-end align-center"
-          >
-            <v-text-field
-              density="compact"
-              label="Search"
-              prepend-inner-icon="mdi-magnify"
-              variant="outlined"
-              hide-details
-              class="mr-4"
-              style="max-width: 200px"
-            />
-            <v-btn
-              icon
-              variant="text"
-              color="primary"
-              class="mr-2"
-            >
-              <v-icon>mdi-earth</v-icon>
-            </v-btn>
-            <v-btn
-              icon
-              variant="text"
-              color="amber"
-            >
-              <v-icon>mdi-bell</v-icon>
-            </v-btn>
-          </v-col>
+          />
         </v-row>
   
         <v-form @submit.prevent="submitProject">
@@ -404,6 +383,7 @@
   <script setup>
   import { ref } from 'vue';
   import LeftMenu from '@/dashboard/LeftMenu.vue';
+  import SearchBar from '@/dashboard/SearchBar.vue';
   
   // Form data
   const projectTitle = ref('');
@@ -538,6 +518,24 @@
   </script>
   
   <style>
+  :deep(.left-menu-component),
+  :deep(.v-navigation-drawer) {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    height: 100vh !important;
+    z-index: 999 !important;
+    overflow-y: hidden !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  }
+ :deep(.v-navigation-drawer--rail) {
+    width: 72px ;
+  }
+  
+  :deep(.v-navigation-drawer:not(.v-navigation-drawer--rail)) {
+    width: 240px !important;
+  }
+
   .border-dashed {
     border-style: dashed !important;
     border-width: 2px !important;

@@ -5,7 +5,7 @@ import CreateAccount from '@/views/CreateAccount.vue';
 import LoginPage from '@/views/LoginPage.vue';
 import PricingSection from '@/components/PricingSection.vue'; // ✅ Correct import
 import CardPayment from '@/views/CardPayment.vue';
-import HomeSaas from '@/views/HomeSaas.vue';
+import DashboardPage from '@/views/DashboardPage.vue';
 import ProjectSection from '@/views/ProjectSection.vue';
 import ProjectTaskVue from '@/views/ProjectTaskVue.vue';
 import ProjectCreate from '@/views/ProjectCreate.vue';
@@ -64,9 +64,9 @@ const routes = [
   },
 
   { 
-    path: '/home-saas',
-    name: 'HomeSaas',
-    component: HomeSaas 
+    path: '/dashboard',
+    name: 'DashboardPage',
+    component: DashboardPage 
   },
 
   { 

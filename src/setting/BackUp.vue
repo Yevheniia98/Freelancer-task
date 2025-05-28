@@ -2,6 +2,7 @@
   <v-app>
     <LeftMenu
       :rail="!sidebarExpanded"
+      class="left-menu-component"
       @update:rail="sidebarExpanded = !$event"
     />
     <SearchBar />
@@ -14,43 +15,6 @@
         fluid
         class="pa-6"
       >
-        <!-- Header with Search -->
-        <div class="d-flex justify-space-between align-center mb-10">
-          <div class="logo">
-            <!-- You can add your logo here if needed -->
-          </div>
-            
-          <div class="d-flex align-center gap-4">
-            <div class="search-container">
-              <v-text-field
-                density="compact"
-                placeholder="Search"
-                prepend-inner-icon="mdi-magnify"
-                variant="outlined"
-                hide-details
-                class="rounded-pill"
-                style="max-width: 240px;"
-              />
-            </div>
-              
-            <v-btn
-              icon
-              class="bg-purple-lighten-4"
-              color="purple"
-            >
-              <v-icon>mdi-earth</v-icon>
-            </v-btn>
-              
-            <v-btn
-              icon
-              class="bg-amber-lighten-4"
-              color="amber"
-            >
-              <v-icon>mdi-bell</v-icon>
-            </v-btn>
-          </div>
-        </div>
-          
         <!-- Main Content -->
         <div class="backup-container">
           <h1 class="text-h4 font-weight-bold mb-8">
@@ -69,7 +33,7 @@
             >
               <div class="d-flex justify-space-between align-center mb-4">
                 <div>
-                  <h3 class="text-h6 font-weight-medium mb-1">
+                  <h3 class="auto text-h6 font-weight-medium mb-1">
                     Automatic Backups
                   </h3>
                   <p class="text-body-2 text-grey">
@@ -94,7 +58,7 @@
                   </p>
                 </div>
                 <v-btn
-                  color="primary"
+                  color="#0C9C8D"
                   variant="flat"
                   prepend-icon="mdi-backup-restore"
                 >
@@ -107,7 +71,9 @@
             <v-table class="rounded-lg mb-8">
               <thead class="table-header bg-teal-lighten-3">
                 <tr>
-                  <th>Date & Time</th>
+                  <th class="date">
+                    Date & Time
+                  </th>
                   <th>Type</th>
                   <th>Size</th>
                   <th>Status</th>
@@ -762,16 +728,43 @@
   }
   
   .table-header {
-    background-color: #80cbc4 !important;
+    background-color: #cfe4fb !important ;
+  }
+
+  .date {
+    margin-left: 10px !important;
   }
   
   :deep(.v-table th) {
     font-weight: 600;
     text-transform: none;
     font-size: 14px;
-    color: rgba(0, 0, 0, 0.87);
+    color: rgba(36, 36, 36, 0.87);
+    
+  }
+
+  :deep(.left-menu-component),
+  :deep(.v-navigation-drawer) {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    height: 100vh !important;
+    z-index: 999 !important;
+    overflow-y: hidden !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  }
+ :deep(.v-navigation-drawer--rail) {
+    width: 72px !important;
   }
   
+  :deep(.v-navigation-drawer:not(.v-navigation-drawer--rail)) {
+    width: 240px !important;
+  }
+  
+.auto {
+    text-align: left;
+  }
+
   /* Button styling */
   :deep(.v-btn) {
     text-transform: none;

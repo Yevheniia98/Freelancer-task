@@ -2,6 +2,7 @@
   <v-app>
     <LeftMenu
       :rail="!sidebarExpanded"
+      сlass="left-menu-component"
       @update:rail="sidebarExpanded = !$event"
     />
     <SearchBar />
@@ -14,43 +15,6 @@
         fluid
         class="pa-6"
       >
-        <!-- Header with Search -->
-        <div class="d-flex justify-space-between align-center mb-10">
-          <div class="logo">
-            <!-- You can add your logo here if needed -->
-          </div>
-            
-          <div class="d-flex align-center gap-4">
-            <div class="search-container">
-              <v-text-field
-                density="compact"
-                placeholder="Search"
-                prepend-inner-icon="mdi-magnify"
-                variant="outlined"
-                hide-details
-                class="rounded-pill"
-                style="max-width: 240px;"
-              />
-            </div>
-              
-            <v-btn
-              icon
-              class="bg-purple-lighten-4"
-              color="purple"
-            >
-              <v-icon>mdi-earth</v-icon>
-            </v-btn>
-              
-            <v-btn
-              icon
-              class="bg-amber-lighten-4"
-              color="amber"
-            >
-              <v-icon>mdi-bell</v-icon>
-            </v-btn>
-          </div>
-        </div>
-          
         <!-- Integrations Title -->
         <div class="integrations-container">
           <h1 class="text-h4 font-weight-bold mb-8">
@@ -421,6 +385,24 @@
     text-transform: none;
     font-size: 14px;
     color: rgba(0, 0, 0, 0.87);
+  }
+
+  :deep(.left-menu-component),
+  :deep(.v-navigation-drawer) {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    height: 100vh !important;
+    z-index: 999 !important;
+    overflow-y: hidden !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  }
+ :deep(.v-navigation-drawer--rail) {
+    width: 72px !important;
+  }
+  
+  :deep(.v-navigation-drawer:not(.v-navigation-drawer--rail)) {
+    width: 240px !important;
   }
   
   /* Button styling */

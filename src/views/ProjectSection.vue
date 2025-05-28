@@ -1,7 +1,9 @@
 <!-- ProjectSection.vue -->
 <template>
   <v-app>
-    <LeftMenu />
+    <LeftMenu 
+      сlass="left-menu-component"
+    />
     <SearchBar />
       
     <v-main class="bg-grey-lighten-4">
@@ -637,6 +639,24 @@ export default defineComponent({
   </script>
   
   <style scoped>
+
+  :deep(.left-menu-component),
+  :deep(.v-navigation-drawer) {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    height: 100vh !important;
+    z-index: 999 !important;
+    overflow-y: hidden !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  }
+ :deep(.v-navigation-drawer--rail) {
+    width: 72px ;
+  }
+  
+  :deep(.v-navigation-drawer:not(.v-navigation-drawer--rail)) {
+    width: 240px !important;
+  }
 
   .task-card {
   transition: transform 0.2s ease, box-shadow 0.2s ease;

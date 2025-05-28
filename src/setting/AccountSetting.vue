@@ -19,36 +19,8 @@
           <h1 class="text-h4 font-weight-bold">
             Account Settings
           </h1>
-          
-          <div class="d-flex">
-            <v-text-field
-              variant="outlined"
-              placeholder="Search"
-              hide-details
-              density="compact"
-              class="mr-3"
-              style="max-width: 180px;"
-              prepend-inner-icon="mdi-magnify"
-            />
-            
-            <v-btn
-              icon
-              variant="text"
-              color="primary"
-              class="mr-2"
-            >
-              <v-icon>mdi-earth</v-icon>
-            </v-btn>
-            
-            <v-btn
-              icon
-              variant="text"
-              color="warning"
-            >
-              <v-icon>mdi-bell</v-icon>
-            </v-btn>
           </div>
-        </div>
+        
         
         <!-- Tab Navigation -->
         <div class="mb-10">

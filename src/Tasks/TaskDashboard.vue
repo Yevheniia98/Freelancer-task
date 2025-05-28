@@ -1,7 +1,10 @@
 <!-- Fixed Tasks Page with Proper Sidebar Integration -->
 <template>
   <v-app>
-    <LeftMenu ref="leftMenuRef" />
+    <LeftMenu
+      ref="leftMenuRef" 
+      сlass="left-menu-component"
+    />
     <SearchBar />
       
     <v-main 
@@ -818,6 +821,25 @@ export default defineComponent({
 </script>
 
 <style scoped>
+:deep(.left-menu-component),
+  :deep(.v-navigation-drawer) {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    height: 100vh !important;
+    z-index: 999 !important;
+    overflow-y: hidden !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  }
+ :deep(.v-navigation-drawer--rail) {
+    width: 72px ;
+  }
+  
+  :deep(.v-navigation-drawer:not(.v-navigation-drawer--rail)) {
+    width: 240px !important;
+  }
+
+
 /* Main content positioning for sidebar integration */
 .main-content-full {
   margin-left: 0;

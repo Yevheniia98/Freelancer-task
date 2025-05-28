@@ -1,7 +1,11 @@
 <template>
   <v-app>
     <!-- Only include the LeftMenu component, no other sidebar -->
-    <LeftMenu />
+    <LeftMenu
+      сlass="left-menu-component"
+      :style="{ position: 'fixed !important', zIndex: 1000 }"
+    />
+    <SearchBar />
     
     <!-- Adjust main content to properly account for sidebar -->
     <v-main style="padding-left: 80px !important;">
@@ -345,7 +349,7 @@
               </v-card-title>
               
               <v-card-text>
-                <div class="d-flex flex-wrap gap-2">
+                <div class="card d-flex flex-wrap gap-1 ">
                   <v-chip
                     v-for="(skill, index) in skills"
                     :key="index"
@@ -675,11 +679,13 @@
 
 <script>
 import LeftMenu from '@/dashboard/LeftMenu.vue';
+import SearchBar from '@/dashboard/SearchBar.vue';
 
 export default {
   name: 'ProjectManagementUI',
   components: { 
-    LeftMenu
+    LeftMenu,
+    SearchBar
   },
 
   data() {
@@ -791,8 +797,31 @@ export default {
 </script>
 
 <style>
+
+:deep(.left-menu-component),
+  :deep(.v-navigation-drawer) {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    height: 100vh !important;
+    z-index: 999 !important;
+    overflow-y: hidden !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  }
+ :deep(.v-navigation-drawer--rail) {
+    width: 72px ;
+  }
+  
+  :deep(.v-navigation-drawer:not(.v-navigation-drawer--rail)) {
+    width: 240px !important;
+  }
+
 .border-dashed {
   border-style: dashed !important;
+}
+
+.card {
+  gap: 10px !important;
 }
 
 /* Custom margin and padding for this page */

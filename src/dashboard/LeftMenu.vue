@@ -34,7 +34,7 @@
       nav
     >
       <v-list-item
-        to="/"
+        to="dashboard"
         link
         class="menu-list-item"
         active-class="active-menu-item"

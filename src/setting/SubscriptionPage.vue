@@ -2,9 +2,9 @@
   <v-app>
     <LeftMenu
       :rail="!sidebarExpanded"
-      @update:rail="sidebarExpanded = !$event"
       class="left-menu-fixed"
       :class="{ 'expanded': sidebarExpanded }"
+      @update:rail="sidebarExpanded = !$event"
     />
     <SearchBar />
     
@@ -76,8 +76,12 @@
                 class="mr-4"
               />
               <div>
-                <div class="text-subtitle-1 font-weight-medium">{{ currentPaymentMethod.name }}</div>
-                <div class="text-caption text-medium-emphasis">Expires {{ currentPaymentMethod.expiry }}</div>
+                <div class="text-subtitle-1 font-weight-medium">
+                  {{ currentPaymentMethod.name }}
+                </div>
+                <div class="text-caption text-medium-emphasis">
+                  Expires {{ currentPaymentMethod.expiry }}
+                </div>
               </div>
             </div>
           </v-card>
@@ -110,7 +114,9 @@
                       height="40"
                       class="mr-4"
                     />
-                    <div class="text-subtitle-1">{{ method.name }}</div>
+                    <div class="text-subtitle-1">
+                      {{ method.name }}
+                    </div>
                   </div>
                   <v-radio
                     v-model="selectedPaymentMethod"
@@ -174,8 +180,8 @@
               </v-btn>
               <v-btn
                 color="primary"
-                @click="updatePaymentMethod"
                 :loading="updating"
+                @click="updatePaymentMethod"
               >
                 Update Payment Method
               </v-btn>
@@ -210,8 +216,12 @@
                   >
                     mdi-rocket-launch
                   </v-icon>
-                  <div class="text-h5 font-weight-bold mb-2">Monthly plan</div>
-                  <div class="text-body-2 text-medium-emphasis">Perfect for getting started</div>
+                  <div class="text-h5 font-weight-bold mb-2">
+                    Monthly plan
+                  </div>
+                  <div class="text-body-2 text-medium-emphasis">
+                    Perfect for getting started
+                  </div>
                   
                   <div class="mt-6 price-display">
                     <span class="currency">$</span>
@@ -226,19 +236,39 @@
               <v-card-text>
                 <div class="features-list">
                   <div class="feature-item">
-                    <v-icon color="success" size="20">mdi-folder-multiple</v-icon>
+                    <v-icon
+                      color="success"
+                      size="20"
+                    >
+                      mdi-folder-multiple
+                    </v-icon>
                     <span>Unlimited projects</span>
                   </div>
                   <div class="feature-item">
-                    <v-icon color="success" size="20">mdi-shield-check</v-icon>
+                    <v-icon
+                      color="success"
+                      size="20"
+                    >
+                      mdi-shield-check
+                    </v-icon>
                     <span>Full access to features</span>
                   </div>
                   <div class="feature-item">
-                    <v-icon color="success" size="20">mdi-headphones</v-icon>
+                    <v-icon
+                      color="success"
+                      size="20"
+                    >
+                      mdi-headphones
+                    </v-icon>
                     <span>Priority support</span>
                   </div>
                   <div class="feature-item">
-                    <v-icon color="success" size="20">mdi-update</v-icon>
+                    <v-icon
+                      color="success"
+                      size="20"
+                    >
+                      mdi-update
+                    </v-icon>
                     <span>Regular updates</span>
                   </div>
                 </div>
@@ -277,8 +307,12 @@
                   >
                     mdi-diamond-stone
                   </v-icon>
-                  <div class="text-h5 font-weight-bold mb-2">6-Months plan</div>
-                  <div class="text-body-2 text-medium-emphasis">Best value for professionals</div>
+                  <div class="text-h5 font-weight-bold mb-2">
+                    6-Months plan
+                  </div>
+                  <div class="text-body-2 text-medium-emphasis">
+                    Best value for professionals
+                  </div>
                   
                   <div class="mt-6 price-display">
                     <span class="currency">$</span>
@@ -293,23 +327,48 @@
               <v-card-text>
                 <div class="features-list">
                   <div class="feature-item">
-                    <v-icon color="success" size="20">mdi-check-decagram</v-icon>
+                    <v-icon
+                      color="success"
+                      size="20"
+                    >
+                      mdi-check-decagram
+                    </v-icon>
                     <span>Everything in Monthly</span>
                   </div>
                   <div class="feature-item">
-                    <v-icon color="success" size="20">mdi-chart-bell-curve</v-icon>
+                    <v-icon
+                      color="success"
+                      size="20"
+                    >
+                      mdi-chart-bell-curve
+                    </v-icon>
                     <span>Advanced analytics</span>
                   </div>
                   <div class="feature-item">
-                    <v-icon color="success" size="20">mdi-puzzle</v-icon>
+                    <v-icon
+                      color="success"
+                      size="20"
+                    >
+                      mdi-puzzle
+                    </v-icon>
                     <span>Custom integrations</span>
                   </div>
                   <div class="feature-item">
-                    <v-icon color="success" size="20">mdi-account-group</v-icon>
+                    <v-icon
+                      color="success"
+                      size="20"
+                    >
+                      mdi-account-group
+                    </v-icon>
                     <span>Dedicated support team</span>
                   </div>
                   <div class="feature-item">
-                    <v-icon color="success" size="20">mdi-star</v-icon>
+                    <v-icon
+                      color="success"
+                      size="20"
+                    >
+                      mdi-star
+                    </v-icon>
                     <span>Early access to features</span>
                   </div>
                 </div>
@@ -336,7 +395,10 @@
             Billing History
           </h2>
 
-          <v-card elevation="0" class="billing-table">
+          <v-card
+            elevation="0"
+            class="billing-table"
+          >
             <v-table>
               <thead>
                 <tr>
@@ -414,7 +476,9 @@
           <v-card class="payment-methods-card pa-6">
             <div class="d-flex justify-space-between align-center mb-6">
               <div>
-                <div class="text-h6 font-weight-medium mb-2">Cancel or pause subscription</div>
+                <div class="text-h6 font-weight-medium mb-2">
+                  Cancel or pause subscription
+                </div>
                 <div class="text-body-2 text-medium-emphasis">
                   By canceling your subscription, you will lose access to premium features after your current billing period ends.
                 </div>
@@ -444,7 +508,13 @@
             <v-divider class="my-4" />
 
             <div class="text-body-2 text-medium-emphasis">
-              <v-icon color="warning" class="mr-2" size="small">mdi-information</v-icon>
+              <v-icon
+                color="warning"
+                class="mr-2"
+                size="small"
+              >
+                mdi-information
+              </v-icon>
               Your data will be securely stored for 30 days after cancellation.
             </div>
           </v-card>
@@ -471,10 +541,16 @@
             </div>
             
             <v-card-text class="text-body-1 pa-0 mb-6">
-              <p class="mb-4">Are you sure you want to cancel your subscription? You will:</p>
+              <p class="mb-4">
+                Are you sure you want to cancel your subscription? You will:
+              </p>
               <ul class="cancel-impacts">
-                <li class="mb-2">Lose access to premium features after current billing period</li>
-                <li class="mb-2">Keep access to your data for 30 days after cancellation</li>
+                <li class="mb-2">
+                  Lose access to premium features after current billing period
+                </li>
+                <li class="mb-2">
+                  Keep access to your data for 30 days after cancellation
+                </li>
                 <li>Be able to reactivate your subscription at any time</li>
               </ul>
             </v-card-text>
@@ -515,7 +591,9 @@
             </v-card-title>
             
             <v-card-text class="pa-0">
-              <p class="text-body-1 mb-6">What's the main reason for canceling your subscription?</p>
+              <p class="text-body-1 mb-6">
+                What's the main reason for canceling your subscription?
+              </p>
               <div class="cancellation-reasons">
                 <v-radio-group
                   v-model="cancellationReason"
