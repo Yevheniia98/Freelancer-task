@@ -1,655 +1,1210 @@
 <template>
-  <div class="top-bar-container">
-    <v-row
-      no-gutters
-      align="center"
-      justify="end"
-      class="top-bar-row"
-    >
-      <!-- Search Component -->
-      <v-col
-        cols="auto"
-        class="search-wrapper"
-      >
-        <v-expand-transition>
-          <v-text-field
+  <div class="modern-topbar" :class="{ 'sidebar-expanded': !props.isRailMode, 'sidebar-rail': props.isRailMode }">
+    <div class="topbar-content">
+      <!-- Search Section -->
+      <div class="search-section" :class="{ 'search-shifted-expanded': !props.isRailMode, 'search-shifted-rail': props.isRailMode }">
+        <div class="search-container" :class="{ 'search-focused': isSearchFocused }">
+          <div class="search-icon">
+            <Search :size="20" />
+          </div>
+          <input 
             v-model="searchQuery"
-            :label="$t('general.search')"
-            variant="outlined"
-            density="compact"
-            hide-details
+            type="text" 
+            :placeholder="t('general.search')"
             class="search-input"
-            bg-color="surface"
-            prepend-inner-icon="mdi-magnify"
-            clearable
+            @focus="isSearchFocused = true"
+            @blur="isSearchFocused = false"
             @keyup.enter="performSearch"
-            @click:clear="clearSearch"
           />
-        </v-expand-transition>
-      </v-col>
-      
-      <!-- Language Selector -->
-      <v-col
-        cols="auto"
-        class="ml-4"
-      >
-        <v-menu
-          v-model="languageMenu"
-          :close-on-content-click="false"
-          location="bottom"
-        >
-          <template #activator="{ props }">
-            <div
-              class="language-icon"
-              v-bind="props"
-            >
-              <v-badge
-                :content="currentLanguage"
-                color="primary"
-                location="bottom end"
-                offset-x="10"
-                offset-y="10"
-              >
-                <v-icon
-                  size="24"
-                  color="#871F8D"
-                >
-                  mdi-web
-                </v-icon>
-              </v-badge>
-            </div>
-          </template>
-          <v-card
-            min-width="200"
-            class="language-menu"
+          <button 
+            v-if="searchQuery" 
+            @click="clearSearch"
+            class="search-clear"
           >
-            <v-list density="compact">
-              <v-list-subheader>{{ $t('general.selectLanguage') }}</v-list-subheader>
-              <v-list-item
-                v-for="(language, i) in availableLanguages"
-                :key="i"
-                :value="language.code"
-                :active="currentLanguage === language.code"
-                :title="language.name"
-                @click="changeLanguage(language.code)"
-              >
-                <template #prepend>
-                  <v-icon
-                    :icon="language.icon"
-                    size="small"
-                    class="mr-2"
-                  />
-                </template>
-                
-                <v-list-item-title>{{ language.name }}</v-list-item-title>
-                
-                <template #append>
-                  <v-icon
-                    v-if="currentLanguage === language.code"
-                    color="primary"
-                    icon="mdi-check"
-                    size="small"
-                  />
-                </template>
-              </v-list-item>
-            </v-list>
-          </v-card>
-        </v-menu>
-      </v-col>
-      
-      <!-- Notifications -->
-      <v-col
-        cols="auto"
-        class="ml-4"
-      >
-        <v-menu
-          v-model="notificationMenu"
-          :close-on-content-click="false"
-          location="bottom"
-        >
-          <template #activator="{ props }">
-            <div
-              class="notification-icon"
-              v-bind="props"
-            >
-              <v-badge 
-                :content="unreadNotifications.length.toString()" 
-                :model-value="unreadNotifications.length > 0"
-                color="error" 
-                location="top start"
-                offset-x="2"
-                offset-y="2"
-              >
-                <v-icon
-                  size="24"
-                  color="#871F8D"
-                >
-                  mdi-bell-outline
-                </v-icon>
-              </v-badge>
-            </div>
-          </template>
-          <v-card
-            min-width="320"
-            max-width="400"
-            class="notification-menu"
+            <X :size="16" />
+          </button>
+        </div>
+      </div>
+
+      <!-- Actions Section -->
+      <div class="actions-section">
+        <!-- Language Selector -->
+        <div class="action-item" ref="languageRef">
+          <button 
+            @click="toggleLanguageMenu"
+            class="action-button"
+            :class="{ 'active': showLanguageMenu }"
           >
-            <v-toolbar
-              density="compact"
-              color="primary"
-              class="text-white"
-            >
-              <v-toolbar-title>{{ $t('notifications.title') }}</v-toolbar-title>
-              <template #append>
-                <v-btn 
-                  v-if="unreadNotifications.length > 0" 
-                  variant="text" 
-                  density="compact"
+            <div class="language-indicator">
+              <Globe :size="18" />
+              <span class="language-code">{{ currentLanguage.toUpperCase() }}</span>
+            </div>
+          </button>
+          
+          <!-- Language Dropdown -->
+          <Transition name="dropdown">
+            <div v-if="showLanguageMenu" class="dropdown-menu language-dropdown">
+              <div class="dropdown-header">
+                <h3>{{ t('general.selectLanguage') }}</h3>
+              </div>
+              <div class="dropdown-content">
+                <button
+                  v-for="language in availableLanguages"
+                  :key="language.code"
+                  @click="changeLanguage(language.code)"
+                  class="dropdown-item"
+                  :class="{ 'active': currentLanguage === language.code }"
+                >
+                  <span class="language-flag">{{ language.flag }}</span>
+                  <span class="language-name">{{ language.name }}</span>
+                  <Check v-if="currentLanguage === language.code" :size="16" />
+                </button>
+              </div>
+            </div>
+          </Transition>
+        </div>
+
+        <!-- Notifications -->
+        <div class="action-item" ref="notificationRef">
+          <button 
+            @click="toggleNotificationMenu"
+            class="action-button"
+            :class="{ 'active': showNotificationMenu }"
+          >
+            <div class="notification-indicator">
+              <Bell :size="18" />
+              <div v-if="unreadCount > 0" class="notification-badge">
+                {{ unreadCount > 99 ? '99+' : unreadCount }}
+              </div>
+            </div>
+          </button>
+
+          <!-- Notifications Dropdown -->
+          <Transition name="dropdown">
+            <div v-if="showNotificationMenu" class="dropdown-menu notification-dropdown">
+              <div class="dropdown-header">
+                <h3>{{ t('notifications.title') }}</h3>
+                <button 
+                  v-if="unreadCount > 0"
                   @click="markAllAsRead"
+                  class="mark-all-read"
                 >
-                  {{ $t('notifications.markAllRead') }}
-                </v-btn>
-              </template>
-            </v-toolbar>
-            
-            <v-list
-              lines="two"
-              class="notification-list"
-            >
-              <template v-if="notifications.length > 0">
-                <v-list-item
+                  {{ t('notifications.markAllRead') }}
+                </button>
+              </div>
+              
+              <div class="dropdown-content notifications-list">
+                <div v-if="notifications.length === 0" class="empty-state">
+                  <Bell :size="48" stroke-width="1.5" />
+                  <p>{{ t('notifications.empty') }}</p>
+                </div>
+                
+                <button
                   v-for="notification in notifications"
                   :key="notification.id"
-                  :class="{ 'unread-notification': !notification.read }"
                   @click="readNotification(notification)"
+                  class="notification-item"
+                  :class="{ 'unread': !notification.read }"
                 >
-                  <template #prepend>
-                    <v-avatar
-                      :color="getNotificationColor(notification.type)"
-                      size="36"
-                    >
-                      <v-icon
-                        :icon="getNotificationIcon(notification.type)"
-                        color="white"
-                      />
-                    </v-avatar>
-                  </template>
-                  
-                  <v-list-item-title>{{ notification.title }}</v-list-item-title>
-                  <v-list-item-subtitle>{{ notification.message }}</v-list-item-subtitle>
-                  
-                  <template #append>
-                    <div class="notification-time text-caption">
-                      {{ formatNotificationTime(notification.time) }}
-                    </div>
-                  </template>
-                </v-list-item>
-              </template>
+                  <div class="notification-icon" :class="`type-${notification.type}`">
+                    <component :is="getNotificationIcon(notification.type)" :size="16" />
+                  </div>
+                  <div class="notification-content">
+                    <h4>{{ notification.title }}</h4>
+                    <p>{{ notification.message }}</p>
+                    <span class="notification-time">{{ formatTime(notification.time) }}</span>
+                  </div>
+                </button>
+              </div>
               
-              <v-list-item v-if="notifications.length === 0">
-                <div class="text-center py-4 text-medium-emphasis">
-                  {{ $t('notifications.empty') }}
-                </div>
-              </v-list-item>
-            </v-list>
-            
-            <v-divider />
-            
-            <v-card-actions>
-              <v-btn 
-                variant="text" 
-                block 
-                @click="viewAllNotifications"
-              >
-                {{ $t('notifications.viewAll') }}
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-menu>
-      </v-col>
-      
-      <!-- User Menu (Optional) -->
-      <v-col
-        cols="auto"
-        class="ml-4"
-      >
-        <v-menu
-          v-model="userMenu"
-          :close-on-content-click="false"
-          location="bottom"
-        >
-          <template #activator="{ props }">
-            <v-avatar
-              class="user-avatar"
-              size="40"
-              v-bind="props"
-            >
-              <v-img
-                src="https://randomuser.me/api/portraits/women/85.jpg"
-                alt="User"
-              />
-            </v-avatar>
-          </template>
-          <v-card
-            min-width="200"
-            class="user-menu"
+              <div class="dropdown-footer">
+                <button @click="viewAllNotifications" class="view-all-btn">
+                  {{ t('notifications.viewAll') }}
+                </button>
+              </div>
+            </div>
+          </Transition>
+        </div>
+
+        <!-- User Menu -->
+        <div class="action-item" ref="userRef">
+          <button 
+            @click="toggleUserMenu"
+            class="action-button user-button"
+            :class="{ 'active': showUserMenu }"
           >
-            <v-list density="compact">
-              <v-list-item>
-                <template #prepend>
-                  <v-avatar size="32">
-                    <v-img
-                      src="https://randomuser.me/api/portraits/women/85.jpg"
-                      alt="User"
-                    />
-                  </v-avatar>
-                </template>
-                <v-list-item-title>{{ userName }}</v-list-item-title>
-                <v-list-item-subtitle>{{ userEmail }}</v-list-item-subtitle>
-              </v-list-item>
-              
-              <v-divider />
-              
-              <v-list-item
-                prepend-icon="mdi-account-outline"
-                :title="$t('user.profile')"
-                @click="navigateTo('/profile')"
+            <div class="user-avatar">
+              <img 
+                :src="user.avatar" 
+                :alt="user.name"
+                class="avatar-image"
               />
-              <v-list-item
-                prepend-icon="mdi-cog-outline"
-                :title="$t('user.settings')"
-                @click="navigateTo('/settings')"
-              />
+              <div class="status-indicator online"></div>
+            </div>
+          </button>
+
+          <!-- User Dropdown -->
+          <Transition name="dropdown">
+            <div v-if="showUserMenu" class="dropdown-menu user-dropdown">
+              <div class="dropdown-header user-header">
+                <div class="user-info">
+                  <img :src="user.avatar" :alt="user.name" class="user-profile-image" />
+                  <div class="user-details">
+                    <h3>{{ user.name }}</h3>
+                    <p>{{ user.email }}</p>
+                  </div>
+                </div>
+              </div>
               
-              <v-divider />
-              
-              <v-list-item
-                prepend-icon="mdi-logout"
-                :title="$t('user.logout')"
-                @click="logout"
-              />
-            </v-list>
-          </v-card>
-        </v-menu>
-      </v-col>
-    </v-row>
+              <div class="dropdown-content">
+                <button @click="navigateTo('/profile')" class="dropdown-item">
+                  <User :size="18" />
+                  <span>{{ t('user.profile') }}</span>
+                </button>
+                
+                <button @click="navigateTo('/settings')" class="dropdown-item">
+                  <Settings :size="18" />
+                  <span>{{ t('user.settings') }}</span>
+                </button>
+                
+                <div class="dropdown-divider"></div>
+                
+                <button @click="logout" class="dropdown-item logout-item">
+                  <LogOut :size="18" />
+                  <span>{{ t('user.logout') }}</span>
+                </button>
+              </div>
+            </div>
+          </Transition>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
-<script>
-export default {
-  name: "SearchBar",
-  data() {
-    return {
-      searchQuery: '',
-      languageMenu: false,
-      notificationMenu: false,
-      userMenu: false,
-      currentLanguage: 'en',
-      userName: 'Isabella Morgan',
-      userEmail: 'isabella@example.com',
-      availableLanguages: [
-        { code: 'en', name: 'English', icon: 'mdi-flag-outline' },
-        { code: 'es', name: 'Español', icon: 'mdi-flag-outline' },
-        { code: 'fr', name: 'Français', icon: 'mdi-flag-outline' },
-        { code: 'de', name: 'Deutsch', icon: 'mdi-flag-outline' },
-        { code: 'ru', name: 'Русский', icon: 'mdi-flag-outline' },
-      ],
-      notifications: [
-        {
-          id: 1,
-          title: 'New Message',
-          message: 'You have received a new message from Emily Johnson',
-          time: new Date(Date.now() - 1000 * 60 * 5), // 5 minutes ago
-          read: false,
-          type: 'message'
-        },
-        {
-          id: 2,
-          title: 'Meeting Reminder',
-          message: 'Your meeting with Design Team starts in 30 minutes',
-          time: new Date(Date.now() - 1000 * 60 * 25), // 25 minutes ago
-          read: false,
-          type: 'calendar'
-        },
-        {
-          id: 3,
-          title: 'Task Completed',
-          message: 'Michael Chen has completed the homepage design task',
-          time: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-          read: true,
-          type: 'task'
-        },
-        {
-          id: 4,
-          title: 'System Update',
-          message: 'The system will undergo maintenance tomorrow at 2 AM',
-          time: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
-          read: true,
-          type: 'system'
-        }
-      ]
-    };
-  },
-  computed: {
-    unreadNotifications() {
-      return this.notifications.filter(notification => !notification.read);
-    },
-    $t() {
-      // Simple translation function - in a real app, this would be provided by i18n
-      const translations = {
-        en: {
-          general: {
-            search: 'Search...',
-            selectLanguage: 'Select Language'
-          },
-          notifications: {
-            title: 'Notifications',
-            markAllRead: 'Mark all as read',
-            empty: 'No notifications',
-            viewAll: 'View all notifications'
-          },
-          user: {
-            profile: 'Profile',
-            settings: 'Settings',
-            logout: 'Log out'
-          },
-          time: {
-            now: 'Just now',
-            minutesAgo: 'min ago',
-            hoursAgo: 'hr ago',
-            today: 'Today',
-            yesterday: 'Yesterday'
-          }
-        },
-        es: {
-          general: {
-            search: 'Buscar...',
-            selectLanguage: 'Seleccionar idioma'
-          },
-          notifications: {
-            title: 'Notificaciones',
-            markAllRead: 'Marcar todo como leído',
-            empty: 'No hay notificaciones',
-            viewAll: 'Ver todas las notificaciones'
-          },
-          user: {
-            profile: 'Perfil',
-            settings: 'Configuración',
-            logout: 'Cerrar sesión'
-          },
-          time: {
-            now: 'Ahora mismo',
-            minutesAgo: 'min atrás',
-            hoursAgo: 'h atrás',
-            today: 'Hoy',
-            yesterday: 'Ayer'
-          }
-        }
-        // Additional languages would be added here
-      };
-      
-      // Get translations for current language or fall back to English
-      const currentTranslations = translations[this.currentLanguage] || translations.en;
-      
-      // Return function to access nested translations by key path
-      return (path) => {
-        const keys = path.split('.');
-        let result = currentTranslations;
-        
-        for (const key of keys) {
-          if (result && result[key] !== undefined) {
-            result = result[key];
-          } else {
-            // Fall back to English if translation not found
-            let fallback = translations.en;
-            for (const k of keys) {
-              if (fallback && fallback[k] !== undefined) {
-                fallback = fallback[k];
-              } else {
-                return path; // Last resort fallback is the key itself
-              }
-            }
-            return fallback;
-          }
-        }
-        
-        return result;
-      };
-    }
-  },
-  methods: {
-    performSearch() {
-      if (!this.searchQuery) return;
-      console.log('Searching for:', this.searchQuery);
-      // Implement search functionality here
-      // this.$emit('search', this.searchQuery);
-    },
-    
-    clearSearch() {
-      this.searchQuery = '';
-      // Clear search results
-      // this.$emit('clear-search');
-    },
-    
-    changeLanguage(code) {
-      this.currentLanguage = code;
-      this.languageMenu = false;
-      // In a real app, you would update the app's locale
-      // this.$i18n.locale = code;
-      // localStorage.setItem('preferredLanguage', code);
-    },
-    
-    readNotification(notification) {
-      notification.read = true;
-      // In a real app, you would send an API call to mark as read
-      // this.$emit('notification-read', notification.id);
-    },
-    
-    markAllAsRead() {
-      this.notifications.forEach(notification => {
-        notification.read = true;
-      });
-      // In a real app, you would send an API call to mark all as read
-      // this.$emit('mark-all-read');
-    },
-    
-    viewAllNotifications() {
-      this.notificationMenu = false;
-      // Navigate to notifications page
-      // this.$router.push('/notifications');
-    },
-    
-    getNotificationColor(type) {
-      const colors = {
-        message: 'primary',
-        calendar: 'success',
-        task: 'warning',
-        system: 'info',
-        error: 'error'
-      };
-      return colors[type] || 'grey';
-    },
-    
-    getNotificationIcon(type) {
-      const icons = {
-        message: 'mdi-message-outline',
-        calendar: 'mdi-calendar-clock',
-        task: 'mdi-check-circle-outline',
-        system: 'mdi-information-outline',
-        error: 'mdi-alert-circle-outline'
-      };
-      return icons[type] || 'mdi-bell-outline';
-    },
-    
-    formatNotificationTime(time) {
-      if (!time) return '';
-      
-      const now = new Date();
-      const minutes = Math.floor((now - new Date(time)) / (1000 * 60));
-      
-      if (minutes < 1) return this.$t('time.now');
-      if (minutes < 60) return `${minutes} ${this.$t('time.minutesAgo')}`;
-      
-      const hours = Math.floor(minutes / 60);
-      if (hours < 24) return `${hours} ${this.$t('time.hoursAgo')}`;
-      
-      // Check if it's today or yesterday
-      const timeDate = new Date(time);
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
-      
-      if (timeDate >= today) return this.$t('time.today');
-      if (timeDate >= yesterday) return this.$t('time.yesterday');
-      
-      // Default to date format
-      return timeDate.toLocaleDateString();
-    },
-    
-    navigateTo(path) {
-      // In a real app, use router
-      // this.$router.push(path);
-      console.log('Navigate to:', path);
-      this.userMenu = false;
-    },
-    
-    logout() {
-      // Implement logout functionality
-      console.log('Logging out...');
-      // this.$store.dispatch('auth/logout');
-      this.userMenu = false;
-    }
+<script setup>
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { 
+  Search, 
+  X, 
+  Globe, 
+  Check, 
+  Bell, 
+  User, 
+  Settings, 
+  LogOut,
+  MessageSquare,
+  Calendar,
+  CheckCircle
+} from 'lucide-vue-next'
+
+// Props to receive sidebar state from parent component
+const props = defineProps({
+  isRailMode: {
+    type: Boolean,
+    default: false
   }
-};
+})
+
+// Reactive data
+const searchQuery = ref('')
+const isSearchFocused = ref(false)
+const showLanguageMenu = ref(false)
+const showNotificationMenu = ref(false)
+const showUserMenu = ref(false)
+const currentLanguage = ref('en')
+
+// Sidebar state - this should be managed by parent component or store
+// const sidebarOpen = ref(true) // Default to open, you can change this
+
+// Refs for click outside detection
+const languageRef = ref(null)
+const notificationRef = ref(null)
+const userRef = ref(null)
+
+// Sidebar toggle function - removed since Vuetify handles this
+// const toggleSidebar = () => {
+//   sidebarOpen.value = !sidebarOpen.value
+//   // You can emit this to parent component if needed
+//   // emit('sidebar-toggle', sidebarOpen.value)
+// }
+
+// User data
+const user = ref({
+  name: 'Isabella Morgan',
+  email: 'isabella@example.com',
+  avatar: 'https://images.unsplash.com/photo-1494790108755-2616c06146b9?w=150&h=150&fit=crop&crop=face'
+})
+
+// Languages
+const availableLanguages = ref([
+  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'es', name: 'Español', flag: '🇪🇸' },
+  { code: 'fr', name: 'Français', flag: '🇫🇷' },
+  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+  { code: 'zh', name: '中文', flag: '🇨🇳' },
+])
+
+// Notifications
+const notifications = ref([
+  {
+    id: 1,
+    title: 'New Message',
+    message: 'You have received a new message from Emily Johnson',
+    time: new Date(Date.now() - 1000 * 60 * 5),
+    read: false,
+    type: 'message'
+  },
+  {
+    id: 2,
+    title: 'Meeting Reminder',
+    message: 'Your meeting with Design Team starts in 30 minutes',
+    time: new Date(Date.now() - 1000 * 60 * 25),
+    read: false,
+    type: 'calendar'
+  },
+  {
+    id: 3,
+    title: 'Task Completed',
+    message: 'Michael Chen has completed the homepage design task',
+    time: new Date(Date.now() - 1000 * 60 * 60 * 2),
+    read: true,
+    type: 'task'
+  }
+])
+
+// Computed
+const unreadCount = computed(() => {
+  return notifications.value.filter(n => !n.read).length
+})
+
+// Translation function
+const translations = {
+  en: {
+    general: { search: 'Search anything...', selectLanguage: 'Select Language' },
+    notifications: { title: 'Notifications', markAllRead: 'Mark all as read', empty: 'No notifications yet', viewAll: 'View all notifications' },
+    user: { profile: 'Profile', settings: 'Settings', logout: 'Sign out' },
+    time: { now: 'Just now', minutesAgo: 'min ago', hoursAgo: 'hr ago', today: 'Today', yesterday: 'Yesterday' }
+  }
+}
+
+const t = (key) => {
+  const keys = key.split('.')
+  let result = translations[currentLanguage.value] || translations.en
+  for (const k of keys) {
+    result = result[k]
+  }
+  return result || key
+}
+
+// Methods
+const performSearch = () => {
+  if (!searchQuery.value) return
+  console.log('Searching for:', searchQuery.value)
+}
+
+const clearSearch = () => {
+  searchQuery.value = ''
+}
+
+const toggleLanguageMenu = () => {
+  showLanguageMenu.value = !showLanguageMenu.value
+  showNotificationMenu.value = false
+  showUserMenu.value = false
+}
+
+const toggleNotificationMenu = () => {
+  showNotificationMenu.value = !showNotificationMenu.value
+  showLanguageMenu.value = false
+  showUserMenu.value = false
+}
+
+const toggleUserMenu = () => {
+  showUserMenu.value = !showUserMenu.value
+  showLanguageMenu.value = false
+  showNotificationMenu.value = false
+}
+
+const changeLanguage = (code) => {
+  currentLanguage.value = code
+  showLanguageMenu.value = false
+}
+
+const readNotification = (notification) => {
+  notification.read = true
+}
+
+const markAllAsRead = () => {
+  notifications.value.forEach(n => n.read = true)
+}
+
+const viewAllNotifications = () => {
+  showNotificationMenu.value = false
+  console.log('Navigate to notifications page')
+}
+
+const navigateTo = (path) => {
+  showUserMenu.value = false
+  console.log('Navigate to:', path)
+}
+
+const logout = () => {
+  showUserMenu.value = false
+  console.log('Logging out...')
+}
+
+const getNotificationIcon = (type) => {
+  const icons = {
+    message: MessageSquare,
+    calendar: Calendar, 
+    task: CheckCircle
+  }
+  return icons[type] || Bell
+}
+
+const formatTime = (time) => {
+  if (!time) return ''
+  const now = new Date()
+  const minutes = Math.floor((now - new Date(time)) / (1000 * 60))
+  
+  if (minutes < 1) return t('time.now')
+  if (minutes < 60) return `${minutes} ${t('time.minutesAgo')}`
+  
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `${hours} ${t('time.hoursAgo')}`
+  
+  return new Date(time).toLocaleDateString()
+}
+
+// Click outside handler
+const handleClickOutside = (event) => {
+  if (languageRef.value && !languageRef.value.contains(event.target)) {
+    showLanguageMenu.value = false
+  }
+  if (notificationRef.value && !notificationRef.value.contains(event.target)) {
+    showNotificationMenu.value = false
+  }
+  if (userRef.value && !userRef.value.contains(event.target)) {
+    showUserMenu.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 <style scoped>
-/* Container for the top bar */
-.top-bar-container {
-  width: 100%;
-  padding: 8px 16px;
-  background-color: white;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+.modern-topbar {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(6, 78, 71, 0.08);
+  box-shadow: 0 1px 3px rgba(6, 78, 71, 0.05);
+  position: relative;
+  z-index: 1000;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.top-bar-row {
-  height: 56px;
+/* Topbar positioning based on Vuetify navigation drawer state */
+.modern-topbar.sidebar-expanded {
+  margin-left: 240px; /* Width when drawer is expanded */
 }
 
-/* Search input styling */
-.search-wrapper {
-  transition: all 0.3s;
-  max-width: 300px;
+.modern-topbar.sidebar-rail {
+  margin-left: 72px; /* Width when drawer is in rail mode */
+}
+
+.topbar-content {
+  max-width: none; /* Remove max-width to allow full width */
+  margin: 0;
+  padding: 0 24px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Menu Toggle Button - Removed since Vuetify handles this */
+/* .menu-toggle {
+  display: flex;
+  align-items: center;
+}
+
+.menu-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 12px;
+  border-radius: 12px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #475569;
+}
+
+.menu-button:hover {
+  background: rgba(6, 78, 71, 0.08);
+  color: #064E47;
+} */
+
+/* Search Section */
+.search-section {
+  flex: 1;
+  max-width: 500px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Search section positioning based on drawer state */
+.search-section.search-shifted-expanded {
+  margin-left: 16px; /* Additional margin when drawer is expanded */
+}
+
+.search-section.search-shifted-rail {
+  margin-left: 8px; /* Small margin when drawer is in rail mode */
+}
+
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: #f1f5f9;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  padding: 0 16px;
+  height: 48px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-container.search-focused,
+.search-container:hover {
+  background: #ffffff;
+  border-color: #064E47;
+  box-shadow: 0 0 0 4px rgba(6, 78, 71, 0.08);
+}
+
+.search-icon {
+  color: #64748b;
+  margin-right: 12px;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.search-focused .search-icon {
+  color: #064E47;
 }
 
 .search-input {
-  border-radius: 4px;
-  transition: all 0.3s ease;
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  color: #1e293b;
+  outline: none;
+  font-weight: 400;
 }
 
-.search-input:focus-within {
-  width: 320px;
-  max-width: 100%;
+.search-input::placeholder {
+  color: #94a3b8;
 }
 
-/* Language Icon Styling */
-.language-icon {
+.search-clear {
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  transition: all 0.2s;
+  margin-left: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.search-clear:hover {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+/* Actions Section */
+.actions-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-item {
+  position: relative;
+}
+
+.action-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 12px;
+  border-radius: 12px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #EEBFFF;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  cursor: pointer;
-  transition: background-color 0.2s;
+  color: #475569;
 }
 
-.language-icon:hover {
-  background-color: #FABFFF;
+.action-button:hover,
+.action-button.active {
+  background: rgba(6, 78, 71, 0.08);
+  color: #064E47;
 }
 
-/* Notification Icon Styling */
-.notification-icon {
+/* Language Indicator */
+.language-indicator {
   display: flex;
   align-items: center;
-  justify-content: center;
-  background-color: #EEBFFF;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  cursor: pointer;
-  transition: background-color 0.2s;
+  gap: 6px;
 }
 
-.notification-icon:hover {
-  background-color: #FABFFF;
-}
-
-/* User Avatar Styling */
-.user-avatar {
-  cursor: pointer;
-  border: 2px solid #EEBFFF;
-  transition: border-color 0.2s;
-}
-
-.user-avatar:hover {
-  border-color: #FABFFF;
-}
-
-/* Notification styles */
-.notification-list {
-  max-height: 350px;
-  overflow-y: auto;
-}
-
-.unread-notification {
-  background-color: rgba(238, 191, 255, 0.1);
-  font-weight: 500;
-}
-
-.notification-time {
-  white-space: nowrap;
-  color: rgba(0, 0, 0, 0.54);
+.language-code {
   font-size: 12px;
+  font-weight: 600;
+  color: #064E47;
+  background: rgba(6, 78, 71, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
-/* Menu adjustments */
-.language-menu, .notification-menu, .user-menu {
-  border-radius: 8px;
+/* Notification Indicator */
+.notification-indicator {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #ef4444;
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* User Avatar */
+.user-avatar {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.user-button.active .user-avatar,
+.user-button:hover .user-avatar {
+  border-color: #064E47;
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.status-indicator {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.status-indicator.online {
+  background: #10b981;
+}
+
+/* Dropdown Menus */
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  z-index: 1000;
+  min-width: 280px;
   overflow: hidden;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .search-wrapper {
-    max-width: 200px;
-  }
-  
-  .search-input:focus-within {
-    width: 240px;
-  }
+.language-dropdown {
+  min-width: 220px;
 }
 
-@media (max-width: 600px) {
-  .top-bar-container {
-    padding: 8px;
+.notification-dropdown {
+  min-width: 380px;
+  max-width: 400px;
+}
+
+.user-dropdown {
+  min-width: 260px;
+}
+
+.dropdown-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dropdown-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.mark-all-read {
+  background: none;
+  border: none;
+  color: #064E47;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.mark-all-read:hover {
+  background: rgba(6, 78, 71, 0.08);
+}
+
+/* User Header */
+.user-header {
+  background: linear-gradient(135deg, #064E47 0%, #047857 100%);
+  color: white;
+  border-bottom: none;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.user-profile-image {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.user-details h3 {
+  color: white;
+  margin: 0;
+  font-size: 16px;
+}
+
+.user-details p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  margin: 4px 0 0;
+}
+
+/* Dropdown Content */
+.dropdown-content {
+  padding: 8px;
+}
+
+.notifications-list {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.dropdown-item {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 12px 16px;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #475569;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.dropdown-item:hover {
+  background: #f8fafc;
+  color: #064E47;
+}
+
+.dropdown-item.active {
+  background: rgba(6, 78, 71, 0.08);
+  color: #064E47;
+}
+
+.language-flag {
+  font-size: 18px;
+}
+
+.language-name {
+  flex: 1;
+  font-weight: 500;
+}
+
+/* Notification Items */
+.notification-item {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 16px 20px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.notification-item:hover {
+  background: #f8fafc;
+}
+
+.notification-item.unread {
+  background: rgba(6, 78, 71, 0.02);
+  border-left: 3px solid #064E47;
+}
+
+.notification-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: white;
+}
+
+.notification-icon.type-message {
+  background: #3b82f6;
+}
+
+.notification-icon.type-calendar {
+  background: #10b981;
+}
+
+.notification-icon.type-task {
+  background: #f59e0b;
+}
+
+.notification-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-content h4 {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.notification-content p {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.notification-time {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #94a3b8;
+}
+
+.empty-state p {
+  margin: 16px 0 0;
+  font-size: 14px;
+}
+
+/* Footer */
+.dropdown-footer {
+  padding: 12px 20px 20px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.view-all-btn {
+  width: 100%;
+  background: none;
+  border: 1px solid #e2e8f0;
+  color: #064E47;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-all-btn:hover {
+  background: #f8fafc;
+  border-color: #064E47;
+}
+
+/* Divider */
+.dropdown-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 8px 0;
+}
+
+/* Logout Item */
+.logout-item {
+  color: #dc2626 !important;
+}
+
+.logout-item:hover {
+  background: #fef2f2 !important;
+  color: #dc2626 !important;
+}
+
+/* Transitions */
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dropdown-enter-from,
+.dropdown-leave-to {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.95);
+}
+
+.dropdown-enter-to,
+.dropdown-leave-from {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modern-topbar.sidebar-expanded,
+  .modern-topbar.sidebar-rail {
+    margin-left: 0; /* Remove margin on mobile */
   }
   
-  .language-icon,
-  .notification-icon {
-    width: 36px;
-    height: 36px;
+  .topbar-content {
+    padding: 0 16px;
+    height: 64px;
+    gap: 16px;
   }
-  
+
+  .search-section {
+    max-width: none;
+    flex: 1;
+  }
+
+  .search-section.search-shifted-expanded,
+  .search-section.search-shifted-rail {
+    margin-left: 0; /* Remove additional margin on mobile */
+  }
+
+  .search-container {
+    height: 44px;
+    padding: 0 12px;
+    border-radius: 12px;
+  }
+
+  .search-input {
+    font-size: 16px;
+  }
+
+  .actions-section {
+    gap: 4px;
+  }
+
+  .action-button {
+    padding: 10px;
+  }
+
   .user-avatar {
     width: 36px;
     height: 36px;
+    border-radius: 10px;
   }
-  
-  .ml-4 {
-    margin-left: 8px !important;
+
+  .dropdown-menu {
+    min-width: 260px;
+    right: -8px;
+  }
+
+  .notification-dropdown {
+    min-width: 320px;
+    max-width: 350px;
+  }
+
+  .language-dropdown {
+    min-width: 200px;
+  }
+
+  .user-dropdown {
+    min-width: 240px;
+  }
+}
+
+@media (max-width: 480px) {
+  .topbar-content {
+    padding: 0 12px;
+    gap: 12px;
+  }
+
+  .search-container {
+    height: 40px;
+    padding: 0 10px;
+  }
+
+  .search-icon {
+    margin-right: 8px;
+  }
+
+  .action-button {
+    padding: 8px;
+  }
+
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+  }
+
+  .dropdown-menu {
+    right: 0;
+    left: auto;
+    min-width: 280px;
+    max-width: calc(100vw - 24px);
+  }
+
+  .notification-dropdown {
+    min-width: 300px;
+    max-width: calc(100vw - 24px);
+  }
+
+  .dropdown-header {
+    padding: 16px;
+  }
+
+  .notification-item {
+    padding: 12px 16px;
+  }
+
+  .notification-content h4 {
+    font-size: 13px;
+  }
+
+  .notification-content p {
+    font-size: 12px;
+  }
+}
+
+/* Custom Scrollbar */
+.notifications-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notifications-list::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.notifications-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.notifications-list::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Focus States for Accessibility */
+.action-button:focus-visible {
+  outline: 2px solid #064E47;
+  outline-offset: 2px;
+}
+
+.search-input:focus-visible {
+  outline: none;
+}
+
+.dropdown-item:focus-visible,
+.notification-item:focus-visible {
+  outline: 2px solid #064E47;
+  outline-offset: -2px;
+}
+
+/* Loading States */
+.notification-item.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.notification-item.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #e2e8f0;
+  border-top-color: #064E47;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  transform: translateY(-50%);
+}
+
+@keyframes spin {
+  to {
+    transform: translateY(-50%) rotate(360deg);
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .search-container {
+    border: 2px solid #000;
+  }
+
+  .dropdown-menu {
+    border: 2px solid #000;
+  }
+
+  .notification-badge {
+    border: 2px solid #fff;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .search-container,
+  .action-button,
+  .dropdown-item,
+  .notification-item {
+    transition: none;
+  }
+
+  .dropdown-enter-active,
+  .dropdown-leave-active {
+    transition: none;
+  }
+
+  .notification-item.loading::after {
+    animation: none;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .modern-topbar {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .search-container {
+    background: #334155;
+    color: #e2e8f0;
+  }
+
+  .search-container.search-focused,
+  .search-container:hover {
+    background: #475569;
+    border-color: #10b981;
+  }
+
+  .search-input {
+    color: #e2e8f0;
+  }
+
+  .search-input::placeholder {
+    color: #94a3b8;
+  }
+
+  .action-button {
+    color: #cbd5e1;
+  }
+
+  .action-button:hover,
+  .action-button.active {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+  }
+
+  .dropdown-menu {
+    background: #1e293b;
+    border-color: #334155;
+  }
+
+  .dropdown-header {
+    border-bottom-color: #334155;
+  }
+
+  .dropdown-header h3 {
+    color: #e2e8f0;
+  }
+
+  .dropdown-item {
+    color: #cbd5e1;
+  }
+
+  .dropdown-item:hover {
+    background: #334155;
+    color: #10b981;
+  }
+
+  .notification-item {
+    border-bottom-color: #334155;
+  }
+
+  .notification-item:hover {
+    background: #334155;
+  }
+
+  .notification-content h4 {
+    color: #e2e8f0;
+  }
+
+  .notification-content p {
+    color: #94a3b8;
   }
 }
 </style>

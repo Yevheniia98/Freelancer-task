@@ -1,7 +1,9 @@
 <!-- DesignTools.vue -->
 <template>
   <v-app>
-    <LeftMenu />
+    <LeftMenu 
+    сlass="left-menu-component"/>
+    <SearchBar />
         
     <v-main class="main-content">
       <div class="hero-section">
@@ -16,55 +18,12 @@
               </p>
             </div>
             
-            <div class="search-controls">
-              <div class="search-wrapper">
-                <v-text-field
-                  density="comfortable"
-                  placeholder="Search tools..."
-                  prepend-inner-icon="mdi-magnify"
-                  variant="solo"
-                  hide-details
-                  class="search-field"
-                  rounded="xl"
-                />
-              </div>
+            
               
-              <div class="action-buttons">
-                <v-btn 
-                  icon 
-                  size="large"
-                  class="action-btn globe-btn"
-                  elevation="0"
-                >
-                  <v-icon>mdi-earth</v-icon>
-                  <v-tooltip activator="parent" location="bottom">
-                    Browse Web
-                  </v-tooltip>
-                </v-btn>
-                
-                <v-btn 
-                  icon 
-                  size="large"
-                  class="action-btn notification-btn"
-                  elevation="0"
-                >
-                  <v-icon>mdi-bell</v-icon>
-                  <v-badge 
-                    color="error" 
-                    content="3" 
-                    offset-x="8" 
-                    offset-y="8"
-                  >
-                  </v-badge>
-                  <v-tooltip activator="parent" location="bottom">
-                    Notifications
-                  </v-tooltip>
-                </v-btn>
-              </div>
             </div>
+            </v-container>
           </div>
-        </v-container>
-      </div>
+        
 
       <v-container fluid class="content-container px-6 pb-8">
         <!-- Chat Tools Section -->
@@ -226,11 +185,13 @@
 <script>
 import { defineComponent, ref, onMounted } from 'vue';
 import LeftMenu from '@/dashboard/LeftMenu.vue';
+import SearchBar from '@/dashboard/SearchBar.vue';
 
 export default defineComponent({
   name: 'DesignTools',
   components: {
-    LeftMenu
+    LeftMenu,
+    SearchBar
   },
   setup() {
     // Responsive state
@@ -268,7 +229,7 @@ export default defineComponent({
       { 
         title: 'Zoom', 
         link: 'https://www.zoom.com/', 
-        icon: 'https://cdn.worldvectorlogo.com/logos/zoom-communications-logo-freelogovectors.net_.svg' 
+        icon: 'zoom.png' 
       },
       { 
         title: 'ChatGPT', 
@@ -278,7 +239,7 @@ export default defineComponent({
       { 
         title: 'Claude AI', 
         link: 'https://claude.ai/new', 
-        icon: 'https://cdn.worldvectorlogo.com/logos/anthropic-claude-1.svg' 
+        icon: 'claude.jpg' 
       }
     ]);
     
@@ -302,12 +263,12 @@ export default defineComponent({
       { 
         title: 'DesignCrowd', 
         link: 'https://www.designcrowd.com/', 
-        icon: 'https://cdn.worldvectorlogo.com/logos/designcrowd-logo.svg' 
+        icon: 'dc.jpg' 
       },
       { 
         title: '99designs', 
         link: 'https://en.99designs.de/', 
-        icon: 'https://cdn.worldvectorlogo.com/logos/99designs-logo.svg' 
+        icon: '99d.png' 
       },
       { 
         title: 'Behance', 
@@ -317,7 +278,7 @@ export default defineComponent({
       { 
         title: 'Freelance Guru', 
         link: 'https://www.guru.com/', 
-        icon: 'https://cdn.worldvectorlogo.com/logos/guru-2.svg' 
+        icon: 'guru.png' 
       },
       { 
         title: 'GitHub', 
@@ -339,7 +300,7 @@ export default defineComponent({
       { 
         title: 'Adobe Illustrator', 
         link: 'https://www.adobe.com/', 
-        icon: 'https://cdn.worldvectorlogo.com/logos/adobe-illustrator-cc-icon.svg', 
+        icon: 'Adobe.png', 
         isAdobe: true, 
         adobeClass: 'ai', 
         adobeShort: 'Ai' 
@@ -347,7 +308,7 @@ export default defineComponent({
       { 
         title: 'Adobe Animate', 
         link: 'https://www.adobe.com/', 
-        icon: 'https://cdn.worldvectorlogo.com/logos/animate-1.svg', 
+        icon: 'An.png', 
         isAdobe: true, 
         adobeClass: 'an', 
         adobeShort: 'An' 
@@ -355,7 +316,7 @@ export default defineComponent({
       { 
         title: 'Adobe After Effects', 
         link: 'https://www.adobe.com/', 
-        icon: 'https://cdn.worldvectorlogo.com/logos/after-effects-cc.svg', 
+        icon: 'Ae.png', 
         isAdobe: true, 
         adobeClass: 'ae', 
         adobeShort: 'Ae' 
@@ -363,7 +324,7 @@ export default defineComponent({
       { 
         title: 'Adobe InDesign', 
         link: 'https://www.adobe.com/products/indesign.html', 
-        icon: 'https://cdn.worldvectorlogo.com/logos/indesign-cc.svg', 
+        icon: 'ain.png', 
         isAdobe: true, 
         adobeClass: 'id', 
         adobeShort: 'Id' 
@@ -371,7 +332,7 @@ export default defineComponent({
       { 
         title: 'Adobe Media Encoder', 
         link: 'https://www.adobe.com/products/media-encoder.html', 
-        icon: 'https://cdn.worldvectorlogo.com/logos/media-encoder.svg', 
+        icon: 'me.png', 
         isAdobe: true, 
         adobeClass: 'me', 
         adobeShort: 'Me' 
@@ -387,7 +348,7 @@ export default defineComponent({
       { 
         title: 'Adobe Premiere Pro', 
         link: 'https://www.adobe.com/de/products/premiere/campaign/pricing.html', 
-        icon: 'https://cdn.worldvectorlogo.com/logos/premiere-cc.svg', 
+        icon: 'Pr.png', 
         isAdobe: true, 
         adobeClass: 'pr', 
         adobeShort: 'Pr' 
@@ -395,22 +356,22 @@ export default defineComponent({
       { 
         title: 'Canva', 
         link: 'https://www.canva.com/en_gb/', 
-        icon: 'https://cdn.worldvectorlogo.com/logos/canva-1.svg' 
+        icon: 'canva.jpeg' 
       },
       { 
         title: 'Figma', 
         link: 'https://www.figma.com/', 
-        icon: 'https://cdn.worldvectorlogo.com/logos/figma-5.svg' 
+        icon: 'figma.png' 
       },
       { 
         title: 'Midjourney', 
         link: 'https://www.midjourney.com/home', 
-        icon: 'https://cdn.worldvectorlogo.com/logos/midjourney-1.svg' 
+        icon: 'Midjourney.png' 
       },
       { 
         title: 'Fotor', 
         link: 'https://www.fotor.com/', 
-        icon: 'https://is3-ssl.mzstatic.com/image/thumb/Purple112/v4/1d/cc/b7/1dccb7a2-c4be-b84d-fd22-c5073ba00f0b/AppIcon-0-1x_U007emarketing-0-7-0-sRGB-85-220.png/512x512bb.jpg' 
+        icon: 'fotor.jpeg' 
       },
       { 
         title: 'Excel', 
@@ -448,15 +409,33 @@ export default defineComponent({
 </script>
   
 <style scoped>
+:deep(.left-menu-component),
+  :deep(.v-navigation-drawer) {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    height: 100vh !important;
+    z-index: 999 !important;
+    overflow-y: hidden !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  }
+ :deep(.v-navigation-drawer--rail) {
+    width: 72px ;
+  }
+  
+  :deep(.v-navigation-drawer:not(.v-navigation-drawer--rail)) {
+    width: 240px !important;
+  }
+
 /* Main Layout */
 .main-content {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #064E47 0%, #0D7C66 50%, #41B3A2 100%);
   min-height: 100vh;
 }
 
 /* Hero Section */
 .hero-section {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #064E47 0%, #0D7C66 50%, #41B3A2 100%);
   position: relative;
   overflow: hidden;
 }
@@ -497,7 +476,7 @@ export default defineComponent({
 }
 
 .gradient-text {
-  background: linear-gradient(45deg, #ffd700, #ffeb3b);
+  background: linear-gradient(45deg, #FFD700, #FFA726);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -645,7 +624,7 @@ export default defineComponent({
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, transparent 0%, rgba(99, 102, 241, 0.05) 100%);
+  background: linear-gradient(135deg, transparent 0%, rgba(6, 78, 71, 0.08) 100%);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -653,7 +632,7 @@ export default defineComponent({
 .tool-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  border-color: #6366f1;
+  border-color: #0D7C66;
 }
 
 .tool-card:hover::before {
@@ -716,7 +695,7 @@ export default defineComponent({
 .tool-card:hover .tool-link-indicator {
   opacity: 1;
   transform: translateX(0);
-  color: #6366f1;
+  color: #0D7C66;
 }
 
 /* Adobe Icons */
