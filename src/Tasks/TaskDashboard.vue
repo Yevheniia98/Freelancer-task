@@ -1,4 +1,4 @@
-<!-- Fixed Tasks Page with Proper Sidebar Integration -->
+<!-- Tasks.vue -->
 <template>
   <v-app>
     <LeftMenu
@@ -7,347 +7,252 @@
     />
     <SearchBar />
       
-    <v-main 
-      class="bg-grey-lighten-4"
-      :class="mainContentClass"
-    >
-      <v-container
-        fluid
-        class="pa-4 pa-sm-6"
-      >
-        <!-- Header - Made responsive -->
-        <div class="d-flex justify-space-between align-center mb-6 flex-wrap">
-          <h1 class="text-h4 text-h5-sm font-weight-bold">
-            Tasks
-          </h1>
-          <v-btn 
-            color="teal" 
-            variant="elevated" 
-            class="text-white mt-2 mt-sm-0"
-            elevation="0"
-            @click="openCreateDialog"
-          >
-            Create Task
-          </v-btn>
+    <v-main class="main-content">
+      <!-- Hero Section -->
+      <div class="hero-section">
+        <v-container fluid class="px-6 py-8">
+          <div class="hero-content">
+            <div class="title-section">
+              <h1 class="hero-title">
+                <span class="gradient-text">Task</span> Management
+              </h1>
+              <p class="hero-subtitle">
+                Organize and track your tasks efficiently to boost productivity
+              </p>
+            </div>
+            <div class="hero-actions">
+              <v-btn 
+                color="white"
+                variant="elevated"
+                size="large"
+                rounded="lg"
+                class="hero-btn"
+                @click="openCreateDialog"
+              >
+                <v-icon class="mr-2">mdi-plus</v-icon>
+                Create Task
+              </v-btn>
+            </div>
+          </div>
+        </v-container>
+      </div>
+
+      <v-container fluid class="content-container px-6 pb-8">
+        <!-- Task Statistics Section -->
+        <div class="tool-section">
+          <div class="section-header">
+            <div class="section-title">
+              <v-icon class="section-icon" color="primary">mdi-chart-box</v-icon>
+              <h2 class="section-heading">Task Statistics</h2>
+            </div>
+            <v-chip
+              size="small"
+              color="primary"
+              variant="outlined"
+              class="count-chip"
+            >
+              4 metrics
+            </v-chip>
+          </div>
+          
+          <div class="stats-grid">
+            <!-- Total Tasks Card -->
+            <div class="stat-item">
+              <div class="stat-card total-tasks-card">
+                <div class="stat-icon-wrapper total-tasks-icon">
+                  <v-icon class="stat-icon" color="white">mdi-file-document-outline</v-icon>
+                </div>
+                <div class="stat-info">
+                  <h3 class="stat-title">Total Tasks</h3>
+                  <div class="stat-amount">103k</div>
+                  <div class="stat-change positive">
+                    <v-icon size="small">mdi-arrow-up</v-icon>
+                    15.03% vs. previous month
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Pending Tasks Card -->
+            <div class="stat-item">
+              <div class="stat-card pending-tasks-card">
+                <div class="stat-icon-wrapper pending-tasks-icon">
+                  <v-icon class="stat-icon" color="white">mdi-timer-sand</v-icon>
+                </div>
+                <div class="stat-info">
+                  <h3 class="stat-title">Pending Tasks</h3>
+                  <div class="stat-amount">5k</div>
+                  <div class="stat-change negative">
+                    <v-icon size="small">mdi-arrow-down</v-icon>
+                    3.5% vs. previous month
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Completed Tasks Card -->
+            <div class="stat-item">
+              <div class="stat-card completed-tasks-card">
+                <div class="stat-icon-wrapper completed-tasks-icon">
+                  <v-icon class="stat-icon" color="white">mdi-check-circle</v-icon>
+                </div>
+                <div class="stat-info">
+                  <h3 class="stat-title">Completed Tasks</h3>
+                  <div class="stat-amount">98k</div>
+                  <div class="stat-change negative">
+                    <v-icon size="small">mdi-arrow-down</v-icon>
+                    0.5% vs. previous month
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Deleted Tasks Card -->
+            <div class="stat-item">
+              <div class="stat-card deleted-tasks-card">
+                <div class="stat-icon-wrapper deleted-tasks-icon">
+                  <v-icon class="stat-icon" color="white">mdi-delete</v-icon>
+                </div>
+                <div class="stat-info">
+                  <h3 class="stat-title">Deleted Tasks</h3>
+                  <div class="stat-amount">12.8%</div>
+                  <div class="stat-change positive">
+                    <v-icon size="small">mdi-arrow-up</v-icon>
+                    5.1% vs. previous month
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- Stats Cards - Made responsive -->
-        <v-row>
-          <v-col
-            cols="12"
-            sm="6"
-            lg="3"
-          >
-            <v-card
-              class="pa-4"
-              rounded="lg"
-              elevation="1"
-            >
-              <div class="d-flex justify-space-between mb-2">
-                <div>
-                  <div class="text-subtitle-1 text-medium-emphasis">
-                    Total Tasks
-                  </div>
-                  <div class="text-h3 text-h4-sm font-weight-bold">
-                    103k
-                  </div>
-                </div>
-                <v-avatar
-                  color="light-blue-lighten-4"
-                  :size="isMobile ? 48 : 56"
-                >
-                  <v-icon color="light-blue">
-                    mdi-file-document-outline
-                  </v-icon>
-                </v-avatar>
-              </div>
-              <div class="d-flex align-center">
-                <v-chip
-                  color="light-blue-lighten-5"
-                  size="small"
-                  class="font-weight-medium"
-                >
-                  <v-icon
-                    size="small"
-                    start
-                    color="light-blue"
-                  >
-                    mdi-arrow-up
-                  </v-icon>
-                  15.03%
-                </v-chip>
-                <span class="ml-2 text-body-2 text-caption-sm">vs. previous month</span>
-              </div>
-            </v-card>
-          </v-col>
-            
-          <v-col
-            cols="12"
-            sm="6"
-            lg="3"
-          >
-            <v-card
-              class="pa-4"
-              rounded="lg"
-              elevation="1"
-            >
-              <div class="d-flex justify-space-between mb-2">
-                <div>
-                  <div class="text-subtitle-1 text-medium-emphasis">
-                    Pending Task
-                  </div>
-                  <div class="text-h3 text-h4-sm font-weight-bold">
-                    5k
-                  </div>
-                </div>
-                <v-avatar
-                  color="amber-lighten-4"
-                  :size="isMobile ? 48 : 56"
-                >
-                  <v-icon color="amber">
-                    mdi-timer-sand
-                  </v-icon>
-                </v-avatar>
-              </div>
-              <div class="d-flex align-center">
-                <v-chip
-                  color="red-lighten-5"
-                  size="small"
-                  class="font-weight-medium"
-                >
-                  <v-icon
-                    size="small"
-                    start
-                    color="red"
-                  >
-                    mdi-arrow-down
-                  </v-icon>
-                  3.5%
-                </v-chip>
-                <span class="ml-2 text-body-2 text-caption-sm">vs. previous month</span>
-              </div>
-            </v-card>
-          </v-col>
-            
-          <v-col
-            cols="12"
-            sm="6"
-            lg="3"
-          >
-            <v-card
-              class="pa-4"
-              rounded="lg"
-              elevation="1"
-            >
-              <div class="d-flex justify-space-between mb-2">
-                <div>
-                  <div class="text-subtitle-1 text-medium-emphasis">
-                    Completed Tasks
-                  </div>
-                  <div class="text-h3 text-h4-sm font-weight-bold">
-                    98k
-                  </div>
-                </div>
-                <v-avatar
-                  color="teal-lighten-4"
-                  :size="isMobile ? 48 : 56"
-                >
-                  <v-icon color="teal">
-                    mdi-check-circle
-                  </v-icon>
-                </v-avatar>
-              </div>
-              <div class="d-flex align-center">
-                <v-chip
-                  color="red-lighten-5"
-                  size="small"
-                  class="font-weight-medium"
-                >
-                  <v-icon
-                    size="small"
-                    start
-                    color="red"
-                  >
-                    mdi-arrow-down
-                  </v-icon>
-                  0.5%
-                </v-chip>
-                <span class="ml-2 text-body-2 text-caption-sm">vs. previous month</span>
-              </div>
-            </v-card>
-          </v-col>
-            
-          <v-col
-            cols="12"
-            sm="6"
-            lg="3"
-          >
-            <v-card
-              class="pa-4"
-              rounded="lg"
-              elevation="1"
-            >
-              <div class="d-flex justify-space-between mb-2">
-                <div>
-                  <div class="text-subtitle-1 text-medium-emphasis">
-                    Deleted Tasks
-                  </div>
-                  <div class="text-h3 text-h4-sm font-weight-bold">
-                    12,8%
-                  </div>
-                </div>
-                <v-avatar
-                  color="red-lighten-4"
-                  :size="isMobile ? 48 : 56"
-                >
-                  <v-icon color="red">
-                    mdi-delete
-                  </v-icon>
-                </v-avatar>
-              </div>
-              <div class="d-flex align-center">
-                <v-chip
-                  color="light-blue-lighten-5"
-                  size="small"
-                  class="font-weight-medium"
-                >
-                  <v-icon
-                    size="small"
-                    start
-                    color="light-blue"
-                  >
-                    mdi-arrow-up
-                  </v-icon>
-                  5.1%
-                </v-chip>
-                <span class="ml-2 text-body-2 text-caption-sm">vs. previous month</span>
-              </div>
-            </v-card>
-          </v-col>
-        </v-row>
-
-        <!-- Tasks Table Card - Made responsive -->
-        <v-card
-          class="mt-6"
-          elevation="1"
-          rounded="lg"
-        >
-          <v-card-title class="d-flex justify-space-between align-center pa-4 pa-sm-6 flex-wrap">
-            <h2 class="text-h5 text-h6-sm">
-              All Tasks
-            </h2>
-            <v-btn 
-              color="teal" 
-              variant="elevated" 
-              class="text-white mt-2 mt-sm-0"
-              elevation="0"
-              @click="openCreateDialog"
-            >
-              Create Task
-            </v-btn>
-          </v-card-title>
-            
-          <v-card-text class="pa-0">
-            <!-- Search and Filter Controls - Made responsive -->
-            <div class="d-flex flex-column flex-sm-row pa-4 gap-4">
-              <v-text-field
-                v-model="taskSearch"
-                label="Search for task"
-                append-inner-icon="mdi-magnify"
-                single-line
-                hide-details
-                outlined
-                density="comfortable"
-                class="flex-grow-1"
-                style="max-width: none"
-              />
-                
-              <v-menu>
-                <template #activator="{ props }">
-                  <v-text-field
-                    v-bind="props"
-                    label="Select date range"
-                    readonly
-                    hide-details
-                    outlined
-                    density="comfortable"
-                    append-inner-icon="mdi-calendar"
-                    class="flex-grow-1 flex-sm-grow-0"
-                    :style="isMobile ? 'max-width: none' : 'max-width: 250px'"
-                  />
-                </template>
-                <v-date-picker range />
-              </v-menu>
+        <!-- Task Management Section -->
+        <div class="tool-section">
+          <div class="section-header">
+            <div class="section-title">
+              <v-icon class="section-icon" color="warning">mdi-format-list-checks</v-icon>
+              <h2 class="section-heading">All Tasks</h2>
             </div>
+            <div class="section-actions">
+              <v-chip
+                size="small"
+                color="warning"
+                variant="outlined"
+                class="count-chip"
+              >
+                {{ filteredTasks.length }} tasks
+              </v-chip>
+              <v-btn
+                color="warning"
+                variant="outlined"
+                size="small"
+                rounded="lg"
+                class="ml-2"
+                @click="openCreateDialog"
+              >
+                <v-icon size="small" class="mr-1">mdi-plus</v-icon>
+                Add Task
+              </v-btn>
+            </div>
+          </div>
+          
+          <div class="task-management-container">
+            <div class="task-management-card">
+              <!-- Search and Filters -->
+              <div class="task-filters">
+                <v-text-field
+                  v-model="taskSearch"
+                  label="Search for task"
+                  variant="outlined"
+                  density="comfortable"
+                  prepend-inner-icon="mdi-magnify"
+                  hide-details
+                  class="search-field"
+                />
+                
+                <v-menu>
+                  <template #activator="{ props }">
+                    <v-text-field
+                      v-bind="props"
+                      label="Select date range"
+                      variant="outlined"
+                      density="comfortable"
+                      readonly
+                      hide-details
+                      append-inner-icon="mdi-calendar"
+                      class="date-field"
+                    />
+                  </template>
+                  <v-date-picker range />
+                </v-menu>
+              </div>
               
-            <!-- Data Table - Made responsive -->
-            <v-data-table
-              :headers="responsiveHeaders"
-              :items="filteredTasks"
-              :search="taskSearch"
-              hover
-              class="elevation-0"
-              :items-per-page="isMobile ? 5 : 10"
-              :mobile-breakpoint="0"
-            >
-              <template #[`item.status`]="{ item }">
-                <v-chip
-                  :color="getStatusColor(item.status).color"
-                  :text-color="getStatusColor(item.status).textColor"
-                  :size="isMobile ? 'x-small' : 'small'"
+              <!-- Tasks Table -->
+              <div class="tasks-table-container">
+                <v-data-table
+                  :headers="responsiveHeaders"
+                  :items="filteredTasks"
+                  :search="taskSearch"
+                  hover
+                  class="tasks-table"
+                  :items-per-page="isMobile ? 5 : 10"
+                  :mobile-breakpoint="0"
                 >
-                  {{ item.status }}
-                </v-chip>
-              </template>
-                
-              <template #[`item.priority`]="{ item }">
-                <v-chip
-                  :color="getPriorityColor(item.priority).color"
-                  :text-color="getPriorityColor(item.priority).textColor"
-                  :size="isMobile ? 'x-small' : 'small'"
-                >
-                  {{ item.priority }}
-                </v-chip>
-              </template>
-                
-              <template #[`item.actions`]="{ item }">
-                <div class="d-flex">
-                  <v-btn
-                    :icon="!isMobile"
-                    :size="isMobile ? 'small' : 'default'"
-                    color="blue"
-                    variant="text"
-                    @click="editTask(item)"
-                  >
-                    <v-icon>mdi-pencil</v-icon>
-                    <span
-                      v-if="isMobile"
-                      class="ml-1"
-                    >Edit</span>
-                  </v-btn>
-                  <v-btn
-                    :icon="!isMobile"
-                    :size="isMobile ? 'small' : 'default'"
-                    color="red" 
-                    variant="text"
-                    @click="deleteTask(item.id)"
-                  >
-                    <v-icon>mdi-delete-outline</v-icon>
-                    <span
-                      v-if="isMobile"
-                      class="ml-1"
-                    >Delete</span>
-                  </v-btn>
-                </div>
-              </template>
+                  <template #[`item.status`]="{ item }">
+                    <v-chip
+                      :color="getStatusColor(item.status).color"
+                      :text-color="getStatusColor(item.status).textColor"
+                      :size="isMobile ? 'x-small' : 'small'"
+                      variant="tonal"
+                    >
+                      {{ item.status }}
+                    </v-chip>
+                  </template>
+                    
+                  <template #[`item.priority`]="{ item }">
+                    <v-chip
+                      :color="getPriorityColor(item.priority).color"
+                      :text-color="getPriorityColor(item.priority).textColor"
+                      :size="isMobile ? 'x-small' : 'small'"
+                      variant="tonal"
+                    >
+                      {{ item.priority }}
+                    </v-chip>
+                  </template>
+                    
+                  <template #[`item.actions`]="{ item }">
+                    <div class="action-buttons">
+                      <v-btn
+                        icon
+                        size="small"
+                        color="primary"
+                        variant="text"
+                        class="action-btn"
+                        @click="editTask(item)"
+                      >
+                        <v-icon>mdi-pencil</v-icon>
+                      </v-btn>
+                      <v-btn
+                        icon
+                        size="small"
+                        color="error" 
+                        variant="text"
+                        class="action-btn"
+                        @click="deleteTask(item.id)"
+                      >
+                        <v-icon>mdi-delete-outline</v-icon>
+                      </v-btn>
+                    </div>
+                  </template>
 
-              <!-- Mobile view customization -->
-              <template #[`item.dueDate`]="{ item }">
-                <span class="text-body-2">{{ formatDate(item.dueDate) }}</span>
-              </template>
-            </v-data-table>
-          </v-card-text>
-        </v-card>
+                  <template #[`item.dueDate`]="{ item }">
+                    <span class="due-date">{{ formatDate(item.dueDate) }}</span>
+                  </template>
+                </v-data-table>
+              </div>
+            </div>
+          </div>
+        </div>
       </v-container>
     </v-main>
 
@@ -357,121 +262,113 @@
       max-width="600px"
       fullscreen-breakpoint="sm"
     >
-      <v-card>
-        <v-card-title class="text-h5 bg-teal text-white pa-4">
-          {{ editingTask ? 'Edit Task' : 'Create New Task' }}
+      <v-card rounded="xl" flat border>
+        <v-card-title class="hero-modal-header pa-6">
+          <div class="modal-title">
+            <v-icon class="mr-3" color="white">mdi-clipboard-edit</v-icon>
+            {{ editingTask ? 'Edit Task' : 'Create New Task' }}
+          </div>
         </v-card-title>
           
-        <v-card-text class="pa-4 pt-6">
-          <v-form
-            ref="form"
-            v-model="isFormValid"
-          >
-            <v-container>
-              <v-row>
-                <v-col
-                  cols="12"
-                  sm="6"
+        <v-card-text class="pa-6">
+          <v-form ref="form" v-model="isFormValid">
+            <v-row>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model="currentTask.project"
+                  label="Project"
+                  variant="outlined"
+                  required
+                  :rules="[v => !!v || 'Project is required']"
+                />
+              </v-col>
+                
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model="currentTask.clientName"
+                  label="Client Name"
+                  variant="outlined"
+                  required
+                  :rules="[v => !!v || 'Client name is required']"
+                />
+              </v-col>
+                
+              <v-col cols="12">
+                <v-text-field
+                  v-model="currentTask.task"
+                  label="Task"
+                  variant="outlined"
+                  required
+                  :rules="[v => !!v || 'Task is required']"
+                />
+              </v-col>
+                
+              <v-col cols="12" sm="6">
+                <v-menu
+                  ref="menuRef"
+                  v-model="dateMenu"
+                  :close-on-content-click="false"
+                  transition="scale-transition"
+                  offset-y
                 >
-                  <v-text-field
-                    v-model="currentTask.project"
-                    label="Project"
-                    required
-                    :rules="[v => !!v || 'Project is required']"
-                  />
-                </v-col>
-                  
-                <v-col
-                  cols="12"
-                  sm="6"
-                >
-                  <v-text-field
-                    v-model="currentTask.clientName"
-                    label="Client Name"
-                    required
-                    :rules="[v => !!v || 'Client name is required']"
-                  />
-                </v-col>
-                  
-                <v-col cols="12">
-                  <v-text-field
-                    v-model="currentTask.task"
-                    label="Task"
-                    required
-                    :rules="[v => !!v || 'Task is required']"
-                  />
-                </v-col>
-                  
-                <v-col
-                  cols="12"
-                  sm="6"
-                >
-                  <v-menu
-                    ref="menuRef"
-                    v-model="dateMenu"
-                    :close-on-content-click="false"
-                    transition="scale-transition"
-                    offset-y
-                  >
-                    <template #activator="{ props }">
-                      <v-text-field
-                        v-model="currentTask.dueDate"
-                        label="Due Date"
-                        prepend-icon="mdi-calendar"
-                        readonly
-                        v-bind="props"
-                      />
-                    </template>
-                    <v-date-picker
+                  <template #activator="{ props }">
+                    <v-text-field
                       v-model="currentTask.dueDate"
-                      @input="dateMenu = false"
+                      label="Due Date"
+                      variant="outlined"
+                      prepend-inner-icon="mdi-calendar"
+                      readonly
+                      v-bind="props"
                     />
-                  </v-menu>
-                </v-col>
-                  
-                <v-col
-                  cols="12"
-                  sm="6"
-                >
-                  <v-select
-                    v-model="currentTask.status"
-                    :items="['New', 'Inprogress', 'Completed']"
-                    label="Status"
-                    required
+                  </template>
+                  <v-date-picker
+                    v-model="currentTask.dueDate"
+                    @input="dateMenu = false"
                   />
-                </v-col>
-                  
-                <v-col cols="12">
-                  <v-select
-                    v-model="currentTask.priority"
-                    :items="['Low', 'Medium', 'High']"
-                    label="Priority"
-                    required
-                  />
-                </v-col>
-              </v-row>
-            </v-container>
+                </v-menu>
+              </v-col>
+                
+              <v-col cols="12" sm="6">
+                <v-select
+                  v-model="currentTask.status"
+                  :items="['New', 'Inprogress', 'Completed']"
+                  label="Status"
+                  variant="outlined"
+                  required
+                />
+              </v-col>
+                
+              <v-col cols="12">
+                <v-select
+                  v-model="currentTask.priority"
+                  :items="['Low', 'Medium', 'High']"
+                  label="Priority"
+                  variant="outlined"
+                  required
+                />
+              </v-col>
+            </v-row>
           </v-form>
         </v-card-text>
           
-        <v-card-actions class="pa-4 flex-wrap gap-2">
-          <v-spacer class="d-none d-sm-block" />
+        <v-card-actions class="pa-6 pt-0">
+          <v-spacer />
           <v-btn
-            color="grey"
+            color="grey-darken-1"
             variant="text"
-            class="flex-grow-1 flex-sm-grow-0"
             @click="taskDialog = false"
           >
             Cancel
           </v-btn>
           <v-btn 
-            color="teal" 
-            variant="elevated" 
-            class="text-white flex-grow-1 flex-sm-grow-0"
+            color="primary"
+            variant="elevated"
+            rounded="lg"
             :disabled="!isFormValid"
             @click="saveTask"
           >
-            {{ editingTask ? 'Update' : 'Create' }}
+            <v-icon class="mr-2">mdi-content-save</v-icon>
+            {{ editingTask ? 'Update Task' : 'Create Task' }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -483,29 +380,42 @@
       max-width="400px"
       fullscreen-breakpoint="sm"
     >
-      <v-card>
-        <v-card-title class="text-h5 bg-red text-white pa-4">
-          Delete Task
+      <v-card rounded="xl" flat border>
+        <v-card-title class="error-modal-header pa-6">
+          <div class="modal-title">
+            <v-icon class="mr-3" color="white">mdi-delete-alert</v-icon>
+            Delete Task
+          </div>
         </v-card-title>
-        <v-card-text class="pa-4 pt-6">
-          Are you sure you want to delete this task? This action cannot be undone.
+        
+        <v-card-text class="pa-6">
+          <div class="text-center">
+            <v-icon size="64" color="error">mdi-delete-circle</v-icon>
+            <p class="text-body-1 mt-4">
+              Are you sure you want to delete this task?
+            </p>
+            <p class="text-body-2 text-medium-emphasis">
+              This action cannot be undone.
+            </p>
+          </div>
         </v-card-text>
-        <v-card-actions class="pa-4 flex-wrap gap-2">
-          <v-spacer class="d-none d-sm-block" />
+        
+        <v-card-actions class="pa-6 pt-0">
+          <v-spacer />
           <v-btn
-            color="grey"
+            color="grey-darken-1"
             variant="text"
-            class="flex-grow-1 flex-sm-grow-0"
             @click="deleteDialog = false"
           >
             Cancel
           </v-btn>
           <v-btn
-            color="red"
+            color="error"
             variant="elevated"
-            class="text-white flex-grow-1 flex-sm-grow-0"
+            rounded="lg"
             @click="confirmDelete"
           >
+            <v-icon class="mr-2">mdi-delete</v-icon>
             Delete
           </v-btn>
         </v-card-actions>
@@ -685,26 +595,26 @@ export default defineComponent({
     const getStatusColor = (status) => {
       switch (status) {
         case 'Completed':
-          return { color: 'green-lighten-5', textColor: 'green' };
+          return { color: 'success', textColor: 'success' };
         case 'Inprogress':
-          return { color: 'blue-lighten-5', textColor: 'blue' };
+          return { color: 'primary', textColor: 'primary' };
         case 'New':
-          return { color: 'purple-lighten-5', textColor: 'purple' };
+          return { color: 'warning', textColor: 'warning' };
         default:
-          return { color: 'grey-lighten-3', textColor: 'grey-darken-1' };
+          return { color: 'grey', textColor: 'grey' };
       }
     };
 
     const getPriorityColor = (priority) => {
       switch (priority) {
         case 'High':
-          return { color: 'red-lighten-5', textColor: 'red' };
+          return { color: 'error', textColor: 'error' };
         case 'Medium':
-          return { color: 'amber-lighten-5', textColor: 'amber-darken-2' };
+          return { color: 'warning', textColor: 'warning' };
         case 'Low':
-          return { color: 'blue-lighten-5', textColor: 'blue' };
+          return { color: 'info', textColor: 'info' };
         default:
-          return { color: 'grey-lighten-3', textColor: 'grey-darken-1' };
+          return { color: 'grey', textColor: 'grey' };
       }
     };
 
@@ -822,23 +732,401 @@ export default defineComponent({
 
 <style scoped>
 :deep(.left-menu-component),
-  :deep(.v-navigation-drawer) {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    height: 100vh !important;
-    z-index: 999 !important;
-    overflow-y: hidden !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-  }
- :deep(.v-navigation-drawer--rail) {
-    width: 72px ;
-  }
-  
-  :deep(.v-navigation-drawer:not(.v-navigation-drawer--rail)) {
-    width: 240px !important;
-  }
+:deep(.v-navigation-drawer) {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  height: 100vh !important;
+  z-index: 999 !important;
+  overflow-y: hidden !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
 
+:deep(.v-navigation-drawer--rail) {
+  width: 72px;
+}
+
+:deep(.v-navigation-drawer:not(.v-navigation-drawer--rail)) {
+  width: 240px !important;
+}
+
+/* Main Layout - Same as Design Tools */
+.main-content {
+  background: linear-gradient(135deg, #064E47 0%, #0D7C66 50%, #41B3A2 100%);
+  min-height: 100vh;
+}
+
+/* Hero Section - Same as Design Tools */
+.hero-section {
+  background: linear-gradient(135deg, #064E47 0%, #0D7C66 50%, #41B3A2 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.05"><circle cx="30" cy="30" r="2"/></g></svg>');
+  pointer-events: none;
+}
+
+.hero-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.title-section {
+  flex: 1;
+  min-width: 300px;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: white;
+  margin: 0;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.gradient-text {
+  background: linear-gradient(45deg, #FFD700, #FFA726);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-subtitle {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 1rem 0 0 0;
+  font-weight: 400;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.hero-btn {
+  background: white !important;
+  color: #0D7C66 !important;
+  font-weight: 600;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.hero-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+}
+
+/* Content Container - Same as Design Tools */
+.content-container {
+  background: #f8fafc;
+  margin-top: -2rem;
+  border-radius: 2rem 2rem 0 0;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Tool Sections - Same as Design Tools */
+.tool-section {
+  margin-bottom: 3rem;
+}
+
+.tool-section:last-child {
+  margin-bottom: 0;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.section-icon {
+  font-size: 1.8rem;
+}
+
+.section-heading {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.count-chip {
+  font-weight: 600;
+}
+
+.section-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Statistics Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.stat-item {
+  position: relative;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #e2e8f0;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, transparent 0%, rgba(6, 78, 71, 0.08) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border-color: #0D7C66;
+}
+
+.stat-card:hover::before {
+  opacity: 1;
+}
+
+.stat-icon-wrapper {
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.total-tasks-icon {
+  background: linear-gradient(135deg, #3B82F6, #60A5FA);
+}
+
+.pending-tasks-icon {
+  background: linear-gradient(135deg, #F59E0B, #FBBF24);
+}
+
+.completed-tasks-icon {
+  background: linear-gradient(135deg, #10B981, #34D399);
+}
+
+.deleted-tasks-icon {
+  background: linear-gradient(135deg, #EF4444, #F87171);
+}
+
+.stat-card:hover .stat-icon-wrapper {
+  transform: scale(1.05);
+}
+
+.stat-icon {
+  font-size: 1.5rem;
+}
+
+.stat-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.stat-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #64748b;
+  margin: 0 0 0.5rem 0;
+}
+
+.stat-amount {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+}
+
+.stat-change {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.stat-change.positive {
+  color: #10B981;
+}
+
+.stat-change.negative {
+  color: #EF4444;
+}
+
+/* Task Management Container */
+.task-management-container {
+  width: 100%;
+}
+
+.task-management-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #e2e8f0;
+  position: relative;
+  overflow: hidden;
+}
+
+.task-management-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, transparent 0%, rgba(6, 78, 71, 0.08) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.task-management-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border-color: #0D7C66;
+}
+
+.task-management-card:hover::before {
+  opacity: 1;
+}
+
+/* Task Filters */
+.task-filters {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.search-field {
+  flex: 1;
+  min-width: 250px;
+}
+
+.date-field {
+  flex-shrink: 0;
+  min-width: 200px;
+}
+
+/* Tasks Table */
+.tasks-table-container {
+  position: relative;
+  z-index: 1;
+}
+
+.tasks-table {
+  background: transparent !important;
+}
+
+:deep(.tasks-table .v-data-table__wrapper) {
+  background: transparent;
+}
+
+:deep(.tasks-table .v-data-table-header) {
+  background: #f8fafc;
+}
+
+:deep(.tasks-table .v-data-table-header th) {
+  background: #f8fafc !important;
+  font-weight: 600 !important;
+  color: #374151 !important;
+  border-bottom: 2px solid #e5e7eb !important;
+}
+
+:deep(.tasks-table .v-data-table__td) {
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+
+:deep(.tasks-table tbody tr:hover) {
+  background-color: #f8fafc !important;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.action-btn {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+:deep(.v-data-table tbody tr:hover) .action-btn {
+  opacity: 1;
+}
+
+.due-date {
+  font-weight: 500;
+  color: #64748b;
+}
+
+/* Modal Headers */
+.hero-modal-header {
+  background: linear-gradient(135deg, #0D7C66, #41B3A2);
+  color: white;
+}
+
+.error-modal-header {
+  background: linear-gradient(135deg, #EF4444, #F87171);
+  color: white;
+}
+
+.modal-title {
+  display: flex;
+  align-items: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
 
 /* Main content positioning for sidebar integration */
 .main-content-full {
@@ -856,55 +1144,123 @@ export default defineComponent({
   transition: none;
 }
 
-/* Data table responsiveness */
-.v-data-table ::v-deep .v-data-table-header th {
-  white-space: nowrap;
-  font-weight: bold !important;
+/* Animation - Same as Design Tools */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* Responsive text sizes */
-.text-h4-sm {
-  font-size: 1.5rem !important;
+.tool-section {
+  animation: fadeInUp 0.6s ease-out;
 }
 
-.text-h5-sm {
-  font-size: 1.25rem !important;
+.tool-section:nth-child(2) {
+  animation-delay: 0.1s;
 }
 
-.text-h6-sm {
-  font-size: 1.125rem !important;
+.tool-section:nth-child(3) {
+  animation-delay: 0.2s;
 }
 
-.text-caption-sm {
-  font-size: 0.75rem !important;
+.tool-section:nth-child(4) {
+  animation-delay: 0.3s;
 }
 
-/* Gap utility for flexbox */
-.gap-2 {
-  gap: 8px;
-}
-
-.gap-4 {
-  gap: 16px;
-}
-
-/* Responsive styles */
-@media (max-width: 600px) {
-  .v-data-table ::v-deep .v-data-table__wrapper {
-    font-size: 0.875rem;
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem;
   }
   
-  .v-data-table ::v-deep .v-data-table-header th {
-    padding: 8px 4px !important;
+  .hero-subtitle {
+    font-size: 1.1rem;
   }
   
-  .v-data-table ::v-deep .v-data-table__td {
-    padding: 8px 4px !important;
+  .hero-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 2rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .section-heading {
+    font-size: 1.5rem;
+  }
+  
+  .content-container {
+    margin-top: -1rem;
+    border-radius: 1.5rem 1.5rem 0 0;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .section-actions {
+    align-self: stretch;
+    justify-content: space-between;
+  }
+  
+  .task-filters {
+    flex-direction: column;
+  }
+  
+  .search-field,
+  .date-field {
+    min-width: auto;
   }
   
   /* Ensure mobile always has no left margin */
   .main-content-mobile {
     margin-left: 0 !important;
+  }
+  
+  :deep(.tasks-table .v-data-table__wrapper) {
+    font-size: 0.875rem;
+  }
+  
+  :deep(.tasks-table .v-data-table-header th) {
+    padding: 8px 4px !important;
+  }
+  
+  :deep(.tasks-table .v-data-table__td) {
+    padding: 8px 4px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+  
+  .stat-card,
+  .task-management-card {
+    padding: 1rem;
+  }
+  
+  .stat-icon-wrapper {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .stat-icon {
+    font-size: 1.25rem;
+  }
+  
+  .stat-amount {
+    font-size: 1.5rem;
   }
 }
 
@@ -913,10 +1269,5 @@ export default defineComponent({
   .main-content-with-sidebar {
     margin-left: 260px; /* Slightly smaller margin for tablets */
   }
-}
-
-/* Dialog animation */
-.v-dialog {
-  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 </style>

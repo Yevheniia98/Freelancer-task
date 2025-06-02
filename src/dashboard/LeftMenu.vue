@@ -110,15 +110,7 @@
             Clients
           </v-list-item-title>
         </v-list-item>
-        <v-list-item 
-          class="submenu-item" 
-          link
-          to="/invite-member"
-        >
-          <v-list-item-title class="l">
-            Invite freelancer
-          </v-list-item-title>
-        </v-list-item>
+       
         <v-list-item 
           class="submenu-item" 
           link

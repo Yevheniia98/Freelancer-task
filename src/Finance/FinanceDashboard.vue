@@ -6,130 +6,118 @@
     />
     <SearchBar />
     
-    <v-main class="bg-surface-subtle">
-      <v-container
-        fluid
-        class="pa-6 pa-sm-8"
-      >
-        <!-- Header -->
-        <div class="d-flex justify-space-between align-center mb-8">
-          <h1 class="text-h4 font-weight-bold text-primary">
-            Finance Overview
-          </h1>
+    <v-main class="main-content">
+      <!-- Hero Section -->
+      <div class="hero-section">
+        <v-container fluid class="px-6 py-8">
+          <div class="hero-content">
+            <div class="title-section">
+              <h1 class="hero-title">
+                <span class="gradient-text">Finance</span> Overview
+              </h1>
+              <p class="hero-subtitle">
+                Track your financial performance and manage your expenses
+              </p>
+            </div>
+          </div>
+        </v-container>
+      </div>
+
+      <v-container fluid class="content-container px-6 pb-8">
+        <!-- Summary Cards Section -->
+        <div class="tool-section">
+          <div class="section-header">
+            <div class="section-title">
+              <v-icon class="section-icon" color="primary">mdi-chart-line</v-icon>
+              <h2 class="section-heading">Financial Summary</h2>
+            </div>
+            <v-chip
+              size="small"
+              color="primary"
+              variant="outlined"
+              class="count-chip"
+            >
+              3 metrics
+            </v-chip>
+          </div>
+          
+          <div class="summary-grid">
+            <!-- Total Balance Card -->
+            <div class="summary-item">
+              <div class="summary-card">
+                <div class="summary-icon-wrapper">
+                  <v-icon class="summary-icon" color="white">mdi-wallet</v-icon>
+                </div>
+                <div class="summary-info">
+                  <h3 class="summary-title">Total Balance</h3>
+                  <div class="summary-amount">32,363.75€</div>
+                  <div class="summary-change positive">
+                    <v-icon size="small">mdi-arrow-up-thin</v-icon>
+                    +3.3% than last month
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Income Card -->
+            <div class="summary-item">
+              <div class="summary-card income-card">
+                <div class="summary-icon-wrapper income-icon">
+                  <v-icon class="summary-icon" color="white">mdi-trending-up</v-icon>
+                </div>
+                <div class="summary-info">
+                  <h3 class="summary-title">Income</h3>
+                  <div class="summary-amount income-amount">+30,645€</div>
+                  <div class="summary-change positive">
+                    <v-icon size="small">mdi-arrow-up-thin</v-icon>
+                    +1.2% than last month
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Expenses Card -->
+            <div class="summary-item">
+              <div class="summary-card expense-card">
+                <div class="summary-icon-wrapper expense-icon">
+                  <v-icon class="summary-icon" color="white">mdi-trending-down</v-icon>
+                </div>
+                <div class="summary-info">
+                  <h3 class="summary-title">Expenses</h3>
+                  <div class="summary-amount expense-amount">-21,465.90€</div>
+                  <div class="summary-change negative">
+                    <v-icon size="small">mdi-arrow-down-thin</v-icon>
+                    -8.3% than last month
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        
-        <!-- Summary Cards -->
-        <v-row class="mb-8">
-          <v-col
-            cols="12"
-            md="4"
-          >
-            <v-card
-              rounded="xl"
-              class="summary-card"
-              flat
-              border
+
+        <!-- Charts Section -->
+        <div class="tool-section">
+          <div class="section-header">
+            <div class="section-title">
+              <v-icon class="section-icon" color="warning">mdi-chart-bar</v-icon>
+              <h2 class="section-heading">Financial Charts</h2>
+            </div>
+            <v-chip
+              size="small"
+              color="warning"
+              variant="outlined"
+              class="count-chip"
             >
-              <v-card-text class="pa-6">
-                <div class="d-flex flex-column">
-                  <div class="d-flex justify-space-between">
-                    <span class="text-subtitle-1 text-medium-emphasis font-weight-medium">Total Balance</span>
-                    <span class="text-caption">
-                      <v-icon
-                        size="small"
-                        color="success"
-                        class="mb-1"
-                      >mdi-arrow-up-thin</v-icon> 
-                      <span class="text-success">+3.3%</span>
-                      <span class="text-medium-emphasis ml-1">than last month</span>
-                    </span>
-                  </div>
-                  <span class="text-h3 font-weight-bold mt-2">32 363.75€</span>
-                </div>
-              </v-card-text>
-            </v-card>
-          </v-col>
+              2 charts
+            </v-chip>
+          </div>
           
-          <v-col
-            cols="12"
-            md="4"
-          >
-            <v-card
-              rounded="xl"
-              class="summary-card"
-              flat
-              border
-            >
-              <v-card-text class="pa-6">
-                <div class="d-flex flex-column">
-                  <div class="d-flex justify-space-between">
-                    <span class="text-subtitle-1 text-medium-emphasis font-weight-medium">Income</span>
-                    <span class="text-caption">
-                      <v-icon
-                        size="small"
-                        color="success"
-                        class="mb-1"
-                      >mdi-arrow-up-thin</v-icon> 
-                      <span class="text-success">+1.2%</span>
-                      <span class="text-medium-emphasis ml-1">than last month</span>
-                    </span>
-                  </div>
-                  <span class="text-h3 font-weight-bold mt-2 text-success">+30 645€</span>
-                </div>
-              </v-card-text>
-            </v-card>
-          </v-col>
-          
-          <v-col
-            cols="12"
-            md="4"
-          >
-            <v-card
-              rounded="xl"
-              class="summary-card"
-              flat
-              border
-            >
-              <v-card-text class="pa-6">
-                <div class="d-flex flex-column">
-                  <div class="d-flex justify-space-between">
-                    <span class="text-subtitle-1 text-medium-emphasis font-weight-medium">Expenses</span>
-                    <span class="text-caption">
-                      <v-icon
-                        size="small"
-                        color="error"
-                        class="mb-1"
-                      >mdi-arrow-down-thin</v-icon> 
-                      <span class="text-error">-8.3%</span>
-                      <span class="text-medium-emphasis ml-1">than last month</span>
-                    </span>
-                  </div>
-                  <span class="text-h3 font-weight-bold mt-2 text-error">-21 465.90€</span>
-                </div>
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
-        
-        <!-- Main Content -->
-        <v-row>
-          <!-- Income & Expenses Chart -->
-          <v-col
-            cols="12"
-            lg="6"
-            class="mb-8"
-          >
-            <v-card
-              rounded="xl"
-              flat
-              border
-              class="h-100"
-            >
-              <v-card-text class="pa-6">
-                <div class="d-flex justify-space-between align-center mb-6">
-                  <h2 class="text-h5 font-weight-medium text-primary">
-                    Income & Expenses
-                  </h2>
+          <div class="charts-grid">
+            <!-- Income & Expenses Chart -->
+            <div class="chart-item">
+              <div class="chart-card">
+                <div class="chart-header">
+                  <h3 class="chart-title">Income & Expenses</h3>
                   <v-select
                     v-model="selectedTimeframe"
                     :items="timeframes"
@@ -139,52 +127,34 @@
                     hide-details
                     style="max-width: 150px"
                     bg-color="surface"
-                    class="text-body-1"
+                    class="chart-select"
                   />
                 </div>
-                
-                <div
-                  class="chart-container"
-                  style="position: relative; height: 320px;"
-                >
+                <div class="chart-container" style="position: relative; height: 320px;">
                   <bar-chart 
                     v-if="chartDataLoaded"
                     :data="incomeExpenseData" 
                     :options="barChartOptions"
                   />
                 </div>
-                
-                <div class="d-flex mt-6">
-                  <div class="d-flex align-center mr-6">
-                    <div class="color-dot primary-dot mr-2" />
-                    <span class="text-body-1 font-weight-medium">Income</span>
+                <div class="chart-legend">
+                  <div class="legend-item">
+                    <div class="legend-dot income-dot"></div>
+                    <span>Income</span>
                   </div>
-                  <div class="d-flex align-center">
-                    <div class="color-dot light-blue-dot mr-2" />
-                    <span class="text-body-1 font-weight-medium">Expenses</span>
+                  <div class="legend-item">
+                    <div class="legend-dot expense-dot"></div>
+                    <span>Expenses</span>
                   </div>
                 </div>
-              </v-card-text>
-            </v-card>
-          </v-col>
-          
-          <!-- Expenses by Category -->
-          <v-col
-            cols="12"
-            lg="6"
-            class="mb-8"
-          >
-            <v-card
-              rounded="xl"
-              flat
-              border
-              class="h-100"
-            >
-              <v-card-text class="pa-6">
-                <div class="d-flex justify-space-between align-center mb-6">
-                  <h2 class="text-h5 font-weight-medium text-primary">
-                    Expenses by Categories
-                  </h2>
+              </div>
+            </div>
+            
+            <!-- Expenses by Category Chart -->
+            <div class="chart-item">
+              <div class="chart-card">
+                <div class="chart-header">
+                  <h3 class="chart-title">Expenses by Categories</h3>
                   <v-select
                     v-model="selectedExpenseView"
                     :items="expenseViews"
@@ -194,216 +164,181 @@
                     hide-details
                     style="max-width: 150px"
                     bg-color="surface"
-                    class="text-body-1"
+                    class="chart-select"
                   />
                 </div>
-                
-                <div
-                  class="chart-container"
-                  style="position: relative; height: 320px;"
-                >
+                <div class="chart-container" style="position: relative; height: 320px;">
                   <doughnut-chart 
                     v-if="chartDataLoaded"
                     :data="expensesByCategoryData" 
                     :options="doughnutOptions"
                   />
                   <div class="chart-center-text">
-                    <div class="text-subtitle-1 font-weight-medium text-medium-emphasis">
-                      Food
-                    </div>
-                    <div class="text-h4 font-weight-bold text-error">
-                      -7 654.57€
-                    </div>
+                    <div class="center-label">Food</div>
+                    <div class="center-amount">-7,654.57€</div>
                   </div>
                 </div>
-                
-                <div class="d-flex flex-wrap mt-6 justify-center">
+                <div class="category-legend">
                   <div
                     v-for="(category, index) in expenseCategories"
                     :key="index"
-                    class="d-flex align-center mx-3 mb-3"
+                    class="category-item"
                   >
-                    <div
-                      class="color-dot mr-2"
-                      :style="{ backgroundColor: category.color }"
-                    />
-                    <span class="text-body-1 font-weight-medium">{{ category.name }}</span>
-                    <span class="text-body-1 ml-2 text-medium-emphasis">{{ category.percentage }}%</span>
+                    <div class="category-dot" :style="{ backgroundColor: category.color }"></div>
+                    <span class="category-name">{{ category.name }}</span>
+                    <span class="category-percentage">{{ category.percentage }}%</span>
                   </div>
                 </div>
-              </v-card-text>
-            </v-card>
-          </v-col>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transactions Section -->
+        <div class="tool-section">
+          <div class="section-header">
+            <div class="section-title">
+              <v-icon class="section-icon" color="success">mdi-credit-card</v-icon>
+              <h2 class="section-heading">Recent Transactions</h2>
+            </div>
+            <div class="section-actions">
+              <v-chip
+                size="small"
+                color="success"
+                variant="outlined"
+                class="count-chip"
+              >
+                {{ recentTransactions.length }} transactions
+              </v-chip>
+              <v-btn
+                color="success"
+                variant="outlined"
+                size="small"
+                rounded="lg"
+                class="ml-2"
+                @click="openAddExpenseDialog"
+              >
+                <v-icon size="small" class="mr-1">mdi-plus</v-icon>
+                Add Transaction
+              </v-btn>
+            </div>
+          </div>
           
-          <!-- Recent Transactions -->
-          <v-col
-            cols="12"
-            lg="6"
-            class="mb-8"
-          >
-            <v-card
-              rounded="xl"
-              flat
-              border
-              class="h-100"
+          <div class="transactions-grid">
+            <div 
+              v-for="(transaction, index) in recentTransactions" 
+              :key="index"
+              class="transaction-item"
             >
-              <v-card-text class="pa-6">
-                <div class="d-flex justify-space-between align-center mb-6">
-                  <h2 class="text-h5 font-weight-medium text-primary">
-                    Recent Transactions
-                  </h2>
+              <div class="transaction-card">
+                <div class="transaction-icon-wrapper">
+                  <v-icon class="transaction-icon" color="white">
+                    {{ transaction.icon }}
+                  </v-icon>
+                </div>
+                <div class="transaction-info">
+                  <h3 class="transaction-title">{{ transaction.category }}</h3>
+                  <div class="transaction-date">{{ transaction.date }}</div>
+                </div>
+                <div class="transaction-actions">
+                  <div class="transaction-amount" :class="transaction.amount.startsWith('-') ? 'negative' : 'positive'">
+                    {{ transaction.amount }}€
+                  </div>
                   <v-btn
                     icon
-                    color="primary"
+                    size="small"
+                    color="error"
                     variant="text"
-                    class="rounded-xl"
-                    @click="openAddExpenseDialog"
+                    class="delete-btn"
+                    @click="deleteTransaction(index)"
                   >
-                    <v-icon>mdi-plus</v-icon>
+                    <v-icon size="small">mdi-delete</v-icon>
                   </v-btn>
                 </div>
-                
-                <div class="transaction-table">
-                  <div class="transaction-header d-flex">
-                    <div class="transaction-column-category font-weight-medium">
-                      Category
-                    </div>
-                    <div class="transaction-column-date font-weight-medium">
-                      Date
-                    </div>
-                    <div class="transaction-column-amount font-weight-medium">
-                      Amount
-                    </div>
-                    <div class="transaction-column-actions" />
-                  </div>
-                  
-                  <div
-                    v-for="(transaction, index) in recentTransactions"
-                    :key="index"
-                    class="transaction-row d-flex"
-                  >
-                    <div class="transaction-column-category d-flex align-center">
-                      <div class="transaction-icon-container mr-3">
-                        <v-icon
-                          size="20"
-                          color="white"
-                        >
-                          {{ transaction.icon }}
-                        </v-icon>
-                      </div>
-                      <span class="font-weight-medium">{{ transaction.category }}</span>
-                    </div>
-                    <div class="transaction-column-date">
-                      {{ transaction.date }}
-                    </div>
-                    <div
-                      class="transaction-column-amount font-weight-medium"
-                      :class="transaction.amount.startsWith('-') ? 'text-error' : 'text-success'"
-                    >
-                      {{ transaction.amount }}€
-                    </div>
-                    <div class="transaction-column-actions">
-                      <v-btn
-                        icon
-                        size="small"
-                        color="error"
-                        variant="text"
-                        class="transaction-delete-btn"
-                        @click="deleteTransaction(index)"
-                      >
-                        <v-icon size="small">
-                          mdi-delete
-                        </v-icon>
-                      </v-btn>
-                    </div>
-                  </div>
-                </div>
-              </v-card-text>
-            </v-card>
-          </v-col>
-          
-          <!-- Combined column for Spending Limits and Upcoming Payments -->
-          <v-col
-            cols="12"
-            lg="6"
-          >
-            <!-- Spending Limits -->
-            <v-card
-              rounded="xl"
-              flat
-              border
-              class="mb-8"
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Info Section -->
+        <div class="tool-section">
+          <div class="section-header">
+            <div class="section-title">
+              <v-icon class="section-icon" color="info">mdi-information</v-icon>
+              <h2 class="section-heading">Financial Management</h2>
+            </div>
+            <v-chip
+              size="small"
+              color="info"
+              variant="outlined"
+              class="count-chip"
             >
-              <v-card-text class="pa-6">
-                <div class="d-flex justify-space-between align-center mb-6">
-                  <h2 class="text-h5 font-weight-medium text-primary">
-                    Spending Limits
-                  </h2>
-                  <v-btn
-                    icon
-                    color="primary"
-                    variant="text"
-                    class="rounded-xl"
-                  >
+              2 sections
+            </v-chip>
+          </div>
+          
+          <div class="management-grid">
+            <!-- Spending Limits -->
+            <div class="management-item">
+              <div class="management-card">
+                <div class="management-header">
+                  <h3 class="management-title">Spending Limits</h3>
+                  <v-btn icon size="small" color="primary" variant="text">
                     <v-icon>mdi-cog</v-icon>
                   </v-btn>
                 </div>
-                
-                <div
-                  v-for="(limit, index) in spendingLimits"
-                  :key="index"
-                  class="mb-6"
-                >
-                  <div class="d-flex justify-space-between mb-2">
-                    <span class="text-subtitle-1 font-weight-medium">{{ limit.category }}</span>
-                    <span class="text-subtitle-1">
-                      <span class="font-weight-bold">{{ formatNumber(limit.current) }}</span>
-                      <span class="text-medium-emphasis">of {{ formatNumber(limit.max) }}€</span>
-                    </span>
+                <div class="limits-list">
+                  <div
+                    v-for="(limit, index) in spendingLimits"
+                    :key="index"
+                    class="limit-item"
+                  >
+                    <div class="limit-info">
+                      <span class="limit-category">{{ limit.category }}</span>
+                      <span class="limit-amount">
+                        <span class="current">{{ formatNumber(limit.current) }}</span>
+                        <span class="max">of {{ formatNumber(limit.max) }}€</span>
+                      </span>
+                    </div>
+                    <div class="limit-progress">
+                      <v-progress-linear
+                        :model-value="(limit.current / limit.max) * 100"
+                        height="8"
+                        rounded
+                        :color="(limit.current / limit.max) > 0.8 ? 'error' : 'primary'"
+                      />
+                    </div>
                   </div>
                 </div>
-              </v-card-text>
-            </v-card>
+              </div>
+            </div>
             
             <!-- Upcoming Payments -->
-            <v-card
-              rounded="xl"
-              flat
-              border
-            >
-              <v-card-text class="pa-6">
-                <h2 class="text-h5 font-weight-medium text-primary mb-6">
-                  Upcoming Payments
-                </h2>
-                
-                <div class="upcoming-payments">
+            <div class="management-item">
+              <div class="management-card">
+                <div class="management-header">
+                  <h3 class="management-title">Upcoming Payments</h3>
+                </div>
+                <div class="payments-list">
                   <div
                     v-for="(payment, index) in upcomingPayments"
                     :key="index"
-                    class="upcoming-payment-item d-flex align-center"
+                    class="payment-item"
                   >
-                    <div class="payment-icon-container mr-4">
-                      <v-icon color="white">
-                        {{ payment.icon }}
-                      </v-icon>
+                    <div class="payment-icon-wrapper">
+                      <v-icon class="payment-icon" color="white">{{ payment.icon }}</v-icon>
                     </div>
-                    <div class="payment-details flex-grow-1">
-                      <div class="payment-service font-weight-medium">
-                        {{ payment.service }}
-                      </div>
-                      <div class="payment-date text-caption text-medium-emphasis">
-                        {{ payment.date }}
-                      </div>
+                    <div class="payment-info">
+                      <h4 class="payment-service">{{ payment.service }}</h4>
+                      <div class="payment-date">{{ payment.date }}</div>
                     </div>
-                    <div class="payment-amount font-weight-bold">
-                      {{ payment.amount }}€
-                    </div>
+                    <div class="payment-amount">{{ payment.amount }}€</div>
                   </div>
                 </div>
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
+              </div>
+            </div>
+          </div>
+        </div>
       </v-container>
     </v-main>
     
@@ -412,20 +347,13 @@
       v-model="showAddExpenseDialog"
       max-width="500px"
     >
-      <v-card
-        rounded="xl"
-        flat
-        border
-      >
+      <v-card rounded="xl" flat border>
         <v-card-title class="text-h5 font-weight-medium pt-6 pb-2 px-6">
           Add New Expense
         </v-card-title>
         
         <v-card-text class="px-6">
-          <v-form
-            ref="expenseForm"
-            @submit.prevent="addNewExpense"
-          >
+          <v-form ref="expenseForm" @submit.prevent="addNewExpense">
             <v-select
               v-model="newExpense.category"
               :items="availableCategories"
@@ -876,69 +804,356 @@ export default defineComponent({
 </script>
 
 <style scoped>
-
-
 :deep(.left-menu-component),
-  :deep(.v-navigation-drawer) {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    height: 100vh !important;
-    z-index: 999 !important;
-    overflow-y: hidden !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-  }
- :deep(.v-navigation-drawer--rail) {
-    width: 72px ;
-  }
-  
-  :deep(.v-navigation-drawer:not(.v-navigation-drawer--rail)) {
-    width: 240px !important;
-  }
-
-
-.bg-surface-subtle {
-  background-color: #f9fafb !important;
+:deep(.v-navigation-drawer) {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  height: 100vh !important;
+  z-index: 999 !important;
+  overflow-y: hidden !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Summary cards styling */
+:deep(.v-navigation-drawer--rail) {
+  width: 72px;
+}
+
+:deep(.v-navigation-drawer:not(.v-navigation-drawer--rail)) {
+  width: 240px !important;
+}
+
+/* Main Layout - Same as Design Tools */
+.main-content {
+  background: linear-gradient(135deg, #064E47 0%, #0D7C66 50%, #41B3A2 100%);
+  min-height: 100vh;
+}
+
+/* Hero Section - Same as Design Tools */
+.hero-section {
+  background: linear-gradient(135deg, #064E47 0%, #0D7C66 50%, #41B3A2 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.05"><circle cx="30" cy="30" r="2"/></g></svg>');
+  pointer-events: none;
+}
+
+.hero-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.title-section {
+  flex: 1;
+  min-width: 300px;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: white;
+  margin: 0;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.gradient-text {
+  background: linear-gradient(45deg, #FFD700, #FFA726);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-subtitle {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 1rem 0 0 0;
+  font-weight: 400;
+}
+
+/* Content Container - Same as Design Tools */
+.content-container {
+  background: #f8fafc;
+  margin-top: -2rem;
+  border-radius: 2rem 2rem 0 0;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Tool Sections - Same as Design Tools */
+.tool-section {
+  margin-bottom: 3rem;
+}
+
+.tool-section:last-child {
+  margin-bottom: 0;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.section-icon {
+  font-size: 1.8rem;
+}
+
+.section-heading {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.count-chip {
+  font-weight: 600;
+}
+
+.section-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Summary Cards Grid */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.summary-item {
+  position: relative;
+}
+
 .summary-card {
-  background-color: white;
-  border-radius: 16px;
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #e2e8f0;
   height: 100%;
-  border-color: rgba(0, 0, 0, 0.08) !important;
+  position: relative;
+  overflow: hidden;
 }
 
-/* Text color classes */
-.text-success {
+.summary-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, transparent 0%, rgba(6, 78, 71, 0.08) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.summary-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border-color: #0D7C66;
+}
+
+.summary-card:hover::before {
+  opacity: 1;
+}
+
+.summary-icon-wrapper {
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #0D7C66, #41B3A2);
+  transition: all 0.3s ease;
+}
+
+.income-icon {
+  background: linear-gradient(135deg, #10B981, #34D399) !important;
+}
+
+.expense-icon {
+  background: linear-gradient(135deg, #EF4444, #F87171) !important;
+}
+
+.summary-card:hover .summary-icon-wrapper {
+  transform: scale(1.05);
+}
+
+.summary-icon {
+  font-size: 1.5rem;
+}
+
+.summary-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.summary-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #64748b;
+  margin: 0 0 0.5rem 0;
+}
+
+.summary-amount {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+}
+
+.income-amount {
   color: #10B981 !important;
 }
 
-.text-error {
+.expense-amount {
   color: #EF4444 !important;
 }
 
-.text-primary {
-  color: #1E293B !important;
+.summary-change {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
 }
 
-/* Chart and visualization components */
+.summary-change.positive {
+  color: #10B981;
+}
+
+.summary-change.negative {
+  color: #EF4444;
+}
+
+/* Charts Grid */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem;
+}
+
+.chart-item {
+  position: relative;
+}
+
+.chart-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #e2e8f0;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.chart-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, transparent 0%, rgba(6, 78, 71, 0.08) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.chart-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border-color: #0D7C66;
+}
+
+.chart-card:hover::before {
+  opacity: 1;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.chart-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.chart-select {
+  min-width: 120px;
+}
+
 .chart-container {
   width: 100%;
   height: 100%;
 }
 
-.color-dot {
-  width: 14px;
-  height: 14px;
+.chart-legend {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
 }
 
-.primary-dot {
+.income-dot {
   background-color: #4B9E91;
 }
 
-.light-blue-dot {
+.expense-dot {
   background-color: #95B5E0;
 }
 
@@ -951,183 +1166,454 @@ export default defineComponent({
   pointer-events: none;
 }
 
-/* Transaction table styling */
-.transaction-table {
-  width: 100%;
-}
-
-.transaction-header {
-  color: rgba(0, 0, 0, 0.6);
+.center-label {
   font-size: 0.875rem;
-  font-weight: 500;
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  margin-bottom: 12px;
-}
-
-.transaction-row {
-  padding: 14px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-}
-
-.transaction-column-category {
-  flex: 1;
-  min-width: 100px;
-}
-
-.transaction-column-date {
-  flex: 1;
-  color: rgba(0, 0, 0, 0.6);
-  font-size: 0.875rem;
-}
-
-.transaction-column-amount {
-  width: 100px;
-  text-align: right;
+  color: #64748b;
   font-weight: 500;
 }
 
-.transaction-column-actions {
-  width: 60px;
-  text-align: right;
+.center-amount {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #EF4444;
+  margin-top: 0.25rem;
 }
 
-.transaction-icon-container {
+.category-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.category-item {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  background-color: var(--v-primary-base);
+  gap: 0.5rem;
+  font-size: 0.875rem;
 }
 
-.transaction-row:nth-child(1) .transaction-icon-container {
-  background-color: #4B9E91;
+.category-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
 }
 
-.transaction-row:nth-child(2) .transaction-icon-container {
-  background-color: #C7D2FE;
+.category-name {
+  font-weight: 500;
+  color: #1e293b;
 }
 
-.transaction-row:nth-child(3) .transaction-icon-container {
-  background-color: #818CF8;
+.category-percentage {
+  color: #64748b;
 }
 
-.transaction-row:nth-child(4) .transaction-icon-container {
-  background-color: #3B75D9;
+/* Transactions Grid */
+.transactions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
 }
 
-.transaction-delete-btn {
+.transaction-item {
+  position: relative;
+}
+
+.transaction-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #e2e8f0;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.transaction-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, transparent 0%, rgba(6, 78, 71, 0.08) 100%);
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.3s ease;
 }
 
-.transaction-row:hover .transaction-delete-btn {
+.transaction-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border-color: #0D7C66;
+}
+
+.transaction-card:hover::before {
   opacity: 1;
 }
 
-/* Upcoming payments styling */
-.upcoming-payments {
-  width: 100%;
-}
-
-.upcoming-payment-item {
-  padding: 14px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-}
-
-.upcoming-payment-item:last-child {
-  border-bottom: none;
-}
-
-.payment-icon-container {
+.transaction-icon-wrapper {
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #0D7C66, #41B3A2);
+  transition: all 0.3s ease;
+}
+
+.transaction-card:nth-child(1) .transaction-icon-wrapper {
+  background: linear-gradient(135deg, #4B9E91, #41B3A2);
+}
+
+.transaction-card:nth-child(2) .transaction-icon-wrapper {
+  background: linear-gradient(135deg, #C7D2FE, #A5B4FC);
+}
+
+.transaction-card:nth-child(3) .transaction-icon-wrapper {
+  background: linear-gradient(135deg, #818CF8, #6366F1);
+}
+
+.transaction-card:nth-child(4) .transaction-icon-wrapper {
+  background: linear-gradient(135deg, #3B75D9, #2563EB);
+}
+
+.transaction-card:hover .transaction-icon-wrapper {
+  transform: scale(1.05);
+}
+
+.transaction-icon {
+  font-size: 1.25rem;
+}
+
+.transaction-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.transaction-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.25rem 0;
+}
+
+.transaction-date {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.transaction-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.transaction-amount {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.transaction-amount.positive {
+  color: #10B981;
+}
+
+.transaction-amount.negative {
+  color: #EF4444;
+}
+
+.delete-btn {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.transaction-card:hover .delete-btn {
+  opacity: 1;
+}
+
+/* Management Grid */
+.management-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.management-item {
+  position: relative;
+}
+
+.management-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #e2e8f0;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.management-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, transparent 0%, rgba(6, 78, 71, 0.08) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.management-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border-color: #0D7C66;
+}
+
+.management-card:hover::before {
+  opacity: 1;
+}
+
+.management-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.management-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+/* Spending Limits */
+.limits-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.limit-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.limit-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.limit-category {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.limit-amount .current {
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.limit-amount .max {
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.limit-progress {
+  width: 100%;
+}
+
+/* Upcoming Payments */
+.payments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.payment-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.payment-item:last-child {
+  border-bottom: none;
+}
+
+.payment-icon-wrapper {
+  flex-shrink: 0;
   width: 40px;
   height: 40px;
-  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, #0D7C66, #41B3A2);
 }
 
-.upcoming-payment-item:nth-child(1) .payment-icon-container {
-  background-color: #4B9E91;
+.payment-item:nth-child(1) .payment-icon-wrapper {
+  background: linear-gradient(135deg, #4B9E91, #41B3A2);
 }
 
-.upcoming-payment-item:nth-child(2) .payment-icon-container {
-  background-color: #C7D2FE;
+.payment-item:nth-child(2) .payment-icon-wrapper {
+  background: linear-gradient(135deg, #C7D2FE, #A5B4FC);
 }
 
-.upcoming-payment-item:nth-child(3) .payment-icon-container {
-  background-color: #818CF8;
+.payment-item:nth-child(3) .payment-icon-wrapper {
+  background: linear-gradient(135deg, #818CF8, #6366F1);
 }
 
-.upcoming-payment-item:nth-child(4) .payment-icon-container {
-  background-color: #3B75D9;
+.payment-item:nth-child(4) .payment-icon-wrapper {
+  background: linear-gradient(135deg, #3B75D9, #2563EB);
 }
 
-.upcoming-payment-item:nth-child(5) .payment-icon-container {
-  background-color: #65C7D9;
+.payment-item:nth-child(5) .payment-icon-wrapper {
+  background: linear-gradient(135deg, #65C7D9, #0891B2);
+}
+
+.payment-icon {
+  font-size: 1.125rem;
+}
+
+.payment-info {
+  flex: 1;
+  min-width: 0;
 }
 
 .payment-service {
   font-size: 0.9375rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.25rem 0;
 }
 
 .payment-date {
   font-size: 0.75rem;
+  color: #64748b;
 }
 
 .payment-amount {
   font-size: 0.9375rem;
+  font-weight: 700;
+  color: #1e293b;
 }
 
-
-
-/* Card styling */
-:deep(.v-card) {
-  transition: transform 0.2s ease;
+/* Animation - Same as Design Tools */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-:deep(.v-card:hover) {
-  transform: translateY(-2px);
+.tool-section {
+  animation: fadeInUp 0.6s ease-out;
 }
 
-:deep(.v-btn) {
-  letter-spacing: 0.5px;
-  font-weight: 500;
+.tool-section:nth-child(2) {
+  animation-delay: 0.1s;
 }
 
-:deep(.v-btn--icon) {
-  border-radius: 10px;
+.tool-section:nth-child(3) {
+  animation-delay: 0.2s;
 }
 
-/* Responsive adjustments */
-@media (max-width: 960px) {
-  .transaction-column-date {
-    display: none;
+.tool-section:nth-child(4) {
+  animation-delay: 0.3s;
+}
+
+.tool-section:nth-child(5) {
+  animation-delay: 0.4s;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem;
   }
   
-  .summary-card {
-    margin-bottom: 16px;
+  .hero-subtitle {
+    font-size: 1.1rem;
+  }
+  
+  .hero-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 2rem;
+  }
+  
+  .summary-grid,
+  .charts-grid,
+  .transactions-grid,
+  .management-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .section-heading {
+    font-size: 1.5rem;
+  }
+  
+  .content-container {
+    margin-top: -1rem;
+    border-radius: 1.5rem 1.5rem 0 0;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .section-actions {
+    align-self: stretch;
+    justify-content: space-between;
   }
 }
 
-@media (max-width: 600px) {
-  .text-h3 {
-    font-size: 1.75rem !important;
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2rem;
   }
   
-  .text-h4 {
-    font-size: 1.5rem !important;
+  .summary-card,
+  .chart-card,
+  .transaction-card,
+  .management-card {
+    padding: 1rem;
   }
   
-  .text-h5 {
-    font-size: 1.25rem !important;
+  .chart-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
   }
   
-  .pa-6 {
-    padding: 16px !important;
+  .chart-select {
+    min-width: auto;
+  }
+  
+  .category-legend {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
   }
 }
 </style>

@@ -5,511 +5,781 @@
     />
     <SearchBar />
       
-    <v-main class="bg-grey-lighten-4">
-      <v-container
-        fluid
-        class="pa-4 pa-sm-6"
-      >
-        <div class="d-flex justify-space-between align-center mb-6 flex-wrap">
-          <h1 class="text-h4 text-h5-sm font-weight-bold">
-            My Team
-          </h1>
-          <div class="d-flex align-center mt-2 mt-sm-0">
-            <v-btn 
-              color="teal" 
-              class="text-white" 
-              elevation="0" 
-              @click="openNewChatDialog()"
+    <v-main class="main-content">
+      <!-- Hero Section -->
+      <div class="hero-section">
+        <v-container fluid class="px-6 py-8">
+          <div class="hero-content">
+            <div class="title-section">
+              <h1 class="hero-title">
+                <span class="gradient-text">Team</span> Collaboration
+              </h1>
+              <p class="hero-subtitle">
+                Connect, communicate, and collaborate with your team members
+              </p>
+            </div>
+            <div class="hero-actions">
+              <v-btn 
+                color="white"
+                variant="elevated"
+                size="large"
+                rounded="lg"
+                class="hero-btn"
+                @click="openNewChatDialog()"
+              >
+                <v-icon class="mr-2">mdi-chat-plus</v-icon>
+                Create Chat
+              </v-btn>
+            </div>
+          </div>
+        </v-container>
+      </div>
+
+      <v-container fluid class="content-container px-6 pb-8">
+        <!-- Team Overview Section -->
+        <div class="tool-section">
+          <div class="section-header">
+            <div class="section-title">
+              <v-icon class="section-icon" color="primary">mdi-chart-donut</v-icon>
+              <h2 class="section-heading">Team Overview</h2>
+            </div>
+            <v-chip
+              size="small"
+              color="primary"
+              variant="outlined"
+              class="count-chip"
             >
-              Create new chat
-            </v-btn>
+              {{ teamMembers.length }} members
+            </v-chip>
+          </div>
+          
+          <div class="team-overview-grid">
+            <!-- Active Chats Card -->
+            <div class="overview-item">
+              <div class="overview-card active-chats-card">
+                <div class="overview-icon-wrapper active-chats-icon">
+                  <v-icon class="overview-icon" color="white">mdi-chat-processing</v-icon>
+                </div>
+                <div class="overview-info">
+                  <h3 class="overview-title">Active Chats</h3>
+                  <div class="overview-amount">{{ chats.length }}</div>
+                  <div class="overview-description">Team conversations</div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Team Members Card -->
+            <div class="overview-item">
+              <div class="overview-card team-members-card">
+                <div class="overview-icon-wrapper team-members-icon">
+                  <v-icon class="overview-icon" color="white">mdi-account-group</v-icon>
+                </div>
+                <div class="overview-info">
+                  <h3 class="overview-title">Team Members</h3>
+                  <div class="overview-amount">{{ teamMembers.length }}</div>
+                  <div class="overview-description">Active collaborators</div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Total Payroll Card -->
+            <div class="overview-item">
+              <div class="overview-card total-payroll-card">
+                <div class="overview-icon-wrapper total-payroll-icon">
+                  <v-icon class="overview-icon" color="white">mdi-currency-usd</v-icon>
+                </div>
+                <div class="overview-info">
+                  <h3 class="overview-title">Monthly Payroll</h3>
+                  <div class="overview-amount">${{ totalPayroll.toLocaleString() }}</div>
+                  <div class="overview-description">Team compensation</div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Active Projects Card -->
+            <div class="overview-item">
+              <div class="overview-card active-projects-card">
+                <div class="overview-icon-wrapper active-projects-icon">
+                  <v-icon class="overview-icon" color="white">mdi-briefcase-variant</v-icon>
+                </div>
+                <div class="overview-info">
+                  <h3 class="overview-title">Active Projects</h3>
+                  <div class="overview-amount">{{ uniqueProjects.length }}</div>
+                  <div class="overview-description">Ongoing work</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-  
-        <v-row>
-          <!-- Left sidebar - Chats and Contacts -->
-          <v-col
-            cols="12"
-            md="4"
-            lg="3"
-          >
-            <v-card
-              class="sidebar-card"
-              elevation="1"
-              rounded="lg"
-            >
-              <div class="card-header">
-                <div class="d-flex justify-space-between align-center px-4 py-3">
-                  <h2 class="text-h6">
-                    Chats
-                  </h2>
-                </div>
-                
-                <v-text-field
-                  placeholder="Search here ..."
-                  prepend-inner-icon="mdi-magnify"
-                  variant="outlined"
-                  hide-details
-                  density="compact"
-                  class="mx-4 mb-3"
-                />
 
-                <!-- Custom tabs that look like in your image -->
-                <div class="custom-tabs d-flex px-4">
-                  <div 
-                    class="custom-tab py-2 px-3" 
-                    :class="{ active: activeTab === 'chats' }"
-                    @click="activeTab = 'chats'"
-                  >
-                    Chats
-                  </div>
-                  <div 
-                    class="custom-tab py-2 px-3" 
-                    :class="{ active: activeTab === 'contacts' }"
-                    @click="activeTab = 'contacts'"
-                  >
-                    Contacts
-                  </div>
-                </div>
-                <v-divider />
-              </div>    
-              
-              <v-card-text class="pa-0">
-                <v-window v-model="activeTab">
-                  <!-- Chats Tab -->
-                  <v-window-item value="chats">
-                    <v-list
-                      lines="two"
-                      class="py-0"
-                    >
-                      <v-list-item
-                        v-for="chat in chats"
-                        :key="chat.id"
-                        :active="selectedChat && chat.id === selectedChat.id"
-                        class="chat-item"
-                        @click="selectChat(chat)"
-                      >
-                        <template #prepend>
-                          <v-avatar
-                            color="teal"
-                            size="40"
-                          >
-                            <span class="text-caption text-white">{{ getChatInitials(chat) }}</span>
-                          </v-avatar>
-                        </template>
-                          
-                        <v-list-item-title class="font-weight-medium">
-                          {{ chat.name }}
-                        </v-list-item-title>
-                        <v-list-item-subtitle class="text-truncate">
-                          {{ chat.lastMessage || 'No messages yet' }}
-                        </v-list-item-subtitle>
-                          
-                        <template #append>
-                          <div class="text-caption text-grey d-none d-sm-block">
-                            {{ formatTime(chat.lastMessageTime) }}
-                          </div>
-                        </template>
-                      </v-list-item>
-                    </v-list>
-                  </v-window-item>
-  
-                  <!-- Contacts Tab -->
-                  <v-window-item value="contacts">
-                    <v-list
-                      lines="two"
-                      class="py-0"
-                    >
-                      <v-list-item
-                        v-for="contact in teamMembers"
-                        :key="contact.id"
-                        :active="selectedMember && contact.id === selectedMember.id"
-                        class="contact-item"
-                        @click="selectTeamMember(contact)"
-                      >
-                        <template #prepend>
-                          <v-avatar
-                            :image="contact.avatar"
-                            size="40"
-                          >
-                            <v-icon v-if="!contact.avatar">
-                              mdi-account
-                            </v-icon>
-                          </v-avatar>
-                        </template>
-                          
-                        <v-list-item-title class="font-weight-medium">
-                          {{ contact.name }}
-                        </v-list-item-title>
-                        <v-list-item-subtitle class="text-truncate">
-                          {{ contact.role }}
-                        </v-list-item-subtitle>
-                      </v-list-item>
-                    </v-list>
-                  </v-window-item>
-                </v-window>
-              </v-card-text>
-            </v-card>
-          </v-col>
-  
-          <!-- Main content area -->
-          <v-col
-            cols="12"
-            md="8"
-            lg="9"
-          >
-            <!-- Chat Area -->
-            <v-card
-              v-if="activeTab === 'chats' && selectedChat"
-              class="chat-card"
-              elevation="1"
-              rounded="lg"
-            >
-              <v-card-title class="chat-header d-flex align-center">
-                <v-avatar
-                  color="teal"
-                  size="40"
-                  class="mr-3"
-                >
-                  <span class="text-caption text-white">{{ getChatInitials(selectedChat) }}</span>
-                </v-avatar>
-                <span class="text-truncate">{{ selectedChat.name }}</span>
-                <v-spacer />
-                <v-btn
-                  icon
-                  variant="text"
-                  @click="openChatSettingsDialog(selectedChat)"
-                >
-                  <v-icon>mdi-cog</v-icon>
-                </v-btn>
-              </v-card-title>
-  
-              <v-divider />
-  
-              <div
-                ref="messagesContainer"
-                class="chat-messages"
-              >
-                <div
-                  v-for="(message, index) in selectedChatMessages"
-                  :key="index" 
-                  :class="['message-wrapper', message.senderId === currentUserId ? 'message-sent' : 'message-received']"
-                >
-                  <div class="message-bubble">
-                    <div
-                      v-if="message.senderId !== currentUserId"
-                      class="message-sender text-caption text-primary font-weight-medium mb-1"
-                    >
-                      {{ getSenderName(message.senderId) }}
-                    </div>
-                    <div class="message-text">
-                      {{ message.text }}
-                    </div>
-                    <div class="message-time text-caption text-right">
-                      {{ formatTime(message.timestamp) }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-  
-              <v-divider />
-  
-              <v-card-actions class="chat-input">
-                <v-text-field 
-                  v-model="newMessage" 
-                  hide-details 
-                  placeholder="Type a message" 
-                  variant="outlined"
-                  density="comfortable"
-                  append-inner-icon="mdi-send"
-                  @click:append-inner="sendMessage"
-                  @keyup.enter="sendMessage"
-                />
-              </v-card-actions>
-            </v-card>
-  
-            <!-- No Chat Selected State -->
-            <v-card
-              v-else-if="activeTab === 'chats' && !selectedChat"
-              class="d-flex flex-column align-center justify-center empty-state"
-              elevation="1"
-              rounded="lg"
-            >
-              <v-icon
-                size="64"
-                color="grey-lighten-1"
-                class="mb-4"
-              >
-                mdi-chat-outline
-              </v-icon>
-              <div class="text-h6 mb-2 text-center">
-                No chat selected
-              </div>
-              <div class="text-body-2 text-center mb-4 px-3">
-                Select a chat from the sidebar or create a new one
-              </div>
+        <!-- Team Workspace Section -->
+        <div class="tool-section">
+          <div class="section-header">
+            <div class="section-title">
+              <v-icon class="section-icon" color="warning">mdi-forum</v-icon>
+              <h2 class="section-heading">Team Workspace</h2>
+            </div>
+            <div class="section-actions">
               <v-btn
-                color="teal"
-                class="text-white"
-                @click="openNewChatDialog"
+                color="primary"
+                variant="outlined"
+                size="small"
+                rounded="lg"
+                @click="openInviteDialog"
               >
-                Create New Chat
+                <v-icon size="small" class="mr-1">mdi-email-plus</v-icon>
+                Invite Members
               </v-btn>
-            </v-card>
-  
-            <!-- Team Member Details -->
-            <v-card
-              v-if="activeTab === 'contacts' && selectedMember"
-              class="member-details"
-              elevation="1"
-              rounded="lg"
-            >
-              <v-card-title class="member-header">
-                <v-avatar
-                  :image="selectedMember.avatar"
-                  size="64"
-                  class="mr-md-3 mb-3 mb-md-0"
-                >
-                  <v-icon
-                    v-if="!selectedMember.avatar"
-                    size="40"
-                  >
-                    mdi-account
-                  </v-icon>
-                </v-avatar>
-                <div class="flex-grow-1 text-center text-md-left">
-                  <div class="text-h5">
-                    {{ selectedMember.name }}
-                  </div>
-                  <div class="text-subtitle-1 text-medium-emphasis">
-                    {{ selectedMember.role }}
-                  </div>
-                </div>
-                <v-spacer class="d-none d-md-block" />
-                <v-btn
-                  color="teal"
-                  class="text-white flex-grow-1 flex-md-grow-0 mt-3 mt-md-0"
-                  @click="startPrivateChat(selectedMember)"
-                >
-                  Message
-                </v-btn>
-              </v-card-title>
-  
-              <v-divider />
-  
-              <v-card-text>
-                <v-row>
-                  <v-col
-                    cols="12"
-                    md="6"
-                  >
-                    <div class="text-subtitle-1 font-weight-bold mb-2">
-                      Contact Information
-                    </div>
-                    <v-list
-                      lines="two"
-                      density="compact"
-                    >
-                      <v-list-item prepend-icon="mdi-email">
-                        <v-list-item-title>Email</v-list-item-title>
-                        <v-list-item-subtitle class="text-truncate">
-                          {{ selectedMember.email }}
-                        </v-list-item-subtitle>
-                      </v-list-item>
-  
-                      <v-list-item prepend-icon="mdi-phone">
-                        <v-list-item-title>Phone</v-list-item-title>
-                        <v-list-item-subtitle>{{ selectedMember.phone }}</v-list-item-subtitle>
-                      </v-list-item>
-                    </v-list>
-                  </v-col>
-  
-                  <v-col
-                    cols="12"
-                    md="6"
-                  >
-                    <div class="text-subtitle-1 font-weight-bold mb-2">
-                      Payment Information
-                    </div>
-                    <v-list
-                      lines="two"
-                      density="compact"
-                    >
-                      <v-list-item prepend-icon="mdi-cash">
-                        <v-list-item-title>Monthly Pay</v-list-item-title>
-                        <v-list-item-subtitle>${{ selectedMember.payment }}/month</v-list-item-subtitle>
-                        <template #append>
-                          <v-btn
-                            icon
-                            variant="text"
-                            size="small"
-                            @click="openEditPaymentDialog(selectedMember)"
-                          >
-                            <v-icon>mdi-pencil</v-icon>
-                          </v-btn>
-                        </template>
-                      </v-list-item>
-  
-                      <v-list-item prepend-icon="mdi-briefcase">
-                        <v-list-item-title>Current Project</v-list-item-title>
-                        <v-list-item-subtitle class="text-truncate">
-                          {{ selectedMember.currentProject }}
-                        </v-list-item-subtitle>
-                        <template #append>
-                          <v-btn
-                            icon
-                            variant="text"
-                            size="small"
-                            @click="openEditProjectDialog(selectedMember)"
-                          >
-                            <v-icon>mdi-pencil</v-icon>
-                          </v-btn>
-                        </template>
-                      </v-list-item>
-                    </v-list>
-                  </v-col>
-                </v-row>
-  
-                <v-divider class="my-4" />
-  
-                <div class="text-subtitle-1 font-weight-bold mb-2">
-                  Skills
-                </div>
-                <div class="skills-container">
-                  <v-chip
-                    v-for="(skill, index) in selectedMember.skills"
-                    :key="index"
-                    class="mr-2 mb-2"
-                    color="teal-lighten-5"
-                    text-color="teal-darken-1"
-                  >
-                    {{ skill }}
-                  </v-chip>
-                </div>
-              </v-card-text>
-            </v-card>
-  
-            <!-- No Member Selected State -->
-            <v-card
-              v-else-if="activeTab === 'contacts' && !selectedMember"
-              class="d-flex flex-column align-center justify-center empty-state"
-              elevation="1"
-              rounded="lg" 
-            >
-              <v-icon
-                size="64"
-                color="grey-lighten-1"
-                class="mb-4"
-              >
-                mdi-account-group-outline
-              </v-icon>
-              <div class="text-h6 mb-2 text-center">
-                No team member selected
-              </div>
-              <div class="text-body-2 text-center mb-4 px-3">
-                Select a team member from the sidebar to view details
-              </div>
               <v-btn
-                color="teal"
-                class="text-white"
+                color="warning"
+                variant="outlined"
+                size="small"
+                rounded="lg"
                 @click="openAddMemberDialog"
               >
-                Add New Member
+                <v-icon size="small" class="mr-1">mdi-account-plus</v-icon>
+                Add Member
               </v-btn>
-            </v-card>
-          </v-col>
-        </v-row>
+            </div>
+          </div>
+          
+          <div class="workspace-container">
+            <v-row>
+              <!-- Sidebar - Chats and Contacts -->
+              <v-col cols="12" md="4" lg="3">
+                <div class="workspace-sidebar">
+                  <div class="sidebar-header">
+                    <div class="sidebar-tabs">
+                      <div 
+                        class="sidebar-tab" 
+                        :class="{ active: activeTab === 'chats' }"
+                        @click="activeTab = 'chats'"
+                      >
+                        <v-icon size="small" class="mr-1">mdi-chat</v-icon>
+                        Chats
+                      </div>
+                      <div 
+                        class="sidebar-tab" 
+                        :class="{ active: activeTab === 'contacts' }"
+                        @click="activeTab = 'contacts'"
+                      >
+                        <v-icon size="small" class="mr-1">mdi-account-group</v-icon>
+                        Contacts
+                      </div>
+                    </div>
+                    
+                    <v-text-field
+                      placeholder="Search..."
+                      variant="outlined"
+                      density="compact"
+                      hide-details
+                      prepend-inner-icon="mdi-magnify"
+                      class="search-field mt-3"
+                    />
+                  </div>
+                  
+                  <div class="sidebar-content">
+                    <!-- Chats List -->
+                    <div v-if="activeTab === 'chats'" class="chats-list">
+                      <div
+                        v-for="chat in chats"
+                        :key="chat.id"
+                        class="chat-item"
+                        :class="{ active: selectedChat && chat.id === selectedChat.id }"
+                        @click="selectChat(chat)"
+                      >
+                        <div class="chat-avatar">
+                          <span class="chat-initials">{{ getChatInitials(chat) }}</span>
+                        </div>
+                        <div class="chat-info">
+                          <div class="chat-name">{{ chat.name }}</div>
+                          <div class="chat-last-message">{{ chat.lastMessage || 'No messages yet' }}</div>
+                        </div>
+                        <div class="chat-time">{{ formatTime(chat.lastMessageTime) }}</div>
+                      </div>
+                    </div>
+                    
+                    <!-- Contacts List -->
+                    <div v-if="activeTab === 'contacts'" class="contacts-list">
+                      <div
+                        v-for="contact in teamMembers"
+                        :key="contact.id"
+                        class="contact-item"
+                        :class="{ active: selectedMember && contact.id === selectedMember.id }"
+                        @click="selectTeamMember(contact)"
+                      >
+                        <div class="contact-avatar">
+                          <img v-if="contact.avatar" :src="contact.avatar" :alt="contact.name" />
+                          <v-icon v-else color="white">mdi-account</v-icon>
+                        </div>
+                        <div class="contact-info">
+                          <div class="contact-name">{{ contact.name }}</div>
+                          <div class="contact-role">{{ contact.role }}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </v-col>
+
+              <!-- Main Content Area -->
+              <v-col cols="12" md="8" lg="9">
+                <div class="workspace-main">
+                  <!-- Chat Interface -->
+                  <div v-if="activeTab === 'chats' && selectedChat" class="chat-interface">
+                    <div class="chat-header">
+                      <div class="chat-header-info">
+                        <div class="chat-header-avatar">
+                          <span class="chat-initials">{{ getChatInitials(selectedChat) }}</span>
+                        </div>
+                        <div class="chat-header-details">
+                          <h3 class="chat-title">{{ selectedChat.name }}</h3>
+                          <div class="chat-members">{{ selectedChat.members.length }} members</div>
+                        </div>
+                      </div>
+                      <v-btn
+                        icon
+                        size="small"
+                        variant="text"
+                        @click="openChatSettingsDialog(selectedChat)"
+                      >
+                        <v-icon>mdi-cog</v-icon>
+                      </v-btn>
+                    </div>
+                    
+                    <div ref="messagesContainer" class="chat-messages">
+                      <div
+                        v-for="(message, index) in selectedChatMessages"
+                        :key="index" 
+                        :class="['message-wrapper', message.senderId === currentUserId ? 'message-sent' : 'message-received']"
+                      >
+                        <div class="message-bubble">
+                          <div
+                            v-if="message.senderId !== currentUserId"
+                            class="message-sender"
+                          >
+                            {{ getSenderName(message.senderId) }}
+                          </div>
+                          <div class="message-text">{{ message.text }}</div>
+                          <div class="message-time">{{ formatTime(message.timestamp) }}</div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="chat-input">
+                      <v-text-field 
+                        v-model="newMessage" 
+                        hide-details 
+                        placeholder="Type a message" 
+                        variant="outlined"
+                        density="comfortable"
+                        append-inner-icon="mdi-send"
+                        @click:append-inner="sendMessage"
+                        @keyup.enter="sendMessage"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- No Chat Selected -->
+                  <div v-else-if="activeTab === 'chats' && !selectedChat" class="empty-state">
+                    <v-icon size="64" color="grey-lighten-1">mdi-chat-outline</v-icon>
+                    <h3 class="empty-title">No chat selected</h3>
+                    <p class="empty-description">Select a chat from the sidebar or create a new one</p>
+                    <v-btn color="primary" rounded="lg" @click="openNewChatDialog">
+                      <v-icon class="mr-2">mdi-chat-plus</v-icon>
+                      Create New Chat
+                    </v-btn>
+                  </div>
+
+                  <!-- Team Member Details -->
+                  <div v-if="activeTab === 'contacts' && selectedMember" class="member-details">
+                    <div class="member-header">
+                      <div class="member-avatar-large">
+                        <img v-if="selectedMember.avatar" :src="selectedMember.avatar" :alt="selectedMember.name" />
+                        <v-icon v-else size="40" color="white">mdi-account</v-icon>
+                      </div>
+                      <div class="member-info">
+                        <h3 class="member-name">{{ selectedMember.name }}</h3>
+                        <div class="member-role">{{ selectedMember.role }}</div>
+                        <v-btn
+                          color="primary"
+                          rounded="lg"
+                          size="small"
+                          class="mt-2"
+                          @click="startPrivateChat(selectedMember)"
+                        >
+                          <v-icon size="small" class="mr-1">mdi-message</v-icon>
+                          Message
+                        </v-btn>
+                      </div>
+                    </div>
+                    
+                    <div class="member-details-content">
+                      <div class="details-grid">
+                        <div class="detail-section">
+                          <h4 class="section-title">Contact Information</h4>
+                          <div class="detail-item">
+                            <v-icon size="small" color="primary">mdi-email</v-icon>
+                            <span>{{ selectedMember.email }}</span>
+                          </div>
+                          <div class="detail-item">
+                            <v-icon size="small" color="primary">mdi-phone</v-icon>
+                            <span>{{ selectedMember.phone }}</span>
+                          </div>
+                        </div>
+                        
+                        <div class="detail-section">
+                          <h4 class="section-title">Work Information</h4>
+                          <div class="detail-item">
+                            <v-icon size="small" color="success">mdi-currency-usd</v-icon>
+                            <span>${{ selectedMember.payment }}/month</span>
+                            <v-btn
+                              icon
+                              size="x-small"
+                              variant="text"
+                              @click="openEditPaymentDialog(selectedMember)"
+                            >
+                              <v-icon size="small">mdi-pencil</v-icon>
+                            </v-btn>
+                          </div>
+                          <div class="detail-item">
+                            <v-icon size="small" color="warning">mdi-briefcase</v-icon>
+                            <span>{{ selectedMember.currentProject }}</span>
+                            <v-btn
+                              icon
+                              size="x-small"
+                              variant="text"
+                              @click="openEditProjectDialog(selectedMember)"
+                            >
+                              <v-icon size="small">mdi-pencil</v-icon>
+                            </v-btn>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="skills-section">
+                        <h4 class="section-title">Skills</h4>
+                        <div class="skills-container">
+                          <v-chip
+                            v-for="(skill, index) in selectedMember.skills"
+                            :key="index"
+                            size="small"
+                            color="primary"
+                            variant="tonal"
+                            class="mr-1 mb-1"
+                          >
+                            {{ skill }}
+                          </v-chip>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- No Member Selected -->
+                  <div v-else-if="activeTab === 'contacts' && !selectedMember" class="empty-state">
+                    <v-icon size="64" color="grey-lighten-1">mdi-account-group-outline</v-icon>
+                    <h3 class="empty-title">No team member selected</h3>
+                    <p class="empty-description">Select a team member from the sidebar to view details</p>
+                    <v-btn color="primary" rounded="lg" @click="openAddMemberDialog">
+                      <v-icon class="mr-2">mdi-account-plus</v-icon>
+                      Add New Member
+                    </v-btn>
+                  </div>
+                </div>
+              </v-col>
+            </v-row>
+          </div>
+        </div>
       </v-container>
     </v-main>
-  
+
     <!-- New Chat Dialog -->
     <v-dialog
       v-model="newChatDialog"
       max-width="500px"
       fullscreen-breakpoint="sm"
     >
-      <v-card>
-        <v-card-title class="text-h5 bg-teal text-white pa-4">
-          Create New Chat
+      <v-card rounded="xl" flat border>
+        <v-card-title class="hero-modal-header pa-6">
+          <div class="modal-title">
+            <v-icon class="mr-3" color="white">mdi-chat-plus</v-icon>
+            Create New Chat
+          </div>
         </v-card-title>
           
-        <v-card-text class="pa-4 pt-6">
-          <v-form
-            ref="chatForm"
-            v-model="isFormValid"
-          >
+        <v-card-text class="pa-6">
+          <v-form ref="chatForm" v-model="isFormValid">
             <v-text-field
               v-model="newChatName"
               label="Chat Name"
+              variant="outlined"
               required
               :rules="[v => !!v || 'Chat name is required']"
             />
-  
-            <div class="text-subtitle-1 font-weight-bold mb-2">
+
+            <div class="text-subtitle-1 font-weight-bold mb-3 mt-4">
               Select Members
             </div>
-            <v-list class="member-selection">
-              <v-list-item
+            <div class="member-selection">
+              <div
                 v-for="member in teamMembers"
                 :key="member.id"
+                class="member-select-item"
                 @click="toggleMemberSelection(member)"
               >
-                <template #prepend>
-                  <v-checkbox
-                    v-model="selectedMembers"
-                    :value="member.id"
-                    hide-details
-                    class="member-checkbox"
-                  />
-                </template>
-                <v-list-item-title>{{ member.name }}</v-list-item-title>
-                <v-list-item-subtitle>{{ member.role }}</v-list-item-subtitle>
-              </v-list-item>
-            </v-list>
+                <v-checkbox
+                  v-model="selectedMembers"
+                  :value="member.id"
+                  hide-details
+                  class="member-checkbox"
+                />
+                <div class="member-select-info">
+                  <div class="member-select-name">{{ member.name }}</div>
+                  <div class="member-select-role">{{ member.role }}</div>
+                </div>
+              </div>
+            </div>
           </v-form>
         </v-card-text>
           
-        <v-card-actions class="pa-4 flex-wrap gap-2">
-          <v-spacer class="d-none d-sm-block" />
+        <v-card-actions class="pa-6 pt-0">
+          <v-spacer />
           <v-btn 
             color="grey-darken-1" 
             variant="text" 
-            class="flex-grow-1 flex-sm-grow-0"
             @click="newChatDialog = false"
           >
             Cancel
           </v-btn>
           <v-btn 
-            color="teal" 
-            class="flex-grow-1 flex-sm-grow-0 text-white"
+            color="primary"
+            variant="elevated"
+            rounded="lg"
             :disabled="!isFormValid || selectedMembers.length === 0"
             @click="createNewChat"
           >
-            Create
+            <v-icon class="mr-2">mdi-check</v-icon>
+            Create Chat
           </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
-  
+
+    <!-- Invite Members Dialog -->
+    <v-dialog
+      v-model="inviteDialog"
+      max-width="500px"
+      fullscreen-breakpoint="sm"
+    >
+      <v-card rounded="xl" flat border>
+        <v-card-title class="hero-modal-header pa-6">
+          <div class="modal-title">
+            <v-icon class="mr-3" color="white">mdi-email-plus</v-icon>
+            Invite Team Members
+          </div>
+          <v-spacer />
+          <v-btn
+            icon
+            size="small"
+            variant="text"
+            color="white"
+            @click="inviteDialog = false"
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+
+        <v-card-text class="pa-6 text-center invite-content">
+          <div class="invite-background"></div>
+          
+          <h2 class="text-h5 font-weight-bold mb-6">
+            Invite people to your Workspace
+          </h2>
+
+          <div class="invite-options">
+            <v-btn
+              color="primary"
+              variant="elevated"
+              size="large"
+              rounded="lg"
+              class="invite-option-btn mb-4"
+              block
+              @click="openEmailInviteDialog"
+            >
+              <v-icon class="mr-2">mdi-email</v-icon>
+              Invite via Email
+            </v-btn>
+
+            <v-btn
+              color="primary"
+              variant="outlined"
+              size="large"
+              rounded="lg"
+              class="invite-option-btn"
+              block
+              @click="openPlatformInviteDialog"
+            >
+              <v-icon class="mr-2">mdi-account-search</v-icon>
+              Search & Invite from Platform
+            </v-btn>
+          </div>
+        </v-card-text>
+
+        <v-card-actions class="pa-6 pt-0">
+          <v-spacer />
+          <v-btn 
+            color="grey-darken-1" 
+            variant="text" 
+            @click="inviteDialog = false"
+          >
+            Cancel
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Email Invite Dialog -->
+    <v-dialog
+      v-model="emailInviteDialog"
+      max-width="500px"
+      fullscreen-breakpoint="sm"
+    >
+      <v-card rounded="xl" flat border>
+        <v-card-title class="hero-modal-header pa-6">
+          <div class="modal-title">
+            <v-icon class="mr-3" color="white">mdi-email</v-icon>
+            Invite via Email
+          </div>
+          <v-spacer />
+          <v-btn
+            icon
+            size="small"
+            variant="text"
+            color="white"
+            @click="emailInviteDialog = false"
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+
+        <v-card-text class="pa-6">
+          <div class="invite-background-email"></div>
+          
+          <v-form ref="emailInviteForm" v-model="isEmailInviteFormValid">
+            <v-text-field
+              v-model="emailAddresses"
+              label="Enter email addresses"
+              variant="outlined"
+              placeholder="john@example.com, jane@example.com"
+              hint="Separate multiple emails with commas"
+              persistent-hint
+              required
+              :rules="[
+                v => !!v || 'Email addresses are required',
+                v => validateEmails(v) || 'Please enter valid email addresses'
+              ]"
+            />
+
+            <v-textarea
+              v-model="inviteMessage"
+              label="Personal Message (Optional)"
+              variant="outlined"
+              rows="3"
+              placeholder="Add a personal message to your invitation..."
+              class="mt-4"
+            />
+          </v-form>
+        </v-card-text>
+
+        <v-card-actions class="pa-6 pt-0">
+          <v-btn 
+            color="grey-darken-1" 
+            variant="text" 
+            @click="emailInviteDialog = false"
+          >
+            Cancel
+          </v-btn>
+          <v-spacer />
+          <v-btn 
+            color="primary"
+            variant="elevated"
+            rounded="lg"
+            :loading="sendingInvites"
+            :disabled="!isEmailInviteFormValid || sendingInvites"
+            @click="sendEmailInvites"
+          >
+            <v-icon class="mr-2">mdi-send</v-icon>
+            Send Invites
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Platform Search Invite Dialog -->
+    <v-dialog
+      v-model="platformInviteDialog"
+      max-width="500px"
+      fullscreen-breakpoint="sm"
+    >
+      <v-card rounded="xl" flat border>
+        <v-card-title class="hero-modal-header pa-6">
+          <div class="modal-title">
+            <v-icon class="mr-3" color="white">mdi-account-search</v-icon>
+            Search & Invite
+          </div>
+          <v-spacer />
+          <v-btn
+            icon
+            size="small"
+            variant="text"
+            color="white"
+            @click="platformInviteDialog = false"
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+
+        <v-card-text class="pa-6">
+          <div class="invite-background-platform"></div>
+          
+          <h3 class="text-h6 font-weight-bold mb-4 text-center">
+            Find people to invite to your workspace
+          </h3>
+
+          <v-form ref="platformSearchForm" v-model="isPlatformSearchFormValid">
+            <div class="search-section mb-4">
+              <div class="d-flex align-center mb-3">
+                <div class="search-label">Search by Name</div>
+                <v-text-field
+                  v-model="nameSearch"
+                  variant="outlined"
+                  hide-details
+                  density="compact"
+                  placeholder="Enter full name"
+                  class="search-field"
+                />
+              </div>
+              
+              <div class="text-center my-3">
+                <v-chip size="small" variant="outlined">or</v-chip>
+              </div>
+              
+              <div class="d-flex align-center mb-4">
+                <div class="search-label">Search by Email</div>
+                <v-text-field
+                  v-model="emailSearch"
+                  variant="outlined"
+                  hide-details
+                  density="compact"
+                  placeholder="Enter email address"
+                  class="search-field"
+                />
+              </div>
+            </div>
+
+            <!-- Search Results -->
+            <div v-if="searchResults.length > 0" class="search-results">
+              <h4 class="text-subtitle-1 font-weight-bold mb-3">Search Results</h4>
+              <div class="results-list">
+                <div
+                  v-for="user in searchResults"
+                  :key="user.id"
+                  class="result-item"
+                >
+                  <div class="d-flex align-items-center">
+                    <v-avatar size="40" class="mr-3">
+                      <img v-if="user.avatar" :src="user.avatar" :alt="user.name" />
+                      <v-icon v-else color="white">mdi-account</v-icon>
+                    </v-avatar>
+                    <div class="user-info flex-grow-1">
+                      <div class="user-name">{{ user.name }}</div>
+                      <div class="user-email">{{ user.email }}</div>
+                    </div>
+                    <v-btn
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                      rounded="lg"
+                      @click="inviteUser(user)"
+                    >
+                      Invite
+                    </v-btn>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- No Results -->
+            <div v-else-if="hasSearched && searchResults.length === 0" class="no-results text-center">
+              <v-icon size="48" color="grey-lighten-1">mdi-account-search-outline</v-icon>
+              <div class="text-body-1 mt-2">No users found</div>
+              <div class="text-body-2 text-grey">Try searching with a different name or email</div>
+            </div>
+          </v-form>
+        </v-card-text>
+
+        <v-card-actions class="pa-6 pt-0">
+          <v-btn 
+            color="grey-darken-1" 
+            variant="text" 
+            @click="platformInviteDialog = false"
+          >
+            Cancel
+          </v-btn>
+          <v-spacer />
+          <v-btn 
+            color="primary"
+            variant="elevated"
+            rounded="lg"
+            :loading="searching"
+            :disabled="(!nameSearch && !emailSearch) || searching"
+            @click="searchUsers"
+          >
+            <v-icon class="mr-2">mdi-magnify</v-icon>
+            Search
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Success Snackbar -->
+    <v-snackbar
+      v-model="showSnackbar"
+      :timeout="4000"
+      color="success"
+      location="top"
+    >
+      {{ snackbarMessage }}
+      <template #actions>
+        <v-btn
+          variant="text"
+          @click="showSnackbar = false"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
+
     <!-- Edit Payment Dialog -->
     <v-dialog
       v-model="editPaymentDialog"
       max-width="400px"
       fullscreen-breakpoint="sm"
     >
-      <v-card>
-        <v-card-title class="text-h5 bg-teal text-white pa-4">
-          Update Payment
+      <v-card rounded="xl" flat border>
+        <v-card-title class="hero-modal-header pa-6">
+          <div class="modal-title">
+            <v-icon class="mr-3" color="white">mdi-currency-usd</v-icon>
+            Update Payment
+          </div>
         </v-card-title>
           
-        <v-card-text class="pa-4 pt-6">
-          <v-form
-            ref="paymentForm"
-            v-model="isPaymentFormValid"
-          >
+        <v-card-text class="pa-6">
+          <v-form ref="paymentForm" v-model="isPaymentFormValid">
             <v-text-field
               v-model="editedPayment"
               label="Monthly Payment ($)"
+              variant="outlined"
               type="number"
               required
               :rules="[
@@ -520,47 +790,49 @@
           </v-form>
         </v-card-text>
           
-        <v-card-actions class="pa-4 flex-wrap gap-2">
-          <v-spacer class="d-none d-sm-block" />
+        <v-card-actions class="pa-6 pt-0">
+          <v-spacer />
           <v-btn 
             color="grey-darken-1" 
             variant="text" 
-            class="flex-grow-1 flex-sm-grow-0"
             @click="editPaymentDialog = false"
           >
             Cancel
           </v-btn>
           <v-btn 
-            color="teal"
-            class="flex-grow-1 flex-sm-grow-0 text-white"
+            color="primary"
+            variant="elevated"
+            rounded="lg"
             :disabled="!isPaymentFormValid"
             @click="updatePayment"
           >
+            <v-icon class="mr-2">mdi-content-save</v-icon>
             Update
           </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
-  
+
     <!-- Edit Project Dialog -->
     <v-dialog
       v-model="editProjectDialog"
       max-width="400px"
       fullscreen-breakpoint="sm"
     >
-      <v-card>
-        <v-card-title class="text-h5 bg-teal text-white pa-4">
-          Change Project
+      <v-card rounded="xl" flat border>
+        <v-card-title class="hero-modal-header pa-6">
+          <div class="modal-title">
+            <v-icon class="mr-3" color="white">mdi-briefcase</v-icon>
+            Change Project
+          </div>
         </v-card-title>
           
-        <v-card-text class="pa-4 pt-6">
-          <v-form
-            ref="projectForm"
-            v-model="isProjectFormValid"
-          >
+        <v-card-text class="pa-6">
+          <v-form ref="projectForm" v-model="isProjectFormValid">
             <v-select
               v-model="editedProject"
               label="Select Project"
+              variant="outlined"
               :items="availableProjects"
               required
               :rules="[v => !!v || 'Project is required']"
@@ -568,76 +840,71 @@
           </v-form>
         </v-card-text>
           
-        <v-card-actions class="pa-4 flex-wrap gap-2">
-          <v-spacer class="d-none d-sm-block" />
+        <v-card-actions class="pa-6 pt-0">
+          <v-spacer />
           <v-btn 
             color="grey-darken-1" 
             variant="text" 
-            class="flex-grow-1 flex-sm-grow-0"
             @click="editProjectDialog = false"
           >
             Cancel
           </v-btn>
           <v-btn 
-            color="teal"
-            class="flex-grow-1 flex-sm-grow-0 text-white"
+            color="primary"
+            variant="elevated"
+            rounded="lg"
             :disabled="!isProjectFormValid"
             @click="updateProject"
           >
+            <v-icon class="mr-2">mdi-content-save</v-icon>
             Update
           </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
-  
+
     <!-- Add Member Dialog -->
     <v-dialog
       v-model="addMemberDialog"
       max-width="600px"
       fullscreen-breakpoint="sm"
     >
-      <v-card>
-        <v-card-title class="text-h5 bg-teal text-white pa-4">
-          Add New Team Member
+      <v-card rounded="xl" flat border>
+        <v-card-title class="hero-modal-header pa-6">
+          <div class="modal-title">
+            <v-icon class="mr-3" color="white">mdi-account-plus</v-icon>
+            Add New Team Member
+          </div>
         </v-card-title>
           
-        <v-card-text class="pa-4 pt-6">
-          <v-form
-            ref="memberForm"
-            v-model="isMemberFormValid"
-          >
+        <v-card-text class="pa-6">
+          <v-form ref="memberForm" v-model="isMemberFormValid">
             <v-row>
-              <v-col
-                cols="12"
-                sm="6"
-              >
+              <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="newMember.name"
                   label="Full Name"
+                  variant="outlined"
                   required
                   :rules="[v => !!v || 'Name is required']"
                 />
               </v-col>
                 
-              <v-col
-                cols="12"
-                sm="6"
-              >
+              <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="newMember.role"
                   label="Role"
+                  variant="outlined"
                   required
                   :rules="[v => !!v || 'Role is required']"
                 />
               </v-col>
                 
-              <v-col
-                cols="12"
-                sm="6"
-              >
+              <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="newMember.email"
                   label="Email"
+                  variant="outlined"
                   required
                   :rules="[
                     v => !!v || 'Email is required',
@@ -646,25 +913,21 @@
                 />
               </v-col>
                 
-              <v-col
-                cols="12"
-                sm="6"
-              >
+              <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="newMember.phone"
                   label="Phone"
+                  variant="outlined"
                   required
                   :rules="[v => !!v || 'Phone is required']"
                 />
               </v-col>
                 
-              <v-col
-                cols="12"
-                sm="6"
-              >
+              <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="newMember.payment"
                   label="Monthly Payment ($)"
+                  variant="outlined"
                   type="number"
                   required
                   :rules="[
@@ -674,13 +937,11 @@
                 />
               </v-col>
                 
-              <v-col
-                cols="12"
-                sm="6"
-              >
+              <v-col cols="12" sm="6">
                 <v-select
                   v-model="newMember.currentProject"
                   label="Current Project"
+                  variant="outlined"
                   :items="availableProjects"
                   required
                   :rules="[v => !!v || 'Project is required']"
@@ -691,6 +952,7 @@
                 <v-combobox
                   v-model="newMember.skills"
                   label="Skills"
+                  variant="outlined"
                   multiple
                   chips
                   hint="Enter skills and press Enter"
@@ -701,22 +963,23 @@
           </v-form>
         </v-card-text>
           
-        <v-card-actions class="pa-4 flex-wrap gap-2">
-          <v-spacer class="d-none d-sm-block" />
+        <v-card-actions class="pa-6 pt-0">
+          <v-spacer />
           <v-btn 
             color="grey-darken-1" 
             variant="text"
-            class="flex-grow-1 flex-sm-grow-0"
             @click="addMemberDialog = false"
           >
             Cancel
           </v-btn>
           <v-btn 
-            color="teal"
-            class="flex-grow-1 flex-sm-grow-0 text-white"
+            color="primary"
+            variant="elevated"
+            rounded="lg"
             :disabled="!isMemberFormValid"
             @click="addTeamMember"
           >
+            <v-icon class="mr-2">mdi-account-plus</v-icon>
             Add Member
           </v-btn>
         </v-card-actions>
@@ -725,8 +988,8 @@
   </v-app>
 </template>
   
-  <script>
-  import { defineComponent, ref, computed, nextTick, onMounted, watch } from 'vue';
+<script>
+import { defineComponent, ref, computed, nextTick, onMounted } from 'vue';
 import LeftMenu from '@/dashboard/LeftMenu.vue';
 import SearchBar from '@/dashboard/SearchBar.vue';
   
@@ -746,16 +1009,6 @@ export default defineComponent({
       isMobile.value = window.innerWidth < 600;
       isTablet.value = window.innerWidth >= 600 && window.innerWidth < 960;
     };
-    
-    // Menu items for navigation
-    const menuItems = [
-      { title: 'Dashboard', icon: 'mdi-view-dashboard', to: '/dashboard' },
-      { title: 'My Team', icon: 'mdi-account-group', to: '/team' },
-      { title: 'Projects', icon: 'mdi-briefcase', to: '/projects' },
-      { title: 'Tasks', icon: 'mdi-check-circle', to: '/tasks' },
-      { title: 'Calendar', icon: 'mdi-calendar', to: '/calendar' },
-      { title: 'Settings', icon: 'mdi-cog', to: '/settings' }
-    ];
     
     // Current user
     const currentUserId = 0; // Assuming 0 is the current user's ID
@@ -993,6 +1246,41 @@ export default defineComponent({
     
     // New chat dialog
     const newChatDialog = ref(false);
+
+    // Invite dialogs
+    const inviteDialog = ref(false);
+    const emailInviteDialog = ref(false);
+    const platformInviteDialog = ref(false);
+    
+    // Email invite form
+    const isEmailInviteFormValid = ref(false);
+    const emailInviteForm = ref(null);
+    const emailAddresses = ref('');
+    const inviteMessage = ref('');
+    const sendingInvites = ref(false);
+    
+    // Platform search form
+    const isPlatformSearchFormValid = ref(false);
+    const platformSearchForm = ref(null);
+    const nameSearch = ref('');
+    const emailSearch = ref('');
+    const searching = ref(false);
+    const hasSearched = ref(false);
+    const searchResults = ref([]);
+    
+    // Snackbar
+    const showSnackbar = ref(false);
+    const snackbarMessage = ref('');
+    
+    // Computed properties
+    const totalPayroll = computed(() => {
+      return teamMembers.value.reduce((total, member) => total + member.payment, 0);
+    });
+
+    const uniqueProjects = computed(() => {
+      const projects = teamMembers.value.map(member => member.currentProject);
+      return [...new Set(projects)].filter(project => project);
+    });
     
     // Computed
     const selectedChatMessages = computed(() => {
@@ -1035,10 +1323,6 @@ export default defineComponent({
     
     const selectChat = (chat) => {
       selectedChat.value = chat;
-      // On mobile or tablet, when selecting a chat, adjust the view if needed
-      if (isMobile.value || isTablet.value) {
-        activeTab.value = 'chats';
-      }
       nextTick(() => {
         scrollToBottom();
       });
@@ -1046,10 +1330,6 @@ export default defineComponent({
     
     const selectTeamMember = (member) => {
       selectedMember.value = member;
-      // On mobile or tablet, when selecting a member, adjust the view if needed
-      if (isMobile.value || isTablet.value) {
-        activeTab.value = 'contacts';
-      }
     };
 
     const scrollToBottom = () => {
@@ -1161,7 +1441,6 @@ export default defineComponent({
     
     const openChatSettingsDialog = (chat) => {
       // This would open a dialog to manage chat settings
-      // For this demo, we'll just print to console
       console.log('Chat settings for:', chat.name);
     };
     
@@ -1221,6 +1500,120 @@ export default defineComponent({
       };
       addMemberDialog.value = true;
     };
+
+    const openInviteDialog = () => {
+      inviteDialog.value = true;
+    };
+
+    const openEmailInviteDialog = () => {
+      inviteDialog.value = false;
+      emailInviteDialog.value = true;
+    };
+
+    const openPlatformInviteDialog = () => {
+      inviteDialog.value = false;
+      platformInviteDialog.value = true;
+    };
+
+    const validateEmails = (value) => {
+      if (!value) return true;
+      
+      const emails = value.split(',').map(email => email.trim());
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      
+      return emails.every(email => emailRegex.test(email));
+    };
+
+    const sendEmailInvites = async () => {
+      if (!isEmailInviteFormValid.value) return;
+      
+      sendingInvites.value = true;
+      
+      try {
+        // Split emails by commas and trim whitespace
+        const emails = emailAddresses.value.split(',').map(email => email.trim());
+        
+        // Mock API call - replace with your actual API endpoint
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Show success message
+        snackbarMessage.value = `Invitations sent successfully to ${emails.length} recipient(s)!`;
+        showSnackbar.value = true;
+        
+        // Reset form
+        emailAddresses.value = '';
+        inviteMessage.value = '';
+        emailInviteForm.value?.reset();
+        
+        // Close dialog
+        emailInviteDialog.value = false;
+      } catch (error) {
+        console.error('Error sending invites:', error);
+        snackbarMessage.value = 'Failed to send invitations. Please try again.';
+        showSnackbar.value = true;
+      } finally {
+        sendingInvites.value = false;
+      }
+    };
+
+    const searchUsers = async () => {
+      if (!nameSearch.value && !emailSearch.value) return;
+      
+      searching.value = true;
+      hasSearched.value = true;
+      
+      try {
+        // Mock API call - replace with your actual search endpoint
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Mock search results
+        const mockResults = [
+          {
+            id: 1,
+            name: 'Alex Thompson',
+            email: 'alex.thompson@example.com',
+            avatar: 'https://i.pravatar.cc/150?img=7'
+          },
+          {
+            id: 2,
+            name: 'Sarah Wilson',
+            email: 'sarah.wilson@example.com',
+            avatar: 'https://i.pravatar.cc/150?img=8'
+          }
+        ];
+        
+        // Filter results based on search criteria
+        searchResults.value = mockResults.filter(user => 
+          (nameSearch.value && user.name.toLowerCase().includes(nameSearch.value.toLowerCase())) ||
+          (emailSearch.value && user.email.toLowerCase().includes(emailSearch.value.toLowerCase()))
+        );
+        
+      } catch (error) {
+        console.error('Error searching users:', error);
+        snackbarMessage.value = 'Failed to search users. Please try again.';
+        showSnackbar.value = true;
+      } finally {
+        searching.value = false;
+      }
+    };
+
+    const inviteUser = async (user) => {
+      try {
+        // Mock API call to invite specific user
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        snackbarMessage.value = `Invitation sent to ${user.name}!`;
+        showSnackbar.value = true;
+        
+        // Remove user from search results
+        searchResults.value = searchResults.value.filter(u => u.id !== user.id);
+        
+      } catch (error) {
+        console.error('Error inviting user:', error);
+        snackbarMessage.value = 'Failed to send invitation. Please try again.';
+        showSnackbar.value = true;
+      }
+    };
     
     const addTeamMember = () => {
       if (!isMemberFormValid.value) return;
@@ -1246,30 +1639,7 @@ export default defineComponent({
     // Window resize handler for responsive layout
     const handleResize = () => {
       updateResponsiveState();
-      adjustViewForScreenSize();
     };
-    
-    // Adjust view based on screen size
-    const adjustViewForScreenSize = () => {
-      // On mobile, if sidebar is open, we might want to close it
-      // This would depend on your specific implementation
-      
-      // Adjust heights of messages container based on screen size
-      if (messagesContainer.value) {
-        if (isMobile.value) {
-          messagesContainer.value.style.height = '350px';
-        } else if (isTablet.value) {
-          messagesContainer.value.style.height = '400px';
-        } else {
-          messagesContainer.value.style.height = 'calc(100% - 130px)';
-        }
-      }
-    };
-    
-    // Watch for responsive changes and update UI
-    watch([isMobile, isTablet], () => {
-      adjustViewForScreenSize();
-    });
     
     // Lifecycle hooks
     onMounted(() => {
@@ -1281,16 +1651,12 @@ export default defineComponent({
       if (chats.value.length > 0 && !selectedChat.value) {
         selectChat(chats.value[0]);
       }
-      
-      // Initial adjustment
-      adjustViewForScreenSize();
     });
     
     return {
       // Data
       isMobile,
       isTablet,
-      menuItems,
       activeTab,
       chats,
       messages,
@@ -1300,6 +1666,11 @@ export default defineComponent({
       selectedMember,
       messagesContainer,
       currentUserId,
+      
+      // Computed
+      totalPayroll,
+      uniqueProjects,
+      selectedChatMessages,
       
       // Forms
       isFormValid,
@@ -1330,9 +1701,31 @@ export default defineComponent({
       
       // New chat dialog
       newChatDialog,
+
+      // Invite dialogs
+      inviteDialog,
+      emailInviteDialog,
+      platformInviteDialog,
       
-      // Computed
-      selectedChatMessages,
+      // Email invite form
+      isEmailInviteFormValid,
+      emailInviteForm,
+      emailAddresses,
+      inviteMessage,
+      sendingInvites,
+      
+      // Platform search form
+      isPlatformSearchFormValid,
+      platformSearchForm,
+      nameSearch,
+      emailSearch,
+      searching,
+      hasSearched,
+      searchResults,
+      
+      // Snackbar
+      showSnackbar,
+      snackbarMessage,
       
       // Methods
       formatTime,
@@ -1352,7 +1745,14 @@ export default defineComponent({
       openEditProjectDialog,
       updateProject,
       openAddMemberDialog,
-      addTeamMember
+      addTeamMember,
+      openInviteDialog,
+      openEmailInviteDialog,
+      openPlatformInviteDialog,
+      validateEmails,
+      sendEmailInvites,
+      searchUsers,
+      inviteUser
     };
   }
 });
@@ -1360,99 +1760,532 @@ export default defineComponent({
 
 <style scoped>
 :deep(.left-menu-component),
-  :deep(.v-navigation-drawer) {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    height: 100vh !important;
-    z-index: 999 !important;
-    overflow-y: hidden !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-  }
- :deep(.v-navigation-drawer--rail) {
-    width: 72px ;
-  }
-  
-  :deep(.v-navigation-drawer:not(.v-navigation-drawer--rail)) {
-    width: 240px !important;
-  }
+:deep(.v-navigation-drawer) {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  height: 100vh !important;
+  z-index: 999 !important;
+  overflow-y: hidden !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
 
+:deep(.v-navigation-drawer--rail) {
+  width: 72px;
+}
 
-.app-container {
+:deep(.v-navigation-drawer:not(.v-navigation-drawer--rail)) {
+  width: 240px !important;
+}
+
+/* Main Layout - Same as Design Tools */
+.main-content {
+  background: linear-gradient(135deg, #064E47 0%, #0D7C66 50%, #41B3A2 100%);
+  min-height: 100vh;
+}
+
+/* Hero Section - Same as Design Tools */
+.hero-section {
+  background: linear-gradient(135deg, #064E47 0%, #0D7C66 50%, #41B3A2 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.05"><circle cx="30" cy="30" r="2"/></g></svg>');
+  pointer-events: none;
+}
+
+.hero-content {
   display: flex;
-  height: 100vh;
-  overflow: hidden;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+  position: relative;
+  z-index: 1;
 }
 
-.content-container {
+.title-section {
   flex: 1;
-  padding: 20px;
-  background-color: #f5f5f5;
-  overflow-y: auto;
+  min-width: 300px;
 }
 
-.my-team-page {
-  width: 100%;
-  max-width: 1300px;
-  margin: 0 auto;
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: white;
+  margin: 0;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
 }
 
-/* Cards */
-.sidebar-card, .chat-card, .member-details, .empty-state {
-  border-radius: 8px;
+.gradient-text {
+  background: linear-gradient(45deg, #FFD700, #FFA726);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-subtitle {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 1rem 0 0 0;
+  font-weight: 400;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.hero-btn {
+  background: white !important;
+  color: #0D7C66 !important;
+  font-weight: 600;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.hero-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+}
+
+/* Content Container - Same as Design Tools */
+.content-container {
+  background: #f8fafc;
+  margin-top: -2rem;
+  border-radius: 2rem 2rem 0 0;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Tool Sections - Same as Design Tools */
+.tool-section {
+  margin-bottom: 3rem;
+}
+
+.tool-section:last-child {
+  margin-bottom: 0;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.section-icon {
+  font-size: 1.8rem;
+}
+
+.section-heading {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.count-chip {
+  font-weight: 600;
+}
+
+.section-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Team Overview Grid */
+.team-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.overview-item {
+  position: relative;
+}
+
+.overview-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #e2e8f0;
+  height: 100%;
+  position: relative;
   overflow: hidden;
-  height: 650px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1) !important;
 }
 
-@media (max-width: 960px) {
-  .sidebar-card, .chat-card, .member-details, .empty-state {
-    height: auto;
-    min-height: 400px;
-    margin-bottom: 16px;
-  }
+.overview-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, transparent 0%, rgba(6, 78, 71, 0.08) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-.sidebar-card {
+.overview-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border-color: #0D7C66;
+}
+
+.overview-card:hover::before {
+  opacity: 1;
+}
+
+.overview-icon-wrapper {
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.active-chats-icon {
+  background: linear-gradient(135deg, #0D7C66, #41B3A2);
+}
+
+.team-members-icon {
+  background: linear-gradient(135deg, #3B82F6, #60A5FA);
+}
+
+.total-payroll-icon {
+  background: linear-gradient(135deg, #10B981, #34D399);
+}
+
+.active-projects-icon {
+  background: linear-gradient(135deg, #F59E0B, #FBBF24);
+}
+
+.overview-card:hover .overview-icon-wrapper {
+  transform: scale(1.05);
+}
+
+.overview-icon {
+  font-size: 1.5rem;
+}
+
+.overview-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.overview-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #64748b;
+  margin: 0 0 0.5rem 0;
+}
+
+.overview-amount {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.25rem 0;
+}
+
+.overview-description {
+  font-size: 0.875rem;
+  color: #94a3b8;
+}
+
+/* Workspace Container */
+.workspace-container {
   width: 100%;
 }
 
-/* Chat List */
-.chat-item, .contact-item {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  transition: background-color 0.2s;
+/* Workspace Sidebar */
+.workspace-sidebar {
+  background: white;
+  border-radius: 1rem;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  height: 600px;
+  display: flex;
+  flex-direction: column;
 }
 
-.chat-item:hover, .contact-item:hover {
-  background-color: rgba(0, 0, 0, 0.03);
+.sidebar-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
 }
 
-.chat-item.v-list-item--active {
-  background-color: rgba(0, 128, 128, 0.05);
+.sidebar-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 }
 
-/* Chat Messages */
-.chat-messages {
-  padding: 16px;
+.sidebar-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+  color: #64748b;
+  transition: all 0.3s ease;
+  background: white;
+  border: 1px solid #e2e8f0;
+}
+
+.sidebar-tab.active {
+  background: linear-gradient(135deg, #0D7C66, #41B3A2);
+  color: white;
+  border-color: #0D7C66;
+}
+
+.sidebar-tab:hover:not(.active) {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.search-field {
+  font-size: 0.875rem;
+}
+
+.sidebar-content {
+  flex: 1;
   overflow-y: auto;
-  height: calc(100% - 130px);
-  background-color: #f9f9f9;
+  padding: 1rem;
 }
 
-@media (max-width: 960px) {
-  .chat-messages {
-    height: 400px;
-  }
+/* Chats List */
+.chats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
-@media (max-width: 600px) {
-  .chat-messages {
-    height: 300px;
-  }
+.chat-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.chat-item:hover {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.chat-item.active {
+  background: linear-gradient(135deg, rgba(13, 124, 102, 0.1), rgba(65, 179, 162, 0.1));
+  border-color: #0D7C66;
+}
+
+.chat-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, #0D7C66, #41B3A2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.chat-initials {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: white;
+}
+
+.chat-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
+}
+
+.chat-last-message {
+  font-size: 0.8125rem;
+  color: #64748b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-time {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+/* Contacts List */
+.contacts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.contact-item:hover {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.contact-item.active {
+  background: linear-gradient(135deg, rgba(13, 124, 102, 0.1), rgba(65, 179, 162, 0.1));
+  border-color: #0D7C66;
+}
+
+.contact-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, #0D7C66, #41B3A2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.contact-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.contact-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.contact-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
+}
+
+.contact-role {
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+
+/* Workspace Main */
+.workspace-main {
+  background: white;
+  border-radius: 1rem;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  height: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Chat Interface */
+.chat-interface {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.chat-header-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.chat-header-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #0D7C66, #41B3A2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-header-details {
+  flex: 1;
+}
+
+.chat-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.25rem 0;
+}
+
+.chat-members {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  background: #f8fafc;
 }
 
 .message-wrapper {
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
   display: flex;
   flex-direction: column;
 }
@@ -1466,250 +2299,522 @@ export default defineComponent({
 }
 
 .message-bubble {
-  max-width: 80%;
-  padding: 10px 14px;
-  border-radius: 16px;
-  background-color: white;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-@media (max-width: 600px) {
-  .message-bubble {
-    max-width: 90%;
-  }
+  max-width: 70%;
+  padding: 0.875rem 1rem;
+  border-radius: 1rem;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
 }
 
 .message-sent .message-bubble {
-  background-color: #e3f2fd;
-  border-top-right-radius: 4px;
+  background: linear-gradient(135deg, #0D7C66, #41B3A2);
+  color: white;
+  border-color: #0D7C66;
 }
 
 .message-received .message-bubble {
-  background-color: white;
-  border-top-left-radius: 4px;
+  background: white;
+  color: #1e293b;
+}
+
+.message-sender {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 0.25rem;
+}
+
+.message-text {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  margin-bottom: 0.25rem;
 }
 
 .message-time {
-  font-size: 12px;
-  color: rgba(0, 0, 0, 0.6);
-  margin-top: 4px;
+  font-size: 0.75rem;
+  opacity: 0.7;
+  text-align: right;
 }
 
-/* Chat Input */
 .chat-input {
-  display: flex;
-  align-items: center;
-  padding: 12px 16px;
-  background-color: white;
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
-  position: sticky;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 1;
+  padding: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  background: white;
 }
 
-/* Empty States */
+/* Empty State */
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 16px;
-  background-color: #fafafa;
+  height: 100%;
+  padding: 2rem;
+  text-align: center;
+}
+
+.empty-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 1rem 0 0.5rem 0;
+}
+
+.empty-description {
+  font-size: 1rem;
+  color: #64748b;
+  margin: 0 0 2rem 0;
 }
 
 /* Member Details */
+.member-details {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+}
+
 .member-header {
   display: flex;
   align-items: center;
-  padding: 16px;
-  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding: 2rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
 }
 
-@media (max-width: 600px) {
-  .member-header {
-    justify-content: center;
-    text-align: center;
-  }
-  
-  .member-header .v-avatar {
-    margin-bottom: 16px;
-  }
-  
-  .member-header .v-btn {
-    margin-top: 16px;
-    width: 100%;
-  }
+.member-avatar-large {
+  width: 80px;
+  height: 80px;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, #0D7C66, #41B3A2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.member-avatar-large img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.member-info {
+  flex: 1;
+}
+
+.member-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+}
+
+.member-role {
+  font-size: 1rem;
+  color: #64748b;
+  margin-bottom: 1rem;
+}
+
+.member-details-content {
+  flex: 1;
+  padding: 2rem;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.detail-section {
+  background: #f8fafc;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  border: 1px solid #e2e8f0;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 1rem 0;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+  color: #475569;
+}
+
+.detail-item:last-child {
+  margin-bottom: 0;
+}
+
+.skills-section {
+  background: #f8fafc;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  border: 1px solid #e2e8f0;
 }
 
 .skills-container {
   display: flex;
   flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
-.v-chip {
-  background-color: #e0f2f1 !important;
-  color: #00897b !important;
-  margin-right: 8px;
-  margin-bottom: 8px;
-  font-weight: 500;
+/* Modal Headers */
+.hero-modal-header {
+  background: linear-gradient(135deg, #0D7C66, #41B3A2);
+  color: white;
 }
 
-/* Dialogs */
+.modal-title {
+  display: flex;
+  align-items: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+/* Member Selection */
 .member-selection {
   max-height: 300px;
   overflow-y: auto;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
-  margin-top: 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 0.5rem;
+}
+
+.member-select-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.member-select-item:hover {
+  background: #f8fafc;
 }
 
 .member-checkbox {
-  margin-right: 8px;
+  flex-shrink: 0;
 }
 
-/* Main Layout */
-.content-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-
-/* Custom styling to match the image */
-.v-navigation-drawer {
-  border-right: none !important;
-}
-
-.v-card {
-  border: 1px solid rgba(0, 0, 0, 0.1) !important;
-  box-shadow: none !important;
-}
-
-.custom-tabs {
-  border-bottom: 1px solid transparent;
-  width: 100%;
-}
-
-.custom-tab {
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: 500;
-  color: #757575;
-  border-bottom: 2px solid transparent;
-  transition: all 0.3s ease;
+.member-select-info {
   flex: 1;
-  text-align: center;
 }
 
-.custom-tab.active {
-  color: #00897b;
-  border-bottom: 2px solid #00897b;
+.member-select-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
 }
 
-.custom-tab:hover:not(.active) {
-  color: #424242;
+.member-select-role {
+  font-size: 0.8125rem;
+  color: #64748b;
 }
 
-/* Mobile header adjustments */
-@media (max-width: 600px) {
-  .my-team-page .d-flex.justify-space-between {
+/* Animation - Same as Design Tools */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tool-section {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.tool-section:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.tool-section:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.1rem;
+  }
+  
+  .hero-content {
     flex-direction: column;
+    text-align: center;
+    gap: 2rem;
   }
   
-  .my-team-page h1 {
-    margin-bottom: 16px;
+  .team-overview-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
   
-  .my-team-page .v-btn {
-    width: 100%;
-  }
-}
-
-/* Responsive card layout */
-@media (max-width: 960px) {
-  .my-team-page {
-    margin-left: 0;
+  .section-heading {
+    font-size: 1.5rem;
   }
   
-  .sidebar-card {
-    margin-bottom: 16px;
+  .content-container {
+    margin-top: -1rem;
+    border-radius: 1.5rem 1.5rem 0 0;
   }
   
-  .chat-card, .member-details {
-    margin-top: 16px;
-  }
-}
-
-/* Responsive dialog tweaks */
-@media (max-width: 600px) {
-  .v-dialog {
-    margin: 16px;
-    width: calc(100% - 32px) !important;
-  }
-  
-  .v-card-actions {
+  .section-header {
     flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
   }
   
-  .v-card-actions .v-btn {
-    margin: 4px 0;
-    width: 100%;
+  .section-actions {
+    align-self: stretch;
+    justify-content: space-between;
   }
   
-  .v-spacer {
-    display: none;
-  }
-}
-
-/* Responsive buttons */
-@media (max-width: 600px) {
-  .v-btn.v-btn--density-default {
-    height: 40px;
-  }
-}
-
-/* User profiles section */
-.user-profiles {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-@media (max-width: 600px) {
-  .user-profiles {
-    flex-direction: row;
-    justify-content: center;
-    flex-wrap: wrap;
+  .workspace-sidebar,
+  .workspace-main {
+    height: 400px;
+    margin-bottom: 1rem;
   }
   
-  .user-profiles .v-avatar {
-    margin: 0 8px 8px 0;
+  .sidebar-tabs {
+    grid-template-columns: 1fr 1fr;
   }
-}
-
-/* Menu adjustments for mobile */
-@media (max-width: 960px) {
-  .app-container {
+  
+  .details-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .member-header {
     flex-direction: column;
+    text-align: center;
+    gap: 1rem;
   }
   
-  .left-menu {
-    width: 100%;
-    height: auto;
-    flex-direction: row;
-    overflow-x: auto;
-    justify-content: flex-start;
-    padding: 8px;
+  .member-avatar-large {
+    width: 60px;
+    height: 60px;
   }
   
-  .left-menu .v-list {
-    display: flex;
-    flex-direction: row;
+  .member-name {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2rem;
   }
   
-  .left-menu .v-list-item {
-    margin: 0 8px;
+  .overview-card {
+    padding: 1rem;
+  }
+  
+  .overview-icon-wrapper {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .overview-icon {
+    font-size: 1.25rem;
+  }
+  
+  .overview-amount {
+    font-size: 1.5rem;
+  }
+  
+  .workspace-sidebar,
+  .workspace-main {
+    height: 350px;
+  }
+  
+  .sidebar-header {
+    padding: 1rem;
+  }
+  
+  .sidebar-content {
+    padding: 0.75rem;
+  }
+  
+  .chat-header {
+    padding: 1rem;
+  }
+  
+  .chat-messages {
+    padding: 1rem;
+  }
+  
+  .chat-input {
+    padding: 1rem;
+  }
+  
+  .member-details-content {
+    padding: 1rem;
+  }
+  
+  .detail-section,
+  .skills-section {
+    padding: 1rem;
+  }
+}
+
+/* Invite Dialog Styles */
+.invite-content {
+  position: relative;
+}
+
+.invite-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 25% 60%, rgba(255, 236, 153, 0.3) 0%, transparent 50%), 
+              radial-gradient(circle at 50% 30%, rgba(144, 238, 219, 0.3) 0%, transparent 50%),
+              radial-gradient(circle at 75% 60%, rgba(255, 182, 193, 0.3) 0%, transparent 50%);
+  border-radius: 1rem;
+  z-index: -1;
+}
+
+.invite-background-email {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 30% 40%, rgba(13, 124, 102, 0.1) 0%, transparent 50%), 
+              radial-gradient(circle at 70% 60%, rgba(65, 179, 162, 0.1) 0%, transparent 50%);
+  border-radius: 1rem;
+  z-index: -1;
+}
+
+.invite-background-platform {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 40% 30%, rgba(59, 130, 246, 0.1) 0%, transparent 50%), 
+              radial-gradient(circle at 60% 70%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+  border-radius: 1rem;
+  z-index: -1;
+}
+
+.invite-options {
+  position: relative;
+  z-index: 1;
+}
+
+.invite-option-btn {
+  font-weight: 600;
+  height: 56px;
+}
+
+/* Search Section */
+.search-section {
+  position: relative;
+  z-index: 1;
+}
+
+.search-label {
+  width: 140px;
+  text-align: right;
+  margin-right: 1rem;
+  font-weight: 500;
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.search-field {
+  flex: 1;
+}
+
+/* Search Results */
+.search-results {
+  margin-top: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.results-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.result-item {
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  margin-bottom: 0.75rem;
+  background: white;
+  transition: all 0.3s ease;
+}
+
+.result-item:hover {
+  border-color: #0D7C66;
+  box-shadow: 0 4px 12px rgba(13, 124, 102, 0.1);
+}
+
+.result-item:last-child {
+  margin-bottom: 0;
+}
+
+.user-info {
+  min-width: 0;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
+}
+
+.user-email {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.no-results {
+  margin-top: 2rem;
+  padding: 2rem;
+  position: relative;
+  z-index: 1;
+}
+@media (max-width: 600px) {
+  .chat-item,
+  .contact-item {
+    padding: 1.25rem 1rem;
+  }
+  
+  .sidebar-tab {
+    padding: 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .member-select-item {
+    padding: 1rem;
   }
 }
 </style>
