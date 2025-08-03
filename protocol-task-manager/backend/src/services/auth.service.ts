@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { User, IUser } from '../models/user.model';
@@ -250,19 +250,14 @@ export class AuthService {
   }
 
   private generateToken(userId: string): string {
-    return jwt.sign(
-      { userId }, 
-      this.JWT_SECRET, 
-      { expiresIn: this.JWT_EXPIRES_IN }
-    );
+    const secret = this.JWT_SECRET || 'fallback-secret';
+    const expiresIn = this.JWT_EXPIRES_IN || '24h';
+    return jwt.sign({ userId }, secret, { expiresIn });
   }
 
   private generateTempToken(userId: string): string {
-    return jwt.sign(
-      { userId, temp: true }, 
-      this.JWT_SECRET, 
-      { expiresIn: '5m' }
-    );
+    const secret = this.JWT_SECRET || 'fallback-secret';
+    return jwt.sign({ userId, temp: true }, secret, { expiresIn: '5m' });
   }
 
   public async validateToken(token: string) {

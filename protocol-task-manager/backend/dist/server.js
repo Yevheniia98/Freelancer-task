@@ -24,6 +24,7 @@ const task_routes_1 = __importDefault(require("./routes/task.routes"));
 const team_routes_1 = __importDefault(require("./routes/team.routes"));
 const finance_routes_1 = __importDefault(require("./routes/finance.routes"));
 const settings_routes_1 = __importDefault(require("./routes/settings.routes"));
+const project_integration_routes_1 = __importDefault(require("./routes/project.integration.routes"));
 // Import middleware
 const error_middleware_1 = require("./middleware/error.middleware");
 const notFound_middleware_1 = require("./middleware/notFound.middleware");
@@ -91,6 +92,7 @@ app.use('/api/tasks', task_routes_1.default);
 app.use('/api/team', team_routes_1.default);
 app.use('/api/finance', finance_routes_1.default);
 app.use('/api/settings', settings_routes_1.default);
+app.use('/api/integrations', project_integration_routes_1.default);
 // Socket.io for real-time features
 io.on('connection', (socket) => {
     console.log('User connected:', socket.id);

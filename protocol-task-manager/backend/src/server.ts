@@ -21,6 +21,7 @@ import taskRoutes from './routes/task.routes';
 import teamRoutes from './routes/team.routes';
 import financeRoutes from './routes/finance.routes';
 import settingsRoutes from './routes/settings.routes';
+import projectIntegrationRoutes from './routes/project.integration.routes';
 
 // Import middleware
 import { errorHandler } from './middleware/error.middleware';
@@ -99,6 +100,7 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/team', teamRoutes);
 app.use('/api/finance', financeRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/integrations', projectIntegrationRoutes);
 
 // Socket.io for real-time features
 io.on('connection', (socket) => {

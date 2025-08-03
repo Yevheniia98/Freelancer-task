@@ -3,8 +3,30 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/server.js",
-    "dev": "nodemon --exec ts-node src/server.ts",
+    "start": "node dist/server.js"    "typescript": "^5.7.2"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": ["<rootDir>/src/tests/setup.ts"],
+    "testMatch": [
+      "**/__tests__/**/*.ts",
+      "**/?(*.)+(spec|test).ts"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.ts",
+      "!src/**/*.d.ts",
+      "!src/tests/**",
+      "!src/server.ts"
+    ],
+    "coverageDirectory": "coverage",
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "html"
+    ]
+  }
+}   "dev": "nodemon --exec ts-node src/server.ts",
     "serve": "nodemon --exec ts-node src/server.ts",
     "build": "tsc",
     "test": "jest",
@@ -27,7 +49,6 @@
     "@types/socket.io": "^3.0.1",
     "@types/speakeasy": "^2.0.10",
     "@types/winston": "^2.4.4",
-    "axios": "^1.11.0",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "compression": "^1.8.1",
@@ -55,7 +76,6 @@
     "xss": "^1.0.15"
   },
   "devDependencies": {
-    "@types/axios": "^0.9.36",
     "@types/compression": "^1.7.5",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
@@ -80,9 +100,7 @@
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
-    "setupFilesAfterEnv": [
-      "<rootDir>/src/tests/setup.ts"
-    ],
+    "setupFilesAfterEnv": ["<rootDir>/src/tests/setup.ts"],
     "testMatch": [
       "**/__tests__/**/*.ts",
       "**/?(*.)+(spec|test).ts"
@@ -99,5 +117,25 @@
       "lcov",
       "html"
     ]
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/compression": "^1.8.1",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/jest": "^30.0.0",
+    "@types/jsonwebtoken": "^8.5.9",
+    "@types/morgan": "^1.9.10",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^24.1.0",
+    "@types/nodemailer": "^6.4.17",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/parser": "^8.38.0",
+    "eslint": "^9.32.0",
+    "jest": "^30.0.5",
+    "nodemon": "^3.1.10",
+    "prettier": "^3.6.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   }
 }

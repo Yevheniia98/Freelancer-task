@@ -78,12 +78,12 @@ class PasswordValidator {
                     break;
                 }
             }
-            // Check for keyboard patterns
-            if (this.hasKeyboardPattern(password)) {
-                errors.push('Password contains keyboard patterns');
-                suggestions.push('Avoid patterns like "qwerty" or "asdf"');
-                score -= 15;
-            }
+            // Check for keyboard patterns - DISABLED
+            // if (this.hasKeyboardPattern(password)) {
+            //   errors.push('Password contains keyboard patterns');
+            //   suggestions.push('Avoid patterns like "qwerty" or "asdf"');
+            //   score -= 15;
+            // }
         }
         // User information validation
         if (opts.requireNoUserInfo && userInfo) {

@@ -1,0 +1,123 @@
+#!/bin/bash
+
+# Freelancer Integration System - Demo Script
+# This script demonstrates the API endpoints for the freelancer integration system
+
+echo "🚀 FREELANCER INTEGRATION SYSTEM - DEMO"
+echo "========================================"
+
+# Base URL
+BASE_URL="http://localhost:5000/api/integrations"
+
+# Note: Replace YOUR_JWT_TOKEN with an actual JWT token from login
+JWT_TOKEN="YOUR_JWT_TOKEN"
+
+echo ""
+echo "📋 Available API Endpoints:"
+echo "=========================="
+
+echo ""
+echo "1. 📊 Check Platform Status"
+echo "GET $BASE_URL/platforms"
+echo "curl -X GET \"$BASE_URL/platforms\" \\"
+echo "  -H \"Authorization: Bearer $JWT_TOKEN\" \\"
+echo "  -H \"Content-Type: application/json\""
+
+echo ""
+echo "2. 🔗 Connect to Upwork"
+echo "POST $BASE_URL/platforms/connect"
+echo "curl -X POST \"$BASE_URL/platforms/connect\" \\"
+echo "  -H \"Authorization: Bearer $JWT_TOKEN\" \\"
+echo "  -H \"Content-Type: application/json\" \\"
+echo "  -d '{"
+echo "    \"platform\": \"upwork\","
+echo "    \"credentials\": {"
+echo "      \"consumerKey\": \"your_upwork_consumer_key\","
+echo "      \"consumerSecret\": \"your_upwork_consumer_secret\""
+echo "    }"
+echo "  }'"
+
+echo ""
+echo "3. 📁 Get All Projects"
+echo "GET $BASE_URL/projects"
+echo "curl -X GET \"$BASE_URL/projects\" \\"
+echo "  -H \"Authorization: Bearer $JWT_TOKEN\" \\"
+echo "  -H \"Content-Type: application/json\""
+
+echo ""
+echo "4. 🔍 Filter Projects by Platform"
+echo "GET $BASE_URL/projects?platform=upwork"
+echo "curl -X GET \"$BASE_URL/projects?platform=upwork\" \\"
+echo "  -H \"Authorization: Bearer $JWT_TOKEN\" \\"
+echo "  -H \"Content-Type: application/json\""
+
+echo ""
+echo "5. 🌐 Get External Projects Only"
+echo "GET $BASE_URL/projects/external"
+echo "curl -X GET \"$BASE_URL/projects/external\" \\"
+echo "  -H \"Authorization: Bearer $JWT_TOKEN\" \\"
+echo "  -H \"Content-Type: application/json\""
+
+echo ""
+echo "6. ⚡ Sync Projects from Platforms"
+echo "POST $BASE_URL/projects/sync"
+echo "curl -X POST \"$BASE_URL/projects/sync\" \\"
+echo "  -H \"Authorization: Bearer $JWT_TOKEN\" \\"
+echo "  -H \"Content-Type: application/json\" \\"
+echo "  -d '{"
+echo "    \"platforms\": [\"upwork\"]"
+echo "  }'"
+
+echo ""
+echo "7. 📊 Get Project Statistics"
+echo "GET $BASE_URL/projects/stats"
+echo "curl -X GET \"$BASE_URL/projects/stats\" \\"
+echo "  -H \"Authorization: Bearer $JWT_TOKEN\" \\"
+echo "  -H \"Content-Type: application/json\""
+
+echo ""
+echo "8. 🔄 Resync Individual Project"
+echo "POST $BASE_URL/projects/{PROJECT_ID}/resync"
+echo "curl -X POST \"$BASE_URL/projects/PROJECT_ID/resync\" \\"
+echo "  -H \"Authorization: Bearer $JWT_TOKEN\" \\"
+echo "  -H \"Content-Type: application/json\""
+
+echo ""
+echo "9. ❌ Disconnect from Platform"
+echo "DELETE $BASE_URL/platforms/upwork/disconnect"
+echo "curl -X DELETE \"$BASE_URL/platforms/upwork/disconnect\" \\"
+echo "  -H \"Authorization: Bearer $JWT_TOKEN\" \\"
+echo "  -H \"Content-Type: application/json\""
+
+echo ""
+echo "🧪 Testing Commands:"
+echo "===================="
+echo ""
+echo "Run all integration tests:"
+echo "npm test"
+echo ""
+echo "Run specific Upwork tests:"
+echo "npm test -- --testNamePattern=\"UpworkService\""
+echo ""
+echo "Run integration manager tests:"
+echo "npm test -- --testNamePattern=\"Integration\""
+
+echo ""
+echo "📚 Documentation:"
+echo "=================="
+echo ""
+echo "📖 Complete setup guide: ./UPWORK_INTEGRATION_GUIDE.md"
+echo "📝 Project summary: ./PROJECT_COMPLETION_SUMMARY.md"
+
+echo ""
+echo "🎯 Next Steps:"
+echo "=============="
+echo ""
+echo "1. Set up your Upwork API credentials in .env file"
+echo "2. Start the backend server: npm run dev"
+echo "3. Use the API endpoints above to test integration"
+echo "4. Follow UPWORK_INTEGRATION_GUIDE.md for detailed setup"
+
+echo ""
+echo "✅ System Status: READY FOR PRODUCTION"
+echo "========================================"
