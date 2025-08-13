@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Reset Email - Demo</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            line-height: 1.6; 
+            color: #333; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+        }
+        .email-preview { 
+            border: 2px solid #007bff; 
+            border-radius: 10px; 
+            padding: 20px; 
+            margin: 20px 0; 
+            background: #f8f9fa; 
+        }
+        .email-content {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .verification-code { 
+            background: #f4f4f4; 
+            padding: 20px; 
+            text-align: center; 
+            margin: 20px 0; 
+            border-radius: 5px; 
+        }
+        .code { 
+            font-size: 24px; 
+            font-weight: bold; 
+            color: #007bff; 
+            letter-spacing: 2px; 
+            margin: 10px 0; 
+        }
+        .header {
+            background: #007bff;
+            color: white;
+            padding: 15px;
+            border-radius: 5px 5px 0 0;
+            margin: -20px -20px 20px -20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>📧 Freelancer-Task Password Reset Email Preview</h1>
+    
+    <div class="email-preview">
+        <div class="header">
+            <h3>Subject: Password Reset Verification Code – Freelancer-Task</h3>
+            <p><strong>From:</strong> noreply@freelancer-task.com</p>
+            <p><strong>To:</strong> suprunjen@gmail.com</p>
+        </div>
+        
+        <div class="email-content">
+            <h2>Hello John Doe,</h2>
+            
+            <p>We received a request to reset your password for your Freelancer-Task account.</p>
+            
+            <div class="verification-code">
+                <p><strong>Your verification code is:</strong></p>
+                <div class="code">123456</div>
+            </div>
+            
+            <p>Please enter this code on the website to verify your identity.</p>
+            
+            <p>If you requested to reset your password, continue to follow the instructions on the site.<br>
+            If you did not make this request, you can safely ignore this email — your account will remain secure.</p>
+            
+            <p>Thank you,<br>
+            The Freelancer-Task Team</p>
+        </div>
+    </div>
+
+    <h2>✅ Implementation Status:</h2>
+    <ul>
+        <li>✅ <strong>Subject Line:</strong> "Password Reset Verification Code – Freelancer-Task"</li>
+        <li>✅ <strong>Personalized Greeting:</strong> Uses actual user's name from database</li>
+        <li>✅ <strong>Professional Content:</strong> Clear, concise instructions</li>
+        <li>✅ <strong>Verification Code:</strong> Prominently displayed and formatted</li>
+        <li>✅ <strong>Security Notice:</strong> Reassurance about ignoring unwanted emails</li>
+        <li>✅ <strong>Professional Signature:</strong> "The Freelancer-Task Team"</li>
+        <li>✅ <strong>HTML Formatting:</strong> Clean, responsive design</li>
+        <li>✅ <strong>Plain Text Version:</strong> Also includes text-only version for compatibility</li>
+    </ul>
+
+    <h2>🔧 How It Works:</h2>
+    <ol>
+        <li><strong>User requests password reset:</strong> Enters email on forgot password form</li>
+        <li><strong>System generates code:</strong> Creates 6-digit verification code</li>
+        <li><strong>Email sent:</strong> Uses the template above with user's actual name and code</li>
+        <li><strong>User receives email:</strong> Gets professionally formatted message</li>
+        <li><strong>User enters code:</strong> Verifies identity and proceeds with password reset</li>
+    </ol>
+
+    <div style="background: #d4edda; padding: 15px; border-radius: 5px; margin-top: 20px;">
+        <p><strong>✅ Email template has been successfully updated!</strong><br>
+        The system now sends emails exactly matching your specification.</p>
+    </div>
+</body>
+</html>

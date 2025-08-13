@@ -31,6 +31,9 @@ import SecurityPage from '@/setting/SecurityPage.vue';
 import IntegretionPage from '@/setting/IntegretionPage.vue';
 import BackUp from '@/setting/BackUp.vue';
 import SupportPage from '@/setting/SupportPage.vue';
+import IntegrationsPage from '@/integrations/IntegrationsPage.vue';
+import UpworkOAuthSuccess from '@/integrations/UpworkOAuthSuccess.vue';
+import UpworkOAuthError from '@/integrations/UpworkOAuthError.vue';
 
 const routes = [
   {
@@ -214,6 +217,25 @@ const routes = [
     component: SupportPage 
   },
 
+  // Integration routes
+  {
+    path: '/integrations',
+    name: 'Integrations',
+    component: IntegrationsPage
+  },
+
+  {
+    path: '/integrations/upwork/success',
+    name: 'UpworkOAuthSuccess',
+    component: UpworkOAuthSuccess
+  },
+
+  {
+    path: '/integrations/upwork/error',
+    name: 'UpworkOAuthError',
+    component: UpworkOAuthError
+  },
+
 ];
 
 const router = createRouter({
@@ -232,7 +254,7 @@ router.beforeEach((to, from, next) => {
     'InviteApp', 'TaskDashboard', 'FinanceDashboard', 'CalendarSection',
     'DesignTools', 'AccountSetting', 'PasswordSecurity', 'NotificationPage',
     'DataExport', 'LogOut', 'Subscription', 'Customization', 'Security',
-    'Integration', 'BackUp', 'Support'
+    'Integration', 'BackUp', 'Support', 'Integrations'
   ];
   
   // Define public routes (don't require authentication)
