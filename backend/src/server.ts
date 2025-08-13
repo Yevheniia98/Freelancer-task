@@ -1,3 +1,8 @@
+import dotenv from 'dotenv';
+
+// Load environment variables FIRST before any other imports
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -6,7 +11,6 @@ import session from 'express-session';
 import rateLimit from 'express-rate-limit';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import dotenv from 'dotenv';
 
 // Import configurations
 import { connectDB } from './config/database';
@@ -27,9 +31,6 @@ import projectIntegrationRoutes from './routes/project.integration.routes';
 // Import middleware
 import { errorHandler } from './middleware/error.middleware';
 import { notFound } from './middleware/notFound.middleware';
-
-// Load environment variables
-dotenv.config();
 
 // Create Express app
 const app = express();

@@ -10,7 +10,11 @@ class EmailService {
         // Check if real email credentials are provided
         if (process.env.SMTP_USER && process.env.SMTP_PASS &&
             process.env.SMTP_USER !== 'your-email@gmail.com' &&
-            process.env.SMTP_PASS !== 'your-app-password') {
+            process.env.SMTP_PASS !== 'your-app-password' &&
+            process.env.SMTP_PASS !== 'your-business-gmail-app-password' &&
+            process.env.SMTP_PASS !== 'your-16-character-app-password-here' &&
+            process.env.SMTP_USER.includes('@') &&
+            process.env.SMTP_PASS.length > 10) {
             // Use real email service
             this.transporter = nodemailer_1.default.createTransport({
                 host: process.env.SMTP_HOST || 'smtp.gmail.com',
