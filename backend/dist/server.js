@@ -3,6 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const dotenv_1 = __importDefault(require("dotenv"));
+// Load environment variables FIRST before any other imports
+dotenv_1.default.config();
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
@@ -11,7 +14,6 @@ const express_session_1 = __importDefault(require("express-session"));
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const http_1 = require("http");
 const socket_io_1 = require("socket.io");
-const dotenv_1 = __importDefault(require("dotenv"));
 // Import configurations
 const database_1 = require("./config/database");
 const redis_1 = require("./config/redis");
@@ -29,8 +31,6 @@ const project_integration_routes_1 = __importDefault(require("./routes/project.i
 // Import middleware
 const error_middleware_1 = require("./middleware/error.middleware");
 const notFound_middleware_1 = require("./middleware/notFound.middleware");
-// Load environment variables
-dotenv_1.default.config();
 // Create Express app
 const app = (0, express_1.default)();
 const server = (0, http_1.createServer)(app);

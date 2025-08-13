@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { EmailService } = require('./dist/services/email.service');
 
 console.log('🧪 Testing Email Service Configuration...\n');
