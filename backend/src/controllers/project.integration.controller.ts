@@ -533,14 +533,14 @@ export class ProjectIntegrationController {
       }
 
       // Redirect to frontend success page
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8084';
-      const redirectUrl = oauthSession?.redirectUrl || `${frontendUrl}/integrations/upwork/success`;
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
+      const redirectUrl = oauthSession?.redirectUrl || `${frontendUrl}/settings/integrations?success=true`;
       res.redirect(redirectUrl);
 
     } catch (error) {
       console.error('Upwork OAuth callback failed:', error);
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8084';
-      res.redirect(`${frontendUrl}/integrations/upwork/error?message=${encodeURIComponent('OAuth authentication failed')}`);
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
+      res.redirect(`${frontendUrl}/settings/integrations?success=false&message=${encodeURIComponent('OAuth authentication failed')}`);
     }
   };
 }

@@ -404,7 +404,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import LeftMenu from '@/dashboard/LeftMenu.vue'
 import SearchBar from '@/dashboard/SearchBar.vue'
 
@@ -421,6 +421,7 @@ const snackbarMessage = ref('')
 // Data
 const categories = [
   'All Categories',
+  'Freelance Platform',
   'Productivity',
   'Communication',
   'Project Management',
@@ -432,27 +433,34 @@ const categories = [
 const featuredIntegrations = ref([
   {
     id: 1,
+    name: 'Upwork',
+    description: 'Connect your Upwork account to sync projects and contracts',
+    connected: false,
+    category: 'Freelance Platform'
+  },
+  {
+    id: 2,
     name: 'Slack',
     description: 'Streamline team communication and collaboration',
     connected: true,
     category: 'Communication'
   },
   {
-    id: 2,
+    id: 3,
     name: 'Google Drive',
     description: 'Access and sync your files from anywhere',
     connected: false,
     category: 'Cloud Storage'
   },
   {
-    id: 3,
+    id: 4,
     name: 'Trello',
     description: 'Manage projects and tasks effectively',
     connected: false,
     category: 'Project Management'
   },
   {
-    id: 4,
+    id: 5,
     name: 'GitHub',
     description: 'Connect your repositories and track development',
     connected: true,
@@ -463,6 +471,14 @@ const featuredIntegrations = ref([
 const allIntegrations = ref([
   {
     id: 1,
+    name: 'Upwork',
+    company: 'Upwork Inc.',
+    description: 'Freelance platform for connecting with clients and managing projects',
+    category: 'Freelance Platform',
+    connected: false
+  },
+  {
+    id: 2,
     name: 'Slack',
     company: 'Slack Technologies',
     description: 'Team collaboration and messaging platform',
@@ -470,7 +486,7 @@ const allIntegrations = ref([
     connected: true
   },
   {
-    id: 2,
+    id: 3,
     name: 'Google Drive',
     company: 'Google',
     description: 'Cloud storage and file synchronization service',
@@ -478,7 +494,7 @@ const allIntegrations = ref([
     connected: false
   },
   {
-    id: 3,
+    id: 4,
     name: 'Trello',
     company: 'Atlassian',
     description: 'Visual project management and organization tool',
@@ -486,7 +502,7 @@ const allIntegrations = ref([
     connected: false
   },
   {
-    id: 4,
+    id: 5,
     name: 'GitHub',
     company: 'Microsoft',
     description: 'Code repository hosting and version control',
@@ -494,7 +510,7 @@ const allIntegrations = ref([
     connected: true
   },
   {
-    id: 5,
+    id: 6,
     name: 'Zoom',
     company: 'Zoom Video',
     description: 'Video conferencing and virtual meetings',
@@ -502,7 +518,7 @@ const allIntegrations = ref([
     connected: false
   },
   {
-    id: 6,
+    id: 7,
     name: 'Salesforce',
     company: 'Salesforce',
     description: 'Customer relationship management platform',
@@ -514,6 +530,7 @@ const allIntegrations = ref([
 // Methods
 const getIntegrationIcon = (name) => {
   const icons = {
+    'Upwork': 'mdi-briefcase-account',
     'Slack': 'mdi-slack',
     'Google Drive': 'mdi-google-drive',
     'Trello': 'mdi-trello',
@@ -526,6 +543,7 @@ const getIntegrationIcon = (name) => {
 
 const getIntegrationColor = (name) => {
   const colors = {
+    'Upwork': '#14a800',
     'Slack': '#4a154b',
     'Google Drive': '#4285f4',
     'Trello': '#0079bf',
@@ -537,9 +555,65 @@ const getIntegrationColor = (name) => {
 }
 
 const toggleConnection = (integration) => {
-  selectedIntegration.value = integration
-  dialogAction.value = integration.connected ? 'disconnect' : 'connect'
-  connectionDialog.value = true
+  if (integration.name === 'Upwork') {
+    // Handle Upwork OAuth flow
+    handleUpworkConnection(integration)
+  } else {
+    // Handle other integrations with dialog
+    selectedIntegration.value = integration
+    dialogAction.value = integration.connected ? 'disconnect' : 'connect'
+    connectionDialog.value = true
+  }
+}
+
+const handleUpworkConnection = async (integration) => {
+  if (integration.connected) {
+    // Disconnect Upwork
+    selectedIntegration.value = integration
+    dialogAction.value = 'disconnect'
+    connectionDialog.value = true
+  } else {
+    // Start Upwork OAuth flow
+    try {
+      const token = localStorage.getItem('auth_token')
+      console.log('Token found:', !!token)
+      console.log('Token value:', token ? token.substring(0, 20) + '...' : 'null')
+      
+      if (!token) {
+        snackbarMessage.value = 'You need to be logged in to connect integrations.'
+        successSnackbar.value = true
+        return
+      }
+      
+      const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3002/api'
+      const response = await fetch(`${apiBaseUrl}/integrations/upwork/oauth/initiate`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      
+      console.log('Response status:', response.status)
+      console.log('Response ok:', response.ok)
+      
+      if (response.ok) {
+        const data = await response.json()
+        console.log('Success data:', data)
+        // Redirect to Upwork OAuth
+        window.location.href = data.data.authUrl
+      } else {
+        const errorData = await response.json()
+        console.error('Error response:', errorData)
+        snackbarMessage.value = `Failed to connect to Upwork: ${errorData.message}`
+        successSnackbar.value = true
+      }
+    } catch (error) {
+      console.error('Error starting Upwork OAuth:', error)
+      snackbarMessage.value = 'Failed to connect to Upwork. Please try again.'
+      successSnackbar.value = true
+    }
+  }
 }
 
 const confirmConnection = async () => {
@@ -576,6 +650,58 @@ const confirmConnection = async () => {
     console.error('Error toggling connection:', error)
   }
 }
+
+const handleOAuthCallback = async () => {
+  const urlParams = new URLSearchParams(window.location.search)
+  const success = urlParams.get('success')
+  const message = urlParams.get('message')
+  
+  // Handle OAuth success/error from backend redirect
+  if (success === 'true') {
+    // Update Upwork connection status
+    const upworkFeatured = featuredIntegrations.value.find(i => i.name === 'Upwork')
+    const upworkAll = allIntegrations.value.find(i => i.name === 'Upwork')
+    
+    if (upworkFeatured) upworkFeatured.connected = true
+    if (upworkAll) upworkAll.connected = true
+    
+    snackbarMessage.value = 'Successfully connected to Upwork! Syncing your projects...'
+    successSnackbar.value = true
+    
+    // Trigger automatic sync of Upwork projects
+    try {
+      const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3002/api'
+      const response = await fetch(`${apiBaseUrl}/integrations/sync/upwork`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        }
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        snackbarMessage.value = `Successfully connected to Upwork and synced ${data.data.projectsSynced || 0} projects!`
+      }
+    } catch (error) {
+      console.error('Error syncing projects:', error)
+      snackbarMessage.value = 'Connected to Upwork but failed to sync projects. You can manually sync later.'
+    }
+    
+    // Clean up URL
+    window.history.replaceState({}, document.title, window.location.pathname)
+  } else if (success === 'false' || message) {
+    snackbarMessage.value = message || 'Failed to connect to Upwork. Please try again.'
+    successSnackbar.value = true
+    
+    // Clean up URL
+    window.history.replaceState({}, document.title, window.location.pathname)
+  }
+}
+
+onMounted(() => {
+  handleOAuthCallback()
+})
 </script>
 
 <style scoped>
