@@ -35,6 +35,19 @@
                 </v-icon>
                 Add New Project
               </v-btn>
+              <v-btn 
+                color="white"
+                variant="outlined"
+                size="large"
+                rounded="lg"
+                class="hero-btn-outline ml-3"
+                @click="syncUpworkProjects"
+              >
+                <v-icon class="mr-2">
+                  mdi-sync
+                </v-icon>
+                Sync Upwork
+              </v-btn>
             </div>
           </div>
         </v-container>
@@ -710,7 +723,7 @@
 </template>
 
 <script>
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import LeftMenu from '@/dashboard/LeftMenu.vue';
 import SearchBar from '@/dashboard/SearchBar.vue';
@@ -978,6 +991,95 @@ export default defineComponent({
       snackbar.value = true;
     };
 
+    // Upwork Integration Functions
+    const loadUpworkProjects = async () => {
+      try {
+        const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3002/api'
+        const response = await fetch(`${apiBaseUrl}/integrations/projects`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          const upworkProjects = data.data.filter(project => 
+            project.externalSource && project.externalSource.platform === 'upwork'
+          );
+          
+          // Convert Upwork projects to task format and add only new ones
+          upworkProjects.forEach(project => {
+            // Check if this project is already in our tasks (by external ID)
+            const existingTask = tasks.value.find(task => 
+              task.externalId === project.externalSource.externalId
+            );
+            
+            if (!existingTask) {
+              // Add new Upwork project as a task with 'new' status
+              const newTask = {
+                id: Date.now() + Math.random(), // Generate unique ID
+                externalId: project.externalSource.externalId,
+                platform: 'upwork',
+                title: project.title,
+                description: project.description || 'Upwork project',
+                icon: 'mdi-briefcase-account',
+                iconBg: 'rgba(20, 168, 0, 0.1)',
+                iconColor: 'green-darken-1',
+                progress: 0,
+                total: 1,
+                teamMembers: [1], // Default team member
+                date: new Date(project.createdAt).toLocaleDateString('en-US', { 
+                  day: '2-digit', 
+                  month: 'short', 
+                  year: 'numeric' 
+                }),
+                lastUpdate: 'Synced from Upwork',
+                status: 'new' // Always start as new task
+              };
+              
+              tasks.value.push(newTask);
+            }
+          });
+          
+          console.log(`Loaded ${upworkProjects.length} Upwork projects`);
+        }
+      } catch (error) {
+        console.error('Error loading Upwork projects:', error);
+      }
+    };
+
+    const syncUpworkProjects = async () => {
+      try {
+        const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3002/api'
+        const response = await fetch(`${apiBaseUrl}/integrations/sync/upwork`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          }
+        });
+        
+        if (response.ok) {
+          // Reload projects after sync
+          await loadUpworkProjects();
+          snackbarText.value = 'Upwork projects synced successfully!';
+          snackbarColor.value = 'success';
+          snackbarIcon.value = 'mdi-sync';
+          snackbar.value = true;
+        }
+      } catch (error) {
+        console.error('Error syncing Upwork projects:', error);
+        snackbarText.value = 'Failed to sync Upwork projects';
+        snackbarColor.value = 'error';
+        snackbarIcon.value = 'mdi-alert';
+        snackbar.value = true;
+      }
+    };
+
+    // Load projects on component mount
+    onMounted(() => {
+      loadUpworkProjects();
+    });
+
     return {
       teamMembers,
       tasks,
@@ -996,7 +1098,9 @@ export default defineComponent({
       onDragOver,
       onDragEnter,
       onDragLeave,
-      onDrop
+      onDrop,
+      loadUpworkProjects,
+      syncUpworkProjects
     };
   }
 });
