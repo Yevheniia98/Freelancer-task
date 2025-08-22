@@ -83,6 +83,10 @@ router.post('/sync/:platform', validatePlatformParam, controller.syncPlatform);
 router.get('/upwork/oauth/initiate', controller.initiateUpworkOAuth);
 router.get('/upwork/callback', controller.handleUpworkCallback);
 
+// OAuth routes for Freelancer
+router.get('/freelancer/oauth/initiate', controller.initiateFreelancerOAuth);
+router.get('/freelancer/callback', controller.handleFreelancerCallback);
+
 // Individual project operations
 router.post('/projects/:projectId/resync', validateProjectId, controller.resyncProject);
 

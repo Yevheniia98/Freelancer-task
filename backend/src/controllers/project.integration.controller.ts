@@ -543,4 +543,88 @@ export class ProjectIntegrationController {
       res.redirect(`${frontendUrl}/settings/integrations?success=false&message=${encodeURIComponent('OAuth authentication failed')}`);
     }
   };
+
+  // OAuth endpoints for Freelancer integration
+  initiateFreelancerOAuth = async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          message: 'Authentication required'
+        });
+      }
+
+      // For mock implementation, directly redirect to callback with mock token
+      const mockToken = 'mock_freelancer_token_' + Date.now();
+      const callbackURL = `${process.env.FRONTEND_URL || 'http://localhost:3001'}/settings/integrations?success=true&platform=freelancer&token=${mockToken}`;
+      
+      res.json({
+        success: true,
+        data: {
+          authUrl: callbackURL
+        }
+      });
+
+    } catch (error) {
+      console.error('Freelancer OAuth initiation failed:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to initiate Freelancer OAuth',
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  };
+
+  handleFreelancerCallback = async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      const { token } = req.query;
+
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          message: 'Authentication required'
+        });
+      }
+
+      if (!token) {
+        return res.status(400).json({
+          success: false,
+          message: 'Missing OAuth token'
+        });
+      }
+
+      // Create or get Freelancer service
+      const freelancerService = this.integrationManager.getFreelancerService();
+      
+      if (!freelancerService) {
+        return res.status(500).json({
+          success: false,
+          message: 'Freelancer service not available'
+        });
+      }
+
+      // Authenticate with the token
+      const success = await freelancerService.authenticate({
+        oauthToken: token as string
+      });
+
+      if (success) {
+        // Mark platform as connected
+        await this.integrationManager.connectPlatform('freelancer', userId);
+
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
+        res.redirect(`${frontendUrl}/settings/integrations?success=true&platform=freelancer`);
+      } else {
+        throw new Error('Token authentication failed');
+      }
+
+    } catch (error) {
+      console.error('Freelancer OAuth callback failed:', error);
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
+      res.redirect(`${frontendUrl}/settings/integrations?success=false&message=${encodeURIComponent('OAuth authentication failed')}`);
+    }
+  };
 }
