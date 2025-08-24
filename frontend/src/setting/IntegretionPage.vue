@@ -440,27 +440,34 @@ const featuredIntegrations = ref([
   },
   {
     id: 2,
+    name: 'Freelancer',
+    description: 'Connect your Freelancer.com account to sync projects and manage bids',
+    connected: false,
+    category: 'Freelance Platform'
+  },
+  {
+    id: 3,
     name: 'Slack',
     description: 'Streamline team communication and collaboration',
     connected: true,
     category: 'Communication'
   },
   {
-    id: 3,
+    id: 4,
     name: 'Google Drive',
     description: 'Access and sync your files from anywhere',
     connected: false,
     category: 'Cloud Storage'
   },
   {
-    id: 4,
+    id: 5,
     name: 'Trello',
     description: 'Manage projects and tasks effectively',
     connected: false,
     category: 'Project Management'
   },
   {
-    id: 5,
+    id: 6,
     name: 'GitHub',
     description: 'Connect your repositories and track development',
     connected: true,
@@ -479,6 +486,14 @@ const allIntegrations = ref([
   },
   {
     id: 2,
+    name: 'Freelancer',
+    company: 'Freelancer Technology Pty Limited',
+    description: 'Global freelancing platform for finding work and hiring professionals',
+    category: 'Freelance Platform',
+    connected: false
+  },
+  {
+    id: 3,
     name: 'Slack',
     company: 'Slack Technologies',
     description: 'Team collaboration and messaging platform',
@@ -486,7 +501,7 @@ const allIntegrations = ref([
     connected: true
   },
   {
-    id: 3,
+    id: 4,
     name: 'Google Drive',
     company: 'Google',
     description: 'Cloud storage and file synchronization service',
@@ -494,7 +509,7 @@ const allIntegrations = ref([
     connected: false
   },
   {
-    id: 4,
+    id: 5,
     name: 'Trello',
     company: 'Atlassian',
     description: 'Visual project management and organization tool',
@@ -502,7 +517,7 @@ const allIntegrations = ref([
     connected: false
   },
   {
-    id: 5,
+    id: 6,
     name: 'GitHub',
     company: 'Microsoft',
     description: 'Code repository hosting and version control',
@@ -510,7 +525,7 @@ const allIntegrations = ref([
     connected: true
   },
   {
-    id: 6,
+    id: 7,
     name: 'Zoom',
     company: 'Zoom Video',
     description: 'Video conferencing and virtual meetings',
@@ -558,6 +573,9 @@ const toggleConnection = (integration) => {
   if (integration.name === 'Upwork') {
     // Handle Upwork OAuth flow
     handleUpworkConnection(integration)
+  } else if (integration.name === 'Freelancer') {
+    // Handle Freelancer OAuth flow
+    handleFreelancerConnection(integration)
   } else {
     // Handle other integrations with dialog
     selectedIntegration.value = integration
@@ -616,6 +634,54 @@ const handleUpworkConnection = async (integration) => {
   }
 }
 
+const handleFreelancerConnection = async (integration) => {
+  if (integration.connected) {
+    // Disconnect Freelancer
+    selectedIntegration.value = integration
+    dialogAction.value = 'disconnect'
+    connectionDialog.value = true
+  } else {
+    // Start Freelancer OAuth flow
+    try {
+      const token = localStorage.getItem('auth_token')
+      console.log('Token found for Freelancer:', !!token)
+      
+      if (!token) {
+        snackbarMessage.value = 'You need to be logged in to connect integrations.'
+        successSnackbar.value = true
+        return
+      }
+      
+      const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3002/api'
+      const response = await fetch(`${apiBaseUrl}/integrations/freelancer/oauth/initiate`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      
+      console.log('Freelancer response status:', response.status)
+      
+      if (response.ok) {
+        const data = await response.json()
+        console.log('Freelancer success data:', data)
+        // Redirect to Freelancer OAuth (mock)
+        window.location.href = data.data.authUrl
+      } else {
+        const errorData = await response.json()
+        console.error('Freelancer error response:', errorData)
+        snackbarMessage.value = `Failed to connect to Freelancer: ${errorData.message}`
+        successSnackbar.value = true
+      }
+    } catch (error) {
+      console.error('Error starting Freelancer OAuth:', error)
+      snackbarMessage.value = 'Failed to connect to Freelancer. Please try again.'
+      successSnackbar.value = true
+    }
+  }
+}
+
 const confirmConnection = async () => {
   try {
     // Simulate API call
@@ -654,44 +720,53 @@ const confirmConnection = async () => {
 const handleOAuthCallback = async () => {
   const urlParams = new URLSearchParams(window.location.search)
   const success = urlParams.get('success')
+  const platform = urlParams.get('platform')
   const message = urlParams.get('message')
   
   // Handle OAuth success/error from backend redirect
   if (success === 'true') {
-    // Update Upwork connection status
-    const upworkFeatured = featuredIntegrations.value.find(i => i.name === 'Upwork')
-    const upworkAll = allIntegrations.value.find(i => i.name === 'Upwork')
+    // Update connection status for the specific platform
+    const platformName = platform === 'upwork' ? 'Upwork' : platform === 'freelancer' ? 'Freelancer' : null
     
-    if (upworkFeatured) upworkFeatured.connected = true
-    if (upworkAll) upworkAll.connected = true
-    
-    snackbarMessage.value = 'Successfully connected to Upwork! Syncing your projects...'
-    successSnackbar.value = true
-    
-    // Trigger automatic sync of Upwork projects
-    try {
-      const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3002/api'
-      const response = await fetch(`${apiBaseUrl}/integrations/sync/upwork`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
-        }
-      })
+    if (platformName) {
+      const featuredIntegration = featuredIntegrations.value.find(i => i.name === platformName)
+      const allIntegration = allIntegrations.value.find(i => i.name === platformName)
       
-      if (response.ok) {
-        const data = await response.json()
-        snackbarMessage.value = `Successfully connected to Upwork and synced ${data.data.projectsSynced || 0} projects!`
+      if (featuredIntegration) {
+        featuredIntegration.connected = true
       }
-    } catch (error) {
-      console.error('Error syncing projects:', error)
-      snackbarMessage.value = 'Connected to Upwork but failed to sync projects. You can manually sync later.'
+      if (allIntegration) {
+        allIntegration.connected = true
+      }
+      
+      snackbarMessage.value = `Successfully connected to ${platformName}! Syncing your projects...`
+      successSnackbar.value = true
+      
+      // Trigger automatic sync for the platform
+      try {
+        const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3002/api'
+        const response = await fetch(`${apiBaseUrl}/integrations/sync/${platform}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          }
+        })
+        
+        if (response.ok) {
+          const data = await response.json()
+          snackbarMessage.value = `Successfully connected to ${platformName} and synced ${data.data.projectsSynced || 0} projects!`
+        }
+      } catch (error) {
+        console.error('Error syncing projects:', error)
+        snackbarMessage.value = `Connected to ${platformName} but failed to sync projects. You can manually sync later.`
+      }
+      
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname)
     }
-    
-    // Clean up URL
-    window.history.replaceState({}, document.title, window.location.pathname)
-  } else if (success === 'false' || message) {
-    snackbarMessage.value = message || 'Failed to connect to Upwork. Please try again.'
+  } else if (success === 'false') {
+    snackbarMessage.value = message || 'Failed to connect to the platform'
     successSnackbar.value = true
     
     // Clean up URL

@@ -1,5 +1,6 @@
 import { FreelancerPlatform, PlatformService, ExternalProject } from './freelancer.service';
 import { UpworkService } from './upwork.service';
+import { FreelancerService } from './freelancer-api.service';
 import { Project, IProject, ProjectType, ProjectStatus } from '../models/project.model';
 import mongoose from 'mongoose';
 
@@ -44,10 +45,22 @@ export class FreelancerIntegrationManager {
       isActive: false
     };
 
+    const freelancerPlatform: FreelancerPlatform = {
+      name: 'freelancer',
+      apiKey: '',
+      apiSecret: '',
+      accessToken: '',
+      refreshToken: '',
+      isActive: false
+    };
+
     this.platforms.set('upwork', upworkPlatform);
     this.services.set('upwork', new UpworkService(upworkPlatform));
 
-    // TODO: Add other platforms like Freelancer.com, Fiverr, etc.
+    this.platforms.set('freelancer', freelancerPlatform);
+    this.services.set('freelancer', new FreelancerService(freelancerPlatform));
+
+    // TODO: Add other platforms like Fiverr, Guru, etc.
   }
 
   async connectPlatform(platformName: string, credentials: any): Promise<boolean> {
@@ -292,6 +305,10 @@ export class FreelancerIntegrationManager {
 
   getUpworkService(): UpworkService | null {
     return this.services.get('upwork') as UpworkService || null;
+  }
+
+  getFreelancerService(): FreelancerService | null {
+    return this.services.get('freelancer') as FreelancerService || null;
   }
 
   getPlatformService(platformName: string): PlatformService | null {

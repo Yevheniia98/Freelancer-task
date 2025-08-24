@@ -48,6 +48,19 @@
                 </v-icon>
                 Sync Upwork
               </v-btn>
+              <v-btn 
+                color="white"
+                variant="outlined"
+                size="large"
+                rounded="lg"
+                class="hero-btn-outline ml-3"
+                @click="syncFreelancerProjects"
+              >
+                <v-icon class="mr-2">
+                  mdi-sync
+                </v-icon>
+                Sync Freelancer
+              </v-btn>
             </div>
           </div>
         </v-container>
@@ -303,9 +316,25 @@
                             </v-icon>
                           </div>
                           <div class="project-info">
-                            <h4 class="project-title">
-                              {{ task.title }}
-                            </h4>
+                            <div class="project-title-row">
+                              <h4 class="project-title">
+                                {{ task.title }}
+                              </h4>
+                              <v-chip
+                                v-if="task.platform"
+                                :color="getPlatformColor(task.platform)"
+                                variant="flat"
+                                size="x-small"
+                                class="platform-chip ml-2"
+                              >
+                                <v-icon 
+                                  :icon="getPlatformIcon(task.platform)" 
+                                  size="12" 
+                                  class="mr-1"
+                                />
+                                {{ task.platform === 'upwork' ? 'Upwork' : task.platform === 'freelancer' ? 'Freelancer' : 'Local' }}
+                              </v-chip>
+                            </div>
                             <p class="project-description">
                               {{ task.description }}
                             </p>
@@ -455,9 +484,25 @@
                             </v-icon>
                           </div>
                           <div class="project-info">
-                            <h4 class="project-title">
-                              {{ task.title }}
-                            </h4>
+                            <div class="project-title-row">
+                              <h4 class="project-title">
+                                {{ task.title }}
+                              </h4>
+                              <v-chip
+                                v-if="task.platform"
+                                :color="getPlatformColor(task.platform)"
+                                variant="flat"
+                                size="x-small"
+                                class="platform-chip ml-2"
+                              >
+                                <v-icon 
+                                  :icon="getPlatformIcon(task.platform)" 
+                                  size="12" 
+                                  class="mr-1"
+                                />
+                                {{ task.platform === 'upwork' ? 'Upwork' : task.platform === 'freelancer' ? 'Freelancer' : 'Local' }}
+                              </v-chip>
+                            </div>
                             <p class="project-description">
                               {{ task.description }}
                             </p>
@@ -604,9 +649,25 @@
                             </v-icon>
                           </div>
                           <div class="project-info">
-                            <h4 class="project-title">
-                              {{ task.title }}
-                            </h4>
+                            <div class="project-title-row">
+                              <h4 class="project-title">
+                                {{ task.title }}
+                              </h4>
+                              <v-chip
+                                v-if="task.platform"
+                                :color="getPlatformColor(task.platform)"
+                                variant="flat"
+                                size="x-small"
+                                class="platform-chip ml-2"
+                              >
+                                <v-icon 
+                                  :icon="getPlatformIcon(task.platform)" 
+                                  size="12" 
+                                  class="mr-1"
+                                />
+                                {{ task.platform === 'upwork' ? 'Upwork' : task.platform === 'freelancer' ? 'Freelancer' : 'Local' }}
+                              </v-chip>
+                            </div>
                             <div class="project-status">
                               <v-chip
                                 size="small"
@@ -771,7 +832,8 @@ export default defineComponent({
         teamMembers: [1, 2, 3],
         date: '10 Jul, 2024',
         lastUpdate: '3hrs ago',
-        status: 'new'
+        status: 'new',
+        platform: null // Local project
       },
       {
         id: 2,
@@ -785,7 +847,8 @@ export default defineComponent({
         teamMembers: [2, 3, 4],
         date: '19 Jul, 2024',
         lastUpdate: '8 May',
-        status: 'new'
+        status: 'new',
+        platform: null // Local project
       },
       {
         id: 3,
@@ -799,7 +862,40 @@ export default defineComponent({
         teamMembers: [1, 2, 4],
         date: '2 Aug, 2024',
         lastUpdate: '5hrs ago',
-        status: 'new'
+        status: 'new',
+        platform: null // Local project
+      },
+      {
+        id: 100,
+        title: 'React E-commerce Website',
+        description: 'Build a modern e-commerce platform with React and Node.js',
+        icon: 'mdi-briefcase-account',
+        iconBg: 'rgba(20, 168, 0, 0.1)',
+        iconColor: 'green-darken-1',
+        progress: 0,
+        total: 1,
+        teamMembers: [1],
+        date: '20 Aug, 2025',
+        lastUpdate: 'Mock Upwork Project',
+        status: 'new',
+        platform: 'upwork',
+        externalId: 'upwork_mock_001'
+      },
+      {
+        id: 101,
+        title: 'Vue.js Dashboard Development',
+        description: 'Create a modern admin dashboard using Vue.js and Vuetify',
+        icon: 'mdi-account-tie',
+        iconBg: 'rgba(0, 123, 255, 0.1)',
+        iconColor: 'blue-darken-1',
+        progress: 0,
+        total: 1,
+        teamMembers: [1],
+        date: '21 Aug, 2025',
+        lastUpdate: 'Mock Freelancer Project',
+        status: 'new',
+        platform: 'freelancer',
+        externalId: 'freelancer_mock_001'
       },
       {
         id: 4,
@@ -1048,6 +1144,63 @@ export default defineComponent({
       }
     };
 
+    // Freelancer Integration Functions
+    const loadFreelancerProjects = async () => {
+      try {
+        const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3002/api'
+        const response = await fetch(`${apiBaseUrl}/integrations/projects?platform=freelancer`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          const freelancerProjects = data.data.filter(project => 
+            project.externalSource && project.externalSource.platform === 'freelancer'
+          );
+          
+          // Convert Freelancer projects to task format and add only new ones
+          freelancerProjects.forEach(project => {
+            // Check if this project is already in our tasks (by external ID)
+            const existingTask = tasks.value.find(task => 
+              task.externalId === project.externalSource.externalId
+            );
+            
+            if (!existingTask) {
+              // Add new Freelancer project as a task with 'new' status
+              const newTask = {
+                id: Date.now() + Math.random(), // Generate unique ID
+                externalId: project.externalSource.externalId,
+                platform: 'freelancer',
+                title: project.title,
+                description: project.description || 'Freelancer project',
+                icon: 'mdi-account-tie',
+                iconBg: 'rgba(0, 123, 255, 0.1)',
+                iconColor: 'blue-darken-1',
+                progress: 0,
+                total: 1,
+                teamMembers: [1], // Default team member
+                date: new Date(project.createdAt).toLocaleDateString('en-US', { 
+                  day: '2-digit', 
+                  month: 'short', 
+                  year: 'numeric' 
+                }),
+                lastUpdate: 'Synced from Freelancer',
+                status: 'new' // Always start as new task
+              };
+              
+              tasks.value.push(newTask);
+            }
+          });
+          
+          console.log(`Loaded ${freelancerProjects.length} Freelancer projects`);
+        }
+      } catch (error) {
+        console.error('Error loading Freelancer projects:', error);
+      }
+    };
+
     const syncUpworkProjects = async () => {
       try {
         const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3002/api'
@@ -1075,9 +1228,60 @@ export default defineComponent({
       }
     };
 
+    const syncFreelancerProjects = async () => {
+      try {
+        const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3002/api'
+        const response = await fetch(`${apiBaseUrl}/integrations/sync/freelancer`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          }
+        });
+        
+        if (response.ok) {
+          // Reload projects after sync
+          await loadFreelancerProjects();
+          snackbarText.value = 'Freelancer projects synced successfully!';
+          snackbarColor.value = 'success';
+          snackbarIcon.value = 'mdi-sync';
+          snackbar.value = true;
+        }
+      } catch (error) {
+        console.error('Error syncing Freelancer projects:', error);
+        snackbarText.value = 'Failed to sync Freelancer projects';
+        snackbarColor.value = 'error';
+        snackbarIcon.value = 'mdi-alert';
+        snackbar.value = true;
+      }
+    };
+
+    // Platform helper functions
+    const getPlatformColor = (platform) => {
+      switch (platform) {
+        case 'upwork':
+          return 'green-darken-1';
+        case 'freelancer':
+          return 'blue-darken-1';
+        default:
+          return 'grey-darken-1';
+      }
+    };
+
+    const getPlatformIcon = (platform) => {
+      switch (platform) {
+        case 'upwork':
+          return 'mdi-briefcase-account';
+        case 'freelancer':
+          return 'mdi-account-tie';
+        default:
+          return 'mdi-desktop-classic';
+      }
+    };
+
     // Load projects on component mount
     onMounted(() => {
       loadUpworkProjects();
+      loadFreelancerProjects();
     });
 
     return {
@@ -1100,7 +1304,11 @@ export default defineComponent({
       onDragLeave,
       onDrop,
       loadUpworkProjects,
-      syncUpworkProjects
+      loadFreelancerProjects,
+      syncUpworkProjects,
+      syncFreelancerProjects,
+      getPlatformColor,
+      getPlatformIcon
     };
   }
 });
@@ -1567,6 +1775,28 @@ export default defineComponent({
   color: #1e293b;
   margin: 0 0 0.5rem 0;
   line-height: 1.4;
+}
+
+.project-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.project-title-row .project-title {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.platform-chip {
+  flex-shrink: 0;
+  font-size: 0.75rem !important;
+  height: 24px !important;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
 }
 
 .project-description {
