@@ -1317,11 +1317,6 @@ export default defineComponent({
     };
 
     // Load projects on component mount
-<<<<<<< HEAD
-    onMounted(() => {
-      loadUpworkProjects();
-      loadFreelancerProjects();
-=======
     onMounted(async () => {
       try {
         const response = await ProjectApiService.getAll({ limit: 50 });
@@ -1352,7 +1347,9 @@ export default defineComponent({
       } catch (error) {
         console.error('Failed to load projects:', error);
       }
->>>>>>> a548f2c (fix create project)
+      
+      // Also load Upwork projects
+      await loadUpworkProjects();
     });
 
     return {
