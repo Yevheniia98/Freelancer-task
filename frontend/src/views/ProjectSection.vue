@@ -788,6 +788,7 @@ import { defineComponent, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import LeftMenu from '@/dashboard/LeftMenu.vue';
 import SearchBar from '@/dashboard/SearchBar.vue';
+import ProjectApiService from '@/services/projectApi.service.js';
 
 export default defineComponent({
   name: 'ProjectSection',
@@ -996,6 +997,27 @@ export default defineComponent({
       return member ? member.avatar : '';
     };
 
+    // Map backend status to frontend kanban column status
+    const mapBackendStatusToFrontend = (backendStatus) => {
+      const statusMap = {
+        'pending': 'new',
+        'in_progress': 'in-progress',
+        'completed': 'completed',
+        'cancelled': 'completed' // Treat cancelled as completed for display
+      };
+      return statusMap[backendStatus] || 'new';
+    };
+
+    // Map frontend kanban status to backend status
+    const mapFrontendStatusToBackend = (frontendStatus) => {
+      const statusMap = {
+        'new': 'pending',
+        'in-progress': 'in_progress',
+        'completed': 'completed'
+      };
+      return statusMap[frontendStatus] || 'pending';
+    };
+
     const navigateToProjectCreate = () => {
       router.push({ name: 'ProjectCreate' });
     };
@@ -1043,31 +1065,47 @@ export default defineComponent({
       }
     };
 
-    const onDrop = (event, newStatus) => {
+    const onDrop = async (event, newStatus) => {
       event.preventDefault();
       dragOverColumn.value = null;
       
       if (!draggedTask.value) return;
       
-      const taskId = parseInt(event.dataTransfer.getData('text/plain'));
-      const task = tasks.value.find(t => t.id === taskId);
+      const taskId = event.dataTransfer.getData('text/plain');
+      const task = tasks.value.find(t => t.id == taskId); // Use == for both string and number comparison
       
       if (task && task.status !== newStatus) {
         const oldStatus = task.status;
-        task.status = newStatus;
+        const backendStatus = mapFrontendStatusToBackend(newStatus);
         
-        // Update progress for completed tasks
-        if (newStatus === 'completed') {
-          task.progress = task.total || 100;
-          task.lastUpdate = 'Just completed';
-        } else if (oldStatus === 'completed') {
-          // Reset progress if moving out of completed
-          task.progress = Math.floor(task.total * 0.7); // Set to 70% when moving back
-          task.lastUpdate = 'Just updated';
+        try {
+          // Update in backend if this is a real project (has string ID from backend)
+          if (typeof task.id === 'string' && task.id.length > 10) {
+            await ProjectApiService.update(task.id, { status: backendStatus });
+          }
+          
+          // Update local state
+          task.status = newStatus;
+          
+          // Update progress for completed tasks
+          if (newStatus === 'completed') {
+            task.progress = task.total || 1;
+            task.lastUpdate = 'Just completed';
+          } else if (oldStatus === 'completed') {
+            // Reset progress if moving out of completed
+            task.progress = Math.floor((task.total || 1) * 0.7); // Set to 70% when moving back
+            task.lastUpdate = 'Just updated';
+          }
+          
+          // Show success message
+          showStatusUpdate(task.title, oldStatus, newStatus);
+        } catch (error) {
+          console.error('Failed to update project status:', error);
+          snackbarText.value = 'Failed to update project status';
+          snackbarColor.value = 'error';
+          snackbarIcon.value = 'mdi-alert';
+          snackbar.value = true;
         }
-        
-        // Show success message
-        showStatusUpdate(task.title, oldStatus, newStatus);
       }
       
       draggedTask.value = null;
@@ -1279,9 +1317,42 @@ export default defineComponent({
     };
 
     // Load projects on component mount
+<<<<<<< HEAD
     onMounted(() => {
       loadUpworkProjects();
       loadFreelancerProjects();
+=======
+    onMounted(async () => {
+      try {
+        const response = await ProjectApiService.getAll({ limit: 50 });
+        // Map API projects to kanban format
+        const apiProjects = response.data.map((project) => ({
+          id: project.id,
+          title: project.title,
+          description: project.description,
+          icon: 'mdi-pound',
+          iconBg: 'rgba(233, 30, 99, 0.1)',
+          iconColor: 'pink-darken-1',
+          progress: project.status === 'completed' ? 1 : 0,
+          total: 1,
+          teamMembers: [],
+          date: project.deadline ? new Date(project.deadline).toLocaleDateString('en-US', { 
+            day: '2-digit', 
+            month: 'short', 
+            year: 'numeric' 
+          }) : '',
+          lastUpdate: project.updatedAt ? new Date(project.updatedAt).toLocaleDateString() : '',
+          status: mapBackendStatusToFrontend(project.status)
+        }));
+        // Replace hardcoded tasks with API projects, keeping only existing demo tasks in progress/completed
+        tasks.value = [
+          ...apiProjects,
+          ...tasks.value.filter(t => ['in-progress', 'completed'].includes(t.status))
+        ];
+      } catch (error) {
+        console.error('Failed to load projects:', error);
+      }
+>>>>>>> a548f2c (fix create project)
     });
 
     return {
@@ -1807,6 +1878,7 @@ export default defineComponent({
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
 }
 

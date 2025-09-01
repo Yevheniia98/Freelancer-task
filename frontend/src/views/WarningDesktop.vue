@@ -59,8 +59,13 @@
 <script>
 export default {
   name: 'WarningDesktop',
-  emits: ['close'], // Declare the close event here
-  // Other component code...
+  emits: ['close'],
+  props: {
+    isOpen: {
+      type: Boolean,
+      default: false
+    }
+  }
 };
 </script>
 
