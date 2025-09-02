@@ -291,11 +291,11 @@
                         v-for="task in getTasksByStatus('new')"
                         :key="task.id"
                         class="project-card"
-                        :class="{ 'cursor-pointer': task.id === 1, 'dragging': draggedTask?.id === task.id }"
+                        :class="{ 'cursor-pointer': true, 'dragging': draggedTask?.id === task.id }"
                         draggable="true"
                         @dragstart="onDragStart($event, task)"
                         @dragend="onDragEnd"
-                        @click="task.id === 1 ? $router.push('/project-task') : null"
+                        @click="navigateToProjectDetail(task)"
                       >
                         <div class="drag-handle">
                           <v-icon
@@ -460,10 +460,11 @@
                         v-for="task in getTasksByStatus('in-progress')"
                         :key="task.id"
                         class="project-card"
-                        :class="{ 'dragging': draggedTask?.id === task.id }"
+                        :class="{ 'cursor-pointer': true, 'dragging': draggedTask?.id === task.id }"
                         draggable="true"
                         @dragstart="onDragStart($event, task)"
                         @dragend="onDragEnd"
+                        @click="navigateToProjectDetail(task)"
                       >
                         <div class="drag-handle">
                           <v-icon
@@ -628,10 +629,11 @@
                         v-for="task in getTasksByStatus('completed')"
                         :key="task.id"
                         class="project-card completed-project"
-                        :class="{ 'dragging': draggedTask?.id === task.id }"
+                        :class="{ 'cursor-pointer': true, 'dragging': draggedTask?.id === task.id }"
                         draggable="true"
                         @dragstart="onDragStart($event, task)"
                         @dragend="onDragEnd"
+                        @click="navigateToProjectDetail(task)"
                       >
                         <div class="drag-handle">
                           <v-icon
@@ -1022,6 +1024,16 @@ export default defineComponent({
       router.push({ name: 'ProjectCreate' });
     };
 
+    const navigateToProjectDetail = (task) => {
+      // Only navigate if it's a real project (not a demo task)
+      if (typeof task.id === 'string' && task.id.length > 10) {
+        router.push({ name: 'ProjectDetail', params: { id: task.id } });
+      } else if (task.id === 1) {
+        // Keep the old behavior for demo task with ID 1
+        router.push('/project-task');
+      }
+    };
+
     // Drag and Drop Methods
     const onDragStart = (event, task) => {
       draggedTask.value = task;
@@ -1365,6 +1377,7 @@ export default defineComponent({
       getTasksByStatus,
       getTeamMemberAvatar,
       navigateToProjectCreate,
+      navigateToProjectDetail,
       onDragStart,
       onDragEnd,
       onDragOver,

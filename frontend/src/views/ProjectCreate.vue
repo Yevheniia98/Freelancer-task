@@ -2,10 +2,7 @@
 <template>
   <v-app>
     <!-- Left Sidebar -->
-    <LeftMenu 
-      class="left-menu-component"
-      :style="{ position: 'fixed !important', zIndex: 1000 }"
-    />
+    <LeftMenu />
     <SearchBar />
 
     <!-- Main Content -->
@@ -225,7 +222,7 @@
                       </h4>
                       <div
                         class="file-upload-area"
-                        @click="triggerThumbnailUpload"
+                        @click="() => thumbnailInput.click()"
                       >
                         <div
                           v-if="!thumbnailFile"
@@ -415,7 +412,7 @@
                             variant="elevated"
                             rounded="lg"
                             class="mr-3"
-                            @click="triggerFileUpload('computer')"
+                            @click="() => computerFileInput.click()"
                           >
                             <v-icon class="mr-2">
                               mdi-laptop
@@ -426,7 +423,7 @@
                             color="primary"
                             variant="outlined"
                             rounded="lg"
-                            @click="triggerFileUpload('drive')"
+                            @click="() => computerFileInput.click()"
                           >
                             <v-icon class="mr-2">
                               mdi-google-drive
@@ -482,6 +479,7 @@
                       type="file"
                       style="display: none"
                       multiple
+                      accept=".pdf,.doc,.docx,.txt,.rtf,.odt,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.bmp,.svg,.webp,.tiff,.mp4,.avi,.mov,.wmv,.zip,.rar,.7z"
                       @change="handleFileChange"
                     >
                     <input
@@ -489,6 +487,7 @@
                       type="file"
                       style="display: none"
                       multiple
+                      accept=".pdf,.doc,.docx,.txt,.rtf,.odt,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.bmp,.svg,.webp,.tiff,.mp4,.avi,.mov,.wmv,.zip,.rar,.7z"
                       @change="handleDriveFileChange"
                     >
                   </div>
@@ -743,7 +742,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import LeftMenu from '@/dashboard/LeftMenu.vue';
 import SearchBar from '@/dashboard/SearchBar.vue';
@@ -814,6 +813,11 @@ const thumbnailInput = ref(null);
 const computerFileInput = ref(null);
 const driveFileInput = ref(null);
 
+// Component mounted
+onMounted(() => {
+  console.log('ProjectCreate component loaded and upload functionality ready');
+});
+
 // Methods
 const formatText = (format) => {
   console.log(`Applying ${format} formatting to text`);
@@ -839,22 +843,11 @@ const insertImage = () => {
   }
 };
 
-const triggerThumbnailUpload = () => {
-  thumbnailInput.value.click();
-};
-
 const handleThumbnailChange = (event) => {
   const file = event.target.files[0];
   if (file) {
     thumbnailFile.value = file;
-  }
-};
-
-const triggerFileUpload = (source) => {
-  if (source === 'computer') {
-    computerFileInput.value.click();
-  } else if (source === 'drive') {
-    driveFileInput.value.click();
+    console.log('Thumbnail file selected:', file.name);
   }
 };
 

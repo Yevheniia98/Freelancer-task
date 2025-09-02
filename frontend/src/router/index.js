@@ -12,6 +12,7 @@ import DashboardPage from '@/views/DashboardPage.vue';
 import ProjectSection from '@/views/ProjectSection.vue';
 import ProjectTaskVue from '@/views/ProjectTaskVue.vue';
 import ProjectCreate from '@/views/ProjectCreate.vue';
+import ProjectDetail from '@/views/ProjectDetail.vue';
 import ClientMain from '@/Clients Section/ClientMain.vue';
 import CreateClient from '@/Clients Section/CreateClient.vue';
 import MyTeam from '@/Clients Section/MyTeam.vue';
@@ -98,6 +99,12 @@ const routes = [
     path: '/project-create',
     name: 'ProjectCreate',
     component: ProjectCreate 
+  },
+
+  { 
+    path: '/projects/:id',
+    name: 'ProjectDetail',
+    component: ProjectDetail 
   },
 
   {
@@ -239,7 +246,7 @@ router.beforeEach((to, from, next) => {
   
   // Define routes that require authentication
   const protectedRoutes = [
-    'DashboardPage', 'ProjectSection', 'ProjectTaskVue', 'ProjectCreate',
+    'DashboardPage', 'ProjectSection', 'ProjectTaskVue', 'ProjectCreate', 'ProjectDetail',
     'ClientMain', 'CreateClient', 'MyTeam', 'InviteMember', 'InviteEmail', 
     'InviteApp', 'TaskDashboard', 'FinanceDashboard', 'CalendarSection',
     'DesignTools', 'AccountSetting', 'PasswordSecurity', 'NotificationPage',
