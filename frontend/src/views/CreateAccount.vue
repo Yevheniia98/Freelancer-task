@@ -48,6 +48,22 @@
             placeholder="Enter your email address"
             :disabled="isLoading"
           >
+
+          <label>Enter your phone number</label>
+          <input
+            v-model="phoneNumber"
+            type="tel"
+            placeholder="Enter your phone number"
+            :disabled="isLoading"
+          >
+
+          <label>Enter your country</label>
+          <input
+            v-model="country"
+            type="text"
+            placeholder="Enter your country"
+            :disabled="isLoading"
+          >
   
           <label>Create your password</label>
           <div class="password-field">
@@ -152,6 +168,8 @@
       // Form data
       const fullName = ref("");
       const email = ref("");
+      const phoneNumber = ref("");
+      const country = ref("");
       const password = ref("");
       const confirmPassword = ref("");
       const showPassword = ref(false);
@@ -230,7 +248,7 @@
 
         try {
           // Basic validation
-          if (!fullName.value || !email.value || !password.value || !confirmPassword.value) {
+          if (!fullName.value || !email.value || !phoneNumber.value || !country.value || !password.value || !confirmPassword.value) {
             errorMessage.value = {
               title: "Please fill in all fields",
               details: [],
@@ -265,6 +283,8 @@
           const response = await authAPI.register({
             fullName: fullName.value.trim(),
             email: email.value.trim(),
+            phoneNumber: phoneNumber.value.trim(),
+            country: country.value.trim(),
             password: password.value,
             confirmPassword: confirmPassword.value
           });
@@ -322,7 +342,7 @@
       // Computed property to check if form is invalid
       const isFormInvalid = computed(() => {
         // Basic field validation
-        if (!fullName.value || !email.value || !password.value || !confirmPassword.value) {
+        if (!fullName.value || !email.value || !phoneNumber.value || !country.value || !password.value || !confirmPassword.value) {
           return true;
         }
         
@@ -341,7 +361,9 @@
   
       return { 
         fullName, 
-        email, 
+        email,
+        phoneNumber,
+        country, 
         password, 
         confirmPassword, 
         showPassword, 

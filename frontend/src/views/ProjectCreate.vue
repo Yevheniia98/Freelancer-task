@@ -2,10 +2,7 @@
 <template>
   <v-app>
     <!-- Left Sidebar -->
-    <LeftMenu 
-      class="left-menu-component"
-      :style="{ position: 'fixed !important', zIndex: 1000 }"
-    />
+    <LeftMenu />
     <SearchBar />
 
     <!-- Main Content -->
@@ -225,7 +222,7 @@
                       </h4>
                       <div
                         class="file-upload-area"
-                        @click="triggerThumbnailUpload"
+                        @click="() => thumbnailInput.click()"
                       >
                         <div
                           v-if="!thumbnailFile"
@@ -415,7 +412,7 @@
                             variant="elevated"
                             rounded="lg"
                             class="mr-3"
-                            @click="triggerFileUpload('computer')"
+                            @click="() => computerFileInput.click()"
                           >
                             <v-icon class="mr-2">
                               mdi-laptop
@@ -426,7 +423,7 @@
                             color="primary"
                             variant="outlined"
                             rounded="lg"
-                            @click="triggerFileUpload('drive')"
+                            @click="() => computerFileInput.click()"
                           >
                             <v-icon class="mr-2">
                               mdi-google-drive
@@ -482,6 +479,7 @@
                       type="file"
                       style="display: none"
                       multiple
+                      accept=".pdf,.doc,.docx,.txt,.rtf,.odt,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.bmp,.svg,.webp,.tiff,.mp4,.avi,.mov,.wmv,.zip,.rar,.7z"
                       @change="handleFileChange"
                     >
                     <input
@@ -489,6 +487,7 @@
                       type="file"
                       style="display: none"
                       multiple
+                      accept=".pdf,.doc,.docx,.txt,.rtf,.odt,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.bmp,.svg,.webp,.tiff,.mp4,.avi,.mov,.wmv,.zip,.rar,.7z"
                       @change="handleDriveFileChange"
                     >
                   </div>
@@ -743,16 +742,20 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import LeftMenu from '@/dashboard/LeftMenu.vue';
 import SearchBar from '@/dashboard/SearchBar.vue';
+import { ProjectApiService } from '@/services/projectApi.service.js';
+
+const router = useRouter();
 
 // Form data
 const projectTitle = ref('');
 const thumbnailFile = ref(null);
 const description = ref('We are looking for a skilled UI/UX designer to redesign our landing page, focusing on creating a modern, visually appealing, and user-friendly experience. The design should enhance usability, highlight key elements effectively, and align with our brand identity. Your work should guide users smoothly to the call-to-action, improving engagement and conversions.\n\nRequirements:\n• Create a clean, responsive, and attractive design\n• Focus on improving structure, usability, and interactivity\n• Deliver wireframes/mockups and final design files (Figma or Adobe XD)\n• Experience with designing high-conversion landing pages is preferred');
-const priority = ref('High');
-const status = ref('In Progress');
+const priority = ref('high');
+const status = ref('pending');
 const deadline = ref('');
 const privacy = ref('Private');
 const category = ref('Designing');
@@ -771,16 +774,17 @@ const uploadedFiles = ref([]);
 
 // Options
 const priorityOptions = [
-  { title: 'High Priority', value: 'High' },
-  { title: 'Medium Priority', value: 'Medium' },
-  { title: 'Low Priority', value: 'Low' }
+  { title: 'High Priority', value: 'high' },
+  { title: 'Medium Priority', value: 'medium' },
+  { title: 'Low Priority', value: 'low' },
+  { title: 'Urgent Priority', value: 'urgent' }
 ];
 
 const statusOptions = [
-  { title: 'In Progress', value: 'In Progress' },
-  { title: 'Pending', value: 'Pending' },
-  { title: 'Completed', value: 'Completed' },
-  { title: 'On Hold', value: 'On Hold' }
+  { title: 'Pending', value: 'pending' },
+  { title: 'In Progress', value: 'in_progress' },
+  { title: 'Completed', value: 'completed' },
+  { title: 'Cancelled', value: 'cancelled' }
 ];
 
 const privacyOptions = [
@@ -809,6 +813,11 @@ const thumbnailInput = ref(null);
 const computerFileInput = ref(null);
 const driveFileInput = ref(null);
 
+// Component mounted
+onMounted(() => {
+  console.log('ProjectCreate component loaded and upload functionality ready');
+});
+
 // Methods
 const formatText = (format) => {
   console.log(`Applying ${format} formatting to text`);
@@ -834,22 +843,11 @@ const insertImage = () => {
   }
 };
 
-const triggerThumbnailUpload = () => {
-  thumbnailInput.value.click();
-};
-
 const handleThumbnailChange = (event) => {
   const file = event.target.files[0];
   if (file) {
     thumbnailFile.value = file;
-  }
-};
-
-const triggerFileUpload = (source) => {
-  if (source === 'computer') {
-    computerFileInput.value.click();
-  } else if (source === 'drive') {
-    driveFileInput.value.click();
+    console.log('Thumbnail file selected:', file.name);
   }
 };
 
@@ -917,27 +915,27 @@ const addTeamMember = () => {
   }
 };
 
-const submitProject = () => {
-  console.log({
-    projectTitle: projectTitle.value,
-    thumbnailFile: thumbnailFile.value,
-    description: description.value,
-    priority: priority.value,
-    status: status.value,
-    deadline: deadline.value,
-    privacy: privacy.value,
-    category: category.value,
-    skills: skills.value,
-    teamLead: teamLead.value,
-    teamMembers: teamMembers.value,
-    uploadedFiles: uploadedFiles.value
-  });
-  
-  showSuccessPopup.value = true;
-  
-  setTimeout(() => {
-    showSuccessPopup.value = false;
-  }, 4000);
+const submitProject = async () => {
+  try {
+    if (!projectTitle.value.trim() || !description.value.trim()) {
+      alert('Project title and description are required.');
+      return;
+    }
+    const projectData = {
+      title: projectTitle.value.trim(),
+      description: description.value.trim(),
+      priority: priority.value || 'medium',
+      status: status.value || 'pending',
+      deadline: deadline.value ? deadline.value : undefined
+    };
+    const createdProject = await ProjectApiService.create(projectData);
+    showSuccessPopup.value = true;
+    setTimeout(() => {
+      router.push('/projects');
+    }, 2000);
+  } catch (error) {
+    alert(error.message || 'Failed to create project. Please try again.');
+  }
 };
 </script>
 

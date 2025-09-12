@@ -263,23 +263,53 @@ const saving = ref(false)
 const snackbar = ref(false)
 const fileInput = ref(null)
 
-// Form data
-const formData = ref({
-  fullName: 'John Doe',
-  email: 'john.doe@example.com',
-  phoneNumber: '+1 (555) 123-4567',
-  country: 'United States'
-})
+// Load user data from localStorage
+const loadUserData = () => {
+  const userData = localStorage.getItem('user_data');
+  if (userData) {
+    const user = JSON.parse(userData);
+    return {
+      fullName: user.fullName || '',
+      email: user.email || '',
+      phoneNumber: user.phoneNumber || '',
+      country: user.country || ''
+    };
+  }
+  // Fallback to empty data if no user data found
+  return {
+    fullName: '',
+    email: '',
+    phoneNumber: '',
+    country: ''
+  };
+};
+
+// Form data - initialize with real user data
+const formData = ref(loadUserData())
 
 // File upload handler
-const handleFileUpload = (event) => {
-  const file = event.target.files[0]
+import axios from 'axios';
+
+const handleFileUpload = async (event) => {
+  const file = event.target.files[0];
   if (file) {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      profileImage.value = e.target.result
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const response = await axios.post('http://localhost:3001/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      if (response.data && response.data.path) {
+        // Set the profile image to the uploaded file URL
+        profileImage.value = response.data.path;
+      } else {
+        console.error('Upload failed: No file path returned');
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
     }
-    reader.readAsDataURL(file)
   }
 }
 
@@ -295,9 +325,27 @@ const removeProfilePicture = () => {
 const saveProfile = async () => {
   saving.value = true
   try {
+    // Update localStorage with new user data
+    const existingUserData = localStorage.getItem('user_data');
+    if (existingUserData) {
+      const userData = JSON.parse(existingUserData);
+      // Update user data with form data
+      const updatedUserData = {
+        ...userData,
+        fullName: formData.value.fullName,
+        email: formData.value.email,
+        phoneNumber: formData.value.phoneNumber,
+        country: formData.value.country
+      };
+      localStorage.setItem('user_data', JSON.stringify(updatedUserData));
+    } else {
+      // Create new user data if none exists
+      localStorage.setItem('user_data', JSON.stringify(formData.value));
+    }
+    
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000))
-    console.log('Saving profile:', formData.value)
+    console.log('Profile saved successfully:', formData.value)
     snackbar.value = true
     setTimeout(() => {
       snackbar.value = false
@@ -331,17 +379,24 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Layout */
-.main-expanded { margin-left: 240px !important; padding-left: 24px !important; }
-.main-collapsed { margin-left: 72px !important; padding-left: 24px !important; }
+/* Layout - Centered content with equal margins */
+.main-expanded { 
+  margin-left: 30px !important; /* sidebar width (240px) + 30px margin */
+  margin-right: 30px !important; 
+}
+.main-collapsed { 
+  margin-left: 102px !important; /* collapsed sidebar width (72px) + 30px margin */
+  margin-right: 30px !important; 
+}
 .transition-all { transition: all 0.3s ease; }
 
-/* Container adjustments */
+/* Container adjustments - Centered with max width */
 .container-full-width {
-  max-width: none !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
   width: 100%;
-  padding-left: 24px !important;
-  padding-right: 24px !important;
+  padding-left: 30px !important;
+  padding-right: 30px !important;
 }
 
 /* Left Menu Override */

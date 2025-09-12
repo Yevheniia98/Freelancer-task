@@ -12,6 +12,7 @@ import DashboardPage from '@/views/DashboardPage.vue';
 import ProjectSection from '@/views/ProjectSection.vue';
 import ProjectTaskVue from '@/views/ProjectTaskVue.vue';
 import ProjectCreate from '@/views/ProjectCreate.vue';
+import ProjectDetail from '@/views/ProjectDetail.vue';
 import ClientMain from '@/Clients Section/ClientMain.vue';
 import CreateClient from '@/Clients Section/CreateClient.vue';
 import MyTeam from '@/Clients Section/MyTeam.vue';
@@ -33,6 +34,7 @@ import SecurityPage from '@/setting/SecurityPage.vue';
 import IntegretionPage from '@/setting/IntegretionPage.vue';
 import BackUp from '@/setting/BackUp.vue';
 import SupportPage from '@/setting/SupportPage.vue';
+import AcceptInvite from '@/views/AcceptInvite.vue';
 
 const routes = [
   {
@@ -64,6 +66,11 @@ const routes = [
     path: '/reset-password',
     name: 'ResetPassword',
     component: ResetPassword,
+  },
+  { 
+    path: '/invite/accept',
+    name: 'AcceptInvite',
+    component: AcceptInvite,
   },
   { 
     path: '/pricing',
@@ -98,6 +105,12 @@ const routes = [
     path: '/project-create',
     name: 'ProjectCreate',
     component: ProjectCreate 
+  },
+
+  { 
+    path: '/projects/:id',
+    name: 'ProjectDetail',
+    component: ProjectDetail 
   },
 
   {
@@ -239,7 +252,7 @@ router.beforeEach((to, from, next) => {
   
   // Define routes that require authentication
   const protectedRoutes = [
-    'DashboardPage', 'ProjectSection', 'ProjectTaskVue', 'ProjectCreate',
+    'DashboardPage', 'ProjectSection', 'ProjectTaskVue', 'ProjectCreate', 'ProjectDetail',
     'ClientMain', 'CreateClient', 'MyTeam', 'InviteMember', 'InviteEmail', 
     'InviteApp', 'TaskDashboard', 'FinanceDashboard', 'CalendarSection',
     'DesignTools', 'AccountSetting', 'PasswordSecurity', 'NotificationPage',

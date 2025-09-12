@@ -194,7 +194,7 @@
               v-if="showUserMenu"
               class="dropdown-menu user-dropdown"
             >
-              <div class="dropdown-header user-header">
+              <div class="dropdown-header user-header" @click="navigateTo('/account')">
                 <div class="user-info">
                   <img
                     :src="user.avatar"
@@ -211,7 +211,7 @@
               <div class="dropdown-content">
                 <button
                   class="dropdown-item"
-                  @click="navigateTo('/profile')"
+                  @click="navigateTo('/account')"
                 >
                   <User :size="18" />
                   <span>{{ t('user.profile') }}</span>
@@ -412,6 +412,9 @@ const viewAllNotifications = () => {
 const navigateTo = (path) => {
   showUserMenu.value = false
   console.log('Navigate to:', path)
+  router.push(path).catch(err => {
+    console.error('Navigation error:', err)
+  })
 }
 
 const logout = async () => {
@@ -787,6 +790,12 @@ onUnmounted(() => {
   background: linear-gradient(135deg, #064E47 0%, #047857 100%);
   color: white;
   border-bottom: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.user-header:hover {
+  background: linear-gradient(135deg, #047857 0%, #065F46 100%);
 }
 
 .user-info {

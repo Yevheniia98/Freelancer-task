@@ -47,6 +47,7 @@
     "eslint": "^8.57.1",
     "eslint-plugin-vue": "^9.33.0",
     "eslint-webpack-plugin": "^5.0.0",
+    "nodemon": "^3.1.10",
     "sass": "^1.83.1",
     "sass-loader": "^16.0.4",
     "vue-eslint-parser": "^10.1.1",

@@ -26,14 +26,29 @@
                 {{ formatDay(event.date) }}
               </div>
             </div>
-            <div class="meeting-info">
-              <div class="event-type">
-                {{ event.type }}
-              </div>
-              <div class="event-title">
-                {{ event.title }}
-              </div>
+                      <div class="meeting-info">
+            <div class="event-type-container">
+              <span class="event-type">{{ event.type }}</span>
+              <v-chip
+                v-if="event.platform && event.meetingLink"
+                size="x-small"
+                :color="getMeetingButtonColor(event)"
+                variant="elevated"
+                class="platform-chip"
+              >
+                <v-icon size="x-small" class="mr-1">{{ getMeetingIcon(event) }}</v-icon>
+                {{ event.platform.toUpperCase() }}
+              </v-chip>
             </div>
+            <div class="event-title">
+              {{ event.title }}
+            </div>
+          </div>
+          </div>
+
+          <!-- Meeting Description -->
+          <div v-if="event.description" class="meeting-description">
+            <p class="description-text">{{ event.description }}</p>
           </div>
           
           <!-- Time Info -->
@@ -66,25 +81,59 @@
           </div>
           
           <!-- Join Button -->
-          <v-btn
+          <v-tooltip
             v-if="event.type !== 'Task'"
-            block
-            color="black"
-            class="join-btn text-white"
+            location="top"
+            :text="getMeetingTooltip(event)"
           >
-            <v-icon
-              size="small"
-              class="mr-1"
-            >
-              mdi-video
-            </v-icon>
-            Join Meeting
-          </v-btn>
+            <template #activator="{ props }">
+              <a
+                v-if="event.meetingLink"
+                :href="event.meetingLink"
+                class="meeting-link-wrapper"
+                @click="joinMeeting(event)"
+              >
+                <v-btn
+                  v-bind="props"
+                  block
+                  :color="getMeetingButtonColor(event)"
+                  class="join-btn text-white"
+                  :loading="joiningMeeting === event.id"
+                  tag="div"
+                >
+                  <v-icon
+                    size="small"
+                    class="mr-1"
+                  >
+                    {{ getMeetingIcon(event) }}
+                  </v-icon>
+                  {{ getMeetingButtonText(event) }}
+                </v-btn>
+              </a>
+              <v-btn
+                v-else
+                v-bind="props"
+                block
+                :color="getMeetingButtonColor(event)"
+                class="join-btn text-white"
+                disabled
+              >
+                <v-icon
+                  size="small"
+                  class="mr-1"
+                >
+                  {{ getMeetingIcon(event) }}
+                </v-icon>
+                {{ getMeetingButtonText(event) }}
+              </v-btn>
+            </template>
+          </v-tooltip>
           <v-btn
             v-else
             block
-            color="black"
+            color="success"
             class="join-btn text-white"
+            @click="completeTask(event)"
           >
             <v-icon
               size="small"
@@ -93,6 +142,24 @@
               mdi-check
             </v-icon>
             Complete Task
+          </v-btn>
+          
+          <!-- Delete Button for All Event Types -->
+          <v-btn
+            icon
+            size="small"
+            color="error"
+            variant="text"
+            class="delete-btn"
+            @click="deleteEvent(event.id)"
+          >
+            <v-icon size="small">mdi-delete</v-icon>
+            <v-tooltip
+              activator="parent"
+              location="top"
+            >
+              Delete reminder
+            </v-tooltip>
           </v-btn>
         </div>
       </div>
@@ -115,30 +182,32 @@
     <!-- Middle Column - Create Reminder -->
     <div class="reminder-create">
       <!-- User Info -->
-      <div class="user-info">
+      <div class="user-info d-flex align-center mb-4">
         <v-avatar
-          size="36"
-          class="mr-2"
+          size="40"
+          class="mr-3"
         >
           <v-img :src="userAvatar" />
         </v-avatar>
-        <span class="user-name">me ({{ userName }})</span>
+        <span class="user-name text-h6">{{ userName }} (You)</span>
       </div>
 
       <!-- Event Type Selection -->
-      <div class="event-type-toggle">
+      <div class="event-type-toggle mb-4">
         <v-btn-toggle
           v-model="eventType"
           mandatory
           rounded="pill"
           density="comfortable"
-          color="teal"
+          color="primary"
+          class="mb-4"
         >
           <v-btn
             value="event"
             variant="text"
             class="event-btn"
           >
+            <v-icon left size="small">mdi-calendar</v-icon>
             Event
           </v-btn>
           <v-btn
@@ -146,6 +215,7 @@
             variant="text"
             class="event-btn"
           >
+            <v-icon left size="small">mdi-clipboard-check</v-icon>
             Task
           </v-btn>
           <v-btn
@@ -153,6 +223,7 @@
             variant="text"
             class="event-btn"
           >
+            <v-icon left size="small">mdi-video</v-icon>
             Meet
           </v-btn>
         </v-btn-toggle>
@@ -163,127 +234,189 @@
         v-model="newEvent.title"
         placeholder="Add title"
         variant="outlined"
-        density="compact"
+        density="comfortable"
         hide-details
-        class="title-input"
+        class="title-input mb-4"
+        prepend-inner-icon="mdi-format-title"
       />
 
-      <!-- Date and Time Section -->
+      <!-- Enhanced Date and Time Section -->
       <v-card
-        class="reminder-section"
-        variant="outlined"
+        class="reminder-section mb-4 elevation-4"
+        style="border-radius: 15px; background: linear-gradient(145deg, #f8f9ff 0%, #e3f2fd 100%);"
       >
-        <div class="section-header">
-          <v-icon
-            size="small"
-            class="mr-2"
-          >
-            mdi-clock-outline
-          </v-icon>
-          <span class="section-title">Date and time</span>
-        </div>
-
-        <!-- Date Selection -->
-        <div class="input-row">
-          <div class="input-label">
-            On
+        <v-card-title class="pa-4 pb-2">
+          <div class="d-flex align-center">
+            <v-icon
+              color="primary"
+              class="mr-3"
+              size="24"
+            >
+              mdi-calendar-clock
+            </v-icon>
+            <span class="text-h6 font-weight-medium text-primary">Schedule & Timing</span>
           </div>
-          <v-menu
-            v-model="dateMenu"
-            :close-on-content-click="false"
-            transition="scale-transition"
-            location="bottom"
-          >
-            <template #activator="{ props }">
-              <v-text-field
-                v-model="formattedDate"
-                density="compact"
-                variant="outlined"
-                readonly
-                hide-details
-                v-bind="props"
-              />
-            </template>
-            <v-date-picker
-              v-model="newEvent.date"
-              @update:model-value="dateMenu = false"
-            />
-          </v-menu>
-        </div>
+        </v-card-title>
+        
+        <v-card-text class="pa-4 pt-2">
 
-        <!-- Time From -->
-        <div class="input-row">
-          <div class="input-label">
-            From
-          </div>
-          <v-menu
-            v-model="timeFromMenu"
-            :close-on-content-click="false"
-            transition="scale-transition"
-            location="bottom"
-          >
-            <template #activator="{ props }">
-              <v-text-field
-                v-model="formattedTimeFrom"
-                density="compact"
-                variant="outlined"
-                readonly
-                hide-details
-                v-bind="props"
+          <!-- Enhanced Date Selection -->
+          <div class="date-section mb-4">
+            <div class="input-label-enhanced d-flex align-center mb-2">
+              <v-icon size="small" color="primary" class="mr-2">mdi-calendar</v-icon>
+              <span class="font-weight-medium">Date</span>
+            </div>
+            <v-menu
+              v-model="dateMenu"
+              :close-on-content-click="false"
+              transition="scale-transition"
+              location="bottom"
+            >
+              <template #activator="{ props }">
+                <v-text-field
+                  v-model="formattedDate"
+                  density="comfortable"
+                  variant="outlined"
+                  readonly
+                  hide-details
+                  v-bind="props"
+                  prepend-inner-icon="mdi-calendar"
+                  style="border-radius: 12px;"
+                  color="primary"
+                />
+              </template>
+              <v-date-picker
+                v-model="newEvent.date"
+                @update:model-value="dateMenu = false"
               />
-            </template>
-            <v-time-picker
-              v-model="newEvent.timeFrom"
-              @update:model-value="timeFromMenu = false"
-            />
-          </v-menu>
-        </div>
+            </v-menu>
+          </div>
 
-        <!-- Time To -->
-        <div class="input-row">
-          <div class="input-label">
-            To
+          <!-- Enhanced Time Section -->
+          <div class="time-section">
+            <div class="time-inputs-container d-flex gap-3">
+              <!-- Time From -->
+              <div class="time-input-group flex-1">
+                <div class="input-label-enhanced d-flex align-center mb-2">
+                  <v-icon size="small" color="success" class="mr-2">mdi-clock-start</v-icon>
+                  <span class="font-weight-medium">From</span>
+                </div>
+                <v-menu
+                  v-model="timeFromMenu"
+                  :close-on-content-click="false"
+                  transition="scale-transition"
+                  location="bottom"
+                >
+                  <template #activator="{ props }">
+                    <v-text-field
+                      v-model="formattedTimeFrom"
+                      density="comfortable"
+                      variant="outlined"
+                      readonly
+                      hide-details
+                      v-bind="props"
+                      prepend-inner-icon="mdi-clock-outline"
+                      style="border-radius: 12px;"
+                      color="success"
+                    />
+                  </template>
+                  <v-time-picker
+                    v-model="newEvent.timeFrom"
+                    @update:model-value="timeFromMenu = false"
+                  />
+                </v-menu>
+              </div>
+
+              <!-- Time To -->
+              <div class="time-input-group flex-1">
+                <div class="input-label-enhanced d-flex align-center mb-2">
+                  <v-icon size="small" color="error" class="mr-2">mdi-clock-end</v-icon>
+                  <span class="font-weight-medium">To</span>
+                </div>
+                <v-menu
+                  v-model="timeToMenu"
+                  :close-on-content-click="false"
+                  transition="scale-transition"
+                  location="bottom"
+                >
+                  <template #activator="{ props }">
+                    <v-text-field
+                      v-model="formattedTimeTo"
+                      density="comfortable"
+                      variant="outlined"
+                      readonly
+                      hide-details
+                      v-bind="props"
+                      prepend-inner-icon="mdi-clock-outline"
+                      style="border-radius: 12px;"
+                      color="error"
+                    />
+                  </template>
+                  <v-time-picker
+                    v-model="newEvent.timeTo"
+                    @update:model-value="timeToMenu = false"
+                  />
+                </v-menu>
+              </div>
+            </div>
           </div>
-          <v-menu
-            v-model="timeToMenu"
-            :close-on-content-click="false"
-            transition="scale-transition"
-            location="bottom"
-          >
-            <template #activator="{ props }">
-              <v-text-field
-                v-model="formattedTimeTo"
-                density="compact"
-                variant="outlined"
-                readonly
-                hide-details
-                v-bind="props"
-              />
-            </template>
-            <v-time-picker
-              v-model="newEvent.timeTo"
-              @update:model-value="timeToMenu = false"
-            />
-          </v-menu>
-        </div>
+        </v-card-text>
       </v-card>
 
-      <!-- People Section -->
+      <!-- Enhanced People Section -->
       <v-card
         v-if="eventType !== 'task'"
-        class="reminder-section mb-4"
-        variant="outlined"
+        class="reminder-section mb-4 elevation-4"
+        style="border-radius: 15px; background: linear-gradient(145deg, #fff3e0 0%, #ffecb3 100%);"
       >
-        <div class="d-flex align-center px-3 py-2">
-          <v-icon
-            size="small"
-            class="mr-2"
+        <v-card-title class="pa-4 pb-2">
+          <div class="d-flex align-center">
+            <v-icon
+              color="orange-darken-1"
+              class="mr-3"
+              size="24"
+            >
+              mdi-account-multiple-plus
+            </v-icon>
+            <span class="text-h6 font-weight-medium text-orange-darken-1">Invite Participants</span>
+          </div>
+        </v-card-title>
+        
+        <v-card-text class="pa-4 pt-2">
+
+        <!-- Invitation Type Toggle -->
+        <div class="invitation-type-toggle mb-3">
+          <v-btn-toggle
+            v-model="invitationType"
+            mandatory
+            density="compact"
+            color="primary"
+            class="invitation-toggle"
           >
-            mdi-account-outline
-          </v-icon>
+            <v-btn
+              value="app-users"
+              variant="outlined"
+              class="invitation-btn"
+            >
+              <v-icon class="mr-1">mdi-account-circle</v-icon>
+              App Users
+            </v-btn>
+            <v-btn
+              value="email"
+              variant="outlined"
+              class="invitation-btn"
+            >
+              <v-icon class="mr-1">mdi-email</v-icon>
+              Email
+            </v-btn>
+          </v-btn-toggle>
+        </div>
+
+        <!-- App Users Selection -->
+        <div v-if="invitationType === 'app-users'" class="d-flex align-center px-3 py-2">
           <v-text-field
             v-model="peopleSearch"
-            placeholder="Add people"
+            placeholder="Search app users"
             variant="plain"
             density="compact"
             hide-details
@@ -294,6 +427,7 @@
                 v-model="peopleMenu"
                 :close-on-content-click="false"
                 location="bottom"
+                width="300"
               >
                 <template #activator="{ props }">
                   <v-btn
@@ -307,78 +441,284 @@
                     </v-icon>
                   </v-btn>
                 </template>
-                <v-list density="compact">
-                  <v-list-item
-                    v-for="person in filteredPeople"
-                    :key="person.id"
-                    @click="addPerson(person)"
-                  >
-                    <template #prepend>
-                      <v-avatar size="32">
-                        <v-img :src="person.avatar" />
-                      </v-avatar>
-                    </template>
-                    <v-list-item-title>{{ person.name }}</v-list-item-title>
-                  </v-list-item>
-                </v-list>
+                <v-card class="people-dropdown" elevation="8">
+                  <v-card-title class="pa-3">
+                    <v-icon class="mr-2">mdi-account-search</v-icon>
+                    Available Users
+                  </v-card-title>
+                  <v-list density="compact" max-height="200" class="overflow-y-auto">
+                    <v-list-item
+                      v-for="person in filteredPeople"
+                      :key="person.id"
+                      @click="addPerson(person)"
+                      class="person-option"
+                    >
+                      <template #prepend>
+                        <v-avatar size="32">
+                          <v-img :src="person.avatar" />
+                        </v-avatar>
+                      </template>
+                      <v-list-item-title>{{ person.name }}</v-list-item-title>
+                      <v-list-item-subtitle>{{ person.email }}</v-list-item-subtitle>
+                      <template #append>
+                        <v-icon color="success">mdi-plus-circle</v-icon>
+                      </template>
+                    </v-list-item>
+                    <v-list-item v-if="filteredPeople.length === 0" disabled>
+                      <v-list-item-title class="text-center text-grey">
+                        No users found
+                      </v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-card>
               </v-menu>
             </template>
           </v-text-field>
         </div>
+
+        <!-- Email Invitation -->
+        <div v-else class="email-invitation px-3 py-2">
+          <v-text-field
+            v-model="emailInviteInput"
+            placeholder="Enter email addresses (comma separated)"
+            variant="plain"
+            density="compact"
+            hide-details
+            class="email-input"
+            @keyup.enter="addEmailInvitees"
+          >
+            <template #append>
+              <v-btn
+                icon="mdi-plus"
+                size="small"
+                variant="text"
+                @click="addEmailInvitees"
+                :disabled="!emailInviteInput.trim()"
+              />
+            </template>
+          </v-text-field>
+          
+
+          <div class="email-hint mt-1">
+            <v-icon size="small" class="mr-1">mdi-information-outline</v-icon>
+            <span class="text-caption text-grey">Press Enter or click + to add emails</span>
+          </div>
+          
+
+        </div>
         
-        <!-- Selected People -->
+        <!-- Selected People and Email Invitees -->
         <div
-          v-if="selectedPeople.length > 0"
+          v-if="selectedPeople.length > 0 || emailInvitees.length > 0"
           class="selected-people px-3 py-2"
         >
+          <!-- App Users -->
           <div
             v-for="(person, index) in selectedPeople"
-            :key="person.id"
-            class="selected-person"
+            :key="`user-${person.id}`"
+            class="selected-person app-user"
           >
             <v-avatar
               size="24"
-              class="mr-1"
+              class="mr-2"
             >
               <v-img :src="person.avatar" />
             </v-avatar>
-            <span class="person-name">{{ person.name }}</span>
+            <div class="person-info">
+              <span class="person-name">{{ person.name }}</span>
+              <span class="person-type">App User</span>
+            </div>
             <v-btn
-              icon
+              icon="mdi-close"
               size="x-small"
               variant="text"
               @click="removePerson(index)"
+            />
+          </div>
+
+          <!-- Email Invitees -->
+          <div
+            v-for="(email, index) in emailInvitees"
+            :key="`email-${index}`"
+            class="selected-person email-invitee"
+          >
+            <v-avatar
+              size="24"
+              class="mr-2"
+              color="grey-lighten-2"
             >
-              <v-icon size="small">
-                mdi-close
-              </v-icon>
-            </v-btn>
+              <v-icon size="16">mdi-email</v-icon>
+            </v-avatar>
+            <div class="person-info">
+              <span class="person-name">{{ email }}</span>
+              <span class="person-type">Email Invite</span>
+            </div>
+            <v-btn
+              icon="mdi-close"
+              size="x-small"
+              variant="text"
+              @click="removeEmailInvitee(index)"
+            />
           </div>
         </div>
+
+        <!-- Invitation Summary -->
+        <div v-if="selectedPeople.length > 0 || emailInvitees.length > 0" class="invitation-summary px-3 py-2">
+          <v-divider class="mb-2"></v-divider>
+          <div class="summary-text">
+            <v-icon size="small" class="mr-1" color="success">mdi-check-circle</v-icon>
+            <span class="text-caption">
+              {{ selectedPeople.length + emailInvitees.length }} participant(s) will be invited
+            </span>
+          </div>
+        </div>
+        </v-card-text>
       </v-card>
 
-      <!-- Meeting Link Section -->
+      <!-- Enhanced Meeting Link Section -->
       <v-card
         v-if="eventType !== 'task'"
-        class="reminder-section mb-4"
-        variant="outlined"
+        class="reminder-section mb-4 elevation-4"
+        style="border-radius: 15px; background: linear-gradient(145deg, #e8f5e8 0%, #c8e6c9 100%);"
       >
-        <div class="d-flex align-center px-3 py-2">
-          <v-icon
-            size="small"
-            class="mr-2"
+        <v-card-title class="pa-4 pb-2">
+          <div class="d-flex align-center">
+            <v-icon
+              color="green-darken-1"
+              class="mr-3"
+              size="24"
+            >
+              mdi-video-plus
+            </v-icon>
+            <span class="text-h6 font-weight-medium text-green-darken-1">Meeting Platform</span>
+          </div>
+        </v-card-title>
+        
+        <v-card-text class="pa-4 pt-2">
+
+          <!-- Enhanced Platform Selection -->
+          <div class="platform-selection-enhanced mb-4">
+            <h4 class="text-subtitle-1 font-weight-medium mb-3 text-green-darken-1">Choose Platform</h4>
+            <v-btn-toggle
+              v-model="selectedPlatform"
+              mandatory
+              class="platform-toggle-enhanced justify-center"
+              style="background: rgba(76, 175, 80, 0.1); border-radius: 15px; padding: 8px; width: 100%;"
+            >
+              <v-btn
+                value="zoom"
+                class="platform-btn-enhanced mx-1"
+                style="border-radius: 12px; min-width: 110px;"
+                color="blue"
+              >
+                <v-icon left size="small">mdi-video</v-icon>
+                Zoom
+              </v-btn>
+              <v-btn
+                value="meet"
+                class="platform-btn-enhanced mx-1"
+                style="border-radius: 12px; min-width: 110px;"
+                color="green"
+              >
+                <v-icon left size="small">mdi-google</v-icon>
+                Meet
+              </v-btn>
+              <v-btn
+                value="custom"
+                class="platform-btn-enhanced mx-1"
+                style="border-radius: 12px; min-width: 110px;"
+                color="purple"
+              >
+                <v-icon left size="small">mdi-link</v-icon>
+                Custom
+              </v-btn>
+            </v-btn-toggle>
+          </div>
+
+        <!-- Auto-generate or custom link -->
+        <div v-if="selectedPlatform === 'zoom'" class="d-flex align-center px-3 py-2">
+          <v-btn
+            variant="outlined"
+            color="primary"
+            @click="generateZoomLink"
+            :disabled="!!newEvent.meetingLink"
+            class="generate-btn"
           >
-            mdi-link
-          </v-icon>
+            <v-icon class="mr-1">mdi-plus</v-icon>
+            Generate Zoom Link
+          </v-btn>
+          <v-text-field
+            v-if="newEvent.meetingLink"
+            v-model="newEvent.meetingLink"
+            readonly
+            variant="plain"
+            density="compact"
+            hide-details
+            class="link-input ml-2"
+          >
+            <template #append>
+              <v-btn
+                icon="mdi-content-copy"
+                size="small"
+                variant="text"
+                @click="copyToClipboard(newEvent.meetingLink)"
+              />
+            </template>
+          </v-text-field>
+        </div>
+
+        <div v-else-if="selectedPlatform === 'meet'" class="d-flex align-center px-3 py-2">
+          <v-btn
+            variant="outlined"
+            color="primary"
+            @click="generateMeetLink"
+            :disabled="!!newEvent.meetingLink"
+            class="generate-btn"
+          >
+            <v-icon class="mr-1">mdi-plus</v-icon>
+            Generate Meet Link
+          </v-btn>
+          <v-text-field
+            v-if="newEvent.meetingLink"
+            v-model="newEvent.meetingLink"
+            readonly
+            variant="plain"
+            density="compact"
+            hide-details
+            class="link-input ml-2"
+          >
+            <template #append>
+              <v-btn
+                icon="mdi-content-copy"
+                size="small"
+                variant="text"
+                @click="copyToClipboard(newEvent.meetingLink)"
+              />
+            </template>
+          </v-text-field>
+        </div>
+
+        <div v-else class="d-flex align-center px-3 py-2">
           <v-text-field
             v-model="newEvent.meetingLink"
-            placeholder="Add meeting link"
+            placeholder="Enter custom meeting link"
             variant="plain"
             density="compact"
             hide-details
             class="link-input"
-          />
+          >
+            <template #append>
+              <v-btn
+                icon="mdi-content-copy"
+                size="small"
+                variant="text"
+                @click="copyToClipboard(newEvent.meetingLink)"
+                :disabled="!newEvent.meetingLink"
+              />
+            </template>
+          </v-text-field>
         </div>
+        </v-card-text>
       </v-card>
 
       <!-- Description Section (New) -->
@@ -499,12 +839,15 @@
       <!-- Create Button -->
       <v-btn 
         block 
-        color="#0C9C8D" 
-        class="create-btn text-white"
+        size="large"
+        color="success"
+        class="create-btn text-white font-weight-bold mb-4"
+        style="border-radius: 12px; height: 50px; font-size: 16px;"
         :disabled="!newEvent.title"
         @click="createEvent"
       >
-        Create
+        <v-icon left class="mr-2">mdi-plus</v-icon>
+        {{ eventType === 'task' ? 'Create Task' : eventType === 'meet' ? 'Schedule Meeting' : 'Create Event' }}
       </v-btn>
     </div>
 
@@ -598,6 +941,30 @@
         </div>
       </div>
     </div>
+
+    <!-- Notification Toast -->
+    <div class="notification-container">
+      <transition-group name="notification" tag="div">
+        <div
+          v-for="notification in notifications"
+          :key="notification.id"
+          class="notification-toast"
+          :class="`notification-${notification.type}`"
+        >
+          <v-icon class="notification-icon">
+            {{ getNotificationIcon(notification.type) }}
+          </v-icon>
+          <span class="notification-message">{{ notification.message }}</span>
+          <v-btn
+            icon="mdi-close"
+            size="x-small"
+            variant="text"
+            @click="removeNotification(notification.id)"
+            class="notification-close"
+          />
+        </div>
+      </transition-group>
+    </div>
   </div>
 </template>
 
@@ -614,6 +981,14 @@ const peopleSearch = ref('');
 const selectedPeople = ref([]);
 const userName = ref('Isabella');
 const userAvatar = ref('https://randomuser.me/api/portraits/women/85.jpg');
+
+// Enhanced meeting functionality
+const selectedPlatform = ref('zoom');
+const invitationType = ref('app-users');
+const emailInviteInput = ref('');
+const emailInvitees = ref([]);
+const notifications = ref([]);
+const joiningMeeting = ref(null); // Track which meeting is being joined
 
 // For date and time menus
 const dateMenu = ref(false);
@@ -740,7 +1115,12 @@ function resetForm() {
   endDateMenu.value = false;
   
   selectedPeople.value = [];
+  emailInvitees.value = [];
+  emailInviteInput.value = '';
+  selectedPlatform.value = 'zoom';
+  invitationType.value = 'app-users';
   eventType.value = 'event';
+  joiningMeeting.value = null;
 }
 
 // Call this when repeat option changes
@@ -782,30 +1162,81 @@ const events = ref([
     id: 1,
     title: 'Meeting with Company',
     description: 'Quarterly review with stakeholders',
-    date: '2025-04-05',
-    timeFrom: '10:00',
-    timeTo: '11:30',
+    date: '2025-09-10',
+    timeFrom: '09:00',
+    timeTo: '10:00',
     type: 'Live event',
-    meetingLink: 'https://meet.zoom.com/123456',
+    platform: 'zoom',
+    meetingLink: 'https://meet.google.com/sic-bhis-jpu',
     attendees: [
       { id: 1, name: 'John Smith', avatar: 'https://randomuser.me/api/portraits/men/1.jpg' },
       { id: 2, name: 'Emma Johnson', avatar: 'https://randomuser.me/api/portraits/women/2.jpg' },
       { id: 3, name: 'Michael Brown', avatar: 'https://randomuser.me/api/portraits/men/3.jpg' },
       { id: 4, name: 'Sarah Davis', avatar: 'https://randomuser.me/api/portraits/women/4.jpg' }
     ],
+    emailInvitees: ['client@company.com'],
     repeatEvery: 'Monthly',
     repeatDays: [],
-    endRepeatDate: '2025-10-05'
+    endRepeatDate: '2025-10-05',
+    organizer: {
+      name: 'Isabella',
+      avatar: 'https://randomuser.me/api/portraits/women/85.jpg'
+    }
+  },
+  {
+    id: 2,
+    title: 'Project Planning Session',
+    description: 'Weekly planning and sprint review',
+    date: '2025-09-12',
+    timeFrom: '14:00',
+    timeTo: '15:30',
+    type: 'Meeting',
+    platform: 'meet',
+    meetingLink: 'https://meet.google.com/abc-defg-hij',
+    attendees: [
+      { id: 3, name: 'Michael Brown', avatar: 'https://randomuser.me/api/portraits/men/3.jpg' },
+      { id: 5, name: 'David Wilson', avatar: 'https://randomuser.me/api/portraits/men/5.jpg' }
+    ],
+    emailInvitees: ['external@partner.com', 'consultant@agency.com'],
+    repeatEvery: 'Weekly',
+    repeatDays: ['F'],
+    endRepeatDate: '2025-12-12',
+    organizer: {
+      name: 'Isabella',
+      avatar: 'https://randomuser.me/api/portraits/women/85.jpg'
+    }
+  },
+  {
+    id: 3,
+    title: 'Complete Project Documentation',
+    description: 'Finish writing user manuals and API docs',
+    date: '2025-09-15',
+    timeFrom: '09:00',
+    timeTo: '17:00',
+    type: 'Task',
+    platform: null,
+    meetingLink: null,
+    attendees: [],
+    emailInvitees: [],
+    repeatEvery: 'On',
+    repeatDays: [],
+    endRepeatDate: null,
+    organizer: {
+      name: 'Isabella',
+      avatar: 'https://randomuser.me/api/portraits/women/85.jpg'
+    }
   }
 ]);
 
 const people = [
-  { id: 1, name: 'John Smith', avatar: 'https://randomuser.me/api/portraits/men/1.jpg' },
-  { id: 2, name: 'Emma Johnson', avatar: 'https://randomuser.me/api/portraits/women/2.jpg' },
-  { id: 3, name: 'Michael Brown', avatar: 'https://randomuser.me/api/portraits/men/3.jpg' },
-  { id: 4, name: 'Sarah Davis', avatar: 'https://randomuser.me/api/portraits/women/4.jpg' },
-  { id: 5, name: 'David Wilson', avatar: 'https://randomuser.me/api/portraits/men/5.jpg' },
-  { id: 6, name: 'Jennifer Taylor', avatar: 'https://randomuser.me/api/portraits/women/6.jpg' }
+  { id: 1, name: 'John Smith', email: 'john.smith@company.com', avatar: 'https://randomuser.me/api/portraits/men/1.jpg' },
+  { id: 2, name: 'Emma Johnson', email: 'emma.johnson@company.com', avatar: 'https://randomuser.me/api/portraits/women/2.jpg' },
+  { id: 3, name: 'Michael Brown', email: 'michael.brown@company.com', avatar: 'https://randomuser.me/api/portraits/men/3.jpg' },
+  { id: 4, name: 'Sarah Davis', email: 'sarah.davis@company.com', avatar: 'https://randomuser.me/api/portraits/women/4.jpg' },
+  { id: 5, name: 'David Wilson', email: 'david.wilson@company.com', avatar: 'https://randomuser.me/api/portraits/men/5.jpg' },
+  { id: 6, name: 'Jennifer Taylor', email: 'jennifer.taylor@company.com', avatar: 'https://randomuser.me/api/portraits/women/6.jpg' },
+  { id: 7, name: 'Alex Rodriguez', email: 'alex.rodriguez@company.com', avatar: 'https://randomuser.me/api/portraits/men/7.jpg' },
+  { id: 8, name: 'Lisa Chen', email: 'lisa.chen@company.com', avatar: 'https://randomuser.me/api/portraits/women/8.jpg' }
 ];
 
 // Initialize calendar with current month
@@ -951,8 +1382,13 @@ function isSelectedDate(date) {
 
 // People selection functions
 function addPerson(person) {
+  console.log('🔥 addPerson called with:', person);
+  console.log('🔥 selectedPeople.value before:', selectedPeople.value);
   if (!selectedPeople.value.some(p => p.id === person.id)) {
     selectedPeople.value.push(person);
+    console.log('🔥 Person added! selectedPeople.value after:', selectedPeople.value);
+  } else {
+    console.log('🔥 Person already exists in selectedPeople');
   }
   peopleSearch.value = '';
   peopleMenu.value = false;
@@ -960,6 +1396,221 @@ function addPerson(person) {
 
 function removePerson(index) {
   selectedPeople.value.splice(index, 1);
+}
+
+// Enhanced meeting functionality
+function generateZoomLink() {
+  // Generate a realistic Zoom meeting link
+  const meetingId = Math.floor(Math.random() * 1000000000);
+  const password = Math.random().toString(36).substring(2, 8);
+  newEvent.value.meetingLink = `https://zoom.us/j/${meetingId}?pwd=${password}`;
+  showNotification('Zoom meeting link generated!', 'success');
+}
+
+function generateMeetLink() {
+  // Generate a realistic Google Meet link
+  const meetingId = Math.random().toString(36).substring(2, 12);
+  newEvent.value.meetingLink = `https://meet.google.com/${meetingId}`;
+  showNotification('Google Meet link generated!', 'success');
+}
+
+function copyToClipboard(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(() => {
+      showNotification('Link copied to clipboard!', 'success');
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+      showNotification('Failed to copy link', 'error');
+    });
+  } else {
+    // Fallback for older browsers
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+      document.execCommand('copy');
+      showNotification('Link copied to clipboard!', 'success');
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+      showNotification('Failed to copy link', 'error');
+    }
+    document.body.removeChild(textArea);
+  }
+}
+
+function addEmailInvitees() {
+  console.log('🔥 addEmailInvitees called with input:', emailInviteInput.value);
+  const emails = emailInviteInput.value
+    .split(',')
+    .map(email => email.trim())
+    .filter(email => email && isValidEmail(email));
+  
+  console.log('🔥 Processed emails:', emails);
+  console.log('🔥 emailInvitees.value before:', emailInvitees.value);
+  
+  if (emails.length > 0) {
+    // Add unique emails only
+    emails.forEach(email => {
+      if (!emailInvitees.value.includes(email)) {
+        emailInvitees.value.push(email);
+      }
+    });
+    console.log('🔥 emailInvitees.value after:', emailInvitees.value);
+    emailInviteInput.value = '';
+    showNotification(`${emails.length} email(s) added to invitees`, 'success');
+  } else {
+    showNotification('Please enter valid email addresses', 'warning');
+  }
+}
+
+function removeEmailInvitee(index) {
+  emailInvitees.value.splice(index, 1);
+}
+
+function isValidEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+function showNotification(message, type = 'info') {
+  const notification = {
+    id: Date.now(),
+    message,
+    type,
+    timestamp: new Date()
+  };
+  notifications.value.push(notification);
+  
+  // Auto-remove notification after 3 seconds
+  setTimeout(() => {
+    const index = notifications.value.findIndex(n => n.id === notification.id);
+    if (index > -1) {
+      notifications.value.splice(index, 1);
+    }
+  }, 3000);
+}
+
+function sendInAppNotifications(event) {
+  // Send notifications to app users
+  selectedPeople.value.forEach(person => {
+    const notification = {
+      userId: person.id,
+      type: 'meeting_invitation',
+      title: 'Meeting Invitation',
+      message: `You've been invited to "${event.title}" on ${formatDateForDisplay(event.date)}`,
+      meetingId: event.id,
+      timestamp: new Date()
+    };
+    console.log('Sending in-app notification to:', person.name, notification);
+    // In a real app, this would make an API call to store the notification
+  });
+}
+
+async function sendEmailInvitations(event) {
+  try {
+    console.log('🚀 Starting sendEmailInvitations with event:', event);
+    
+    // Import the meeting invitation API service
+    const { meetingInvitationApi } = await import('../services/meetingInvitationApi.service.js');
+    
+    // Get organizer email (you may need to get this from user context)
+    let organizerEmail = localStorage.getItem('userEmail');
+    
+    // If no organizer email is set, prompt for it or use a default
+    if (!organizerEmail || organizerEmail === 'organizer@example.com') {
+      // For demo purposes, let's set a default email. In production, this would come from user authentication
+      organizerEmail = 'suprun.jen@gmail.com'; // Using your email for testing
+      localStorage.setItem('userEmail', organizerEmail);
+      console.log('📧 Using organizer email:', organizerEmail);
+    }
+    
+    // Convert app users to expected format
+    const appUsers = selectedPeople.value.map(person => ({
+      email: person.email || `${person.name.toLowerCase().replace(' ', '.')}@company.com`, // fallback email
+      name: person.name
+    }));
+
+    console.log('👥 Selected app users:', selectedPeople.value);
+    console.log('📧 Converted app users:', appUsers);
+    console.log('📮 Email invitees:', emailInvitees.value);
+
+    // Only send to invited participants (no organizer confirmation email)
+    const allRecipients = [...appUsers];
+    
+    // FORCE: Get emails from DOM if reactive value is empty
+    let allEmailInvitees = [...emailInvitees.value];
+    
+    // Fallback: if reactive array is empty, try to get emails from displayed UI
+    if (allEmailInvitees.length === 0) {
+      const emailElements = document.querySelectorAll('.email-invitee .person-name');
+      const domEmails = Array.from(emailElements).map(el => el.textContent.trim());
+      allEmailInvitees = domEmails.filter(email => email && email.includes('@'));
+      console.log('🔧 FALLBACK: Got emails from DOM:', domEmails);
+    }
+
+    console.log('📊 Recipients debug:', {
+      appUsers: allRecipients.length,
+      emailInvitees: allEmailInvitees.length,
+      emailInviteesRaw: emailInvitees.value,
+      fallbackEmails: allEmailInvitees
+    });
+
+    // Check if there are any recipients to send invitations to
+    const totalRecipients = allRecipients.length + allEmailInvitees.length;
+    console.log('📊 Total recipients:', totalRecipients, 'App users:', allRecipients.length, 'Email invitees:', allEmailInvitees.length);
+    
+    if (totalRecipients === 0) {
+      console.log('⚠️ No email recipients to send invitations to');
+      return;
+    }
+    
+    console.log('✅ Recipients found! Proceeding with email sending...');
+
+    console.log('📤 About to send invitations...');
+    
+    // Send invitations using the API
+    console.log('📤 Sending with data:', {
+      event: event.title,
+      allRecipients,
+      allEmailInvitees,
+      userName: userName.value,
+      organizerEmail
+    });
+    
+    const result = await meetingInvitationApi.sendMeetingInvitations(
+      event,
+      allRecipients,
+      allEmailInvitees,
+      userName.value,
+      organizerEmail
+    );
+
+    console.log('✅ Email invitations sent successfully:', result);
+    
+    // Show success notification with details
+    const totalSent = result.data.sentSuccessfully;
+    const totalFailed = result.data.failed;
+    
+    if (totalFailed > 0) {
+      showNotification(
+        `Invitations sent: ${totalSent} successful, ${totalFailed} failed`, 
+        'warning'
+      );
+    } else {
+      showNotification(
+        `All ${totalSent} email invitations sent successfully!`, 
+        'success'
+      );
+    }
+    
+  } catch (error) {
+    console.error('❌ Failed to send email invitations:', error);
+    showNotification(
+      `Failed to send email invitations: ${error.message}`, 
+      'error'
+    );
+  }
 }
 
 // Date and time formatting functions
@@ -1022,10 +1673,27 @@ const isFormValid = computed(() => {
   return !!newEvent.value.title;
 });
 
+// Delete event function
+function deleteEvent(eventId) {
+  if (confirm('Are you sure you want to delete this reminder?')) {
+    const index = events.value.findIndex(event => event.id === eventId);
+    if (index > -1) {
+      events.value.splice(index, 1);
+      showNotification('Reminder deleted successfully!', 'success');
+    }
+  }
+}
+
 // Create event function
 function createEvent() {
+  console.log('🎯 createEvent function called!');
+  console.log('🎯 Form valid?', isFormValid.value);
+  console.log('🎯 Event type:', eventType.value);
+  console.log('🎯 Selected people:', selectedPeople.value);
+  console.log('🎯 Email invitees:', emailInvitees.value);
+  
   if (!isFormValid.value) {
-    // Add user notification here if needed
+    showNotification('Please fill in all required fields', 'warning');
     return;
   }
   
@@ -1040,10 +1708,16 @@ function createEvent() {
     type: eventType.value === 'event' ? 'Live event' : 
           eventType.value === 'meet' ? 'Meeting' : 'Task',
     meetingLink: newEvent.value.meetingLink,
+    platform: selectedPlatform.value,
     attendees: [...selectedPeople.value],
+    emailInvitees: [...emailInvitees.value],
     repeatEvery: newEvent.value.repeatEvery,
     repeatDays: [...newEvent.value.repeatDays],
-    endRepeatDate: newEvent.value.endRepeatDate
+    endRepeatDate: newEvent.value.endRepeatDate,
+    organizer: {
+      name: userName.value,
+      avatar: userAvatar.value
+    }
   };
 
   // Add to events array and sort by date and time
@@ -1057,13 +1731,42 @@ function createEvent() {
     return a.timeFrom < b.timeFrom ? -1 : 1;
   });
   
-  // Generate recurring events if needed
-  if (newEvent.value.repeatEvery !== 'On' && newEvent.value.endRepeatDate) {
-    generateRecurringEvents(createdEvent);
+  // Send notifications and invitations
+  if (eventType.value !== 'task') {
+    // Send in-app notifications to selected users
+    if (selectedPeople.value.length > 0) {
+      sendInAppNotifications(createdEvent);
+    }
+    
+      // Send email invitations only if there are participants
+  const totalInvitees = selectedPeople.value.length + emailInvitees.value.length;
+  if (totalInvitees > 0) {
+    // Wait for email sending to complete before resetting form
+    sendEmailInvitations(createdEvent).then(() => {
+      showNotification(`${eventType.value === 'event' ? 'Event' : 'Meeting'} created and ${totalInvitees} invitation(s) sent!`, 'success');
+      // Reset form after emails are sent
+      resetForm();
+    }).catch((error) => {
+      console.error('Email sending failed:', error);
+      showNotification(`${eventType.value === 'event' ? 'Event' : 'Meeting'} created but email sending failed!`, 'warning');
+      // Reset form even if email fails
+      resetForm();
+    });
+  } else {
+    showNotification(`${eventType.value === 'event' ? 'Event' : 'Meeting'} created successfully!`, 'success');
+    // Reset form immediately if no emails to send
+    resetForm();
   }
-  
-  // Reset form
+} else {
+  showNotification('Task created successfully!', 'success');
+  // Reset form immediately for tasks
   resetForm();
+}
+
+// Generate recurring events if needed
+if (newEvent.value.repeatEvery !== 'On' && newEvent.value.endRepeatDate) {
+  generateRecurringEvents(createdEvent);
+}
 }
 
 // Generate recurring events based on repeat settings
@@ -1154,6 +1857,107 @@ onMounted(() => {
   // Set default end repeat date
   setDefaultEndDate();
 });
+
+function getNotificationIcon(type) {
+  switch (type) {
+    case 'success': return 'mdi-check-circle';
+    case 'error': return 'mdi-alert-circle';
+    case 'warning': return 'mdi-alert';
+    case 'info':
+    default: return 'mdi-information';
+  }
+}
+
+function removeNotification(id) {
+  const index = notifications.value.findIndex(n => n.id === id);
+  if (index > -1) {
+    notifications.value.splice(index, 1);
+  }
+}
+
+// Meeting button helpers
+function getMeetingButtonColor(event) {
+  if (!event.meetingLink) return 'grey';
+  
+  switch (event.platform) {
+    case 'zoom': return 'blue';
+    case 'meet': return 'green';
+    case 'custom': return 'purple';
+    default: return 'primary';
+  }
+}
+
+function getMeetingIcon(event) {
+  if (!event.meetingLink) return 'mdi-video-off';
+  
+  switch (event.platform) {
+    case 'zoom': return 'mdi-video';
+    case 'meet': return 'mdi-google';
+    case 'custom': return 'mdi-link';
+    default: return 'mdi-video';
+  }
+}
+
+function getMeetingButtonText(event) {
+  if (!event.meetingLink) return 'No Meeting Link';
+  
+  switch (event.platform) {
+    case 'zoom': return 'Join Zoom';
+    case 'meet': return 'Join Meet';
+    case 'custom': return 'Join Meeting';
+    default: return 'Join Meeting';
+  }
+}
+
+function getMeetingTooltip(event) {
+  if (!event.meetingLink) {
+    return 'No meeting link available for this event';
+  }
+  
+  const platformName = event.platform === 'zoom' ? 'Zoom' : 
+                      event.platform === 'meet' ? 'Google Meet' : 
+                      'Custom Platform';
+  
+  return `Click to go to ${platformName} meeting\n${event.meetingLink}`;
+}
+
+function joinMeeting(event) {
+  if (!event.meetingLink) {
+    showNotification('No meeting link available', 'warning');
+    return;
+  }
+  
+  // Set loading state
+  joiningMeeting.value = event.id;
+  
+  // Log meeting join for analytics/tracking
+  console.log('Joining meeting:', {
+    id: event.id,
+    title: event.title,
+    platform: event.platform,
+    link: event.meetingLink
+  });
+  
+  // Show success notification
+  showNotification(`Redirecting to ${event.platform || 'meeting'}...`, 'info');
+  
+  // Brief loading state for visual feedback
+  setTimeout(() => {
+    joiningMeeting.value = null;
+  }, 300);
+  
+  // Let the link handle the navigation naturally
+  return true;
+}
+
+function completeTask(event) {
+  // Mark task as completed
+  const eventIndex = events.value.findIndex(e => e.id === event.id);
+  if (eventIndex > -1) {
+    events.value.splice(eventIndex, 1);
+    showNotification(`Task "${event.title}" completed!`, 'success');
+  }
+}
 </script>
 
 <style scoped>
@@ -1244,9 +2048,22 @@ onMounted(() => {
   margin-bottom: 4px;
 }
 
+.event-type-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
 .event-title {
   font-size: 14px;
   font-weight: 500;
+}
+
+.platform-chip {
+  font-size: 10px;
+  height: 20px;
+  font-weight: 600;
 }
 
 .meeting-time {
@@ -1522,8 +2339,564 @@ onMounted(() => {
   align-items: center;
   background-color: #f5f5f5;
   border-radius: 16px;
-  padding: 4px 8px;
+  padding: 8px 12px;
   font-size: 12px;
+  margin-bottom: 8px;
+  min-height: 40px;
+}
+
+.person-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  margin-left: 4px;
+}
+
+.person-name {
+  font-weight: 500;
+  color: #374151;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.person-type {
+  font-size: 11px;
+  color: #6b7280;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.app-user {
+  background: linear-gradient(135deg, #e0f2fe 0%, #b3e5fc 100%);
+  border: 1px solid rgba(3, 169, 244, 0.2);
+}
+
+.email-invitee {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffcc80 100%);
+  border: 1px solid rgba(255, 152, 0, 0.2);
+}
+
+/* Platform Selection */
+.platform-selection {
+  padding: 0 16px;
+}
+
+.platform-toggle {
+  width: 100%;
+}
+
+.platform-btn {
+  flex: 1;
+  font-size: 12px;
+  padding: 8px 12px;
+  min-width: 0;
+}
+
+.generate-btn {
+  font-size: 12px;
+  height: 32px;
+  text-transform: none;
+}
+
+/* Invitation Type Toggle */
+.invitation-type-toggle {
+  padding: 0 16px;
+}
+
+.invitation-toggle {
+  width: 100%;
+}
+
+.invitation-btn {
+  flex: 1;
+  font-size: 12px;
+  padding: 8px 12px;
+  min-width: 0;
+}
+
+/* Email Input */
+.email-input {
+  margin: 0;
+  padding: 0;
+}
+
+.email-hint {
+  padding: 0 16px;
+}
+
+/* People Dropdown */
+.people-dropdown {
+  max-width: 320px;
+}
+
+.person-option:hover {
+  background-color: #f5f5f5;
+}
+
+/* Invitation Summary */
+.invitation-summary {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border-radius: 8px;
+  margin: 8px;
+}
+
+.summary-text {
+  display: flex;
+  align-items: center;
+  color: #166534;
+  font-weight: 500;
+}
+
+/* Notification System */
+.notification-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  max-width: 400px;
+}
+
+.notification-toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: white;
+  border-left: 4px solid;
+  max-width: 100%;
+  animation: slideIn 0.3s ease-out;
+}
+
+.notification-success {
+  border-left-color: #10b981;
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+}
+
+.notification-error {
+  border-left-color: #ef4444;
+  background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+}
+
+.notification-warning {
+  border-left-color: #f59e0b;
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+}
+
+.notification-info {
+  border-left-color: #3b82f6;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+}
+
+.notification-icon {
+  font-size: 20px;
+}
+
+.notification-success .notification-icon {
+  color: #10b981;
+}
+
+.notification-error .notification-icon {
+  color: #ef4444;
+}
+
+.notification-warning .notification-icon {
+  color: #f59e0b;
+}
+
+.notification-info .notification-icon {
+  color: #3b82f6;
+}
+
+.notification-message {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.notification-close {
+  opacity: 0.6;
+}
+
+.notification-close:hover {
+  opacity: 1;
+}
+
+/* Notification Transitions */
+.notification-enter-active,
+.notification-leave-active {
+  transition: all 0.3s ease;
+}
+
+.notification-enter-from {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+.notification-leave-to {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+.notification-move {
+  transition: transform 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Enhanced Meeting Cards */
+.meeting-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.meeting-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border-color: #3b82f6;
+}
+
+.meeting-description {
+  margin: 8px 0 12px 0;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 6px;
+  border-left: 3px solid #e3f2fd;
+}
+
+.description-text {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.4;
+  margin: 0;
+  font-style: italic;
+}
+
+.join-btn {
+  text-transform: none;
+  letter-spacing: 0;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.join-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.join-btn:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+}
+
+.join-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Platform-specific button styles */
+.join-btn.v-btn--variant-elevated.bg-blue {
+  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+}
+
+.join-btn.v-btn--variant-elevated.bg-blue:hover {
+  background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+}
+
+.join-btn.v-btn--variant-elevated.bg-green {
+  background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+}
+
+.join-btn.v-btn--variant-elevated.bg-green:hover {
+  background: linear-gradient(135deg, #388E3C 0%, #2E7D32 100%);
+}
+
+.join-btn.v-btn--variant-elevated.bg-purple {
+  background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
+}
+
+.join-btn.v-btn--variant-elevated.bg-purple:hover {
+  background: linear-gradient(135deg, #7B1FA2 0%, #6A1B9A 100%);
+}
+
+.join-btn.v-btn--variant-elevated.bg-success {
+  background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+}
+
+.join-btn.v-btn--variant-elevated.bg-success:hover {
+  background: linear-gradient(135deg, #388E3C 0%, #2E7D32 100%);
+}
+
+.join-btn.v-btn--variant-elevated.bg-grey {
+  background: linear-gradient(135deg, #9E9E9E 0%, #757575 100%);
+}
+
+/* Shimmer effect for active buttons */
+.join-btn:not(:disabled)::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.join-btn:not(:disabled):hover::before {
+  left: 100%;
+}
+
+/* Meeting Link Wrapper */
+.meeting-link-wrapper {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.meeting-link-wrapper:hover {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Enhanced Form Styles */
+.header-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.header-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.user-info-enhanced .user-details {
+  flex: 1;
+}
+
+.event-type-enhanced .v-btn-toggle {
+  width: 100%;
+}
+
+.event-btn-enhanced {
+  transition: all 0.3s ease;
+  border: 2px solid rgba(255,255,255,0.3) !important;
+}
+
+.event-btn-enhanced:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+.event-btn-enhanced.v-btn--active {
+  background: rgba(255,255,255,0.9) !important;
+  color: #667eea !important;
+  transform: scale(1.05);
+}
+
+.title-card {
+  transition: all 0.3s ease;
+}
+
+.title-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.title-input-enhanced .v-field {
+  border-radius: 12px !important;
+}
+
+.title-input-enhanced .v-field--focused {
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+.input-label-enhanced {
+  font-size: 14px;
+  color: #424242;
+  margin-bottom: 8px;
+}
+
+.date-section .v-field,
+.time-input-group .v-field {
+  border-radius: 12px !important;
+  transition: all 0.3s ease;
+}
+
+.date-section .v-field:hover,
+.time-input-group .v-field:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.time-inputs-container {
+  gap: 16px;
+}
+
+.platform-selection-enhanced .v-btn-toggle {
+  width: 100%;
+}
+
+.platform-btn-enhanced {
+  transition: all 0.3s ease;
+  border: 2px solid rgba(76, 175, 80, 0.3) !important;
+}
+
+.platform-btn-enhanced:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.platform-btn-enhanced.v-btn--active {
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+.create-button-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.create-button-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.6s;
+}
+
+.create-button-card:hover::before {
+  left: 100%;
+}
+
+.create-btn-enhanced {
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+}
+
+.create-btn-enhanced:hover {
+  transform: translateY(-3px);
+}
+
+.create-btn-enhanced:disabled {
+  opacity: 0.6;
+  transform: none !important;
+}
+
+/* Enhanced Card Hover Effects */
+.reminder-section {
+  transition: all 0.3s ease;
+}
+
+.reminder-section:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+}
+
+/* Form Enhancements */
+.description-input {
+  margin: 0;
+  padding: 0;
+  transform: translate(5px, -5px);
+}
+
+.title-input .v-field__input {
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.reminder-section {
+  transition: all 0.3s ease;
+}
+
+.reminder-section:hover {
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+
+.create-btn {
+  height: 48px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  margin-top: 24px;
+  font-size: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(12, 156, 141, 0.3);
+  transition: all 0.3s ease;
+}
+
+.create-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(12, 156, 141, 0.4);
+}
+
+.create-btn:disabled {
+  opacity: 0.6;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Delete Button Styles */
+.meeting-card {
+  position: relative;
+}
+
+.delete-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 10;
+}
+
+.meeting-card:hover .delete-btn {
+  opacity: 1;
+}
+
+.delete-btn:hover {
+  background-color: rgba(244, 67, 54, 0.1) !important;
 }
 
 </style>
