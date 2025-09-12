@@ -357,17 +357,24 @@ const showSnackbar = (message, color = 'success') => {
 </script>
 
 <style scoped>
-/* Layout */
-.main-expanded { margin-left: 240px !important; padding-left: 24px !important; }
-.main-collapsed { margin-left: 72px !important; padding-left: 24px !important; }
+/* Layout - Centered content with equal margins */
+.main-expanded { 
+  margin-left: 30px !important; /* sidebar width (240px) + 30px margin */
+  margin-right: 30px !important; 
+}
+.main-collapsed { 
+  margin-left: 102px !important; /* collapsed sidebar width (72px) + 30px margin */
+  margin-right: 30px !important; 
+}
 .transition-all { transition: all 0.3s ease; }
 
-/* Container adjustments */
+/* Container adjustments - Centered with max width */
 .container-full-width {
-  max-width: none !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
   width: 100%;
-  padding-left: 24px !important;
-  padding-right: 24px !important;
+  padding-left: 30px !important;
+  padding-right: 30px !important;
 }
 
 /* Left Menu Override */

@@ -498,15 +498,25 @@ const showSnackbar = (message) => {
 </script>
 
 <style scoped>
-/* Layout */
-.main-expanded { margin-left: 240px !important; }
-.main-collapsed { margin-left: 72px !important; }
+/* Layout - Centered content with equal margins */
+.ml-60 { 
+  margin-left: 30px !important; /* sidebar width (240px) + 30px margin */
+  margin-right: 30px !important; 
+}
+.ml-14 { 
+  margin-left: 102px !important; /* collapsed sidebar width (72px) + 30px margin */
+  margin-right: 30px !important; 
+}
 .transition-all { transition: all 0.3s ease; }
 
 .container-full-width { 
-  max-width: none !important; 
+  max-width: 1200px !important;
+  margin: 0 auto !important;
   width: 100%;
+  padding-left: 30px !important;
+  padding-right: 30px !important;
 }
+
 
 /* Header Section */
 .header-section {

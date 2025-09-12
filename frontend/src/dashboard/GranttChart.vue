@@ -497,10 +497,10 @@ export default {
       },
       
       teamMembers: [
-        { id: 1, name: 'Rose Fuller', avatar: '/api/placeholder/32/32' },
-        { id: 2, name: 'Martin Tamer', avatar: '/api/placeholder/32/32' },
-        { id: 3, name: 'John Doe', avatar: '/api/placeholder/32/32' },
-        { id: 4, name: 'Jane Smith', avatar: '/api/placeholder/32/32' }
+        { id: 1, name: 'Rose Fuller', avatar: 'https://randomuser.me/api/portraits/women/1.jpg' },
+        { id: 2, name: 'Martin Tamer', avatar: 'https://randomuser.me/api/portraits/men/2.jpg' },
+        { id: 3, name: 'John Doe', avatar: 'https://randomuser.me/api/portraits/men/3.jpg' },
+        { id: 4, name: 'Jane Smith', avatar: 'https://randomuser.me/api/portraits/women/4.jpg' }
       ],
       
       months: [

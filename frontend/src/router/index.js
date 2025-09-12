@@ -34,6 +34,7 @@ import SecurityPage from '@/setting/SecurityPage.vue';
 import IntegretionPage from '@/setting/IntegretionPage.vue';
 import BackUp from '@/setting/BackUp.vue';
 import SupportPage from '@/setting/SupportPage.vue';
+import AcceptInvite from '@/views/AcceptInvite.vue';
 
 const routes = [
   {
@@ -65,6 +66,11 @@ const routes = [
     path: '/reset-password',
     name: 'ResetPassword',
     component: ResetPassword,
+  },
+  { 
+    path: '/invite/accept',
+    name: 'AcceptInvite',
+    component: AcceptInvite,
   },
   { 
     path: '/pricing',

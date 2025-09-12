@@ -9,6 +9,9 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import session from 'express-session';
 import rateLimit from 'express-rate-limit';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 
@@ -27,6 +30,9 @@ import teamRoutes from './routes/team.routes';
 import financeRoutes from './routes/finance.routes';
 import settingsRoutes from './routes/settings.routes';
 import projectIntegrationRoutes from './routes/project.integration.routes';
+import meetingInvitationRoutes from './routes/meeting-invitation.routes';
+import testEmailRoutes from './routes/test-email.routes';
+import teamManagementRoutes from './routes/team-management.routes';
 
 // Import middleware
 import { errorHandler } from './middleware/error.middleware';
@@ -44,17 +50,10 @@ const io = new Server(server, {
 
 const PORT = process.env.PORT || 5000;
 
-// Security middleware
+// Security middleware - completely disable CSP in development
 app.use(helmet({
   crossOriginEmbedderPolicy: false,
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "https:"],
-    },
-  },
+  contentSecurityPolicy: false, // Completely disable CSP in development
 }));
 
 // CORS configuration
@@ -66,8 +65,8 @@ app.use(cors({
     'http://localhost:8080'
   ],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'enctype']
 }));
 
 // Request logging
@@ -76,6 +75,57 @@ app.use(morgan('combined'));
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Ensure uploads directory exists with proper path handling
+const uploadsDir = path.join(process.cwd(), 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log('📁 Created uploads directory at:', uploadsDir);
+}
+
+// Static file serving for uploads
+app.use('/uploads', express.static(uploadsDir));
+
+// Multer configuration for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadsDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const sanitizedOriginalName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
+    cb(null, `${file.fieldname}-${uniqueSuffix}-${sanitizedOriginalName}`);
+  }
+});
+
+const upload = multer({ 
+  storage: storage,
+  limits: {
+    fileSize: 50 * 1024 * 1024, // 50MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    // Allow images and documents
+    const allowedMimes = [
+      'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+      'application/pdf', 
+      'application/msword', 
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-powerpoint',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'text/plain'
+    ];
+    
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error(`File type ${file.mimetype} not allowed`));
+    }
+  }
+});
+
+
 
 // Session middleware
 app.use(session({
@@ -117,9 +167,81 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/clients', clientRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/team', teamRoutes);
+app.use('/api/team-management', teamManagementRoutes);
 app.use('/api/finance', financeRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/integrations', projectIntegrationRoutes);
+app.use('/api/meeting-invitations', meetingInvitationRoutes);
+app.use('/api/test-email', testEmailRoutes);
+
+// Image Upload Endpoint - Clean & Simple
+app.post('/upload', (req, res) => {
+  const uploadSingle = multer({
+    storage: multer.diskStorage({
+      destination: (req, file, cb) => {
+        cb(null, uploadsDir);
+      },
+      filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname);
+        const name = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, `img-${name}${ext}`);
+      }
+    }),
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB limit
+    },
+    fileFilter: (req, file, cb) => {
+      // Allow images and documents (like WhatsApp)
+      const allowedTypes = [
+        'image/',
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'text/plain',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.ms-powerpoint',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+      ];
+      
+      const isAllowed = allowedTypes.some(type => file.mimetype.startsWith(type) || file.mimetype === type);
+      
+      if (isAllowed) {
+        cb(null, true);
+      } else {
+        cb(new Error('File type not supported. Please upload images or documents.'));
+      }
+    }
+  }).single('file');
+
+  uploadSingle(req, res, (err) => {
+    if (err) {
+      console.error('Upload error:', err.message);
+      return res.status(400).json({
+        success: false,
+        message: err.message
+      });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No image file uploaded'
+      });
+    }
+
+    console.log(`✅ Image uploaded: ${req.file.filename}`);
+    
+    res.json({
+      success: true,
+      message: 'Image uploaded successfully',
+      filename: req.file.filename,
+      filePath: `/uploads/${req.file.filename}`,
+      originalName: req.file.originalname,
+      size: req.file.size
+    });
+  });
+});
 
 // Socket.io for real-time features
 io.on('connection', (socket) => {

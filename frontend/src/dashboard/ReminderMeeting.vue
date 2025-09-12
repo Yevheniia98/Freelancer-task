@@ -143,6 +143,24 @@
             </v-icon>
             Complete Task
           </v-btn>
+          
+          <!-- Delete Button for All Event Types -->
+          <v-btn
+            icon
+            size="small"
+            color="error"
+            variant="text"
+            class="delete-btn"
+            @click="deleteEvent(event.id)"
+          >
+            <v-icon size="small">mdi-delete</v-icon>
+            <v-tooltip
+              activator="parent"
+              location="top"
+            >
+              Delete reminder
+            </v-tooltip>
+          </v-btn>
         </div>
       </div>
       
@@ -479,10 +497,14 @@
               />
             </template>
           </v-text-field>
+          
+
           <div class="email-hint mt-1">
             <v-icon size="small" class="mr-1">mdi-information-outline</v-icon>
             <span class="text-caption text-grey">Press Enter or click + to add emails</span>
           </div>
+          
+
         </div>
         
         <!-- Selected People and Email Invitees -->
@@ -1360,8 +1382,13 @@ function isSelectedDate(date) {
 
 // People selection functions
 function addPerson(person) {
+  console.log('🔥 addPerson called with:', person);
+  console.log('🔥 selectedPeople.value before:', selectedPeople.value);
   if (!selectedPeople.value.some(p => p.id === person.id)) {
     selectedPeople.value.push(person);
+    console.log('🔥 Person added! selectedPeople.value after:', selectedPeople.value);
+  } else {
+    console.log('🔥 Person already exists in selectedPeople');
   }
   peopleSearch.value = '';
   peopleMenu.value = false;
@@ -1413,10 +1440,14 @@ function copyToClipboard(text) {
 }
 
 function addEmailInvitees() {
+  console.log('🔥 addEmailInvitees called with input:', emailInviteInput.value);
   const emails = emailInviteInput.value
     .split(',')
     .map(email => email.trim())
     .filter(email => email && isValidEmail(email));
+  
+  console.log('🔥 Processed emails:', emails);
+  console.log('🔥 emailInvitees.value before:', emailInvitees.value);
   
   if (emails.length > 0) {
     // Add unique emails only
@@ -1425,6 +1456,7 @@ function addEmailInvitees() {
         emailInvitees.value.push(email);
       }
     });
+    console.log('🔥 emailInvitees.value after:', emailInvitees.value);
     emailInviteInput.value = '';
     showNotification(`${emails.length} email(s) added to invitees`, 'success');
   } else {
@@ -1475,28 +1507,110 @@ function sendInAppNotifications(event) {
   });
 }
 
-function sendEmailInvitations(event) {
-  // Send email invitations
-  emailInvitees.value.forEach(email => {
-    const invitation = {
-      to: email,
-      subject: `Meeting Invitation: ${event.title}`,
-      body: `
-        You've been invited to a meeting!
-        
-        Title: ${event.title}
-        Date: ${formatDateForDisplay(event.date)}
-        Time: ${formatTimeForDisplay(event.timeFrom)} - ${formatTimeForDisplay(event.timeTo)}
-        ${event.description ? `Description: ${event.description}` : ''}
-        ${event.meetingLink ? `Join Link: ${event.meetingLink}` : ''}
-        
-        Organized by: ${userName.value}
-      `,
-      meetingId: event.id
-    };
-    console.log('Sending email invitation to:', email, invitation);
-    // In a real app, this would make an API call to send the email
-  });
+async function sendEmailInvitations(event) {
+  try {
+    console.log('🚀 Starting sendEmailInvitations with event:', event);
+    
+    // Import the meeting invitation API service
+    const { meetingInvitationApi } = await import('../services/meetingInvitationApi.service.js');
+    
+    // Get organizer email (you may need to get this from user context)
+    let organizerEmail = localStorage.getItem('userEmail');
+    
+    // If no organizer email is set, prompt for it or use a default
+    if (!organizerEmail || organizerEmail === 'organizer@example.com') {
+      // For demo purposes, let's set a default email. In production, this would come from user authentication
+      organizerEmail = 'suprun.jen@gmail.com'; // Using your email for testing
+      localStorage.setItem('userEmail', organizerEmail);
+      console.log('📧 Using organizer email:', organizerEmail);
+    }
+    
+    // Convert app users to expected format
+    const appUsers = selectedPeople.value.map(person => ({
+      email: person.email || `${person.name.toLowerCase().replace(' ', '.')}@company.com`, // fallback email
+      name: person.name
+    }));
+
+    console.log('👥 Selected app users:', selectedPeople.value);
+    console.log('📧 Converted app users:', appUsers);
+    console.log('📮 Email invitees:', emailInvitees.value);
+
+    // Only send to invited participants (no organizer confirmation email)
+    const allRecipients = [...appUsers];
+    
+    // FORCE: Get emails from DOM if reactive value is empty
+    let allEmailInvitees = [...emailInvitees.value];
+    
+    // Fallback: if reactive array is empty, try to get emails from displayed UI
+    if (allEmailInvitees.length === 0) {
+      const emailElements = document.querySelectorAll('.email-invitee .person-name');
+      const domEmails = Array.from(emailElements).map(el => el.textContent.trim());
+      allEmailInvitees = domEmails.filter(email => email && email.includes('@'));
+      console.log('🔧 FALLBACK: Got emails from DOM:', domEmails);
+    }
+
+    console.log('📊 Recipients debug:', {
+      appUsers: allRecipients.length,
+      emailInvitees: allEmailInvitees.length,
+      emailInviteesRaw: emailInvitees.value,
+      fallbackEmails: allEmailInvitees
+    });
+
+    // Check if there are any recipients to send invitations to
+    const totalRecipients = allRecipients.length + allEmailInvitees.length;
+    console.log('📊 Total recipients:', totalRecipients, 'App users:', allRecipients.length, 'Email invitees:', allEmailInvitees.length);
+    
+    if (totalRecipients === 0) {
+      console.log('⚠️ No email recipients to send invitations to');
+      return;
+    }
+    
+    console.log('✅ Recipients found! Proceeding with email sending...');
+
+    console.log('📤 About to send invitations...');
+    
+    // Send invitations using the API
+    console.log('📤 Sending with data:', {
+      event: event.title,
+      allRecipients,
+      allEmailInvitees,
+      userName: userName.value,
+      organizerEmail
+    });
+    
+    const result = await meetingInvitationApi.sendMeetingInvitations(
+      event,
+      allRecipients,
+      allEmailInvitees,
+      userName.value,
+      organizerEmail
+    );
+
+    console.log('✅ Email invitations sent successfully:', result);
+    
+    // Show success notification with details
+    const totalSent = result.data.sentSuccessfully;
+    const totalFailed = result.data.failed;
+    
+    if (totalFailed > 0) {
+      showNotification(
+        `Invitations sent: ${totalSent} successful, ${totalFailed} failed`, 
+        'warning'
+      );
+    } else {
+      showNotification(
+        `All ${totalSent} email invitations sent successfully!`, 
+        'success'
+      );
+    }
+    
+  } catch (error) {
+    console.error('❌ Failed to send email invitations:', error);
+    showNotification(
+      `Failed to send email invitations: ${error.message}`, 
+      'error'
+    );
+  }
 }
 
 // Date and time formatting functions
@@ -1559,8 +1673,25 @@ const isFormValid = computed(() => {
   return !!newEvent.value.title;
 });
 
+// Delete event function
+function deleteEvent(eventId) {
+  if (confirm('Are you sure you want to delete this reminder?')) {
+    const index = events.value.findIndex(event => event.id === eventId);
+    if (index > -1) {
+      events.value.splice(index, 1);
+      showNotification('Reminder deleted successfully!', 'success');
+    }
+  }
+}
+
 // Create event function
 function createEvent() {
+  console.log('🎯 createEvent function called!');
+  console.log('🎯 Form valid?', isFormValid.value);
+  console.log('🎯 Event type:', eventType.value);
+  console.log('🎯 Selected people:', selectedPeople.value);
+  console.log('🎯 Email invitees:', emailInvitees.value);
+  
   if (!isFormValid.value) {
     showNotification('Please fill in all required fields', 'warning');
     return;
@@ -1607,28 +1738,35 @@ function createEvent() {
       sendInAppNotifications(createdEvent);
     }
     
-    // Send email invitations
-    if (emailInvitees.value.length > 0) {
-      sendEmailInvitations(createdEvent);
-    }
-    
-    const totalInvitees = selectedPeople.value.length + emailInvitees.value.length;
-    if (totalInvitees > 0) {
-      showNotification(`Meeting created and ${totalInvitees} invitation(s) sent!`, 'success');
-    } else {
-      showNotification('Meeting created successfully!', 'success');
-    }
+      // Send email invitations only if there are participants
+  const totalInvitees = selectedPeople.value.length + emailInvitees.value.length;
+  if (totalInvitees > 0) {
+    // Wait for email sending to complete before resetting form
+    sendEmailInvitations(createdEvent).then(() => {
+      showNotification(`${eventType.value === 'event' ? 'Event' : 'Meeting'} created and ${totalInvitees} invitation(s) sent!`, 'success');
+      // Reset form after emails are sent
+      resetForm();
+    }).catch((error) => {
+      console.error('Email sending failed:', error);
+      showNotification(`${eventType.value === 'event' ? 'Event' : 'Meeting'} created but email sending failed!`, 'warning');
+      // Reset form even if email fails
+      resetForm();
+    });
   } else {
-    showNotification('Task created successfully!', 'success');
+    showNotification(`${eventType.value === 'event' ? 'Event' : 'Meeting'} created successfully!`, 'success');
+    // Reset form immediately if no emails to send
+    resetForm();
   }
-  
-  // Generate recurring events if needed
-  if (newEvent.value.repeatEvery !== 'On' && newEvent.value.endRepeatDate) {
-    generateRecurringEvents(createdEvent);
-  }
-  
-  // Reset form
+} else {
+  showNotification('Task created successfully!', 'success');
+  // Reset form immediately for tasks
   resetForm();
+}
+
+// Generate recurring events if needed
+if (newEvent.value.repeatEvery !== 'On' && newEvent.value.endRepeatDate) {
+  generateRecurringEvents(createdEvent);
+}
 }
 
 // Generate recurring events based on repeat settings
@@ -2737,6 +2875,28 @@ function completeTask(event) {
   opacity: 0.6;
   transform: none;
   box-shadow: none;
+}
+
+/* Delete Button Styles */
+.meeting-card {
+  position: relative;
+}
+
+.delete-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 10;
+}
+
+.meeting-card:hover .delete-btn {
+  opacity: 1;
+}
+
+.delete-btn:hover {
+  background-color: rgba(244, 67, 54, 0.1) !important;
 }
 
 </style>
