@@ -352,6 +352,19 @@ const saveProfile = async () => {
         profileImage: profileImage.value
       };
       localStorage.setItem('user_data', JSON.stringify(updatedUserData));
+      
+      // Dispatch events for real-time updates across the app
+      window.dispatchEvent(new CustomEvent('userNameUpdated', {
+        detail: { 
+          fullName: formData.value.fullName,
+          name: formData.value.fullName
+        }
+      }));
+      
+      window.dispatchEvent(new CustomEvent('profileImageUpdated', {
+        detail: { profileImage: profileImage.value }
+      }));
+      
     } else {
       // Create new user data if none exists
       const newUserData = {
@@ -359,6 +372,18 @@ const saveProfile = async () => {
         profileImage: profileImage.value
       };
       localStorage.setItem('user_data', JSON.stringify(newUserData));
+      
+      // Dispatch events for new user data
+      window.dispatchEvent(new CustomEvent('userNameUpdated', {
+        detail: { 
+          fullName: formData.value.fullName,
+          name: formData.value.fullName
+        }
+      }));
+      
+      window.dispatchEvent(new CustomEvent('profileImageUpdated', {
+        detail: { profileImage: profileImage.value }
+      }));
     }
     
     // Simulate API call

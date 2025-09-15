@@ -969,7 +969,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 // Remove this import since you're defining your own implementation
 // import { isSameDay } from 'vuetify/lib/util/dateTimeUtils' 
 
@@ -1856,6 +1856,43 @@ onMounted(() => {
   
   // Set default end repeat date
   setDefaultEndDate();
+  
+  // Load user data from localStorage
+  loadUserData();
+  
+  // Listen for profile updates
+  window.addEventListener('profileImageUpdated', handleProfileUpdate);
+  window.addEventListener('userNameUpdated', handleProfileUpdate);
+});
+
+// Load user data from localStorage
+function loadUserData() {
+  const userData = localStorage.getItem('user_data');
+  if (userData) {
+    const parsedData = JSON.parse(userData);
+    userName.value = parsedData.fullName || parsedData.name || 'User';
+    userAvatar.value = parsedData.profileImage || parsedData.avatar || 'https://randomuser.me/api/portraits/women/85.jpg';
+  }
+}
+
+// Handle profile updates
+function handleProfileUpdate(event) {
+  if (event.detail) {
+    if (event.detail.profileImage) {
+      userAvatar.value = event.detail.profileImage;
+    }
+    if (event.detail.fullName || event.detail.name) {
+      userName.value = event.detail.fullName || event.detail.name;
+    }
+    // Reload all user data to ensure consistency
+    loadUserData();
+  }
+}
+
+// Cleanup event listeners
+onBeforeUnmount(() => {
+  window.removeEventListener('profileImageUpdated', handleProfileUpdate);
+  window.removeEventListener('userNameUpdated', handleProfileUpdate);
 });
 
 function getNotificationIcon(type) {

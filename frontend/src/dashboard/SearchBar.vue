@@ -322,6 +322,19 @@ const handleProfileImageUpdate = (event) => {
   }
 }
 
+// Listen for user name updates
+const handleUserNameUpdate = (event) => {
+  if (event.detail && (event.detail.fullName || event.detail.name)) {
+    user.value.name = event.detail.fullName || event.detail.name;
+  }
+}
+
+// Handle all profile updates
+const handleProfileUpdate = (event) => {
+  // Reload all user data to ensure consistency
+  loadUserData();
+}
+
 // Languages
 const availableLanguages = ref([
   { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -502,12 +515,14 @@ const handleClickOutside = (event) => {
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
   loadUserData()
-  window.addEventListener('profileImageUpdated', handleProfileImageUpdate)
+  window.addEventListener('profileImageUpdated', handleProfileUpdate)
+  window.addEventListener('userNameUpdated', handleProfileUpdate)
 })
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
-  window.removeEventListener('profileImageUpdated', handleProfileImageUpdate)
+  window.removeEventListener('profileImageUpdated', handleProfileUpdate)
+  window.removeEventListener('userNameUpdated', handleProfileUpdate)
 })
 </script>
 

@@ -748,8 +748,9 @@ export default {
     // Load user data from localStorage
     this.loadUserData();
     
-    // Listen for profile image updates
-    window.addEventListener('profileImageUpdated', this.handleProfileImageUpdate);
+    // Listen for profile updates
+    window.addEventListener('profileImageUpdated', this.handleProfileUpdate);
+    window.addEventListener('userNameUpdated', this.handleProfileUpdate);
     
     // Initialize last messages for chats
     this.chats.forEach(chat => {
@@ -788,8 +789,9 @@ export default {
   },
   
   beforeDestroy() {
-    // Remove event listener
-    window.removeEventListener('profileImageUpdated', this.handleProfileImageUpdate);
+    // Remove event listeners
+    window.removeEventListener('profileImageUpdated', this.handleProfileUpdate);
+    window.removeEventListener('userNameUpdated', this.handleProfileUpdate);
   },
   
   methods: {
@@ -806,11 +808,10 @@ export default {
       }
     },
     
-    // Handle profile image updates
-    handleProfileImageUpdate(event) {
-      if (event.detail && event.detail.profileImage) {
-        this.currentUser.avatar = event.detail.profileImage;
-      }
+    // Handle profile updates (both image and name)
+    handleProfileUpdate(event) {
+      // Always reload user data for consistency
+      this.loadUserData();
     },
     
     selectChat(chatId) {
