@@ -349,6 +349,69 @@
               </v-col>
             </v-row>
           </div>
+
+          <!-- Project Files Section -->
+          <div v-if="project.files && project.files.length > 0" class="tool-section">
+            <div class="section-header">
+              <div class="section-title">
+                <v-icon class="section-icon" color="info">mdi-file-multiple</v-icon>
+                <h2 class="section-heading">Project Files</h2>
+              </div>
+            </div>
+            
+            <div class="files-grid">
+              <div 
+                v-for="file in project.files" 
+                :key="file.id" 
+                class="file-card"
+              >
+                <div class="file-preview">
+                  <div v-if="isImage(file.mimetype)" class="image-preview">
+                    <img 
+                      :src="`http://localhost:3001${file.path}`" 
+                      :alt="file.originalName"
+                      class="preview-image"
+                    />
+                  </div>
+                  <div v-else class="file-icon-preview">
+                    <v-icon :color="getFileIconColor(file.mimetype)" size="48">
+                      {{ getFileIcon(file.mimetype) }}
+                    </v-icon>
+                  </div>
+                </div>
+                
+                <div class="file-info">
+                  <h4 class="file-name">{{ file.originalName }}</h4>
+                  <p class="file-size">{{ formatFileSize(file.size) }}</p>
+                  <p class="file-date">{{ formatFileDate(file.uploadedAt) }}</p>
+                </div>
+                
+                <div class="file-actions">
+                  <v-btn 
+                    :href="`http://localhost:3001${file.path}`" 
+                    target="_blank"
+                    color="primary" 
+                    variant="outlined" 
+                    size="small"
+                    class="mr-2"
+                  >
+                    <v-icon class="mr-1">mdi-download</v-icon>
+                    Download
+                  </v-btn>
+                  <v-btn 
+                    :href="`http://localhost:3001${file.path}`" 
+                    target="_blank"
+                    color="secondary" 
+                    variant="text" 
+                    size="small"
+                  >
+                    <v-icon class="mr-1">mdi-eye</v-icon>
+                    View
+                  </v-btn>
+                </div>
+              </div>
+            </div>
+          </div>
         </v-container>
       </div>
     </v-main>
@@ -512,6 +575,61 @@ const formatDeadline = (deadline) => {
   } else {
     return `in ${diffDays} days`;
   }
+};
+
+// File helpers
+const isImage = (mimetype) => {
+  return mimetype && mimetype.startsWith('image/');
+};
+
+const getFileIcon = (mimetype) => {
+  if (!mimetype) return 'mdi-file';
+  
+  if (mimetype.startsWith('image/')) return 'mdi-file-image';
+  if (mimetype.includes('pdf')) return 'mdi-file-pdf-box';
+  if (mimetype.includes('word') || mimetype.includes('document')) return 'mdi-file-word';
+  if (mimetype.includes('excel') || mimetype.includes('spreadsheet')) return 'mdi-file-excel';
+  if (mimetype.includes('powerpoint') || mimetype.includes('presentation')) return 'mdi-file-powerpoint';
+  if (mimetype.includes('zip') || mimetype.includes('rar') || mimetype.includes('7z')) return 'mdi-folder-zip';
+  if (mimetype.includes('video')) return 'mdi-file-video';
+  if (mimetype.includes('audio')) return 'mdi-file-music';
+  if (mimetype.includes('text')) return 'mdi-file-document';
+  
+  return 'mdi-file';
+};
+
+const getFileIconColor = (mimetype) => {
+  if (!mimetype) return 'grey';
+  
+  if (mimetype.startsWith('image/')) return 'green';
+  if (mimetype.includes('pdf')) return 'red';
+  if (mimetype.includes('word') || mimetype.includes('document')) return 'blue';
+  if (mimetype.includes('excel') || mimetype.includes('spreadsheet')) return 'green';
+  if (mimetype.includes('powerpoint') || mimetype.includes('presentation')) return 'orange';
+  if (mimetype.includes('zip') || mimetype.includes('rar') || mimetype.includes('7z')) return 'purple';
+  if (mimetype.includes('video')) return 'red';
+  if (mimetype.includes('audio')) return 'purple';
+  
+  return 'grey';
+};
+
+const formatFileSize = (bytes) => {
+  if (bytes === 0) return '0 Bytes';
+  
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+};
+
+const formatFileDate = (dateString) => {
+  if (!dateString) return 'Unknown';
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
 };
 
 // Actions
@@ -1090,6 +1208,103 @@ onMounted(() => {
   .hero-btn, .hero-btn-outline {
     width: 100%;
     min-width: unset;
+  }
+}
+
+/* Files Section */
+.files-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.file-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid #e2e8f0;
+}
+
+.file-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.file-preview {
+  height: 150px;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.image-preview {
+  width: 100%;
+  height: 100%;
+}
+
+.preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.file-icon-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.file-info {
+  padding: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.file-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-size {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0 0 0.25rem 0;
+}
+
+.file-date {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.file-actions {
+  padding: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .files-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .file-actions {
+    flex-direction: column;
+  }
+  
+  .file-actions .v-btn {
+    width: 100%;
   }
 }
 </style>

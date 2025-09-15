@@ -302,6 +302,26 @@ const user = ref({
   avatar: 'https://images.unsplash.com/photo-1494790108755-2616c06146b9?w=150&h=150&fit=crop&crop=face'
 })
 
+// Load user data from localStorage
+const loadUserData = () => {
+  const userData = localStorage.getItem('user_data');
+  if (userData) {
+    const parsedData = JSON.parse(userData);
+    user.value = {
+      name: parsedData.fullName || parsedData.name || 'User',
+      email: parsedData.email || 'user@example.com',
+      avatar: parsedData.profileImage || parsedData.avatar || 'https://images.unsplash.com/photo-1494790108755-2616c06146b9?w=150&h=150&fit=crop&crop=face'
+    };
+  }
+}
+
+// Listen for profile image updates
+const handleProfileImageUpdate = (event) => {
+  if (event.detail && event.detail.profileImage) {
+    user.value.avatar = event.detail.profileImage;
+  }
+}
+
 // Languages
 const availableLanguages = ref([
   { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -481,10 +501,13 @@ const handleClickOutside = (event) => {
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
+  loadUserData()
+  window.addEventListener('profileImageUpdated', handleProfileImageUpdate)
 })
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
+  window.removeEventListener('profileImageUpdated', handleProfileImageUpdate)
 })
 </script>
 

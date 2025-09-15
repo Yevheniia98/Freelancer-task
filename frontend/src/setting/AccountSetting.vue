@@ -303,7 +303,20 @@ const handleFileUpload = async (event) => {
       });
       if (response.data && response.data.path) {
         // Set the profile image to the uploaded file URL
-        profileImage.value = response.data.path;
+        profileImage.value = `http://localhost:3001${response.data.path}`;
+        
+        // Update localStorage with new profile image immediately
+        const existingUserData = localStorage.getItem('user_data');
+        if (existingUserData) {
+          const userData = JSON.parse(existingUserData);
+          userData.profileImage = profileImage.value;
+          localStorage.setItem('user_data', JSON.stringify(userData));
+        }
+        
+        // Trigger a custom event to notify other components
+        window.dispatchEvent(new CustomEvent('profileImageUpdated', {
+          detail: { profileImage: profileImage.value }
+        }));
       } else {
         console.error('Upload failed: No file path returned');
       }
@@ -329,18 +342,23 @@ const saveProfile = async () => {
     const existingUserData = localStorage.getItem('user_data');
     if (existingUserData) {
       const userData = JSON.parse(existingUserData);
-      // Update user data with form data
+      // Update user data with form data and profile image
       const updatedUserData = {
         ...userData,
         fullName: formData.value.fullName,
         email: formData.value.email,
         phoneNumber: formData.value.phoneNumber,
-        country: formData.value.country
+        country: formData.value.country,
+        profileImage: profileImage.value
       };
       localStorage.setItem('user_data', JSON.stringify(updatedUserData));
     } else {
       // Create new user data if none exists
-      localStorage.setItem('user_data', JSON.stringify(formData.value));
+      const newUserData = {
+        ...formData.value,
+        profileImage: profileImage.value
+      };
+      localStorage.setItem('user_data', JSON.stringify(newUserData));
     }
     
     // Simulate API call
@@ -374,6 +392,25 @@ onMounted(() => {
   const pathSegment = route.path.split('/').pop()
   if (pathSegment && ['profile', 'password1', 'notifications', 'data-export', 'log-out'].includes(pathSegment)) {
     tab.value = pathSegment
+  }
+  
+  // Load user data from localStorage
+  const userData = localStorage.getItem('user_data');
+  if (userData) {
+    const parsedData = JSON.parse(userData);
+    
+    // Set form data
+    formData.value = {
+      fullName: parsedData.fullName || '',
+      email: parsedData.email || '',
+      phoneNumber: parsedData.phoneNumber || '',
+      country: parsedData.country || ''
+    };
+    
+    // Set profile image
+    if (parsedData.profileImage) {
+      profileImage.value = parsedData.profileImage;
+    }
   }
 })
 </script>

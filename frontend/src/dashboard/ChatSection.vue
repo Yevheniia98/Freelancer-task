@@ -745,6 +745,12 @@ export default {
   },
   
   mounted() {
+    // Load user data from localStorage
+    this.loadUserData();
+    
+    // Listen for profile image updates
+    window.addEventListener('profileImageUpdated', this.handleProfileImageUpdate);
+    
     // Initialize last messages for chats
     this.chats.forEach(chat => {
       if (chat.messages.length > 0) {
@@ -781,7 +787,32 @@ export default {
     }, 15000);
   },
   
+  beforeDestroy() {
+    // Remove event listener
+    window.removeEventListener('profileImageUpdated', this.handleProfileImageUpdate);
+  },
+  
   methods: {
+    // Load user data from localStorage
+    loadUserData() {
+      const userData = localStorage.getItem('user_data');
+      if (userData) {
+        const parsedData = JSON.parse(userData);
+        this.currentUser = {
+          ...this.currentUser,
+          name: parsedData.fullName || parsedData.name || 'You',
+          avatar: parsedData.profileImage || parsedData.avatar || this.currentUser.avatar
+        };
+      }
+    },
+    
+    // Handle profile image updates
+    handleProfileImageUpdate(event) {
+      if (event.detail && event.detail.profileImage) {
+        this.currentUser.avatar = event.detail.profileImage;
+      }
+    },
+    
     selectChat(chatId) {
       this.selectedChatId = chatId;
       const chat = this.chats.find(c => c.id === chatId);

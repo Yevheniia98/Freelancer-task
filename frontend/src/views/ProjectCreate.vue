@@ -921,6 +921,8 @@ const submitProject = async () => {
       alert('Project title and description are required.');
       return;
     }
+    
+    // Create project first
     const projectData = {
       title: projectTitle.value.trim(),
       description: description.value.trim(),
@@ -928,7 +930,36 @@ const submitProject = async () => {
       status: status.value || 'pending',
       deadline: deadline.value ? deadline.value : undefined
     };
+    
     const createdProject = await ProjectApiService.create(projectData);
+    
+    // Upload files if any
+    if (uploadedFiles.value.length > 0 || thumbnailFile.value) {
+      const filesToUpload = [...uploadedFiles.value];
+      if (thumbnailFile.value) {
+        filesToUpload.push(thumbnailFile.value);
+      }
+      
+      // Upload each file
+      for (const file of filesToUpload) {
+        try {
+          const formData = new FormData();
+          formData.append('file', file);
+          
+          const response = await fetch(`/api/projects/${createdProject.id}/files`, {
+            method: 'POST',
+            body: formData
+          });
+          
+          if (!response.ok) {
+            console.error(`Failed to upload ${file.name}`);
+          }
+        } catch (uploadError) {
+          console.error(`Error uploading ${file.name}:`, uploadError);
+        }
+      }
+    }
+    
     showSuccessPopup.value = true;
     setTimeout(() => {
       router.push('/projects');
