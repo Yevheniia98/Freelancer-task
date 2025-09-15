@@ -45,7 +45,7 @@ const transporter = nodemailer.createTransport({
 // File upload configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/");
+    cb(null, path.join(__dirname, "../uploads/"));
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
@@ -305,6 +305,18 @@ app.get('/api/dashboard', authenticateToken, (req: any, res: Response) => {
     success: true,
     message: 'Dashboard data',
     user: req.user
+  });
+});
+
+// API File upload route (for profile pictures, etc.)
+app.post("/api/upload", upload.single("file"), (req: Request, res: Response) => {
+  if (!req.file) {
+    return res.status(400).json({ message: "File not uploaded" });
+  }
+  res.json({
+    message: "File uploaded successfully",
+    filename: req.file.filename,
+    path: `/uploads/${req.file.filename}`,
   });
 });
 
