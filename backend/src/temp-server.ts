@@ -6,6 +6,10 @@ import cors from "cors";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import nodemailer from "nodemailer";
+import * as dotenv from "dotenv";
+
+// Load environment variables
+dotenv.config();
 
 const app = express();
 
@@ -33,12 +37,12 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-make-it-
 
 // Email configuration
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: parseInt(process.env.SMTP_PORT || '587'),
   secure: false,
   auth: {
-    user: 'freelancetasker0@gmail.com',
-    pass: 'cflj fcsz jadd gbmy'
+    user: process.env.SMTP_USER || 'freelancetasker0@gmail.com',
+    pass: process.env.SMTP_PASS || 'cflj fcsz jadd gbmy'
   }
 });
 
@@ -753,7 +757,7 @@ async function sendSingleMeetingInvitation(recipient: any, meetingData: any) {
   };
 }
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3030;
 
 app.listen(PORT, () => {
   console.log(`🚀 Temporary server running on http://localhost:${PORT}`);
