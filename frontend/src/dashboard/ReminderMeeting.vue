@@ -189,7 +189,7 @@
         >
           <v-img :src="userAvatar" />
         </v-avatar>
-        <span class="user-name text-h6">{{ userName }} (You)</span>
+        <span class="user-name text-h6">{{ userName }}</span>
       </div>
 
       <!-- Event Type Selection -->
