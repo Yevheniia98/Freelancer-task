@@ -464,6 +464,295 @@ app.post('/api/projects/:id/files', upload.single('file'), (req: Request, res: R
   });
 });
 
+// Meeting invitation endpoints
+app.post('/api/meeting-invitations/send-multiple', async (req: Request, res: Response) => {
+  try {
+    const { recipients, meetingData } = req.body;
+
+    console.log('📧 Received meeting invitation request:', {
+      recipients: recipients?.length || 0,
+      meetingData: meetingData?.title || 'No title'
+    });
+
+    if (!recipients || !Array.isArray(recipients) || recipients.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Recipients array is required and must not be empty'
+      });
+    }
+
+    if (!meetingData || !meetingData.title) {
+      return res.status(400).json({
+        success: false,
+        message: 'Meeting data with title is required'
+      });
+    }
+
+    const emailResults = await Promise.allSettled(
+      recipients.map(async (recipient) => {
+        if (!recipient.email) {
+          throw new Error(`Invalid recipient: missing email`);
+        }
+
+        const emailContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Meeting Invitation</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9; }
+        .header { background: #0D7C66; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .content { background: white; padding: 30px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .meeting-details { background: #f8f9fa; padding: 20px; border-radius: 6px; margin: 20px 0; }
+        .detail-row { margin: 10px 0; }
+        .label { font-weight: bold; color: #0D7C66; }
+        .join-button { display: inline-block; background: #0D7C66; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+        .footer { text-align: center; color: #666; font-size: 14px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📅 Meeting Invitation</h1>
+        </div>
+        <div class="content">
+            <p>Hello ${recipient.name || 'there'},</p>
+            
+            <p>You're invited to join our upcoming meeting:</p>
+            
+            <div class="meeting-details">
+                <div class="detail-row">
+                    <span class="label">Meeting:</span> ${meetingData.title}
+                </div>
+                ${meetingData.description ? `
+                <div class="detail-row">
+                    <span class="label">Description:</span> ${meetingData.description}
+                </div>
+                ` : ''}
+                <div class="detail-row">
+                    <span class="label">Date:</span> ${new Date(meetingData.date).toLocaleDateString('en-US', { 
+                      weekday: 'long', 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                </div>
+                <div class="detail-row">
+                    <span class="label">Time:</span> ${meetingData.startTime} - ${meetingData.endTime}
+                </div>
+                ${meetingData.platform ? `
+                <div class="detail-row">
+                    <span class="label">Platform:</span> ${meetingData.platform.charAt(0).toUpperCase() + meetingData.platform.slice(1)}
+                </div>
+                ` : ''}
+                <div class="detail-row">
+                    <span class="label">Organizer:</span> ${meetingData.organizerName} (${meetingData.organizerEmail})
+                </div>
+            </div>
+            
+            ${meetingData.meetingLink ? `
+            <p style="text-align: center;">
+                <a href="${meetingData.meetingLink}" class="join-button">🔗 Join Meeting</a>
+            </p>
+            ` : ''}
+            
+            <p>We look forward to seeing you there!</p>
+            
+            <p>Best regards,<br>
+            ${meetingData.organizerName}</p>
+        </div>
+        <div class="footer">
+            <p>This is an automated invitation from the Freelancer Task Manager</p>
+        </div>
+    </div>
+</body>
+</html>
+        `;
+
+        const mailOptions = {
+          from: `"${meetingData.organizerName}" <${process.env.EMAIL_USER || 'freelancetasker0@gmail.com'}>`,
+          to: recipient.email,
+          subject: `📅 Meeting Invitation: ${meetingData.title}`,
+          html: emailContent
+        };
+
+        console.log(`📤 Sending email to: ${recipient.email}`);
+        const info = await transporter.sendMail(mailOptions);
+        console.log(`✅ Email sent to ${recipient.email}:`, info.messageId);
+        
+        return {
+          email: recipient.email,
+          name: recipient.name,
+          status: 'sent',
+          messageId: info.messageId
+        };
+      })
+    );
+
+    const sentSuccessfully = emailResults.filter(result => result.status === 'fulfilled').length;
+    const failed = emailResults.filter(result => result.status === 'rejected').length;
+    
+    const failedResults = emailResults
+      .filter(result => result.status === 'rejected')
+      .map(result => ({
+        error: (result as PromiseRejectedResult).reason.message
+      }));
+
+    console.log(`📊 Email results: ${sentSuccessfully} sent, ${failed} failed`);
+
+    res.json({
+      success: true,
+      message: `Meeting invitations processed: ${sentSuccessfully} sent, ${failed} failed`,
+      data: {
+        sentSuccessfully,
+        failed,
+        results: emailResults.map(result => 
+          result.status === 'fulfilled' ? result.value : { error: (result as PromiseRejectedResult).reason.message }
+        ),
+        failedResults
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Meeting invitation error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to send meeting invitations',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+app.post('/api/meeting-invitations/send-single', async (req: Request, res: Response) => {
+  try {
+    const { recipient, meetingData } = req.body;
+
+    if (!recipient?.email || !meetingData?.title) {
+      return res.status(400).json({
+        success: false,
+        message: 'Recipient email and meeting title are required'
+      });
+    }
+
+    // Use the same logic as send-multiple but for a single recipient
+    const result = await sendSingleMeetingInvitation(recipient, meetingData);
+    
+    res.json({
+      success: true,
+      message: 'Meeting invitation sent successfully',
+      data: result
+    });
+
+  } catch (error) {
+    console.error('❌ Single meeting invitation error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to send meeting invitation',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Helper function for single email sending
+async function sendSingleMeetingInvitation(recipient: any, meetingData: any) {
+  const emailContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Meeting Invitation</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9; }
+        .header { background: #0D7C66; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .content { background: white; padding: 30px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .meeting-details { background: #f8f9fa; padding: 20px; border-radius: 6px; margin: 20px 0; }
+        .detail-row { margin: 10px 0; }
+        .label { font-weight: bold; color: #0D7C66; }
+        .join-button { display: inline-block; background: #0D7C66; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+        .footer { text-align: center; color: #666; font-size: 14px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📅 Meeting Invitation</h1>
+        </div>
+        <div class="content">
+            <p>Hello ${recipient.name || 'there'},</p>
+            
+            <p>You're invited to join our upcoming meeting:</p>
+            
+            <div class="meeting-details">
+                <div class="detail-row">
+                    <span class="label">Meeting:</span> ${meetingData.title}
+                </div>
+                ${meetingData.description ? `
+                <div class="detail-row">
+                    <span class="label">Description:</span> ${meetingData.description}
+                </div>
+                ` : ''}
+                <div class="detail-row">
+                    <span class="label">Date:</span> ${new Date(meetingData.date).toLocaleDateString('en-US', { 
+                      weekday: 'long', 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                </div>
+                <div class="detail-row">
+                    <span class="label">Time:</span> ${meetingData.startTime} - ${meetingData.endTime}
+                </div>
+                ${meetingData.platform ? `
+                <div class="detail-row">
+                    <span class="label">Platform:</span> ${meetingData.platform.charAt(0).toUpperCase() + meetingData.platform.slice(1)}
+                </div>
+                ` : ''}
+                <div class="detail-row">
+                    <span class="label">Organizer:</span> ${meetingData.organizerName} (${meetingData.organizerEmail})
+                </div>
+            </div>
+            
+            ${meetingData.meetingLink ? `
+            <p style="text-align: center;">
+                <a href="${meetingData.meetingLink}" class="join-button">🔗 Join Meeting</a>
+            </p>
+            ` : ''}
+            
+            <p>We look forward to seeing you there!</p>
+            
+            <p>Best regards,<br>
+            ${meetingData.organizerName}</p>
+        </div>
+        <div class="footer">
+            <p>This is an automated invitation from the Freelancer Task Manager</p>
+        </div>
+    </div>
+</body>
+</html>
+  `;
+
+  const mailOptions = {
+    from: `"${meetingData.organizerName}" <${process.env.EMAIL_USER || 'freelancetasker0@gmail.com'}>`,
+    to: recipient.email,
+    subject: `📅 Meeting Invitation: ${meetingData.title}`,
+    html: emailContent
+  };
+
+  console.log(`📤 Sending single email to: ${recipient.email}`);
+  const info = await transporter.sendMail(mailOptions);
+  console.log(`✅ Email sent to ${recipient.email}:`, info.messageId);
+  
+  return {
+    email: recipient.email,
+    name: recipient.name,
+    status: 'sent',
+    messageId: info.messageId
+  };
+}
+
 const PORT = 3001;
 
 app.listen(PORT, () => {
