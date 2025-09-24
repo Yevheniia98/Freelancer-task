@@ -23,19 +23,6 @@
               </p>
             </div>
             <div class="hero-actions">
-              <v-btn 
-                color="white"
-                variant="elevated"
-                size="large"
-                rounded="lg"
-                class="hero-btn"
-                @click="submitProject"
-              >
-                <v-icon class="mr-2">
-                  mdi-rocket-launch
-                </v-icon>
-                Create Project
-              </v-btn>
             </div>
           </div>
         </v-container>
@@ -290,32 +277,17 @@
                           >
                             <v-icon>mdi-format-italic</v-icon>
                           </v-btn>
-                          <v-btn
-                            icon
-                            size="small"
-                            variant="text"
-                            @click="insertLink"
-                          >
-                            <v-icon>mdi-link</v-icon>
-                          </v-btn>
-                          <v-btn
-                            icon
-                            size="small"
-                            variant="text"
-                            @click="insertImage"
-                          >
-                            <v-icon>mdi-image</v-icon>
-                          </v-btn>
                         </div>
-                        <v-textarea
-                          v-model="description"
-                          variant="outlined"
-                          hide-details
-                          rows="8"
-                          no-resize
-                          placeholder="Describe your project goals, requirements, and expectations..."
-                          class="custom-textarea"
-                        />
+                        <div
+                          ref="descriptionTextarea"
+                          class="rich-text-editor"
+                          contenteditable="true"
+                          @input="handleRichTextInput"
+                          @focus="onEditorFocus"
+                          @blur="onEditorBlur"
+                          :data-placeholder="editorFocused || description ? '' : 'Describe your project goals, requirements, and expectations...'"
+                        >
+                        </div>
                       </div>
                     </div>
 
@@ -378,10 +350,10 @@
                 <div class="project-card">
                   <div class="card-header">
                     <h3 class="card-title">
-                      Attached Files
+                      Attached files
                     </h3>
                     <p class="card-subtitle">
-                      Upload project resources and documentation
+                      Add Attached files here.
                     </p>
                   </div>
                   
@@ -390,7 +362,9 @@
                       class="file-drop-zone"
                       @drop="handleFileDrop"
                       @dragover.prevent
-                      @dragenter.prevent
+                      @dragenter="handleDragEnter"
+                      @dragleave="handleDragLeave"
+                      style="min-height: 200px; border: 3px dashed #2196F3; border-radius: 12px; transition: all 0.3s ease;"
                     >
                       <div class="drop-zone-content">
                         <v-icon
@@ -400,35 +374,24 @@
                           mdi-cloud-upload
                         </v-icon>
                         <h4 class="drop-title">
-                          Drop files here or click to upload
+                          Drop files here or click to upload.
                         </h4>
                         <p class="drop-subtitle">
-                          Support for multiple file formats
+                          
                         </p>
                         
                         <div class="upload-actions">
                           <v-btn 
                             color="primary"
-                            variant="elevated"
+                            variant="outlined"
                             rounded="lg"
                             class="mr-3"
-                            @click="() => computerFileInput.click()"
+                            @click="triggerFileInput"
                           >
                             <v-icon class="mr-2">
                               mdi-laptop
                             </v-icon>
                             Upload from Computer
-                          </v-btn>
-                          <v-btn 
-                            color="primary"
-                            variant="outlined"
-                            rounded="lg"
-                            @click="() => computerFileInput.click()"
-                          >
-                            <v-icon class="mr-2">
-                              mdi-google-drive
-                            </v-icon>
-                            Google Drive
                           </v-btn>
                         </div>
                       </div>
@@ -479,7 +442,6 @@
                       type="file"
                       style="display: none"
                       multiple
-                      accept=".pdf,.doc,.docx,.txt,.rtf,.odt,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.bmp,.svg,.webp,.tiff,.mp4,.avi,.mov,.wmv,.zip,.rar,.7z"
                       @change="handleFileChange"
                     >
                     <input
@@ -487,7 +449,6 @@
                       type="file"
                       style="display: none"
                       multiple
-                      accept=".pdf,.doc,.docx,.txt,.rtf,.odt,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.bmp,.svg,.webp,.tiff,.mp4,.avi,.mov,.wmv,.zip,.rar,.7z"
                       @change="handleDriveFileChange"
                     >
                   </div>
@@ -600,12 +561,16 @@
                       <h4 class="field-label">
                         Team Lead
                       </h4>
-                      <v-select
+                      <v-combobox
                         v-model="teamLead"
                         :items="teamLeadOptions"
                         variant="outlined"
                         hide-details
                         class="custom-field"
+                        placeholder="Type name or select from team members"
+                        clearable
+                        :hint="teamMembers.length > 0 ? 'You can select from existing team members or type a name' : 'Add team members below to select from them'"
+                        persistent-hint
                       />
                     </div>
 
@@ -615,14 +580,48 @@
                       </h4>
                       <div class="team-members-section">
                         <div class="members-avatars">
-                          <v-avatar
+                          <div
                             v-for="(member, index) in teamMembers"
                             :key="index"
-                            size="40"
-                            class="member-avatar"
+                            class="member-wrapper"
+                            :class="{ 'team-lead-member': member.name === teamLead }"
                           >
-                            <v-img :src="`https://i.pravatar.cc/150?img=${index + 10}`" />
-                          </v-avatar>
+                            <v-avatar
+                              size="40"
+                              class="member-avatar"
+                              :style="getDefaultAvatarStyle(member)"
+                            >
+                              <v-img 
+                                v-if="member.profilePicture" 
+                                :src="member.profilePicture" 
+                                :alt="member.name"
+                              />
+                              <span v-else class="avatar-initials">
+                                {{ getAvatarContent(member) }}
+                              </span>
+                            </v-avatar>
+                            
+                            <!-- Team Lead Crown Icon -->
+                            <v-icon
+                              v-if="member.name === teamLead"
+                              size="16"
+                              color="#FFD700"
+                              class="team-lead-crown"
+                            >
+                              mdi-crown
+                            </v-icon>
+                            
+                            <v-btn
+                              icon
+                              size="16"
+                              color="error"
+                              variant="elevated"
+                              class="delete-member-btn"
+                              @click="removeTeamMember(index)"
+                            >
+                              <v-icon size="12">mdi-close</v-icon>
+                            </v-btn>
+                          </div>
                           <v-btn
                             icon
                             size="40"
@@ -678,30 +677,6 @@
             <div class="action-section">
               <div class="action-buttons">
                 <v-btn
-                  color="error"
-                  variant="outlined"
-                  size="large"
-                  rounded="lg"
-                  class="action-btn"
-                >
-                  <v-icon class="mr-2">
-                    mdi-delete
-                  </v-icon>
-                  Delete Draft
-                </v-btn>
-                <v-btn
-                  color="grey"
-                  variant="outlined"
-                  size="large"
-                  rounded="lg"
-                  class="action-btn"
-                >
-                  <v-icon class="mr-2">
-                    mdi-content-save
-                  </v-icon>
-                  Save Draft
-                </v-btn>
-                <v-btn
                   color="primary"
                   variant="elevated"
                   size="large"
@@ -742,7 +717,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import LeftMenu from '@/dashboard/LeftMenu.vue';
 import SearchBar from '@/dashboard/SearchBar.vue';
@@ -753,7 +728,7 @@ const router = useRouter();
 // Form data
 const projectTitle = ref('');
 const thumbnailFile = ref(null);
-const description = ref('We are looking for a skilled UI/UX designer to redesign our landing page, focusing on creating a modern, visually appealing, and user-friendly experience. The design should enhance usability, highlight key elements effectively, and align with our brand identity. Your work should guide users smoothly to the call-to-action, improving engagement and conversions.\n\nRequirements:\n• Create a clean, responsive, and attractive design\n• Focus on improving structure, usability, and interactivity\n• Deliver wireframes/mockups and final design files (Figma or Adobe XD)\n• Experience with designing high-conversion landing pages is preferred');
+const description = ref('');
 const priority = ref('high');
 const status = ref('pending');
 const deadline = ref('');
@@ -761,12 +736,8 @@ const privacy = ref('Private');
 const category = ref('Designing');
 const skills = ref(['UI/UX', 'CSS', 'HTML', 'Figma']);
 const newSkill = ref('');
-const teamLead = ref('Ellen Smith');
-const teamMembers = ref([
-  { id: 1, name: 'Team Member 1', email: 'member1@example.com' },
-  { id: 2, name: 'Team Member 2', email: 'member2@example.com' },
-  { id: 3, name: 'Team Member 3', email: 'member3@example.com' }
-]);
+const teamLead = ref('');
+const teamMembers = ref([]);
 const newMemberEmail = ref('');
 const showAddMemberForm = ref(false);
 const showSuccessPopup = ref(false);
@@ -801,47 +772,153 @@ const categoryOptions = [
   { title: 'Content Creation', value: 'Content' }
 ];
 
-const teamLeadOptions = [
-  { title: 'Ellen Smith - Senior Designer', value: 'Ellen Smith' },
-  { title: 'John Doe - Project Manager', value: 'John Doe' },
-  { title: 'Jane Smith - Developer', value: 'Jane Smith' },
-  { title: 'Alex Johnson - Lead Designer', value: 'Alex Johnson' }
-];
+// Team Lead options - dynamically generated from existing team members
+const teamLeadOptions = computed(() => {
+  const options = [];
+  
+  // Add existing team members as options
+  teamMembers.value.forEach(member => {
+    options.push({
+      title: `${member.name} (${member.email})`,
+      value: member.name
+    });
+  });
+  
+  // If there's a custom teamLead value that's not in team members, keep it
+  if (teamLead.value && !options.find(opt => opt.value === teamLead.value)) {
+    options.push({
+      title: `${teamLead.value} (Custom)`,
+      value: teamLead.value
+    });
+  }
+  
+  return options;
+});
 
 // File input refs
 const thumbnailInput = ref(null);
 const computerFileInput = ref(null);
 const driveFileInput = ref(null);
+const descriptionTextarea = ref(null);
+const editorFocused = ref(false);
+
+const triggerFileInput = () => {
+  console.log('Triggering file input');
+  
+  if (computerFileInput.value) {
+    // Reset the input first to allow re-selecting the same file
+    computerFileInput.value.value = '';
+    
+    // Create a synthetic click event (some browsers prefer this)
+    const event = new MouseEvent('click', {
+      view: window,
+      bubbles: true,
+      cancelable: true
+    });
+    
+    computerFileInput.value.dispatchEvent(event);
+    console.log('File input triggered successfully');
+  } else {
+    console.error('computerFileInput not found');
+  }
+};
 
 // Component mounted
 onMounted(() => {
   console.log('ProjectCreate component loaded and upload functionality ready');
+  
+  // Initialize rich text editor content
+  if (descriptionTextarea.value && description.value) {
+    descriptionTextarea.value.innerHTML = description.value;
+  }
+});
+
+// Watch for team lead changes to automatically add them to team members
+watch(teamLead, (newTeamLead) => {
+  if (newTeamLead && newTeamLead.trim()) {
+    setTimeout(() => {
+      ensureTeamLeadInMembers();
+    }, 100); // Small delay to allow for proper selection
+  }
 });
 
 // Methods
 const formatText = (format) => {
   console.log(`Applying ${format} formatting to text`);
   
+  if (!descriptionTextarea.value) {
+    console.error('Editor ref not available');
+    return;
+  }
+
+  const editor = descriptionTextarea.value;
+  
+  // Focus the editor first
+  editor.focus();
+  
+  // Use document.execCommand for rich text formatting (like Telegram)
   if (format === 'bold') {
-    description.value = `**${description.value}**`;
+    document.execCommand('bold', false, null);
   } else if (format === 'italic') {
-    description.value = `*${description.value}*`;
+    document.execCommand('italic', false, null);
+  }
+  
+  // Update our description model with plain text version
+  setTimeout(() => {
+    updateDescriptionFromEditor();
+  }, 10);
+};
+
+const handleRichTextInput = () => {
+  updateDescriptionFromEditor();
+};
+
+const updateDescriptionFromEditor = () => {
+  if (descriptionTextarea.value) {
+    // Get the plain text content for our model
+    description.value = descriptionTextarea.value.textContent || descriptionTextarea.value.innerText || '';
   }
 };
 
-const insertLink = () => {
-  const url = prompt('Enter URL:');
-  if (url) {
-    description.value += ` [Link](${url})`;
-  }
+const onEditorFocus = () => {
+  editorFocused.value = true;
 };
 
-const insertImage = () => {
-  const url = prompt('Enter image URL:');
-  if (url) {
-    description.value += ` ![Image](${url})`;
-  }
+const onEditorBlur = () => {
+  editorFocused.value = false;
 };
+
+// Generate default avatar colors based on gender
+const getDefaultAvatarStyle = (member) => {
+  if (member.profilePicture) {
+    return {}; // Use the real profile picture
+  }
+  
+  // Determine gender and assign colors
+  const isWoman = member.gender === 'female' || member.gender === 'woman';
+  const colors = isWoman ? ['#FF69B4', '#FF8C69'] : ['#4169E1', '#32CD32']; // Pink/Orange for women, Blue/Green for men
+  
+  // Use member ID or name to consistently pick a color
+  const colorIndex = (member.id || member.name.length) % colors.length;
+  
+  return {
+    backgroundColor: colors[colorIndex],
+    color: 'white',
+    fontWeight: 'bold'
+  };
+};
+
+// Get avatar display content
+const getAvatarContent = (member) => {
+  if (member.profilePicture) {
+    return member.profilePicture;
+  }
+  
+  // Show first letter of name for default avatar
+  return member.name ? member.name.charAt(0).toUpperCase() : '?';
+};
+
+
 
 const handleThumbnailChange = (event) => {
   const file = event.target.files[0];
@@ -852,26 +929,97 @@ const handleThumbnailChange = (event) => {
 };
 
 const handleFileChange = (event) => {
+  console.log('handleFileChange triggered');
+  console.log('Event:', event);
+  console.log('Files from event:', event.target.files);
+  
   const files = Array.from(event.target.files);
-  uploadedFiles.value.push(...files);
-  console.log('Files selected from computer:', files.map(f => f.name));
+  console.log('Files selected:', files.length, files.map(f => `${f.name} (${f.type}, ${f.size} bytes)`));
+  
+  if (files.length === 0) {
+    console.log('No files selected');
+    return;
+  }
+  
+  const validFiles = validateFiles(files);
+  console.log('Valid files after validation:', validFiles.length, validFiles.map(f => f.name));
+  
+  if (validFiles.length > 0) {
+    uploadedFiles.value = [...uploadedFiles.value, ...validFiles];
+    console.log('Total files after adding:', uploadedFiles.value.length);
+    alert(`Successfully added ${validFiles.length} file(s)`);
+  } else {
+    console.log('No valid files to add');
+  }
+  
+  // Clear the input so the same file can be selected again
+  event.target.value = '';
 };
 
 const handleDriveFileChange = (event) => {
   const files = Array.from(event.target.files);
-  uploadedFiles.value.push(...files);
-  console.log('Files selected from Google Drive:', files.map(f => f.name));
+  const validFiles = validateFiles(files);
+  uploadedFiles.value.push(...validFiles);
+  console.log('Files selected from Google Drive:', validFiles.map(f => f.name));
 };
 
 const handleFileDrop = (event) => {
   event.preventDefault();
+  console.log('Files dropped:', event.dataTransfer.files);
+  
   const files = Array.from(event.dataTransfer.files);
-  uploadedFiles.value.push(...files);
-  console.log('Files dropped:', files.map(f => f.name));
+  console.log('Processing dropped files:', files.map(f => `${f.name} (${f.type})`));
+  
+  const validFiles = validateFiles(files);
+  
+  if (validFiles.length > 0) {
+    uploadedFiles.value = [...uploadedFiles.value, ...validFiles];
+    console.log('Files added to uploadedFiles:', validFiles.map(f => f.name));
+    alert(`✅ Successfully added ${validFiles.length} file(s)!`);
+  }
+  
+  // Remove drag styling
+  event.target.style.backgroundColor = '';
+  event.target.style.borderColor = '';
+};
+
+const handleDragEnter = (event) => {
+  event.preventDefault();
+  event.target.style.backgroundColor = '#e3f2fd';
+  event.target.style.borderColor = '#2196F3';
+  console.log('Drag enter detected');
+};
+
+const handleDragLeave = (event) => {
+  event.preventDefault();
+  event.target.style.backgroundColor = '';
+  event.target.style.borderColor = '';
+  console.log('Drag leave detected');
+};
+
+const validateFiles = (files) => {
+  const maxSize = 5 * 1024 * 1024; // 5MB
+  const validFiles = [];
+  
+  files.forEach(file => {
+    console.log('Validating file:', file.name, 'Type:', file.type, 'Size:', file.size);
+    
+    if (file.size > maxSize) {
+      alert(`File "${file.name}" is too large. Maximum size is 5MB.`);
+      return;
+    }
+    
+    // Accept all files for now - validation will happen on server
+    validFiles.push(file);
+    console.log('File accepted:', file.name);
+  });
+  
+  return validFiles;
 };
 
 const removeFile = (index) => {
   uploadedFiles.value.splice(index, 1);
+  console.log('File removed, remaining files:', uploadedFiles.value.length);
 };
 
 const getFileIcon = (fileType) => {
@@ -902,16 +1050,85 @@ const removeSkill = (skillToRemove) => {
   skills.value = skills.value.filter(skill => skill !== skillToRemove);
 };
 
-const addTeamMember = () => {
+const addTeamMember = async () => {
   if (newMemberEmail.value) {
-    const newMember = {
-      id: teamMembers.value.length + 1,
-      name: newMemberEmail.value.split('@')[0],
-      email: newMemberEmail.value
-    };
-    teamMembers.value.push(newMember);
-    newMemberEmail.value = '';
-    showAddMemberForm.value = false;
+    try {
+      // Try to fetch real user data from backend
+      const response = await fetch(`http://localhost:3030/api/users/by-email/${newMemberEmail.value}`);
+      
+      let newMember;
+      if (response.ok) {
+        const userData = await response.json();
+        newMember = {
+          id: teamMembers.value.length + 1,
+          name: userData.name || userData.fullName || newMemberEmail.value.split('@')[0],
+          email: newMemberEmail.value,
+          profilePicture: userData.profilePicture || userData.avatar || null,
+          gender: userData.gender || 'unknown'
+        };
+      } else {
+        // If user not found, create with basic info
+        newMember = {
+          id: teamMembers.value.length + 1,
+          name: newMemberEmail.value.split('@')[0],
+          email: newMemberEmail.value,
+          profilePicture: null,
+          gender: 'unknown' // Will get random color
+        };
+      }
+      
+      teamMembers.value.push(newMember);
+      newMemberEmail.value = '';
+      showAddMemberForm.value = false;
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      // Fallback to basic member info
+      const newMember = {
+        id: teamMembers.value.length + 1,
+        name: newMemberEmail.value.split('@')[0],
+        email: newMemberEmail.value,
+        profilePicture: null,
+        gender: 'unknown'
+      };
+      teamMembers.value.push(newMember);
+      newMemberEmail.value = '';
+      showAddMemberForm.value = false;
+    }
+  }
+};
+
+const removeTeamMember = (index) => {
+  if (confirm(`Are you sure you want to remove ${teamMembers.value[index].name} from the team?`)) {
+    const removedMember = teamMembers.value[index];
+    teamMembers.value.splice(index, 1);
+    
+    // If the removed member was the team lead, clear the team lead
+    if (teamLead.value === removedMember.name) {
+      teamLead.value = '';
+    }
+    
+    console.log(`Team member at index ${index} removed`);
+  }
+};
+
+// Add team lead to team members if not already present
+const ensureTeamLeadInMembers = () => {
+  if (teamLead.value && teamLead.value.trim()) {
+    const isAlreadyMember = teamMembers.value.some(member => 
+      member.name.toLowerCase() === teamLead.value.toLowerCase()
+    );
+    
+    if (!isAlreadyMember) {
+      const leadAsMember = {
+        id: teamMembers.value.length + 1,
+        name: teamLead.value,
+        email: `${teamLead.value.toLowerCase().replace(/\s+/g, '.')}@company.com`, // Placeholder email
+        profilePicture: null,
+        gender: 'unknown',
+        isTeamLead: true
+      };
+      teamMembers.value.unshift(leadAsMember); // Add at the beginning
+    }
   }
 };
 
@@ -946,16 +1163,22 @@ const submitProject = async () => {
           const formData = new FormData();
           formData.append('file', file);
           
-          const response = await fetch(`/api/projects/${createdProject.id}/files`, {
+          const response = await fetch(`http://localhost:3030/api/projects/${createdProject.id}/files`, {
             method: 'POST',
             body: formData
           });
           
+          const result = await response.json();
+          
           if (!response.ok) {
-            console.error(`Failed to upload ${file.name}`);
+            console.error(`Failed to upload ${file.name}:`, result.message);
+            alert(`Failed to upload ${file.name}: ${result.message}`);
+          } else {
+            console.log(`✅ Successfully uploaded ${file.name}:`, result.message);
           }
         } catch (uploadError) {
           console.error(`Error uploading ${file.name}:`, uploadError);
+          alert(`Error uploading ${file.name}. Please try again.`);
         }
       }
     }
@@ -1297,6 +1520,54 @@ const submitProject = async () => {
   border-radius: 0.5rem;
 }
 
+/* Rich Text Editor */
+.rich-text-editor {
+  min-height: 200px;
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.5rem;
+  padding: 16px;
+  background: white;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  outline: none;
+  transition: border-color 0.3s ease;
+  position: relative;
+}
+
+.rich-text-editor:focus {
+  border-color: #0D7C66;
+  box-shadow: 0 0 0 2px rgba(13, 124, 102, 0.1);
+}
+
+.rich-text-editor:empty::before {
+  content: attr(data-placeholder);
+  color: #999;
+  font-style: italic;
+  pointer-events: none;
+}
+
+.rich-text-editor b,
+.rich-text-editor strong {
+  font-weight: bold;
+}
+
+.rich-text-editor i,
+.rich-text-editor em {
+  font-style: italic;
+}
+
+.rich-text-editor p {
+  margin: 0;
+  padding: 0;
+}
+
+.rich-text-editor br {
+  line-height: 1.5;
+}
+
 /* File Upload Areas */
 .file-upload-area {
   border: 2px dashed #cbd5e1;
@@ -1483,9 +1754,71 @@ const submitProject = async () => {
   flex-wrap: wrap;
 }
 
+.member-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
 .member-avatar {
   border: 2px solid white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.member-wrapper:hover .member-avatar {
+  transform: scale(0.95);
+  opacity: 0.8;
+}
+
+.delete-member-btn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 16px !important;
+  width: 16px !important;
+  height: 16px !important;
+  background: #f44336 !important;
+  color: white !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.member-wrapper:hover .delete-member-btn {
+  opacity: 1;
+}
+
+.delete-member-btn:hover {
+  background: #d32f2f !important;
+  transform: scale(1.1);
+}
+
+.team-lead-member .member-avatar {
+  border: 2px solid #FFD700 !important;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3) !important;
+}
+
+.team-lead-crown {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border-radius: 50%;
+  padding: 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 15;
+}
+
+.avatar-initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 14px;
+  font-weight: bold;
 }
 
 .add-member-btn {

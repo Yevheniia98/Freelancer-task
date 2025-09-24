@@ -303,7 +303,7 @@ const handleFileUpload = async (event) => {
       });
       if (response.data && response.data.path) {
         // Set the profile image to the uploaded file URL
-        profileImage.value = `http://localhost:3001${response.data.path}`;
+        profileImage.value = `http://localhost:3030${response.data.path}`;
         
         // Update localStorage with new profile image immediately
         const existingUserData = localStorage.getItem('user_data');

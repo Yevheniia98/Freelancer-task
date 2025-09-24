@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PDF File Selection Test</title>
+</head>
+<body>
+    <h1>PDF File Selection Test</h1>
+    
+    <h3>Test 1: Basic file input with no restrictions</h3>
+    <input type="file" id="test1" multiple>
+    <button onclick="document.getElementById('test1').click()">Click to select files</button>
+    
+    <h3>Test 2: File input with accept="*/*"</h3>
+    <input type="file" id="test2" multiple accept="*/*">
+    <button onclick="document.getElementById('test2').click()">Click to select files</button>
+    
+    <h3>Test 3: File input with specific PDF accept</h3>
+    <input type="file" id="test3" multiple accept=".pdf,application/pdf">
+    <button onclick="document.getElementById('test3').click()">Click to select files</button>
+    
+    <h3>Test 4: File input with document types</h3>
+    <input type="file" id="test4" multiple accept=".pdf,.doc,.docx,.txt">
+    <button onclick="document.getElementById('test4').click()">Click to select files</button>
+    
+    <div id="results" style="margin-top: 20px; padding: 10px; background: #f0f0f0;"></div>
+
+    <script>
+        function logFileSelection(inputId, files) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.innerHTML = `<strong>${inputId}:</strong> ${files.length} files selected: ${Array.from(files).map(f => `${f.name} (${f.type || 'unknown type'})`).join(', ')}`;
+            results.appendChild(div);
+            console.log(inputId, Array.from(files));
+        }
+
+        ['test1', 'test2', 'test3', 'test4'].forEach(id => {
+            document.getElementById(id).addEventListener('change', function(e) {
+                logFileSelection(`${id} (${this.accept || 'no accept'})`, e.target.files);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -45,7 +45,7 @@ class AuthController {
                 // Split full name into first and last name
                 const nameParts = fullName.trim().split(' ');
                 const firstName = nameParts[0] || '';
-                const lastName = nameParts.slice(1).join(' ') || '';
+                const lastName = nameParts.slice(1).join(' ') || 'User'; // Default to 'User' if no last name provided
                 if (!firstName) {
                     res.status(400).json({
                         success: false,

@@ -368,7 +368,7 @@
                 <div class="file-preview">
                   <div v-if="isImage(file.mimetype)" class="image-preview">
                     <img 
-                      :src="`http://localhost:3001${file.path}`" 
+                      :src="`http://localhost:3030${file.path}`" 
                       :alt="file.originalName"
                       class="preview-image"
                     />
@@ -388,7 +388,7 @@
                 
                 <div class="file-actions">
                   <v-btn 
-                    :href="`http://localhost:3001${file.path}`" 
+                    :href="`http://localhost:3030${file.path}`" 
                     target="_blank"
                     color="primary" 
                     variant="outlined" 
@@ -399,7 +399,7 @@
                     Download
                   </v-btn>
                   <v-btn 
-                    :href="`http://localhost:3001${file.path}`" 
+                    :href="`http://localhost:3030${file.path}`" 
                     target="_blank"
                     color="secondary" 
                     variant="text" 

@@ -1,0 +1,18 @@
+[dotenv@17.2.1] injecting env (20) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+(node:37097) [MONGOOSE] Warning: Duplicate schema index on {"email":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:37097) [MONGOOSE] Warning: Duplicate schema index on {"invoiceNumber":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:37097) [MONGOOSE] Warning: Duplicate schema index on {"projectId":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+🚀 Temporary server running on http://localhost:3030
+📧 Email service configured
+📁 File uploads enabled
+🔐 Authentication enabled
+📧 Received meeting invitation request: { recipients: 1, meetingData: 'Test Meeting' }
+📤 Sending email to: test@example.com
+✅ Email sent to test@example.com: <fdf4ea56-d11f-e4d1-d7f4-6f61004a92a5@gmail.com>
+📊 Email results: 1 sent, 0 failed
+⚠️  MongoDB connection failed, using in-memory storage: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+📧 Received meeting invitation request: { recipients: 1, meetingData: 'Project 1' }
+📤 Sending email to: suprun.jen@gmail.com
+✅ Email sent to suprun.jen@gmail.com: <70149502-ed5a-9d59-bd4c-fe5420be45dc@gmail.com>
+📊 Email results: 1 sent, 0 failed

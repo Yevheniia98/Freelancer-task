@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FreelancerIntegrationManager = void 0;
 const upwork_service_1 = require("./upwork.service");
+const freelancer_api_service_1 = require("./freelancer-api.service");
 const project_model_1 = require("../models/project.model");
 const mongoose_1 = __importDefault(require("mongoose"));
 class FreelancerIntegrationManager {
@@ -23,9 +24,19 @@ class FreelancerIntegrationManager {
             refreshToken: '',
             isActive: false
         };
+        const freelancerPlatform = {
+            name: 'freelancer',
+            apiKey: '',
+            apiSecret: '',
+            accessToken: '',
+            refreshToken: '',
+            isActive: false
+        };
         this.platforms.set('upwork', upworkPlatform);
         this.services.set('upwork', new upwork_service_1.UpworkService(upworkPlatform));
-        // TODO: Add other platforms like Freelancer.com, Fiverr, etc.
+        this.platforms.set('freelancer', freelancerPlatform);
+        this.services.set('freelancer', new freelancer_api_service_1.FreelancerService(freelancerPlatform));
+        // TODO: Add other platforms like Fiverr, Guru, etc.
     }
     async connectPlatform(platformName, credentials) {
         try {
@@ -236,6 +247,9 @@ class FreelancerIntegrationManager {
     }
     getUpworkService() {
         return this.services.get('upwork') || null;
+    }
+    getFreelancerService() {
+        return this.services.get('freelancer') || null;
     }
     getPlatformService(platformName) {
         return this.services.get(platformName) || null;

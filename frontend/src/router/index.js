@@ -14,6 +14,7 @@ import ProjectTaskVue from '@/views/ProjectTaskVue.vue';
 import ProjectCreate from '@/views/ProjectCreate.vue';
 import ProjectDetail from '@/views/ProjectDetail.vue';
 import ClientMain from '@/Clients Section/ClientMain.vue';
+import CRMDashboard from '@/Clients Section/CRMDashboard.vue';
 import CreateClient from '@/Clients Section/CreateClient.vue';
 import MyTeam from '@/Clients Section/MyTeam.vue';
 import InviteMember from '@/Invite member/InviteMember.vue';
@@ -34,7 +35,6 @@ import SecurityPage from '@/setting/SecurityPage.vue';
 import IntegretionPage from '@/setting/IntegretionPage.vue';
 import BackUp from '@/setting/BackUp.vue';
 import SupportPage from '@/setting/SupportPage.vue';
-import AcceptInvite from '@/views/AcceptInvite.vue';
 
 const routes = [
   {
@@ -68,11 +68,6 @@ const routes = [
     component: ResetPassword,
   },
   { 
-    path: '/invite/accept',
-    name: 'AcceptInvite',
-    component: AcceptInvite,
-  },
-  { 
     path: '/pricing',
     name: 'Pricing',
     component: PricingSection // ✅ Fixed the component reference
@@ -92,7 +87,7 @@ const routes = [
   { 
     path: '/projects',
     name: 'Projects',
-    component: ProjectSection 
+    component: ProjectSection
   }, 
 
   { 
@@ -110,13 +105,19 @@ const routes = [
   { 
     path: '/projects/:id',
     name: 'ProjectDetail',
-    component: ProjectDetail 
+    component: ProjectDetail
   },
 
   {
     path: '/client-main',
     name: 'ClientMain',
     component: ClientMain,
+  },
+
+  {
+    path: '/crm',
+    name: 'CRMDashboard',
+    component: CRMDashboard,
   },
 
   {
@@ -146,7 +147,7 @@ const routes = [
   {
     path: '/my-team',
     name: 'MyTeam',
-    component: MyTeam,
+    component: MyTeam
   },
 
   {
@@ -253,7 +254,7 @@ router.beforeEach((to, from, next) => {
   // Define routes that require authentication
   const protectedRoutes = [
     'DashboardPage', 'ProjectSection', 'ProjectTaskVue', 'ProjectCreate', 'ProjectDetail',
-    'ClientMain', 'CreateClient', 'MyTeam', 'InviteMember', 'InviteEmail', 
+    'ClientMain', 'CRMDashboard', 'CreateClient', 'MyTeam', 'InviteMember', 'InviteEmail', 
     'InviteApp', 'TaskDashboard', 'FinanceDashboard', 'CalendarSection',
     'DesignTools', 'AccountSetting', 'PasswordSecurity', 'NotificationPage',
     'DataExport', 'LogOut', 'Subscription', 'Customization', 'Security',
