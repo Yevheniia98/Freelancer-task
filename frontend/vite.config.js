@@ -10,12 +10,12 @@ export default defineConfig({
     }
   },
   server: {
-    port: 8080,
+    port: 3030,
     strictPort: true, // Don't automatically try other ports
     host: '0.0.0.0', // Allow external connections
     proxy: {
       '/api': {
-        target: 'http://localhost:3030',
+        target: 'http://localhost:3002',
         changeOrigin: true
       }
     }
