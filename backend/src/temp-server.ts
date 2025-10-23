@@ -2248,7 +2248,7 @@ app.post('/api/team/invitations/send', async (req: any, res: Response) => {
   }
 });
 
-const PORT = process.env.PORT || 3030;
+const PORT = process.env.PORT || 3002;
 
 app.listen(PORT, () => {
   console.log(`🚀 Temporary server running on http://localhost:${PORT}`);
