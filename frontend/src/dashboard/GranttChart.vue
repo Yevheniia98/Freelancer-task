@@ -208,7 +208,10 @@
         class="resizer" 
         @mousedown="startResize"
         @touchstart="startResize"
-      />
+        title="Drag to resize columns"
+      >
+        <div class="resizer-grip"></div>
+      </div>
 
       <!-- Right side timeline -->
       <div class="right-column">
@@ -719,6 +722,7 @@ export default {
     
     // Column resizer methods
     startResize(event) {
+      console.log('Resize started'); // Debug log
       this.isResizing = true;
       this.resizingBar = null;
       
@@ -729,7 +733,9 @@ export default {
       
       // Prevent default behaviors
       event.preventDefault();
+      event.stopPropagation();
       document.body.style.userSelect = 'none';
+      document.body.style.cursor = 'col-resize';
     },
     
     // Bar resizing methods
@@ -773,16 +779,20 @@ export default {
       } else {
         // Resizing the column width
         const MIN_WIDTH = 200;
-        const MAX_WIDTH = 600;
-        this.leftColumnWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, this.startWidth + deltaX));
+        const MAX_WIDTH = 800; // Increased max width for better flexibility
+        const newWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, this.startWidth + deltaX));
+        this.leftColumnWidth = newWidth;
+        console.log('Resizing to:', newWidth); // Debug log
       }
     },
     
     stopResize() {
+      console.log('Resize stopped'); // Debug log
       this.isResizing = false;
       this.resizingBar = null;
       this.resizingEdge = null;
       document.body.style.userSelect = '';
+      document.body.style.cursor = '';
     },
     
     // UI helpers
@@ -950,7 +960,8 @@ export default {
 <style scoped>
 .gantt-chart-container {
   position: relative;
-  max-width: 1300px;
+  width: 100%; /* Use full available width */
+  max-width: none; /* Remove max-width constraint */
   max-height: 1000px;
   margin-left: 0px;
   margin-bottom: 100px;
@@ -1072,6 +1083,7 @@ export default {
   min-height: 200px;
   max-height: 380px; /* Ensure it fits within the 500px container with headers */
   overflow: hidden;
+  position: relative; /* Add positioning context */
 }
 
 /* Left column styles */
@@ -1235,15 +1247,38 @@ export default {
 
 /* Resizer */
 .resizer {
-  width: 6px;
-  background-color: #2196f3; /* Made blue by default to match the image */
-  cursor: col-resize;
-  transition: background-color 0.2s;
+  width: 6px !important;
+  background-color: #2196f3 !important; /* Force blue color */
+  cursor: col-resize !important;
+  transition: all 0.2s ease;
   flex-shrink: 0; /* Prevent shrinking */
+  height: 100% !important; /* Ensure full height */
+  position: relative;
+  z-index: 100; /* Higher z-index to ensure visibility */
+  border: none;
+  outline: none;
+  min-height: 200px; /* Ensure minimum visible height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .resizer:hover, .resizer:active {
-  background-color: #1976d2; /* Darker blue on hover */
+  background-color: #1976d2 !important; /* Darker blue on hover */
+  width: 8px !important; /* Slightly wider on hover for better UX */
+}
+
+.resizer-grip {
+  width: 2px;
+  height: 30px;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 1px;
+  pointer-events: none; /* Let events pass through to parent */
+}
+
+.resizer:hover .resizer-grip {
+  background-color: rgba(255, 255, 255, 0.9);
+  height: 40px;
 }
 
 /* Right column styles */
@@ -1253,7 +1288,8 @@ export default {
   overflow-x: auto;
   background-color: #fff;
   max-height: 100%;
-  min-width: 500px; /* Ensure minimum width for timeline area */
+  min-width: 600px; /* Increased minimum width for better timeline display */
+  width: 100%; /* Ensure it takes full available width */
 }
 
 .timeline-header {
@@ -1262,8 +1298,8 @@ export default {
   z-index: 2;
   background-color: #f9f9f9;
   border-bottom: 1px solid #e0e0e0;
-  width: fit-content;
-  min-width: 800px; /* Increased minimum width to ensure full timeline visibility */
+  width: 100%; /* Take full available width */
+  min-width: 1000px; /* Increased minimum width for better timeline display */
 }
 
 .month-headers {
@@ -1272,7 +1308,8 @@ export default {
 
 .month-column {
   flex: 1;
-  min-width: 300px; /* Add minimum width for better column display */
+  min-width: 250px; /* Optimized width for better distribution */
+  width: 100%; /* Ensure full width usage */
 }
 
 .month-name {
@@ -1298,8 +1335,8 @@ export default {
 
 .timeline-body {
   position: relative;
-  width: fit-content;
-  min-width: 800px; /* Increased minimum width to match header */
+  width: 100%; /* Take full available width */
+  min-width: 1000px; /* Increased minimum width to match header */
 }
 
 .timeline-row {
