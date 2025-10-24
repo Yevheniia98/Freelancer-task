@@ -129,6 +129,9 @@
                   </v-icon>
                 </div>
               </th>
+              <th class="column-header actions-header">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -142,24 +145,6 @@
                 @dblclick="openEditDialog(task)"
               >
                 {{ task.name }}
-                <div class="row-actions">
-                  <button
-                    class="edit-btn"
-                    @click="openEditDialog(task)"
-                  >
-                    <v-icon small>
-                      mdi-pencil
-                    </v-icon>
-                  </button>
-                  <button
-                    class="delete-btn"
-                    @click="deleteTask(task)"
-                  >
-                    <v-icon small>
-                      mdi-delete
-                    </v-icon>
-                  </button>
-                </div>
               </td>
               <td class="task-cell">
                 <div
@@ -189,6 +174,28 @@
                   :class="getPriorityClass(task.priority)"
                 >
                   {{ task.priority }}
+                </div>
+              </td>
+              <td class="task-cell actions-cell">
+                <div class="row-actions">
+                  <button
+                    class="edit-btn"
+                    @click="openEditDialog(task)"
+                    title="Edit task"
+                  >
+                    <v-icon small>
+                      mdi-pencil
+                    </v-icon>
+                  </button>
+                  <button
+                    class="delete-btn"
+                    @click="deleteTask(task)"
+                    title="Delete task"
+                  >
+                    <v-icon small>
+                      mdi-delete
+                    </v-icon>
+                  </button>
                 </div>
               </td>
             </tr>
@@ -1125,35 +1132,50 @@ export default {
   text-align: left;
 }
 
+/* Actions column styles */
+.actions-header {
+  width: 120px;
+  min-width: 120px;
+}
+
+.actions-cell {
+  width: 120px;
+  min-width: 120px;
+  text-align: center;
+}
+
 .row-actions {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: none;
-  gap: 4px;
-}
-
-.task-row:hover .row-actions {
   display: flex;
-}
-
-.edit-btn{
-  margin-left: 50px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
 }
 
 .edit-btn, .delete-btn {
-  background: none;
-  border: none;
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
   cursor: pointer;
-  font-size: 14px;
-  padding: 2px;
-  border-radius: 3px;
+  font-size: 12px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.edit-btn:hover, .delete-btn:hover {
-  background-color: #85CDC6;
-  color: whitesmoke;
+.edit-btn:hover {
+  background-color: #0C9C8D;
+  color: white;
+  border-color: #0C9C8D;
+  transform: translateY(-1px);
+}
+
+.delete-btn:hover {
+  background-color: #dc3545;
+  color: white;
+  border-color: #dc3545;
+  transform: translateY(-1px);
 }
  
 .assignee {
