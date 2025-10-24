@@ -819,8 +819,8 @@ export default {
         this.columnMenu.visible = true;
         this.columnMenu.column = column;
         this.columnMenu.position = {
-          top: (rect.bottom + 5) + 'px',
-          left: rect.left + 'px'
+          top: (rect.bottom + 8) + 'px', // Increased spacing from 5px to 8px
+          left: (rect.left - 20) + 'px'  // Offset left by 20px to prevent overlap
         };
         
         event.stopPropagation();
@@ -1091,7 +1091,7 @@ export default {
 
 .column-header {
   position: relative;
-  padding: 12px 20px;
+  padding: 12px 50px 12px 20px; /* Increased right padding to make room for menu */
   background-color: #f9f9f9;
   font-weight: 500;
   text-align: left;
@@ -1101,7 +1101,7 @@ export default {
 
 .column-actions {
   position: absolute;
-  right: 10px;
+  right: 15px; /* Increased from 10px to 15px for more spacing */
   top: 50%;
   transform: translateY(-50%);
   display: flex;
@@ -1111,10 +1111,15 @@ export default {
 .column-actions i {
   cursor: pointer;
   opacity: 0.6;
+  padding: 4px; /* Add padding for better clickable area */
+  border-radius: 4px; /* Add border radius for better visual feedback */
+  transition: all 0.2s ease; /* Smooth transition */
 }
 
 .column-actions i:hover {
   opacity: 1;
+  background-color: rgba(12, 156, 141, 0.1); /* Light teal background on hover */
+  color: #0C9C8D; /* Teal color on hover */
 }
 
 .task-row {
@@ -1381,8 +1386,9 @@ export default {
   border: 1px solid #ddd;
   border-radius: 4px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  z-index: 10;
+  z-index: 100; /* Increased z-index to ensure it appears above other content */
   min-width: 180px;
+  margin-top: 5px; /* Add small margin to create space from the header */
 }
 
 .menu-item {
