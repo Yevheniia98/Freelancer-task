@@ -1236,13 +1236,14 @@ export default {
 /* Resizer */
 .resizer {
   width: 6px;
-  background-color: #f0f0f0;
+  background-color: #2196f3; /* Made blue by default to match the image */
   cursor: col-resize;
   transition: background-color 0.2s;
+  flex-shrink: 0; /* Prevent shrinking */
 }
 
 .resizer:hover, .resizer:active {
-  background-color: #2196f3;
+  background-color: #1976d2; /* Darker blue on hover */
 }
 
 /* Right column styles */
@@ -1252,6 +1253,7 @@ export default {
   overflow-x: auto;
   background-color: #fff;
   max-height: 100%;
+  min-width: 500px; /* Ensure minimum width for timeline area */
 }
 
 .timeline-header {
@@ -1261,7 +1263,7 @@ export default {
   background-color: #f9f9f9;
   border-bottom: 1px solid #e0e0e0;
   width: fit-content;
-  min-width: 100%;
+  min-width: 800px; /* Increased minimum width to ensure full timeline visibility */
 }
 
 .month-headers {
@@ -1270,6 +1272,7 @@ export default {
 
 .month-column {
   flex: 1;
+  min-width: 300px; /* Add minimum width for better column display */
 }
 
 .month-name {
@@ -1285,7 +1288,7 @@ export default {
 
 .date-column {
   flex: 1;
-  min-width: 40px;
+  min-width: 60px; /* Increased from 40px to 60px for better spacing */
   padding: 8px 0;
   text-align: center;
   border-right: 1px solid #e0e0e0;
@@ -1296,7 +1299,7 @@ export default {
 .timeline-body {
   position: relative;
   width: fit-content;
-  min-width: 100%;
+  min-width: 800px; /* Increased minimum width to match header */
 }
 
 .timeline-row {
