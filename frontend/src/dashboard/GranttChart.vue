@@ -446,6 +446,33 @@
               <option value="bar-green">
                 Green
               </option>
+              <option value="bar-orange">
+                Orange
+              </option>
+              <option value="bar-lila">
+                Lila
+              </option>
+              <option value="bar-yellow">
+                Yellow
+              </option>
+              <option value="bar-mulund">
+                Mulund
+              </option>
+              <option value="bar-brown">
+                Brown
+              </option>
+              <option value="bar-light-blue">
+                Light Blue
+              </option>
+              <option value="bar-pink">
+                Pink
+              </option>
+              <option value="bar-light-pink">
+                Light Pink
+              </option>
+              <option value="bar-purple-alt">
+                Purple (Alt)
+              </option>
             </select>
           </div>
         </div>
@@ -1375,6 +1402,42 @@ export default {
 
 .bar-green {
   background-color: #388e3c;
+}
+
+.bar-orange {
+  background-color: #ff9800;
+}
+
+.bar-lila {
+  background-color: #e1bee7;
+}
+
+.bar-yellow {
+  background-color: #ffeb3b;
+}
+
+.bar-mulund {
+  background-color: #8d6e63;
+}
+
+.bar-brown {
+  background-color: #795548;
+}
+
+.bar-light-blue {
+  background-color: #81d4fa;
+}
+
+.bar-pink {
+  background-color: #e91e63;
+}
+
+.bar-light-pink {
+  background-color: #f8bbd9;
+}
+
+.bar-purple-alt {
+  background-color: #9c27b0;
 }
 
 .progress-indicator {

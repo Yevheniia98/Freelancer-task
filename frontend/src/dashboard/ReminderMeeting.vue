@@ -181,208 +181,152 @@
 
     <!-- Middle Column - Create Reminder -->
     <div class="reminder-create">
-      <!-- User Info -->
-      <div class="user-info d-flex align-center mb-4">
-        <v-avatar
-          size="40"
-          class="mr-3"
-        >
-          <v-img :src="userAvatar" />
-        </v-avatar>
-        <span class="user-name text-h6">{{ userName }}</span>
+      <!-- User Info Box -->
+      <div class="user-info-box">
+        <div class="user-info d-flex align-center">
+          <v-avatar
+            size="48"
+            class="mr-3"
+          >
+            <v-img :src="userAvatar" />
+          </v-avatar>
+          <span class="user-name text-h6 font-weight-medium">me ({{ userName }})</span>
+        </div>
       </div>
 
-      <!-- Event Type Selection -->
-      <div class="event-type-toggle mb-4">
+      <!-- Event Type Selection Box -->
+      <div class="event-type-box">
         <v-btn-toggle
           v-model="eventType"
           mandatory
-          rounded="pill"
-          density="comfortable"
-          color="primary"
-          class="mb-4"
+          class="event-type-buttons"
+          color="teal"
         >
           <v-btn
             value="event"
-            variant="text"
-            class="event-btn"
+            class="event-type-btn"
+            :class="{ 'active': eventType === 'event' }"
           >
-            <v-icon left size="small">mdi-calendar</v-icon>
             Event
           </v-btn>
           <v-btn
             value="task"
-            variant="text"
-            class="event-btn"
+            class="event-type-btn"
+            :class="{ 'active': eventType === 'task' }"
           >
-            <v-icon left size="small">mdi-clipboard-check</v-icon>
             Task
           </v-btn>
           <v-btn
             value="meet"
-            variant="text"
-            class="event-btn"
+            class="event-type-btn"
+            :class="{ 'active': eventType === 'meet' }"
           >
-            <v-icon left size="small">mdi-video</v-icon>
             Meet
           </v-btn>
         </v-btn-toggle>
       </div>
 
-      <!-- Title Input -->
-      <v-text-field
-        v-model="newEvent.title"
-        placeholder="Add title"
-        variant="outlined"
-        density="comfortable"
-        hide-details
-        class="title-input mb-4"
-        prepend-inner-icon="mdi-format-title"
-      />
+      <!-- Title Input Box -->
+      <div class="input-box title-box">
+        <input
+          v-model="newEvent.title"
+          placeholder="Add title"
+          class="title-input"
+        />
+      </div>
 
-      <!-- Enhanced Date and Time Section -->
-      <v-card
-        class="reminder-section mb-4 elevation-4"
-        style="border-radius: 15px; background: linear-gradient(145deg, #f8f9ff 0%, #e3f2fd 100%);"
-      >
-        <v-card-title class="pa-4 pb-2">
-          <div class="d-flex align-center">
-            <v-icon
-              color="primary"
-              class="mr-3"
-              size="24"
-            >
-              mdi-calendar-clock
-            </v-icon>
-            <span class="text-h6 font-weight-medium text-primary">Schedule & Timing</span>
-          </div>
-        </v-card-title>
-        
-        <v-card-text class="pa-4 pt-2">
+      <!-- Date and Time Section -->
+      <div class="input-box datetime-box">
+        <div class="datetime-header">
+          <v-icon class="datetime-icon">mdi-clock-outline</v-icon>
+          <span class="datetime-title">Date and time</span>
+        </div>
 
-          <!-- Enhanced Date Selection -->
-          <div class="date-section mb-4">
-            <div class="input-label-enhanced d-flex align-center mb-2">
-              <v-icon size="small" color="primary" class="mr-2">mdi-calendar</v-icon>
-              <span class="font-weight-medium">Date</span>
-            </div>
-            <v-menu
-              v-model="dateMenu"
-              :close-on-content-click="false"
-              transition="scale-transition"
-              location="bottom"
-            >
-              <template #activator="{ props }">
-                <v-text-field
-                  v-model="formattedDate"
-                  density="comfortable"
-                  variant="outlined"
-                  readonly
-                  hide-details
-                  v-bind="props"
-                  prepend-inner-icon="mdi-calendar"
-                  style="border-radius: 12px;"
-                  color="primary"
-                />
-              </template>
-              <v-date-picker
-                v-model="newEvent.date"
-                @update:model-value="dateMenu = false"
+        <!-- Date Selection Row -->
+        <div class="datetime-row">
+          <span class="datetime-label">On</span>
+          <v-menu
+            v-model="dateMenu"
+            :close-on-content-click="false"
+            transition="scale-transition"
+            location="bottom"
+          >
+            <template #activator="{ props }">
+              <input
+                :value="formattedDate || 'Select the day'"
+                readonly
+                class="datetime-input"
+                v-bind="props"
+                placeholder="Select the day"
               />
-            </v-menu>
-          </div>
+            </template>
+            <v-date-picker
+              v-model="newEvent.date"
+              @update:model-value="dateMenu = false"
+            />
+          </v-menu>
+        </div>
 
-          <!-- Enhanced Time Section -->
-          <div class="time-section">
-            <div class="time-inputs-container d-flex gap-3">
-              <!-- Time From -->
-              <div class="time-input-group flex-1">
-                <div class="input-label-enhanced d-flex align-center mb-2">
-                  <v-icon size="small" color="success" class="mr-2">mdi-clock-start</v-icon>
-                  <span class="font-weight-medium">From</span>
-                </div>
-                <v-menu
-                  v-model="timeFromMenu"
-                  :close-on-content-click="false"
-                  transition="scale-transition"
-                  location="bottom"
-                >
-                  <template #activator="{ props }">
-                    <v-text-field
-                      v-model="formattedTimeFrom"
-                      density="comfortable"
-                      variant="outlined"
-                      readonly
-                      hide-details
-                      v-bind="props"
-                      prepend-inner-icon="mdi-clock-outline"
-                      style="border-radius: 12px;"
-                      color="success"
-                    />
-                  </template>
-                  <v-time-picker
-                    v-model="newEvent.timeFrom"
-                    @update:model-value="timeFromMenu = false"
-                  />
-                </v-menu>
-              </div>
+        <!-- Time From Row -->
+        <div class="datetime-row">
+          <span class="datetime-label">From</span>
+          <v-menu
+            v-model="timeFromMenu"
+            :close-on-content-click="false"
+            transition="scale-transition"
+            location="bottom"
+          >
+            <template #activator="{ props }">
+              <input
+                :value="formattedTimeFrom || 'Select the time'"
+                readonly
+                class="datetime-input"
+                v-bind="props"
+                placeholder="Select the time"
+              />
+            </template>
+            <v-time-picker
+              v-model="newEvent.timeFrom"
+              @update:model-value="timeFromMenu = false"
+            />
+          </v-menu>
+        </div>
 
-              <!-- Time To -->
-              <div class="time-input-group flex-1">
-                <div class="input-label-enhanced d-flex align-center mb-2">
-                  <v-icon size="small" color="error" class="mr-2">mdi-clock-end</v-icon>
-                  <span class="font-weight-medium">To</span>
-                </div>
-                <v-menu
-                  v-model="timeToMenu"
-                  :close-on-content-click="false"
-                  transition="scale-transition"
-                  location="bottom"
-                >
-                  <template #activator="{ props }">
-                    <v-text-field
-                      v-model="formattedTimeTo"
-                      density="comfortable"
-                      variant="outlined"
-                      readonly
-                      hide-details
-                      v-bind="props"
-                      prepend-inner-icon="mdi-clock-outline"
-                      style="border-radius: 12px;"
-                      color="error"
-                    />
-                  </template>
-                  <v-time-picker
-                    v-model="newEvent.timeTo"
-                    @update:model-value="timeToMenu = false"
-                  />
-                </v-menu>
-              </div>
-            </div>
-          </div>
-        </v-card-text>
-      </v-card>
+        <!-- Time To Row -->
+        <div class="datetime-row">
+          <span class="datetime-label">To</span>
+          <v-menu
+            v-model="timeToMenu"
+            :close-on-content-click="false"
+            transition="scale-transition"
+            location="bottom"
+          >
+            <template #activator="{ props }">
+              <input
+                :value="formattedTimeTo || 'Select the time'"
+                readonly
+                class="datetime-input"
+                v-bind="props"
+                placeholder="Select the time"
+              />
+            </template>
+            <v-time-picker
+              v-model="newEvent.timeTo"
+              @update:model-value="timeToMenu = false"
+            />
+          </v-menu>
+        </div>
+      </div>
 
-      <!-- Enhanced People Section -->
-      <v-card
+      <!-- Add People Section -->
+      <div 
         v-if="eventType !== 'task'"
-        class="reminder-section mb-4 elevation-4"
-        style="border-radius: 15px; background: linear-gradient(145deg, #fff3e0 0%, #ffecb3 100%);"
+        class="input-box people-box"
       >
-        <v-card-title class="pa-4 pb-2">
-          <div class="d-flex align-center">
-            <v-icon
-              color="orange-darken-1"
-              class="mr-3"
-              size="24"
-            >
-              mdi-account-multiple-plus
-            </v-icon>
-            <span class="text-h6 font-weight-medium text-orange-darken-1">Invite Participants</span>
-          </div>
-        </v-card-title>
-        
-        <v-card-text class="pa-4 pt-2">
+        <div class="people-header">
+          <v-icon class="people-icon">mdi-account-multiple-plus</v-icon>
+          <span class="people-title">Add people</span>
+        </div>
 
         <!-- Invitation Type Toggle -->
         <div class="invitation-type-toggle mb-3">
@@ -572,29 +516,17 @@
             </span>
           </div>
         </div>
-        </v-card-text>
-      </v-card>
+      </div>
 
-      <!-- Enhanced Meeting Link Section -->
-      <v-card
+      <!-- Add Meeting Link Section -->
+      <div 
         v-if="eventType !== 'task'"
-        class="reminder-section mb-4 elevation-4"
-        style="border-radius: 15px; background: linear-gradient(145deg, #e8f5e8 0%, #c8e6c9 100%);"
+        class="input-box meeting-link-box"
       >
-        <v-card-title class="pa-4 pb-2">
-          <div class="d-flex align-center">
-            <v-icon
-              color="green-darken-1"
-              class="mr-3"
-              size="24"
-            >
-              mdi-video-plus
-            </v-icon>
-            <span class="text-h6 font-weight-medium text-green-darken-1">Meeting Platform</span>
-          </div>
-        </v-card-title>
-        
-        <v-card-text class="pa-4 pt-2">
+        <div class="meeting-link-header">
+          <v-icon class="meeting-link-icon">mdi-link</v-icon>
+          <span class="meeting-link-title">Add meeting link</span>
+        </div>
 
           <!-- Enhanced Platform Selection -->
           <div class="platform-selection-enhanced mb-4">
@@ -718,123 +650,54 @@
             </template>
           </v-text-field>
         </div>
-        </v-card-text>
-      </v-card>
-
-      <!-- Description Section (New) -->
-      <v-card
-        class="reminder-section mb-4"
-        variant="outlined"
-      >
-        <div class="d-flex align-center px-3 py-2">
-          <v-icon
-            size="small"
-            class="mr-2"
-          >
-            mdi-text-box-outline
-          </v-icon>
-          <v-textarea
-            v-model="newEvent.description"
-            placeholder="Add description"
-            variant="plain"
-            density="compact"
-            hide-details
-            auto-grow
-            rows="2"
-            class="description-input"
-          />
-        </div>
-      </v-card>
+      </div>
 
       <!-- Repeat Section -->
-      <v-card
-        class="reminder-section"
-        variant="outlined"
-      >
-        <div class="section-header">
-          <v-icon
-            size="small"
-            class="mr-2"
-          >
-            mdi-repeat
-          </v-icon>
-          <span class="section-title">Repeat</span>
+      <div class="input-box repeat-box">
+        <div class="repeat-header">
+          <v-icon class="repeat-icon">mdi-repeat</v-icon>
+          <span class="repeat-title">Repeat</span>
         </div>
 
-        <!-- Repeat Frequency -->
-        <div class="input-row">
-          <div class="input-label">
-            Every
-          </div>
+        <!-- Repeat Frequency Row -->
+        <div class="repeat-row">
+          <span class="repeat-label">Every</span>
           <v-select
             v-model="newEvent.repeatEvery"
             :items="repeatOptions"
             density="compact"
             variant="outlined"
             hide-details
+            class="repeat-select"
           />
         </div>
 
-        <!-- Repeat Days -->
+        <!-- Repeat Days Row -->
         <div
           v-if="newEvent.repeatEvery === 'Weekly'"
-          class="input-row"
+          class="repeat-row days-row"
         >
-          <div class="input-label">
-            On
-          </div>
-          <div class="day-toggles">
+          <span class="repeat-label">On</span>
+          <div class="weekdays-container">
             <v-btn-toggle
               v-model="newEvent.repeatDays"
               multiple
-              density="comfortable"
-              class="day-toggle-group"
+              class="weekdays-toggle"
             >
               <v-btn
                 v-for="day in weekDays" 
                 :key="day.value"
                 :value="day.value"
-                size="x-small"
-                class="day-btn"
-                variant="text"
+                size="small"
+                class="weekday-btn"
+                variant="outlined"
               >
                 {{ day.label }}
               </v-btn>
             </v-btn-toggle>
           </div>
         </div>
-        
-        <!-- End Repeat (New) -->
-        <div
-          v-if="newEvent.repeatEvery !== 'On'"
-          class="input-row"
-        >
-          <div class="input-label">
-            Until
-          </div>
-          <v-menu
-            v-model="endDateMenu"
-            :close-on-content-click="false"
-            transition="scale-transition"
-            location="bottom"
-          >
-            <template #activator="{ props }">
-              <v-text-field
-                v-model="formattedEndDate"
-                density="compact"
-                variant="outlined"
-                readonly
-                hide-details
-                v-bind="props"
-              />
-            </template>
-            <v-date-picker
-              v-model="newEvent.endRepeatDate"
-              @update:model-value="endDateMenu = false"
-            />
-          </v-menu>
-        </div>
-      </v-card>
+      </div>
 
       <!-- Create Button -->
       <v-btn 
@@ -2008,6 +1871,234 @@ function completeTask(event) {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   background-color: white;
   margin-left: 0px;
+}
+
+/* New UI Box Styles */
+.input-box {
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  margin-bottom: 16px;
+  padding: 16px;
+}
+
+/* User Info Box */
+.user-info-box {
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+}
+
+.user-name {
+  color: #333;
+  font-weight: 500;
+}
+
+/* Event Type Box */
+.event-type-box {
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  margin-bottom: 16px;
+  padding: 8px;
+}
+
+.event-type-buttons {
+  width: 100%;
+  background-color: #e8e8e8;
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.event-type-btn {
+  flex: 1;
+  border-radius: 4px !important;
+  font-weight: 500;
+  text-transform: none;
+  color: #666;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.event-type-btn.active,
+.event-type-btn.v-btn--active {
+  background-color: #4db6ac !important;
+  color: white !important;
+}
+
+/* Title Box */
+.title-box {
+  padding: 0;
+}
+
+.title-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.title-input::placeholder {
+  color: #999;
+}
+
+/* Date and Time Box */
+.datetime-box {
+  padding: 16px;
+}
+
+.datetime-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.datetime-icon {
+  color: #666;
+  margin-right: 8px;
+}
+
+.datetime-title {
+  font-weight: 500;
+  color: #333;
+}
+
+.datetime-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.datetime-label {
+  min-width: 60px;
+  font-weight: 500;
+  color: #666;
+  margin-right: 16px;
+}
+
+.datetime-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background-color: white;
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.datetime-input::placeholder {
+  color: #999;
+}
+
+/* People Box */
+.people-box {
+  padding: 16px;
+}
+
+.people-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.people-icon {
+  color: #666;
+  margin-right: 8px;
+}
+
+.people-title {
+  font-weight: 500;
+  color: #333;
+}
+
+/* Meeting Link Box */
+.meeting-link-box {
+  padding: 16px;
+}
+
+.meeting-link-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.meeting-link-icon {
+  color: #666;
+  margin-right: 8px;
+}
+
+.meeting-link-title {
+  font-weight: 500;
+  color: #333;
+}
+
+/* Repeat Box */
+.repeat-box {
+  padding: 16px;
+}
+
+.repeat-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.repeat-icon {
+  color: #666;
+  margin-right: 8px;
+}
+
+.repeat-title {
+  font-weight: 500;
+  color: #333;
+}
+
+.repeat-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.repeat-label {
+  min-width: 60px;
+  font-weight: 500;
+  color: #666;
+  margin-right: 16px;
+}
+
+.repeat-select {
+  flex: 1;
+}
+
+.days-row {
+  align-items: flex-start;
+}
+
+.weekdays-container {
+  flex: 1;
+}
+
+.weekdays-toggle {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.weekday-btn {
+  min-width: 40px !important;
+  width: 40px;
+  height: 40px;
+  border-radius: 50% !important;
+  font-weight: 500;
+  border: 1px solid #ddd !important;
 }
 
 /* Left Column - Meeting Cards */
