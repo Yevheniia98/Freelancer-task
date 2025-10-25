@@ -285,51 +285,23 @@
         <!-- Time From Row -->
         <div class="datetime-row">
           <span class="datetime-label">From</span>
-          <v-menu
-            v-model="timeFromMenu"
-            :close-on-content-click="false"
-            transition="scale-transition"
-            location="bottom"
-          >
-            <template #activator="{ props }">
-              <input
-                :value="formattedTimeFrom || 'Select the time'"
-                readonly
-                class="datetime-input"
-                v-bind="props"
-                placeholder="Select the time"
-              />
-            </template>
-            <v-time-picker
-              v-model="newEvent.timeFrom"
-              @update:model-value="timeFromMenu = false"
-            />
-          </v-menu>
+          <input
+            v-model="newEvent.timeFrom"
+            type="time"
+            class="datetime-input time-input"
+            placeholder="09:00"
+          />
         </div>
 
         <!-- Time To Row -->
         <div class="datetime-row">
           <span class="datetime-label">To</span>
-          <v-menu
-            v-model="timeToMenu"
-            :close-on-content-click="false"
-            transition="scale-transition"
-            location="bottom"
-          >
-            <template #activator="{ props }">
-              <input
-                :value="formattedTimeTo || 'Select the time'"
-                readonly
-                class="datetime-input"
-                v-bind="props"
-                placeholder="Select the time"
-              />
-            </template>
-            <v-time-picker
-              v-model="newEvent.timeTo"
-              @update:model-value="timeToMenu = false"
-            />
-          </v-menu>
+          <input
+            v-model="newEvent.timeTo"
+            type="time"
+            class="datetime-input time-input"
+            placeholder="10:00"
+          />
         </div>
       </div>
 
@@ -1399,7 +1371,7 @@ async function sendEmailInvitations(event) {
     // If no organizer email is set, prompt for it or use a default
     if (!organizerEmail || organizerEmail === 'organizer@example.com') {
       // For demo purposes, let's set a default email. In production, this would come from user authentication
-      organizerEmail = 'suprun.jen@gmail.com'; // Using your email for testing
+      organizerEmail = 'freelancetasker0@gmail.com'; // Using the configured email
       localStorage.setItem('userEmail', organizerEmail);
       console.log('📧 Using organizer email:', organizerEmail);
     }
@@ -2086,6 +2058,21 @@ function autoResize() {
 
 .datetime-input::placeholder {
   color: #999;
+}
+
+.time-input {
+  cursor: text !important;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.time-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.time-input:hover::-webkit-calendar-picker-indicator {
+  opacity: 1;
 }
 
 /* People Box */
