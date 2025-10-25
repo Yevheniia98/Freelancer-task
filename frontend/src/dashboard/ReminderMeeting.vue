@@ -190,7 +190,7 @@
           >
             <v-img :src="userAvatar" />
           </v-avatar>
-          <span class="user-name text-h6 font-weight-medium">me ({{ userName }})</span>
+          <span class="user-name text-h6 font-weight-medium">{{ userName }}</span>
         </div>
       </div>
 
@@ -233,6 +233,21 @@
           placeholder="Add title"
           class="title-input"
         />
+      </div>
+
+      <!-- Description Box -->
+      <div class="input-box description-box">
+        <textarea
+          v-model="newEvent.description"
+          placeholder="Add description"
+          class="description-input"
+          rows="3"
+          @input="autoResize"
+          ref="descriptionTextarea"
+        ></textarea>
+        <div class="description-resize-indicator">
+          <v-icon size="small" color="grey">mdi-resize-bottom-right</v-icon>
+        </div>
       </div>
 
       <!-- Date and Time Section -->
@@ -852,6 +867,7 @@ const emailInviteInput = ref('');
 const emailInvitees = ref([]);
 const notifications = ref([]);
 const joiningMeeting = ref(null); // Track which meeting is being joined
+const descriptionTextarea = ref(null); // Reference to description textarea
 
 // For date and time menus
 const dateMenu = ref(false);
@@ -1858,6 +1874,16 @@ function completeTask(event) {
     showNotification(`Task "${event.title}" completed!`, 'success');
   }
 }
+
+// Auto-resize description textarea
+function autoResize() {
+  if (descriptionTextarea.value) {
+    const textarea = descriptionTextarea.value;
+    textarea.style.height = 'auto';
+    const newHeight = Math.min(Math.max(textarea.scrollHeight, 80), 200);
+    textarea.style.height = newHeight + 'px';
+  }
+}
 </script>
 
 <style scoped>
@@ -1946,6 +1972,70 @@ function completeTask(event) {
 
 .title-input::placeholder {
   color: #999;
+}
+
+/* Description Box */
+.description-box {
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.description-input {
+  
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 16px 40px 16px 16px;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: #333;
+  resize: none;
+  min-height: 60px;
+  max-height: 200px;
+  font-family: inherit;
+  box-sizing: border-box;
+  word-wrap: break-word;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
+  line-height: 1.4;
+  margin: 0px, 0px, 0px, 16px;
+
+}
+
+.description-input::-webkit-scrollbar {
+  width: 4px;
+}
+
+.description-input::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.description-input::-webkit-scrollbar-thumb {
+  background-color: #ddd;
+  border-radius: 2px;
+}
+
+.description-input::-webkit-scrollbar-thumb:hover {
+  background-color: #ccc;
+}
+
+.description-input::placeholder {
+  color: #999;
+}
+
+.description-resize-indicator {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  pointer-events: none;
+  opacity: 0.4;
+  transition: opacity 0.2s ease;
+}
+
+.description-box:hover .description-resize-indicator {
+  opacity: 0.7;
 }
 
 /* Date and Time Box */
