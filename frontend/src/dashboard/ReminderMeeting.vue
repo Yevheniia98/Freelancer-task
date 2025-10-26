@@ -1440,8 +1440,8 @@ async function sendEmailInvitations(event) {
     console.log('✅ Email invitations sent successfully:', result);
     
     // Show success notification with details
-    const totalSent = result.data.sentSuccessfully;
-    const totalFailed = result.data.failed;
+    const totalSent = result.data?.sentSuccessfully || result.sentSuccessfully || 0;
+    const totalFailed = result.data?.failed || result.failed || 0;
     
     if (totalFailed > 0) {
       showNotification(

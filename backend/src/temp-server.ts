@@ -654,12 +654,12 @@ app.post('/api/meeting-invitations/send-multiple', async (req: Request, res: Res
     <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9; }
-        .header { background: #0D7C66; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
         .content { background: white; padding: 30px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .meeting-details { background: #f8f9fa; padding: 20px; border-radius: 6px; margin: 20px 0; }
         .detail-row { margin: 10px 0; }
-        .label { font-weight: bold; color: #0D7C66; }
-        .join-button { display: inline-block; background: #000000; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+        .label { font-weight: bold; color: #764ba2; }
+        .join-button { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white !important; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0; font-weight: bold; }
         .footer { text-align: center; color: #666; font-size: 14px; margin-top: 20px; }
     </style>
 </head>
@@ -817,12 +817,12 @@ async function sendSingleMeetingInvitation(recipient: any, meetingData: any) {
     <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9; }
-        .header { background: #0D7C66; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
         .content { background: white; padding: 30px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .meeting-details { background: #f8f9fa; padding: 20px; border-radius: 6px; margin: 20px 0; }
         .detail-row { margin: 10px 0; }
-        .label { font-weight: bold; color: #0D7C66; }
-        .join-button { display: inline-block; background: #000000; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+        .label { font-weight: bold; color: #764ba2; }
+        .join-button { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white !important; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0; font-weight: bold; }
         .footer { text-align: center; color: #666; font-size: 14px; margin-top: 20px; }
     </style>
 </head>
