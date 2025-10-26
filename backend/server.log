@@ -1,30 +1,14 @@
-[dotenv@17.2.1] injecting env (20) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
-(node:76259) [MONGOOSE] Warning: Duplicate schema index on {"email":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+[dotenv@17.2.1] injecting env (20) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+(node:11360) [MONGOOSE] Warning: Duplicate schema index on {"email":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
 (Use `node --trace-warnings ...` to show where the warning was created)
-(node:76259) [MONGOOSE] Warning: Duplicate schema index on {"invoiceNumber":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
-(node:76259) [MONGOOSE] Warning: Duplicate schema index on {"projectId":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:11360) [MONGOOSE] Warning: Duplicate schema index on {"invoiceNumber":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:11360) [MONGOOSE] Warning: Duplicate schema index on {"projectId":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
 🚀 Temporary server running on http://localhost:3002
 📧 Email service configured
 📁 File uploads enabled
 🔐 Authentication enabled
-📧 Received meeting invitation request: { recipients: 1, meetingData: '🎨 GRADIENT HEADER TEST 🎨' }
+⚠️  MongoDB connection failed, using in-memory storage: connect ECONNREFUSED 127.0.0.1:27017, connect ECONNREFUSED ::1:27017
+📧 Received meeting invitation request: { recipients: 1, meetingData: 'Server Restart Test' }
 📤 Sending email to: suprun.jen@gmail.com
-✅ Email sent to suprun.jen@gmail.com: <f7afa296-cf69-ad1b-ce57-b3047eaaf853@gmail.com>
-📊 Email results: 1 sent, 0 failed
-⚠️  MongoDB connection failed, using in-memory storage: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
-📧 Received meeting invitation request: { recipients: 1, meetingData: 'Debug Test Meeting' }
-📤 Sending email to: suprun.jen@gmail.com
-✅ Email sent to suprun.jen@gmail.com: <4026a3fb-8c23-f4ab-f199-9a3f2a252813@gmail.com>
-📊 Email results: 1 sent, 0 failed
-📧 Received meeting invitation request: { recipients: 1, meetingData: 'Direct API Test' }
-📤 Sending email to: suprun.jen@gmail.com
-✅ Email sent to suprun.jen@gmail.com: <4782b2bb-0fde-0f0a-9193-448b61b7556a@gmail.com>
-📊 Email results: 1 sent, 0 failed
-📧 Received meeting invitation request: { recipients: 1, meetingData: 'k' }
-📤 Sending email to: suprun.jen@gmail.com
-✅ Email sent to suprun.jen@gmail.com: <ea295343-bcf9-a80d-21d6-830846c5629d@gmail.com>
-📊 Email results: 1 sent, 0 failed
-📧 Received meeting invitation request: { recipients: 1, meetingData: 'k' }
-📤 Sending email to: suprun.jen@gmail.com
-✅ Email sent to suprun.jen@gmail.com: <a4b74e3a-4cba-f1aa-828a-02ee889670e5@gmail.com>
+✅ Email sent to suprun.jen@gmail.com: <9b01511e-81c8-8efe-155c-06fbbd5641a2@gmail.com>
 📊 Email results: 1 sent, 0 failed
