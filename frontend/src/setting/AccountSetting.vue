@@ -90,17 +90,21 @@
                 <v-avatar
                   size="100"
                   class="profile-avatar"
+                  :class="{ 'default-avatar': !profileImage }"
                 >
                   <v-img
                     v-if="profileImage"
                     :src="profileImage"
                     cover
                   />
-                  <v-img
-                    v-else
-                    src="https://cdn.vuetifyjs.com/images/john.jpg"
-                    cover
-                  />
+                  <div 
+                    v-else 
+                    class="default-account-icon"
+                  >
+                    <svg viewBox="0 0 24 24" width="60" height="60" fill="currentColor">
+                      <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
+                    </svg>
+                  </div>
                 </v-avatar>
               </div>
               
@@ -292,18 +296,28 @@ import axios from 'axios';
 
 const handleFileUpload = async (event) => {
   const file = event.target.files[0];
+  console.log('File selected:', file);
+  
   if (file) {
     const formData = new FormData();
     formData.append('file', file);
+    
+    console.log('Attempting upload to /api/upload');
+    
     try {
       const response = await axios.post('/api/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
+      
+      console.log('Upload response:', response.data);
+      
       if (response.data && response.data.path) {
-        // Set the profile image to the uploaded file URL
-        profileImage.value = `http://localhost:3030${response.data.path}`;
+        // Set the profile image to the uploaded file URL (relative path works better with Vite proxy)
+        profileImage.value = response.data.path;
+        
+        console.log('Image uploaded successfully:', response.data.path);
         
         // Update localStorage with new profile image immediately
         const existingUserData = localStorage.getItem('user_data');
@@ -318,11 +332,16 @@ const handleFileUpload = async (event) => {
           detail: { profileImage: profileImage.value }
         }));
       } else {
-        console.error('Upload failed: No file path returned');
+        console.error('Upload failed: No file path returned:', response.data);
+        alert('Upload failed: No file path returned');
       }
     } catch (error) {
       console.error('Error uploading file:', error);
+      console.error('Error details:', error.response ? error.response.data : error.message);
+      alert(`Upload error: ${error.response ? error.response.data.message : error.message}`);
     }
+  } else {
+    console.log('No file selected');
   }
 }
 
@@ -332,6 +351,21 @@ const removeProfilePicture = () => {
   if (fileInput.value) {
     fileInput.value.value = ''
   }
+  
+  // Update localStorage to remove profile image
+  const existingUserData = localStorage.getItem('user_data');
+  if (existingUserData) {
+    const userData = JSON.parse(existingUserData);
+    userData.profileImage = null;
+    localStorage.setItem('user_data', JSON.stringify(userData));
+  }
+  
+  // Trigger event to notify other components
+  window.dispatchEvent(new CustomEvent('profileImageUpdated', {
+    detail: { profileImage: null }
+  }));
+  
+  console.log('Profile picture removed successfully');
 }
 
 // Save profile
@@ -544,6 +578,23 @@ onMounted(() => {
 .profile-avatar {
   border: 4px solid #f3f4f6;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.profile-avatar.default-avatar {
+  background-color: #f9fafb;
+  border: 4px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.default-account-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #6b7280;
 }
 
 /* Form Styles */

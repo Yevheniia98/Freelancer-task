@@ -178,12 +178,21 @@
             :class="{ 'active': showUserMenu }"
             @click="toggleUserMenu"
           >
-            <div class="user-avatar">
+            <div class="user-avatar" :class="{ 'default-avatar': !user.avatar }">
               <img 
+                v-if="user.avatar"
                 :src="user.avatar" 
                 :alt="user.name"
                 class="avatar-image"
               >
+              <div 
+                v-else 
+                class="default-avatar-icon"
+              >
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
+                </svg>
+              </div>
               <div class="status-indicator online" />
             </div>
           </button>
@@ -197,10 +206,19 @@
               <div class="dropdown-header user-header" @click="navigateTo('/account')">
                 <div class="user-info">
                   <img
+                    v-if="user.avatar"
                     :src="user.avatar"
                     :alt="user.name"
                     class="user-profile-image"
                   >
+                  <div 
+                    v-else 
+                    class="user-profile-image default-profile-icon"
+                  >
+                    <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor">
+                      <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
+                    </svg>
+                  </div>
                   <div class="user-details">
                     <h3>{{ user.name }}</h3>
                     <p>{{ user.email }}</p>
@@ -219,7 +237,7 @@
                 
                 <button
                   class="dropdown-item"
-                  @click="navigateTo('/settings')"
+                  @click="navigateTo('/account')"
                 >
                   <Settings :size="18" />
                   <span>{{ t('user.settings') }}</span>
@@ -299,7 +317,7 @@ const userRef = ref(null)
 const user = ref({
   name: 'Isabella Morgan',
   email: 'isabella@example.com',
-  avatar: 'https://images.unsplash.com/photo-1494790108755-2616c06146b9?w=150&h=150&fit=crop&crop=face'
+  avatar: null
 })
 
 // Load user data from localStorage
@@ -310,14 +328,14 @@ const loadUserData = () => {
     user.value = {
       name: parsedData.fullName || parsedData.name || 'User',
       email: parsedData.email || 'user@example.com',
-      avatar: parsedData.profileImage || parsedData.avatar || 'https://images.unsplash.com/photo-1494790108755-2616c06146b9?w=150&h=150&fit=crop&crop=face'
+      avatar: parsedData.profileImage || parsedData.avatar || null
     };
   }
 }
 
 // Listen for profile image updates
 const handleProfileImageUpdate = (event) => {
-  if (event.detail && event.detail.profileImage) {
+  if (event.detail && event.detail.hasOwnProperty('profileImage')) {
     user.value.avatar = event.detail.profileImage;
   }
 }
@@ -751,6 +769,21 @@ onUnmounted(() => {
   object-fit: cover;
 }
 
+.user-avatar.default-avatar {
+  background-color: #f9fafb;
+  border-color: #e5e7eb;
+}
+
+.default-avatar-icon {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  background-color: #f9fafb;
+}
+
 .status-indicator {
   position: absolute;
   bottom: 2px;
@@ -848,6 +881,15 @@ onUnmounted(() => {
   height: 48px;
   border-radius: 12px;
   object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.default-profile-icon {
+  background-color: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.7);
   border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
