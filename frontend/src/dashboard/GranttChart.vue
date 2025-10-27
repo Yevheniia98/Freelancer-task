@@ -533,12 +533,7 @@ export default {
         originalTask: null
       },
       
-      teamMembers: [
-        { id: 1, name: 'Rose Fuller', avatar: 'https://randomuser.me/api/portraits/women/1.jpg' },
-        { id: 2, name: 'Martin Tamer', avatar: 'https://randomuser.me/api/portraits/men/2.jpg' },
-        { id: 3, name: 'John Doe', avatar: 'https://randomuser.me/api/portraits/men/3.jpg' },
-        { id: 4, name: 'Jane Smith', avatar: 'https://randomuser.me/api/portraits/women/4.jpg' }
-      ],
+      teamMembers: [],
       
       months: [
         {
@@ -567,128 +562,7 @@ export default {
         }
       ],
       
-      tasks: [
-        {
-          id: 1,
-          name: 'Release Roll-out',
-          assigneeId: 1,
-          status: 'In Progress',
-          priority: 'Normal',
-          startDate: '2024-07-04',
-          endDate: '2024-08-25',
-          progress: 47,
-          colorClass: 'bar-dark-gray',
-          bars: [
-            {
-              id: 'bar1',
-              progress: 47,
-              colorClass: 'bar-dark-gray',
-              left: 100,
-              width: 600
-            }
-          ]
-        },
-        {
-          id: 2,
-          name: 'Q-2 Release',
-          assigneeId: null,
-          status: '',
-          priority: '',
-          startDate: '2024-07-12',
-          endDate: '2024-08-21',
-          progress: 30,
-          colorClass: 'bar-dark-gray',
-          bars: [
-            {
-              id: 'bar2',
-              progress: 30,
-              colorClass: 'bar-dark-gray',
-              left: 220,
-              width: 400
-            }
-          ]
-        },
-        {
-          id: 3,
-          name: 'Testing',
-          assigneeId: 1,
-          status: 'In Progress',
-          priority: 'Normal',
-          startDate: '2024-07-24',
-          endDate: '2024-08-17',
-          progress: 20,
-          colorClass: 'bar-purple',
-          bars: [
-            {
-              id: 'bar3',
-              progress: 20,
-              colorClass: 'bar-purple',
-              left: 340,
-              width: 300
-            }
-          ]
-        },
-        {
-          id: 4,
-          name: 'Phase-2',
-          assigneeId: 2,
-          status: 'In Progress',
-          priority: 'Critical',
-          startDate: '2024-07-28',
-          endDate: '2024-08-21',
-          progress: 40,
-          colorClass: 'bar-purple',
-          bars: [
-            {
-              id: 'bar4',
-              progress: 40,
-              colorClass: 'bar-purple',
-              left: 380,
-              width: 320
-            }
-          ]
-        },
-        {
-          id: 5,
-          name: 'Phase-1',
-          assigneeId: null,
-          status: '',
-          priority: '',
-          startDate: '2024-07-16',
-          endDate: '2024-08-01',
-          progress: 34,
-          colorClass: 'bar-dark-gray',
-          bars: [
-            {
-              id: 'bar5',
-              progress: 34,
-              colorClass: 'bar-dark-gray',
-              left: 260,
-              width: 180
-            }
-          ]
-        },
-        {
-          id: 6,
-          name: 'Grid',
-          assigneeId: 2,
-          status: 'In Progress',
-          priority: 'Normal',
-          startDate: '2024-07-24',
-          endDate: '2024-08-05',
-          progress: 50,
-          colorClass: 'bar-purple',
-          bars: [
-            {
-              id: 'bar6',
-              progress: 50,
-              colorClass: 'bar-purple',
-              left: 340,
-              width: 140
-            }
-          ]
-        }
-      ],
+      tasks: [],
       
       nextTaskId: 7
     };
@@ -716,25 +590,318 @@ export default {
     }
   },
   mounted() {
+    // Load real user data
+    this.loadUserData();
+    
+    // Process tasks to add assignee objects
+    this.processTasks();
+    
     // Add event listeners for resizing
     document.addEventListener('mousemove', this.onMouseMove);
     document.addEventListener('mouseup', this.stopResize);
     document.addEventListener('click', this.closeColumnMenu);
     
-    // Process tasks to add assignee objects
-    this.processTasks();
+    // Listen for data updates from other components
+    window.addEventListener('projectsUpdated', this.handleDataUpdate);
+    window.addEventListener('tasksUpdated', this.handleDataUpdate);
+    window.addEventListener('teamUpdated', this.handleDataUpdate);
   },
   beforeUnmount() {
     // Clean up event listeners
     document.removeEventListener('mousemove', this.onMouseMove);
     document.removeEventListener('mouseup', this.stopResize);
     document.removeEventListener('click', this.closeColumnMenu);
+    
+    // Clean up data update listeners
+    window.removeEventListener('projectsUpdated', this.handleDataUpdate);
+    window.removeEventListener('tasksUpdated', this.handleDataUpdate);
+    window.removeEventListener('teamUpdated', this.handleDataUpdate);
   },
   methods: {
+    // Load real user data from localStorage
+    loadUserData() {
+      try {
+        // Load team members
+        this.loadTeamMembers();
+        
+        // Load projects and convert them to Gantt tasks
+        this.loadProjectsAsGanttTasks();
+        
+        console.log('Gantt Chart data loaded:', {
+          teamMembers: this.teamMembers.length,
+          tasks: this.tasks.length
+        });
+      } catch (error) {
+        console.error('Error loading Gantt Chart data:', error);
+        this.initializeSampleGanttData();
+      }
+    },
+    
+    loadTeamMembers() {
+      // Load from localStorage
+      const teamData = localStorage.getItem('team_data');
+      const userData = localStorage.getItem('user_data');
+      
+      this.teamMembers = [];
+      
+      // Add current user
+      if (userData) {
+        try {
+          const user = JSON.parse(userData);
+          this.teamMembers.push({
+            id: 0,
+            name: user.fullName || user.name || 'You',
+            avatar: user.profileImage || user.avatar || null
+          });
+        } catch (e) {
+          console.warn('Error parsing user data:', e);
+        }
+      }
+      
+      // Add team members
+      if (teamData) {
+        try {
+          const team = JSON.parse(teamData);
+          if (Array.isArray(team)) {
+            team.forEach((member, index) => {
+              this.teamMembers.push({
+                id: index + 1,
+                name: member.name || `Team Member ${index + 1}`,
+                avatar: member.avatar || null
+              });
+            });
+          }
+        } catch (e) {
+          console.warn('Error parsing team data:', e);
+        }
+      }
+      
+      // Ensure we have at least one team member (the user)
+      if (this.teamMembers.length === 0) {
+        this.teamMembers.push({
+          id: 0,
+          name: 'You',
+          avatar: null
+        });
+      }
+    },
+    
+    loadProjectsAsGanttTasks() {
+      const projectsData = localStorage.getItem('projects_data');
+      
+      this.tasks = [];
+      let taskId = 1;
+      
+      if (projectsData) {
+        try {
+          const projects = JSON.parse(projectsData);
+          if (Array.isArray(projects)) {
+            projects.forEach(project => {
+              // Convert project to Gantt task
+              const task = this.convertProjectToGanttTask(project, taskId++);
+              if (task) {
+                this.tasks.push(task);
+              }
+            });
+          }
+        } catch (e) {
+          console.warn('Error parsing projects data:', e);
+        }
+      }
+      
+      // If no projects, create sample tasks
+      if (this.tasks.length === 0) {
+        this.createSampleTasks();
+      }
+      
+      // Update nextTaskId
+      this.nextTaskId = taskId;
+    },
+    
+    convertProjectToGanttTask(project, taskId) {
+      try {
+        // Determine project status and progress
+        let status = 'Not Started';
+        let progress = 0;
+        let colorClass = 'bar-gray';
+        
+        if (project.status) {
+          switch (project.status.toLowerCase()) {
+            case 'active':
+            case 'in-progress':
+            case 'in_progress':
+              status = 'In Progress';
+              progress = project.progress || 50;
+              colorClass = project.priority === 'High' ? 'bar-purple' : 'bar-blue';
+              break;
+            case 'completed':
+              status = 'Completed';
+              progress = 100;
+              colorClass = 'bar-green';
+              break;
+            case 'on-hold':
+            case 'paused':
+              status = 'On Hold';
+              progress = project.progress || 25;
+              colorClass = 'bar-orange';
+              break;
+            case 'planning':
+            case 'not-started':
+              status = 'Planning';
+              progress = project.progress || 10;
+              colorClass = 'bar-gray';
+              break;
+            case 'cancelled':
+            case 'canceled':
+              status = 'Cancelled';
+              progress = project.progress || 0;
+              colorClass = 'bar-red';
+              break;
+            default:
+              status = 'In Progress';
+              progress = project.progress || 30;
+              colorClass = 'bar-dark-gray';
+          }
+        } else {
+          // Default for projects without status
+          progress = project.progress || 25;
+          if (progress === 0) {
+            status = 'Not Started';
+            colorClass = 'bar-gray';
+          } else if (progress === 100) {
+            status = 'Completed';
+            colorClass = 'bar-green';
+          } else {
+            status = 'In Progress';
+            colorClass = 'bar-blue';
+          }
+        }
+        
+        // Determine dates
+        const startDate = project.startDate || new Date().toISOString().split('T')[0];
+        const endDate = project.endDate || this.addDaysToDate(startDate, 30);
+        
+        // Find assignee
+        let assigneeId = null;
+        if (project.assignee || project.assigneeId) {
+          assigneeId = project.assigneeId || 0; // Default to user
+        }
+        
+        // Calculate bar positioning (simplified for now)
+        const barWidth = this.calculateBarWidth(startDate, endDate);
+        const barLeft = this.calculateBarPosition(startDate);
+        
+        return {
+          id: taskId,
+          name: project.name || `Project ${taskId}`,
+          assigneeId: assigneeId,
+          status: status,
+          priority: project.priority || 'Normal',
+          startDate: startDate,
+          endDate: endDate,
+          progress: progress,
+          colorClass: colorClass,
+          bars: [{
+            id: `bar${taskId}`,
+            progress: progress,
+            colorClass: colorClass,
+            left: barLeft,
+            width: barWidth
+          }]
+        };
+      } catch (error) {
+        console.error('Error converting project to Gantt task:', error);
+        return null;
+      }
+    },
+    
+    createSampleTasks() {
+      // Create sample tasks when no real projects exist
+      const today = new Date();
+      const sampleProjects = [
+        {
+          name: 'Website Redesign',
+          status: 'active',
+          progress: 75,
+          startDate: this.formatDate(new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)),
+          endDate: this.formatDate(new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000)),
+          assigneeId: 0,
+          priority: 'High'
+        },
+        {
+          name: 'Mobile App Development',
+          status: 'in-progress',
+          progress: 45,
+          startDate: this.formatDate(new Date(today.getTime() - 3 * 24 * 60 * 60 * 1000)),
+          endDate: this.formatDate(new Date(today.getTime() + 21 * 24 * 60 * 60 * 1000)),
+          assigneeId: 1,
+          priority: 'Critical'
+        },
+        {
+          name: 'Brand Identity Design',
+          status: 'completed',
+          progress: 100,
+          startDate: this.formatDate(new Date(today.getTime() - 14 * 24 * 60 * 60 * 1000)),
+          endDate: this.formatDate(new Date(today.getTime() - 2 * 24 * 60 * 60 * 1000)),
+          assigneeId: 0,
+          priority: 'Normal'
+        }
+      ];
+      
+      sampleProjects.forEach((project, index) => {
+        const task = this.convertProjectToGanttTask(project, index + 1);
+        if (task) {
+          this.tasks.push(task);
+        }
+      });
+    },
+    
+    calculateBarWidth(startDate, endDate) {
+      // Simple calculation - in a real implementation this would be more sophisticated
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+      return Math.max(days * 15, 100); // 15px per day, minimum 100px
+    },
+    
+    calculateBarPosition(startDate) {
+      // Simple calculation - in a real implementation this would be based on timeline
+      const start = new Date(startDate);
+      const today = new Date();
+      const diffDays = Math.ceil((start - today) / (1000 * 60 * 60 * 24));
+      return Math.max(100 + (diffDays * 15), 50); // Start from 100px, adjust by days
+    },
+    
+    addDaysToDate(dateString, days) {
+      const date = new Date(dateString);
+      date.setDate(date.getDate() + days);
+      return this.formatDate(date);
+    },
+    
+    formatDate(date) {
+      return date.toISOString().split('T')[0];
+    },
+    
+    initializeSampleGanttData() {
+      // Fallback sample data
+      this.teamMembers = [
+        { id: 0, name: 'You', avatar: null },
+        { id: 1, name: 'John Smith', avatar: null },
+        { id: 2, name: 'Sarah Jones', avatar: null }
+      ];
+      
+      this.createSampleTasks();
+    },
+    
+    // Listen for data updates
+    handleDataUpdate() {
+      this.loadUserData();
+    },
+    
     processTasks() {
       // Add assignee objects to tasks based on assigneeId
       this.tasks.forEach(task => {
-        if (task.assigneeId) {
+        if (task.assigneeId !== null && task.assigneeId !== undefined) {
           task.assignee = this.teamMembers.find(member => member.id === task.assigneeId);
         } else {
           task.assignee = null;
@@ -1438,6 +1605,14 @@ export default {
 
 .bar-purple-alt {
   background-color: #9c27b0;
+}
+
+.bar-gray {
+  background-color: #6b7280;
+}
+
+.bar-red {
+  background-color: #dc2626;
 }
 
 .progress-indicator {

@@ -21,7 +21,7 @@
               <div class="hero-stats">
                 <div class="stat-item">
                   <div class="stat-value">
-                    24
+                    {{ heroStats.activeProjects }}
                   </div>
                   <div class="stat-label">
                     Active Projects
@@ -30,7 +30,7 @@
                 <div class="stat-divider" />
                 <div class="stat-item">
                   <div class="stat-value">
-                    86%
+                    {{ heroStats.completionRate }}%
                   </div>
                   <div class="stat-label">
                     Completion Rate
@@ -39,7 +39,7 @@
                 <div class="stat-divider" />
                 <div class="stat-item">
                   <div class="stat-value">
-                    12
+                    {{ heroStats.teamMembers }}
                   </div>
                   <div class="stat-label">
                     Team Members
@@ -458,6 +458,7 @@
 </template>
 
 <script>
+import { ref, onMounted, onUnmounted } from 'vue';
 import LeftMenu from '@/dashboard/LeftMenu.vue';
 import SearchBar from '@/dashboard/SearchBar.vue';
 import CardsLine from '@/dashboard/CardsLine.vue';
@@ -476,6 +477,101 @@ export default {
     ChatSection,
     TaxSection,
     GranttChart
+  },
+  setup() {
+    // Reactive hero stats
+    const heroStats = ref({
+      activeProjects: 0,
+      completionRate: 0,
+      teamMembers: 1
+    });
+    
+    // Load real dashboard statistics
+    const loadDashboardStats = () => {
+      try {
+        // Get data from localStorage
+        const projectsData = localStorage.getItem('projects_data');
+        const tasksData = localStorage.getItem('tasks_data');
+        const teamData = localStorage.getItem('team_data');
+        
+        let activeProjects = 0;
+        let completionRate = 0;
+        let teamMembers = 1;
+        
+        // Calculate active projects
+        if (projectsData) {
+          try {
+            const projects = JSON.parse(projectsData);
+            if (Array.isArray(projects)) {
+              activeProjects = projects.filter(p => p.status !== 'completed' && p.status !== 'cancelled').length;
+            }
+          } catch (e) {
+            console.warn('Error parsing projects data:', e);
+          }
+        }
+        
+        // Calculate completion rate from tasks
+        if (tasksData) {
+          try {
+            const tasks = JSON.parse(tasksData);
+            if (Array.isArray(tasks) && tasks.length > 0) {
+              const completedTasks = tasks.filter(t => t.status === 'completed').length;
+              completionRate = Math.round((completedTasks / tasks.length) * 100);
+            }
+          } catch (e) {
+            console.warn('Error parsing tasks data:', e);
+          }
+        }
+        
+        // Calculate team members
+        if (teamData) {
+          try {
+            const team = JSON.parse(teamData);
+            if (Array.isArray(team)) {
+              teamMembers = team.length + 1; // +1 for the user
+            }
+          } catch (e) {
+            console.warn('Error parsing team data:', e);
+          }
+        }
+        
+        // Update reactive data
+        heroStats.value = {
+          activeProjects,
+          completionRate,
+          teamMembers
+        };
+        
+      } catch (error) {
+        console.error('Error loading dashboard stats:', error);
+      }
+    };
+    
+    // Handle data updates
+    const handleStatsUpdate = () => {
+      loadDashboardStats();
+    };
+    
+    // Initialize on mount
+    onMounted(() => {
+      loadDashboardStats();
+      
+      // Listen for data updates
+      window.addEventListener('projectsUpdated', handleStatsUpdate);
+      window.addEventListener('tasksUpdated', handleStatsUpdate);
+      window.addEventListener('teamUpdated', handleStatsUpdate);
+    });
+    
+    // Cleanup
+    onUnmounted(() => {
+      window.removeEventListener('projectsUpdated', handleStatsUpdate);
+      window.removeEventListener('tasksUpdated', handleStatsUpdate);
+      window.removeEventListener('teamUpdated', handleStatsUpdate);
+    });
+    
+    return {
+      heroStats
+    };
   }
 }
 </script>

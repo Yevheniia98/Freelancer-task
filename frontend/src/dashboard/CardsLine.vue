@@ -89,48 +89,248 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 
 export default {
   setup() {
+    // Initial stats structure
     const stats = ref([
       { 
         title: 'Active Projects', 
-        value: '24', 
+        value: '0', 
         unit: '',
         icon: 'mdi-briefcase-variant', 
-        trend: 'up',
-        change: '+12%',
+        trend: 'neutral',
+        change: '0%',
         description: 'Projects currently in progress'
       },
       { 
         title: 'Total Tasks', 
-        value: '1,247', 
+        value: '0', 
         unit: '',
         icon: 'mdi-format-list-checks', 
-        trend: 'up',
-        change: '+8%',
+        trend: 'neutral',
+        change: '0%',
         description: 'Tasks completed this period'
       },
       { 
         title: 'Team Members', 
-        value: '48', 
+        value: '1', 
         unit: '',
         icon: 'mdi-account-group', 
-        trend: 'up',
-        change: '+3%',
+        trend: 'neutral',
+        change: '0%',
         description: 'Active team members'
       },
       { 
         title: 'Revenue', 
-        value: '285.4', 
-        unit: 'K',
+        value: '0', 
+        unit: '',
         icon: 'mdi-trending-up', 
-        trend: 'up',
-        change: '+15%',
+        trend: 'neutral',
+        change: '0%',
         description: 'Total earnings this period'
       }
     ]);
+    
+    // Load user data and calculate real metrics
+    const loadUserMetrics = () => {
+      try {
+        // Get user data
+        const userData = localStorage.getItem('user_data');
+        const projectsData = localStorage.getItem('projects_data');
+        const tasksData = localStorage.getItem('tasks_data');
+        const teamData = localStorage.getItem('team_data');
+        const financeData = localStorage.getItem('finance_data');
+        
+        let activeProjects = 0;
+        let totalTasks = 0;
+        let teamMembers = 1; // At least the user themselves
+        let revenue = 0;
+        
+        // Calculate active projects
+        if (projectsData) {
+          try {
+            const projects = JSON.parse(projectsData);
+            activeProjects = Array.isArray(projects) ? projects.filter(p => p.status !== 'completed' && p.status !== 'cancelled').length : 0;
+          } catch (e) {
+            console.warn('Error parsing projects data:', e);
+          }
+        }
+        
+        // Calculate total tasks
+        if (tasksData) {
+          try {
+            const tasks = JSON.parse(tasksData);
+            totalTasks = Array.isArray(tasks) ? tasks.length : 0;
+          } catch (e) {
+            console.warn('Error parsing tasks data:', e);
+          }
+        }
+        
+        // Calculate team members
+        if (teamData) {
+          try {
+            const team = JSON.parse(teamData);
+            teamMembers = Array.isArray(team) ? team.length + 1 : 1; // +1 for the user
+          } catch (e) {
+            console.warn('Error parsing team data:', e);
+          }
+        }
+        
+        // Calculate revenue
+        if (financeData) {
+          try {
+            const finance = JSON.parse(financeData);
+            if (finance.totalIncome) {
+              revenue = parseFloat(finance.totalIncome) || 0;
+            } else if (finance.revenue) {
+              revenue = parseFloat(finance.revenue) || 0;
+            }
+          } catch (e) {
+            console.warn('Error parsing finance data:', e);
+          }
+        }
+        
+        // Update stats with real data
+        stats.value[0].value = activeProjects.toString();
+        stats.value[0].trend = activeProjects > 0 ? 'up' : 'neutral';
+        stats.value[0].change = activeProjects > 0 ? `${activeProjects} active` : 'No active projects';
+        
+        stats.value[1].value = totalTasks > 999 ? `${(totalTasks/1000).toFixed(1)}k` : totalTasks.toString();
+        stats.value[1].trend = totalTasks > 0 ? 'up' : 'neutral';
+        stats.value[1].change = totalTasks > 0 ? `${totalTasks} total` : 'No tasks yet';
+        
+        stats.value[2].value = teamMembers.toString();
+        stats.value[2].trend = teamMembers > 1 ? 'up' : 'neutral';
+        stats.value[2].change = teamMembers > 1 ? `+${teamMembers - 1} members` : 'Just you';
+        
+        if (revenue > 0) {
+          if (revenue >= 1000000) {
+            stats.value[3].value = (revenue / 1000000).toFixed(1);
+            stats.value[3].unit = 'M';
+          } else if (revenue >= 1000) {
+            stats.value[3].value = (revenue / 1000).toFixed(1);
+            stats.value[3].unit = 'K';
+          } else {
+            stats.value[3].value = revenue.toFixed(0);
+            stats.value[3].unit = '';
+          }
+          stats.value[3].trend = 'up';
+          stats.value[3].change = `$${revenue.toFixed(0)} earned`;
+        } else {
+          stats.value[3].value = '0';
+          stats.value[3].unit = '';
+          stats.value[3].trend = 'neutral';
+          stats.value[3].change = 'No revenue yet';
+        }
+        
+        console.log('Metrics updated:', {
+          activeProjects,
+          totalTasks,
+          teamMembers,
+          revenue
+        });
+        
+      } catch (error) {
+        console.error('Error loading user metrics:', error);
+      }
+    };
+    
+    // Listen for data updates
+    const handleDataUpdate = () => {
+      loadUserMetrics();
+    };
+    
+    // Initialize sample data if none exists
+    const initializeSampleData = () => {
+      // Only add sample data if user has no existing data
+      if (!localStorage.getItem('projects_data')) {
+        const today = new Date();
+        const formatDate = (date) => date.toISOString().split('T')[0];
+        
+        const sampleProjects = [
+          {
+            id: 1,
+            name: 'Website Redesign',
+            status: 'active',
+            progress: 75,
+            client: 'TechCorp Inc.',
+            startDate: formatDate(new Date(today.getTime() - 14 * 24 * 60 * 60 * 1000)), // 2 weeks ago
+            endDate: formatDate(new Date(today.getTime() + 21 * 24 * 60 * 60 * 1000)), // 3 weeks from now
+            priority: 'High',
+            assigneeId: 0
+          },
+          {
+            id: 2,
+            name: 'Mobile App Development',
+            status: 'active',
+            progress: 45,
+            client: 'StartupXYZ',
+            startDate: formatDate(new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)), // 1 week ago
+            endDate: formatDate(new Date(today.getTime() + 35 * 24 * 60 * 60 * 1000)), // 5 weeks from now
+            priority: 'Critical',
+            assigneeId: 1
+          },
+          {
+            id: 3,
+            name: 'Brand Identity Design',
+            status: 'completed',
+            progress: 100,
+            client: 'Creative Agency',
+            startDate: formatDate(new Date(today.getTime() - 21 * 24 * 60 * 60 * 1000)), // 3 weeks ago
+            endDate: formatDate(new Date(today.getTime() - 3 * 24 * 60 * 60 * 1000)), // 3 days ago
+            priority: 'Normal',
+            assigneeId: 2
+          },
+          {
+            id: 4,
+            name: 'E-commerce Platform',
+            status: 'planning',
+            progress: 15,
+            client: 'RetailCorp',
+            startDate: formatDate(new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000)), // 1 week from now
+            endDate: formatDate(new Date(today.getTime() + 70 * 24 * 60 * 60 * 1000)), // 10 weeks from now
+            priority: 'Normal',
+            assigneeId: 0
+          }
+        ];
+        localStorage.setItem('projects_data', JSON.stringify(sampleProjects));
+      }
+      
+      if (!localStorage.getItem('tasks_data')) {
+        const sampleTasks = [
+          { id: 1, title: 'Design homepage mockup', status: 'completed', projectId: 1 },
+          { id: 2, title: 'Develop user authentication', status: 'in-progress', projectId: 2 },
+          { id: 3, title: 'Create brand guidelines', status: 'completed', projectId: 3 },
+          { id: 4, title: 'Setup database schema', status: 'in-progress', projectId: 2 },
+          { id: 5, title: 'Design mobile screens', status: 'todo', projectId: 2 },
+          { id: 6, title: 'Write API documentation', status: 'in-progress', projectId: 2 },
+          { id: 7, title: 'User testing sessions', status: 'todo', projectId: 1 },
+          { id: 8, title: 'Deploy to staging', status: 'todo', projectId: 1 }
+        ];
+        localStorage.setItem('tasks_data', JSON.stringify(sampleTasks));
+      }
+      
+      if (!localStorage.getItem('team_data')) {
+        const sampleTeam = [
+          { id: 1, name: 'Alice Johnson', role: 'UI/UX Designer', email: 'alice@company.com' },
+          { id: 2, name: 'Bob Smith', role: 'Frontend Developer', email: 'bob@company.com' },
+          { id: 3, name: 'Carol Martinez', role: 'Backend Developer', email: 'carol@company.com' }
+        ];
+        localStorage.setItem('team_data', JSON.stringify(sampleTeam));
+      }
+      
+      if (!localStorage.getItem('finance_data')) {
+        const sampleFinance = {
+          totalIncome: 45750,
+          monthlyRevenue: 15250,
+          expenses: 8500,
+          profit: 37250
+        };
+        localStorage.setItem('finance_data', JSON.stringify(sampleFinance));
+      }
+    };
 
     const timeOptions = ref([
       { label: 'Last 7 days', value: 'Last 7 days', icon: 'mdi-calendar-week' },
@@ -162,6 +362,31 @@ export default {
         default: return 'mdi-trending-up';
       }
     };
+    
+    // Initialize data on component mount
+    onMounted(() => {
+      // Initialize sample data if none exists
+      initializeSampleData();
+      
+      // Load and display metrics
+      loadUserMetrics();
+      
+      // Listen for data updates from other components
+      window.addEventListener('projectsUpdated', handleDataUpdate);
+      window.addEventListener('tasksUpdated', handleDataUpdate);
+      window.addEventListener('teamUpdated', handleDataUpdate);
+      window.addEventListener('financeUpdated', handleDataUpdate);
+      window.addEventListener('userDataUpdated', handleDataUpdate);
+    });
+    
+    // Cleanup event listeners
+    onUnmounted(() => {
+      window.removeEventListener('projectsUpdated', handleDataUpdate);
+      window.removeEventListener('tasksUpdated', handleDataUpdate);
+      window.removeEventListener('teamUpdated', handleDataUpdate);
+      window.removeEventListener('financeUpdated', handleDataUpdate);
+      window.removeEventListener('userDataUpdated', handleDataUpdate);
+    });
 
     return {
       stats,
@@ -170,7 +395,8 @@ export default {
       selectedOptions,
       selectTime,
       selectCard,
-      getTrendIcon
+      getTrendIcon,
+      loadUserMetrics
     };
   }
 };

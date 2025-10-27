@@ -187,8 +187,20 @@
           <v-avatar
             size="48"
             class="mr-3"
+            :class="{ 'default-user-avatar': !userAvatar }"
           >
-            <v-img :src="userAvatar" />
+            <v-img
+              v-if="userAvatar"
+              :src="userAvatar"
+            />
+            <div 
+              v-else 
+              class="default-user-icon"
+            >
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+                <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
+              </svg>
+            </div>
           </v-avatar>
           <span class="user-name text-h6 font-weight-medium">{{ userName }}</span>
         </div>
@@ -830,7 +842,7 @@ const peopleMenu = ref(false);
 const peopleSearch = ref('');
 const selectedPeople = ref([]);
 const userName = ref('Isabella');
-const userAvatar = ref('https://randomuser.me/api/portraits/women/85.jpg');
+const userAvatar = ref(null);
 
 // Enhanced meeting functionality
 const selectedPlatform = ref('zoom');
@@ -1008,76 +1020,97 @@ const weekDays = [
 
 const repeatOptions = ['On', 'Daily', 'Weekly', 'Monthly', 'Yearly'];
 
-const events = ref([
-  {
-    id: 1,
-    title: 'Meeting with Company',
-    description: 'Quarterly review with stakeholders',
-    date: '2025-09-10',
-    timeFrom: '09:00',
-    timeTo: '10:00',
-    type: 'Live event',
-    platform: 'zoom',
-    meetingLink: 'https://meet.google.com/sic-bhis-jpu',
-    attendees: [
-      { id: 1, name: 'John Smith', avatar: 'https://randomuser.me/api/portraits/men/1.jpg' },
-      { id: 2, name: 'Emma Johnson', avatar: 'https://randomuser.me/api/portraits/women/2.jpg' },
-      { id: 3, name: 'Michael Brown', avatar: 'https://randomuser.me/api/portraits/men/3.jpg' },
-      { id: 4, name: 'Sarah Davis', avatar: 'https://randomuser.me/api/portraits/women/4.jpg' }
-    ],
-    emailInvitees: ['client@company.com'],
-    repeatEvery: 'Monthly',
-    repeatDays: [],
-    endRepeatDate: '2025-10-05',
-    organizer: {
-      name: 'Isabella',
-      avatar: 'https://randomuser.me/api/portraits/women/85.jpg'
-    }
-  },
-  {
-    id: 2,
-    title: 'Project Planning Session',
-    description: 'Weekly planning and sprint review',
-    date: '2025-09-12',
-    timeFrom: '14:00',
-    timeTo: '15:30',
-    type: 'Meeting',
-    platform: 'meet',
-    meetingLink: 'https://meet.google.com/abc-defg-hij',
-    attendees: [
-      { id: 3, name: 'Michael Brown', avatar: 'https://randomuser.me/api/portraits/men/3.jpg' },
-      { id: 5, name: 'David Wilson', avatar: 'https://randomuser.me/api/portraits/men/5.jpg' }
-    ],
-    emailInvitees: ['external@partner.com', 'consultant@agency.com'],
-    repeatEvery: 'Weekly',
-    repeatDays: ['F'],
-    endRepeatDate: '2025-12-12',
-    organizer: {
-      name: 'Isabella',
-      avatar: 'https://randomuser.me/api/portraits/women/85.jpg'
-    }
-  },
-  {
-    id: 3,
-    title: 'Complete Project Documentation',
-    description: 'Finish writing user manuals and API docs',
-    date: '2025-09-15',
-    timeFrom: '09:00',
-    timeTo: '17:00',
-    type: 'Task',
-    platform: null,
-    meetingLink: null,
-    attendees: [],
-    emailInvitees: [],
-    repeatEvery: 'On',
-    repeatDays: [],
-    endRepeatDate: null,
-    organizer: {
-      name: 'Isabella',
-      avatar: 'https://randomuser.me/api/portraits/women/85.jpg'
-    }
+// Load events from localStorage or initialize with sample data
+function loadEvents() {
+  const savedEvents = localStorage.getItem('userEvents');
+  if (savedEvents) {
+    return JSON.parse(savedEvents);
   }
-]);
+  
+  // Return sample events for new users
+  return [
+    {
+      id: 1,
+      title: 'Meeting with Company',
+      description: 'Quarterly review with stakeholders',
+      date: '2025-09-10',
+      timeFrom: '09:00',
+      timeTo: '10:00',
+      type: 'Live event',
+      platform: 'zoom',
+      meetingLink: 'https://meet.google.com/sic-bhis-jpu',
+      attendees: [
+        { id: 1, name: 'John Smith', avatar: 'https://randomuser.me/api/portraits/men/1.jpg' },
+        { id: 2, name: 'Emma Johnson', avatar: 'https://randomuser.me/api/portraits/women/2.jpg' },
+        { id: 3, name: 'Michael Brown', avatar: 'https://randomuser.me/api/portraits/men/3.jpg' },
+        { id: 4, name: 'Sarah Davis', avatar: 'https://randomuser.me/api/portraits/women/4.jpg' }
+      ],
+      emailInvitees: ['client@company.com'],
+      repeatEvery: 'Monthly',
+      repeatDays: [],
+      endRepeatDate: '2025-10-05',
+      organizer: {
+        name: 'Isabella',
+        avatar: 'https://randomuser.me/api/portraits/women/85.jpg'
+      }
+    },
+    {
+      id: 2,
+      title: 'Project Planning Session',
+      description: 'Weekly planning and sprint review',
+      date: '2025-09-12',
+      timeFrom: '14:00',
+      timeTo: '15:30',
+      type: 'Meeting',
+      platform: 'meet',
+      meetingLink: 'https://meet.google.com/abc-defg-hij',
+      attendees: [
+        { id: 3, name: 'Michael Brown', avatar: 'https://randomuser.me/api/portraits/men/3.jpg' },
+        { id: 5, name: 'David Wilson', avatar: 'https://randomuser.me/api/portraits/men/5.jpg' }
+      ],
+      emailInvitees: ['external@partner.com', 'consultant@agency.com'],
+      repeatEvery: 'Weekly',
+      repeatDays: ['F'],
+      endRepeatDate: '2025-12-12',
+      organizer: {
+        name: 'Isabella',
+        avatar: 'https://randomuser.me/api/portraits/women/85.jpg'
+      }
+    },
+    {
+      id: 3,
+      title: 'Complete Project Documentation',
+      description: 'Finish writing user manuals and API docs',
+      date: '2025-09-15',
+      timeFrom: '09:00',
+      timeTo: '17:00',
+      type: 'Task',
+      platform: null,
+      meetingLink: null,
+      attendees: [],
+      emailInvitees: [],
+      repeatEvery: 'On',
+      repeatDays: [],
+      endRepeatDate: null,
+      organizer: {
+        name: 'Isabella',
+        avatar: 'https://randomuser.me/api/portraits/women/85.jpg'
+      }
+    }
+  ];
+}
+
+// Save events to localStorage
+function saveEvents() {
+  localStorage.setItem('userEvents', JSON.stringify(events.value));
+}
+
+const events = ref(loadEvents());
+
+// Update nextEventId after events are loaded
+function updateNextEventId() {
+  nextEventId.value = getNextEventId();
+}
 
 const people = [
   { id: 1, name: 'John Smith', email: 'john.smith@company.com', avatar: 'https://randomuser.me/api/portraits/men/1.jpg' },
@@ -1094,7 +1127,13 @@ const people = [
 const currentMonth = ref(todayDate.getMonth());
 const currentYear = ref(todayDate.getFullYear());
 const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const nextEventId = ref(2);
+// Calculate next event ID based on existing events
+function getNextEventId() {
+  if (events.value.length === 0) return 1;
+  return Math.max(...events.value.map(e => e.id)) + 1;
+}
+
+const nextEventId = ref(getNextEventId());
 
 // Select date from calendar
 function selectDateFromCalendar(date) {
@@ -1530,6 +1569,8 @@ function deleteEvent(eventId) {
     const index = events.value.findIndex(event => event.id === eventId);
     if (index > -1) {
       events.value.splice(index, 1);
+      // Save to localStorage after deletion
+      saveEvents();
       showNotification('Reminder deleted successfully!', 'success');
     }
   }
@@ -1581,6 +1622,9 @@ function createEvent() {
     // If same date, sort by time
     return a.timeFrom < b.timeFrom ? -1 : 1;
   });
+  
+  // Save to localStorage
+  saveEvents();
   
   // Send notifications and invitations
   if (eventType.value !== 'task') {
@@ -1690,6 +1734,9 @@ function generateRecurringEvents(sourceEvent) {
     if (a.date > b.date) return 1;
     return a.timeFrom < b.timeFrom ? -1 : 1;
   });
+  
+  // Save recurring events to localStorage
+  saveEvents();
 }
 
 // Initialize when component is mounted
@@ -1711,6 +1758,9 @@ onMounted(() => {
   // Load user data from localStorage
   loadUserData();
   
+  // Update next event ID after events are loaded
+  updateNextEventId();
+  
   // Listen for profile updates
   window.addEventListener('profileImageUpdated', handleProfileUpdate);
   window.addEventListener('userNameUpdated', handleProfileUpdate);
@@ -1722,14 +1772,14 @@ function loadUserData() {
   if (userData) {
     const parsedData = JSON.parse(userData);
     userName.value = parsedData.fullName || parsedData.name || 'User';
-    userAvatar.value = parsedData.profileImage || parsedData.avatar || 'https://randomuser.me/api/portraits/women/85.jpg';
+    userAvatar.value = parsedData.profileImage || parsedData.avatar || null;
   }
 }
 
 // Handle profile updates
 function handleProfileUpdate(event) {
   if (event.detail) {
-    if (event.detail.profileImage) {
+    if (event.detail.hasOwnProperty('profileImage')) {
       userAvatar.value = event.detail.profileImage;
     }
     if (event.detail.fullName || event.detail.name) {
@@ -1892,6 +1942,20 @@ function autoResize() {
 .user-name {
   color: #333;
   font-weight: 500;
+}
+
+.default-user-avatar {
+  background-color: #f9fafb;
+  border: 2px solid #e5e7eb;
+}
+
+.default-user-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #6b7280;
 }
 
 /* Event Type Box */
