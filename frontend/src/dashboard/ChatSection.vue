@@ -17,10 +17,23 @@
             <div class="d-flex align-center justify-space-between">
           <div class="d-flex align-center">
             <v-avatar
-                  :image="currentUser.avatar"
-                  size="40"
-                  class="mr-3"
-                />
+              size="40"
+              class="mr-3"
+              :class="{ 'default-user-avatar': !currentUser.avatar }"
+            >
+              <v-img
+                v-if="currentUser.avatar"
+                :src="currentUser.avatar"
+              />
+              <div 
+                v-else 
+                class="default-user-icon"
+              >
+                <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+                  <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
+                </svg>
+              </div>
+            </v-avatar>
             <div>
                   <div class="text-h6 font-weight-medium">
                     {{ currentUser.name }}
@@ -74,9 +87,22 @@
               <div class="d-flex align-center pa-3">
                 <div class="position-relative mr-3">
                   <v-avatar
-                    :image="chat.contact.avatar"
                     size="48"
-                  />
+                    :class="{ 'default-user-avatar': !chat.contact.avatar }"
+                  >
+                    <v-img
+                      v-if="chat.contact.avatar"
+                      :src="chat.contact.avatar"
+                    />
+                    <div 
+                      v-else 
+                      class="default-user-icon"
+                    >
+                      <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+                        <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
+                      </svg>
+                    </div>
+                  </v-avatar>
                   <div
                     v-if="chat.contact.isOnline"
                     class="online-indicator"
@@ -152,10 +178,23 @@
               <div class="d-flex align-center justify-space-between pa-3">
                 <div class="d-flex align-center">
                   <v-avatar
-                    :image="selectedChat?.contact.avatar"
                     size="40"
                     class="mr-3"
-                  />
+                    :class="{ 'default-user-avatar': !selectedChat?.contact.avatar }"
+                  >
+                    <v-img
+                      v-if="selectedChat?.contact.avatar"
+                      :src="selectedChat?.contact.avatar"
+                    />
+                    <div 
+                      v-else 
+                      class="default-user-icon"
+                    >
+                      <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+                        <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
+                      </svg>
+                    </div>
+                  </v-avatar>
                   <div>
                     <div class="text-subtitle-1 font-weight-medium">
                       {{ selectedChat?.contact.name }}
@@ -422,7 +461,23 @@
                 @click="startNewChat(contact)"
             >
               <template #prepend>
-                  <v-avatar :image="contact.avatar" size="40" />
+                <v-avatar 
+                  size="40"
+                  :class="{ 'default-user-avatar': !contact.avatar }"
+                >
+                  <v-img
+                    v-if="contact.avatar"
+                    :src="contact.avatar"
+                  />
+                  <div 
+                    v-else 
+                    class="default-user-icon"
+                  >
+                    <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+                      <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
+                    </svg>
+                  </div>
+                </v-avatar>
               </template>
                 <v-list-item-title>{{ contact.name }}</v-list-item-title>
                 <v-list-item-subtitle>{{ contact.role }}</v-list-item-subtitle>
@@ -520,7 +575,7 @@ export default {
       currentUser: {
         id: 0,
         name: 'You',
-        avatar: 'https://randomuser.me/api/portraits/women/33.jpg',
+        avatar: null, // Start with null, let template handle fallback to account icon
         status: 'online'
       },
       currentUserId: 0,
@@ -752,6 +807,9 @@ export default {
     window.addEventListener('profileImageUpdated', this.handleProfileUpdate);
     window.addEventListener('userNameUpdated', this.handleProfileUpdate);
     
+    // Listen for team data updates
+    window.addEventListener('teamUpdated', this.handleTeamUpdate);
+    
     // Initialize last messages for chats
     this.chats.forEach(chat => {
       if (chat.messages.length > 0) {
@@ -792,6 +850,7 @@ export default {
     // Remove event listeners
     window.removeEventListener('profileImageUpdated', this.handleProfileUpdate);
     window.removeEventListener('userNameUpdated', this.handleProfileUpdate);
+    window.removeEventListener('teamUpdated', this.handleTeamUpdate);
   },
   
   methods: {
@@ -803,15 +862,190 @@ export default {
         this.currentUser = {
           ...this.currentUser,
           name: parsedData.fullName || parsedData.name || 'You',
-          avatar: parsedData.profileImage || parsedData.avatar || this.currentUser.avatar
+          avatar: parsedData.profileImage || null // Set to null if no image, let the template handle the fallback
         };
+      } else {
+        // Set to null if no user data, let the template handle the fallback
+        this.currentUser.avatar = null;
       }
+      
+      // Load team members for contacts
+      this.loadTeamMembers();
+    },
+    
+    // Load team members from localStorage
+    loadTeamMembers() {
+      let teamData = localStorage.getItem('teamData');
+      
+      if (!teamData) {
+        // Create sample team data if none exists
+        const sampleTeam = [
+          {
+            id: 1,
+            name: 'Emily Johnson',
+            role: 'UI/UX Designer',
+            email: 'emily.johnson@company.com',
+            avatar: null // Will use default icon
+          },
+          {
+            id: 2,
+            name: 'Michael Chen',
+            role: 'Frontend Developer',
+            email: 'michael.chen@company.com',
+            avatar: null
+          },
+          {
+            id: 3,
+            name: 'Sophia Martinez',
+            role: 'Product Manager',
+            email: 'sophia.martinez@company.com',
+            avatar: null
+          },
+          {
+            id: 4,
+            name: 'James Wilson',
+            role: 'Backend Developer',
+            email: 'james.wilson@company.com',
+            avatar: null
+          },
+          {
+            id: 5,
+            name: 'Olivia Lee',
+            role: 'Marketing Specialist',
+            email: 'olivia.lee@company.com',
+            avatar: null
+          }
+        ];
+        
+        localStorage.setItem('teamData', JSON.stringify(sampleTeam));
+        teamData = JSON.stringify(sampleTeam);
+      }
+      
+      const parsedTeam = JSON.parse(teamData);
+      
+      // Update available contacts with real team data
+      this.availableContacts = parsedTeam.map((member, index) => ({
+        id: member.id || index + 1,
+        name: member.name,
+        role: member.role,
+        avatar: member.avatar || null, // Set to null if no avatar, let template handle fallback
+        isOnline: Math.random() > 0.5, // Random online status
+        lastSeen: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000) // Random last seen within 24h
+      }));
+      
+      // Update existing chats with real team data
+      this.updateChatsWithRealData();
+    },
+    
+    // Update chats with real team member data
+    updateChatsWithRealData() {
+      if (this.availableContacts.length > 0) {
+        // Create chats with recent realistic messages and current dates
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        
+        this.chats = this.availableContacts.slice(0, 3).map((contact, index) => {
+          const chatMessages = this.generateRecentMessages(contact, index);
+          return {
+            id: index + 1,
+            contact: {
+              ...contact,
+              isTyping: false
+            },
+            messages: chatMessages,
+            unreadCount: Math.floor(Math.random() * 3), // Random unread count 0-2
+            lastMessage: chatMessages[chatMessages.length - 1] || null
+          };
+        });
+      }
+    },
+    
+    // Generate realistic recent messages
+    generateRecentMessages(contact, chatIndex) {
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      
+      const messageTemplates = [
+        {
+          templates: [
+            'Hey! How are you doing?',
+            'Good morning! Ready for the day?',
+            'Hi there! Hope you\'re having a great day',
+            'Hello! How\'s the project going?'
+          ],
+          responses: [
+            'I\'m good, thanks! Working on the dashboard.',
+            'Doing well! Just finished the morning standup.',
+            'Great! Just reviewed the latest designs.',
+            'All good here! Making good progress.'
+          ]
+        },
+        {
+          templates: [
+            'The new API endpoints are ready for testing',
+            'I\'ve updated the documentation',
+            'Could you review the latest PR?',
+            'The design mockups are ready'
+          ],
+          responses: [
+            'Great! I\'ll test them this afternoon.',
+            'Perfect! I\'ll check it out now.',
+            'Sure! I\'ll review it in a few minutes.',
+            'Awesome! They look fantastic.'
+          ]
+        },
+        {
+          templates: [
+            'Meeting at 2 PM today?',
+            'Can we discuss the timeline?',
+            'Quick sync call in 10 minutes?',
+            'Team standup in the main room'
+          ],
+          responses: [
+            'Sounds good! See you then.',
+            'Yes, let\'s chat about it.',
+            'Perfect! I\'ll join the call.',
+            'On my way! Thanks for the reminder.'
+          ]
+        }
+      ];
+      
+      const template = messageTemplates[chatIndex % messageTemplates.length];
+      const baseTime = chatIndex === 0 ? today : yesterday;
+      baseTime.setHours(9 + Math.floor(Math.random() * 8), Math.floor(Math.random() * 60));
+      
+      return [
+        {
+          id: (chatIndex * 10) + 1,
+          senderId: contact.id,
+          text: template.templates[Math.floor(Math.random() * template.templates.length)],
+          timestamp: new Date(baseTime.getTime()),
+          type: 'text',
+          status: 'read'
+        },
+        {
+          id: (chatIndex * 10) + 2,
+          senderId: 0, // Current user
+          text: template.responses[Math.floor(Math.random() * template.responses.length)],
+          timestamp: new Date(baseTime.getTime() + 120000), // 2 minutes later
+          type: 'text',
+          status: 'delivered'
+        }
+      ];
     },
     
     // Handle profile updates (both image and name)
     handleProfileUpdate(event) {
       // Always reload user data for consistency
       this.loadUserData();
+    },
+    
+    // Handle team data updates
+    handleTeamUpdate(event) {
+      console.log('🔄 Team data updated, refreshing chat contacts');
+      this.loadTeamMembers();
     },
     
     selectChat(chatId) {
@@ -2079,5 +2313,25 @@ export default {
     width: 80px;
     height: 80px;
   }
+}
+
+/* Default User Avatar Styles */
+.default-user-avatar {
+  background: #f5f5f5 !important;
+  border: 2px solid #e0e0e0;
+}
+
+.default-user-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #9e9e9e;
+}
+
+.default-user-icon svg {
+  width: 60%;
+  height: 60%;
 }
 </style>
