@@ -1020,84 +1020,15 @@ const weekDays = [
 
 const repeatOptions = ['On', 'Daily', 'Weekly', 'Monthly', 'Yearly'];
 
-// Load events from localStorage or initialize with sample data
+// Load events from localStorage or initialize with empty array
 function loadEvents() {
   const savedEvents = localStorage.getItem('userEvents');
   if (savedEvents) {
     return JSON.parse(savedEvents);
   }
   
-  // Return sample events for new users
-  return [
-    {
-      id: 1,
-      title: 'Meeting with Company',
-      description: 'Quarterly review with stakeholders',
-      date: '2025-09-10',
-      timeFrom: '09:00',
-      timeTo: '10:00',
-      type: 'Live event',
-      platform: 'zoom',
-      meetingLink: 'https://meet.google.com/sic-bhis-jpu',
-      attendees: [
-        { id: 1, name: 'John Smith', avatar: 'https://randomuser.me/api/portraits/men/1.jpg' },
-        { id: 2, name: 'Emma Johnson', avatar: 'https://randomuser.me/api/portraits/women/2.jpg' },
-        { id: 3, name: 'Michael Brown', avatar: 'https://randomuser.me/api/portraits/men/3.jpg' },
-        { id: 4, name: 'Sarah Davis', avatar: 'https://randomuser.me/api/portraits/women/4.jpg' }
-      ],
-      emailInvitees: ['client@company.com'],
-      repeatEvery: 'Monthly',
-      repeatDays: [],
-      endRepeatDate: '2025-10-05',
-      organizer: {
-        name: 'Isabella',
-        avatar: 'https://randomuser.me/api/portraits/women/85.jpg'
-      }
-    },
-    {
-      id: 2,
-      title: 'Project Planning Session',
-      description: 'Weekly planning and sprint review',
-      date: '2025-09-12',
-      timeFrom: '14:00',
-      timeTo: '15:30',
-      type: 'Meeting',
-      platform: 'meet',
-      meetingLink: 'https://meet.google.com/abc-defg-hij',
-      attendees: [
-        { id: 3, name: 'Michael Brown', avatar: 'https://randomuser.me/api/portraits/men/3.jpg' },
-        { id: 5, name: 'David Wilson', avatar: 'https://randomuser.me/api/portraits/men/5.jpg' }
-      ],
-      emailInvitees: ['external@partner.com', 'consultant@agency.com'],
-      repeatEvery: 'Weekly',
-      repeatDays: ['F'],
-      endRepeatDate: '2025-12-12',
-      organizer: {
-        name: 'Isabella',
-        avatar: 'https://randomuser.me/api/portraits/women/85.jpg'
-      }
-    },
-    {
-      id: 3,
-      title: 'Complete Project Documentation',
-      description: 'Finish writing user manuals and API docs',
-      date: '2025-09-15',
-      timeFrom: '09:00',
-      timeTo: '17:00',
-      type: 'Task',
-      platform: null,
-      meetingLink: null,
-      attendees: [],
-      emailInvitees: [],
-      repeatEvery: 'On',
-      repeatDays: [],
-      endRepeatDate: null,
-      organizer: {
-        name: 'Isabella',
-        avatar: 'https://randomuser.me/api/portraits/women/85.jpg'
-      }
-    }
-  ];
+  // Return empty array for new users - no sample events
+  return [];
 }
 
 // Save events to localStorage
@@ -1633,25 +1564,22 @@ function createEvent() {
       sendInAppNotifications(createdEvent);
     }
     
-      // Send email invitations only if there are participants
-  const totalInvitees = selectedPeople.value.length + emailInvitees.value.length;
-  if (totalInvitees > 0) {
-    // Wait for email sending to complete before resetting form
-    sendEmailInvitations(createdEvent).then(() => {
-      showNotification(`${eventType.value === 'event' ? 'Event' : 'Meeting'} created and ${totalInvitees} invitation(s) sent!`, 'success');
-      // Reset form after emails are sent
+    // Try to send email invitations
+    const totalInvitees = selectedPeople.value.length + emailInvitees.value.length;
+    if (totalInvitees > 0) {
+      // Attempt to send email invitations with error handling
+      sendEmailInvitations(createdEvent).then(() => {
+        showNotification(`${eventType.value === 'event' ? 'Event' : 'Meeting'} created and ${totalInvitees} invitation(s) sent!`, 'success');
+        resetForm();
+      }).catch((error) => {
+        console.error('Email sending failed:', error);
+        showNotification(`${eventType.value === 'event' ? 'Event' : 'Meeting'} created successfully! Note: Email invitations failed to send - backend service unavailable.`, 'warning');
+        resetForm();
+      });
+    } else {
+      showNotification(`${eventType.value === 'event' ? 'Event' : 'Meeting'} created successfully!`, 'success');
       resetForm();
-    }).catch((error) => {
-      console.error('Email sending failed:', error);
-      showNotification(`${eventType.value === 'event' ? 'Event' : 'Meeting'} created but email sending failed!`, 'warning');
-      // Reset form even if email fails
-      resetForm();
-    });
-  } else {
-    showNotification(`${eventType.value === 'event' ? 'Event' : 'Meeting'} created successfully!`, 'success');
-    // Reset form immediately if no emails to send
-    resetForm();
-  }
+    }
 } else {
   showNotification('Task created successfully!', 'success');
   // Reset form immediately for tasks

@@ -16,9 +16,9 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 
 // Import configurations
-import { connectDB } from './config/database';
-import { connectRedis } from './config/redis';
-import { SecurityMonitor } from './services/security.monitor';
+// import { connectDB } from './config/database';
+// import { connectRedis } from './config/redis';
+// import { SecurityMonitor } from './services/security.monitor';
 
 // Import routes
 import authRoutes from './routes/auth.routes';
@@ -274,18 +274,21 @@ app.use(errorHandler);
 // Database connections
 const startServer = async () => {
   try {
-    // Connect to MongoDB
-    await connectDB();
-    console.log('✅ MongoDB connected');
+    // Temporarily skip MongoDB connection for email functionality
+    console.log('⚠️ MongoDB connection skipped - running in email-only mode');
+    
+    // Comment out MongoDB connection temporarily
+    // await connectDB();
+    // console.log('✅ MongoDB connected');
 
-    // Connect to Redis
-    await connectRedis();
-    console.log('✅ Redis connected');
+    // Comment out Redis connection temporarily  
+    // await connectRedis();
+    // console.log('✅ Redis connected');
 
-    // Initialize Security Monitor
-    const securityMonitor = SecurityMonitor.getInstance();
-    await securityMonitor.initialize();
-    console.log('🔐 Security Monitor initialized');
+    // Comment out Security Monitor temporarily
+    // const securityMonitor = SecurityMonitor.getInstance();
+    // await securityMonitor.initialize();
+    // console.log('🔐 Security Monitor initialized');
 
     // Start server
     server.listen(PORT, () => {

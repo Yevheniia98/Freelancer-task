@@ -26,6 +26,7 @@
         <h2>Test Operations</h2>
         <button class="button" onclick="addSampleEvent()">Add Sample Event</button>
         <button class="button" onclick="testPersistence()">Test Persistence</button>
+        <button class="button" onclick="resetToNewSampleEvents()">Clear All Reminders (Empty State)</button>
         <div id="testResults"></div>
     </div>
 
@@ -84,6 +85,19 @@
                 <p>Events before refresh: ${beforeRefresh ? JSON.parse(beforeRefresh).length : 0} events</p>
                 <p style="color: blue;">Now refresh the page and check if data persists...</p>
             `;
+        }
+        
+        function resetToNewSampleEvents() {
+            localStorage.removeItem('userEvents');
+            document.getElementById('testResults').innerHTML = `
+                <p style="color: green;">All reminders cleared! The "Your Reminders" section will now be empty for new users.</p>
+                <p><strong>Expected behavior:</strong></p>
+                <p>• New users see empty "Your Reminders" section with "No reminders created yet" message</p>
+                <p>• When users create new reminders, they will be saved and persist</p>
+                <p>• No sample/example events will show up automatically</p>
+                <p><a href="http://localhost:3030/dashboard" target="_blank" style="color: #007bff;">→ Open Dashboard (should be empty now)</a></p>
+            `;
+            displayStoredEvents();
         }
         
         // Auto-display on page load
