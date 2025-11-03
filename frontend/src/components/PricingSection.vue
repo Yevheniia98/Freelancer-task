@@ -69,7 +69,7 @@
           >
             <div
               class="toggle-slider"
-              :class="{ annual: isvisa}"
+              :class="{ annual: isAnnual}"
             />
           </div>
           <span
