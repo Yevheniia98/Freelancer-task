@@ -48,6 +48,12 @@ const dotenv = __importStar(require("dotenv"));
 const mongoose_1 = __importDefault(require("mongoose"));
 // Import task entity
 const task_entity_1 = require("./models/task.entity");
+// Import CRM entities
+const client_entity_1 = require("./models/client.entity");
+const communication_entity_1 = require("./models/communication.entity");
+const invoice_entity_1 = require("./models/invoice.entity");
+const deal_entity_1 = require("./models/deal.entity");
+const note_entity_1 = require("./models/note.entity");
 // Load environment variables
 dotenv.config();
 const app = (0, express_1.default)();
@@ -600,12 +606,12 @@ app.post('/api/meeting-invitations/send-multiple', async (req, res) => {
     <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9; }
-        .header { background: #0D7C66; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
         .content { background: white; padding: 30px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .meeting-details { background: #f8f9fa; padding: 20px; border-radius: 6px; margin: 20px 0; }
         .detail-row { margin: 10px 0; }
-        .label { font-weight: bold; color: #0D7C66; }
-        .join-button { display: inline-block; background: #0D7C66; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+        .label { font-weight: bold; color: #764ba2; }
+        .join-button { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white !important; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0; font-weight: bold; }
         .footer { text-align: center; color: #666; font-size: 14px; margin-top: 20px; }
     </style>
 </head>
@@ -668,7 +674,7 @@ app.post('/api/meeting-invitations/send-multiple', async (req, res) => {
 </html>
         `;
             const mailOptions = {
-                from: `"${meetingData.organizerName}" <${process.env.EMAIL_USER || 'freelancetasker0@gmail.com'}>`,
+                from: `"${meetingData.organizerName}" <${process.env.SMTP_USER || 'freelancetasker0@gmail.com'}>`,
                 to: recipient.email,
                 subject: `📅 Meeting Invitation: ${meetingData.title}`,
                 html: emailContent
@@ -748,12 +754,12 @@ async function sendSingleMeetingInvitation(recipient, meetingData) {
     <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9; }
-        .header { background: #0D7C66; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
         .content { background: white; padding: 30px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .meeting-details { background: #f8f9fa; padding: 20px; border-radius: 6px; margin: 20px 0; }
         .detail-row { margin: 10px 0; }
-        .label { font-weight: bold; color: #0D7C66; }
-        .join-button { display: inline-block; background: #0D7C66; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+        .label { font-weight: bold; color: #764ba2; }
+        .join-button { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white !important; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0; font-weight: bold; }
         .footer { text-align: center; color: #666; font-size: 14px; margin-top: 20px; }
     </style>
 </head>
@@ -1246,7 +1252,738 @@ app.delete('/api/tasks/:id', authenticateToken, async (req, res) => {
         });
     }
 });
-const PORT = process.env.PORT || 3030;
+// ====================================
+// CRM API ENDPOINTS
+// ====================================
+// === CLIENTS ENDPOINTS ===
+// Get all clients
+app.get('/api/clients', authenticateToken, async (req, res) => {
+    try {
+        const clients = await client_entity_1.ClientEntity.find().sort({ createdAt: -1 });
+        res.json(clients);
+    }
+    catch (error) {
+        console.error('❌ Error fetching clients:', error);
+        res.status(500).json({ error: 'Failed to fetch clients' });
+    }
+});
+// Get client by ID
+app.get('/api/clients/:id', authenticateToken, async (req, res) => {
+    try {
+        const client = await client_entity_1.ClientEntity.findById(req.params.id);
+        if (!client) {
+            return res.status(404).json({ error: 'Client not found' });
+        }
+        res.json(client);
+    }
+    catch (error) {
+        console.error('❌ Error fetching client:', error);
+        res.status(500).json({ error: 'Failed to fetch client' });
+    }
+});
+// Create new client
+app.post('/api/clients', authenticateToken, async (req, res) => {
+    try {
+        const { name, email, phone, notes } = req.body;
+        if (!name || !email) {
+            return res.status(400).json({ error: 'Name and email are required' });
+        }
+        const client = new client_entity_1.ClientEntity({
+            name,
+            email,
+            phone,
+            notes
+        });
+        await client.save();
+        res.status(201).json(client);
+    }
+    catch (error) {
+        console.error('❌ Error creating client:', error);
+        if (error.code === 11000) {
+            return res.status(400).json({ error: 'Client with this email already exists' });
+        }
+        res.status(500).json({ error: 'Failed to create client' });
+    }
+});
+// Update client
+app.put('/api/clients/:id', authenticateToken, async (req, res) => {
+    try {
+        const { name, email, phone, notes } = req.body;
+        const client = await client_entity_1.ClientEntity.findByIdAndUpdate(req.params.id, { name, email, phone, notes }, { new: true, runValidators: true });
+        if (!client) {
+            return res.status(404).json({ error: 'Client not found' });
+        }
+        res.json(client);
+    }
+    catch (error) {
+        console.error('❌ Error updating client:', error);
+        res.status(500).json({ error: 'Failed to update client' });
+    }
+});
+// Delete client
+app.delete('/api/clients/:id', authenticateToken, async (req, res) => {
+    try {
+        const client = await client_entity_1.ClientEntity.findByIdAndDelete(req.params.id);
+        if (!client) {
+            return res.status(404).json({ error: 'Client not found' });
+        }
+        res.json({ message: 'Client deleted successfully' });
+    }
+    catch (error) {
+        console.error('❌ Error deleting client:', error);
+        res.status(500).json({ error: 'Failed to delete client' });
+    }
+});
+// === COMMUNICATIONS ENDPOINTS ===
+// Get all communications for a client
+app.get('/api/clients/:clientId/communications', authenticateToken, async (req, res) => {
+    try {
+        const communications = await communication_entity_1.CommunicationEntity.findByClient(req.params.clientId);
+        res.json(communications);
+    }
+    catch (error) {
+        console.error('❌ Error fetching communications:', error);
+        res.status(500).json({ error: 'Failed to fetch communications' });
+    }
+});
+// Get all communications
+app.get('/api/communications', authenticateToken, async (req, res) => {
+    try {
+        const { type, clientId, isImportant } = req.query;
+        const filter = {};
+        if (type)
+            filter.type = type;
+        if (clientId)
+            filter.clientId = clientId;
+        if (isImportant !== undefined)
+            filter.isImportant = isImportant === 'true';
+        const communications = await communication_entity_1.CommunicationEntity.find(filter).sort({ date: -1 });
+        res.json(communications);
+    }
+    catch (error) {
+        console.error('❌ Error fetching communications:', error);
+        res.status(500).json({ error: 'Failed to fetch communications' });
+    }
+});
+// Create new communication
+app.post('/api/communications', authenticateToken, async (req, res) => {
+    try {
+        const { clientId, type, direction, subject, content, date, duration, platform, tags, isImportant } = req.body;
+        if (!clientId || !type || !direction || !content) {
+            return res.status(400).json({ error: 'Client ID, type, direction, and content are required' });
+        }
+        const communication = new communication_entity_1.CommunicationEntity({
+            clientId,
+            type,
+            direction,
+            subject,
+            content,
+            date: date ? new Date(date) : new Date(),
+            duration,
+            platform,
+            tags,
+            isImportant: isImportant || false
+        });
+        await communication.save();
+        res.status(201).json(communication);
+    }
+    catch (error) {
+        console.error('❌ Error creating communication:', error);
+        res.status(500).json({ error: 'Failed to create communication' });
+    }
+});
+// Update communication
+app.put('/api/communications/:id', authenticateToken, async (req, res) => {
+    try {
+        const { subject, content, tags, isImportant } = req.body;
+        const communication = await communication_entity_1.CommunicationEntity.findByIdAndUpdate(req.params.id, { subject, content, tags, isImportant }, { new: true, runValidators: true });
+        if (!communication) {
+            return res.status(404).json({ error: 'Communication not found' });
+        }
+        res.json(communication);
+    }
+    catch (error) {
+        console.error('❌ Error updating communication:', error);
+        res.status(500).json({ error: 'Failed to update communication' });
+    }
+});
+// Delete communication
+app.delete('/api/communications/:id', authenticateToken, async (req, res) => {
+    try {
+        const communication = await communication_entity_1.CommunicationEntity.findByIdAndDelete(req.params.id);
+        if (!communication) {
+            return res.status(404).json({ error: 'Communication not found' });
+        }
+        res.json({ message: 'Communication deleted successfully' });
+    }
+    catch (error) {
+        console.error('❌ Error deleting communication:', error);
+        res.status(500).json({ error: 'Failed to delete communication' });
+    }
+});
+// === INVOICES ENDPOINTS ===
+// Get all invoices
+app.get('/api/invoices', authenticateToken, async (req, res) => {
+    try {
+        const { status, clientId } = req.query;
+        const filter = {};
+        if (status)
+            filter.status = status;
+        if (clientId)
+            filter.clientId = clientId;
+        const invoices = await invoice_entity_1.InvoiceEntity.find(filter).sort({ issueDate: -1 });
+        res.json(invoices);
+    }
+    catch (error) {
+        console.error('❌ Error fetching invoices:', error);
+        res.status(500).json({ error: 'Failed to fetch invoices' });
+    }
+});
+// Get invoices for a client
+app.get('/api/clients/:clientId/invoices', authenticateToken, async (req, res) => {
+    try {
+        const invoices = await invoice_entity_1.InvoiceEntity.findByClient(req.params.clientId);
+        res.json(invoices);
+    }
+    catch (error) {
+        console.error('❌ Error fetching client invoices:', error);
+        res.status(500).json({ error: 'Failed to fetch client invoices' });
+    }
+});
+// Get invoice by ID
+app.get('/api/invoices/:id', authenticateToken, async (req, res) => {
+    try {
+        const invoice = await invoice_entity_1.InvoiceEntity.findById(req.params.id);
+        if (!invoice) {
+            return res.status(404).json({ error: 'Invoice not found' });
+        }
+        res.json(invoice);
+    }
+    catch (error) {
+        console.error('❌ Error fetching invoice:', error);
+        res.status(500).json({ error: 'Failed to fetch invoice' });
+    }
+});
+// Create new invoice
+app.post('/api/invoices', authenticateToken, async (req, res) => {
+    try {
+        const { clientId, projectId, title, description, amount, currency, issueDate, dueDate, taxRate, discountRate, notes } = req.body;
+        if (!clientId || !title || !amount || !issueDate || !dueDate) {
+            return res.status(400).json({ error: 'Client ID, title, amount, issue date, and due date are required' });
+        }
+        const invoice = new invoice_entity_1.InvoiceEntity({
+            clientId,
+            projectId,
+            title,
+            description,
+            amount,
+            currency: currency || 'USD',
+            issueDate: new Date(issueDate),
+            dueDate: new Date(dueDate),
+            taxRate: taxRate || 0,
+            discountRate: discountRate || 0,
+            notes
+        });
+        await invoice.save();
+        res.status(201).json(invoice);
+    }
+    catch (error) {
+        console.error('❌ Error creating invoice:', error);
+        res.status(500).json({ error: 'Failed to create invoice' });
+    }
+});
+// Update invoice
+app.put('/api/invoices/:id', authenticateToken, async (req, res) => {
+    try {
+        const { title, description, amount, currency, dueDate, taxRate, discountRate, notes, status } = req.body;
+        const invoice = await invoice_entity_1.InvoiceEntity.findByIdAndUpdate(req.params.id, {
+            title,
+            description,
+            amount,
+            currency,
+            dueDate: dueDate ? new Date(dueDate) : undefined,
+            taxRate,
+            discountRate,
+            notes,
+            status
+        }, { new: true, runValidators: true });
+        if (!invoice) {
+            return res.status(404).json({ error: 'Invoice not found' });
+        }
+        res.json(invoice);
+    }
+    catch (error) {
+        console.error('❌ Error updating invoice:', error);
+        res.status(500).json({ error: 'Failed to update invoice' });
+    }
+});
+// Mark invoice as paid
+app.post('/api/invoices/:id/mark-paid', authenticateToken, async (req, res) => {
+    try {
+        const { amount, paymentMethod, paymentReference } = req.body;
+        const invoice = await invoice_entity_1.InvoiceEntity.findById(req.params.id);
+        if (!invoice) {
+            return res.status(404).json({ error: 'Invoice not found' });
+        }
+        await invoice.markAsPaid(amount, paymentMethod, paymentReference);
+        res.json(invoice);
+    }
+    catch (error) {
+        console.error('❌ Error marking invoice as paid:', error);
+        res.status(500).json({ error: 'Failed to mark invoice as paid' });
+    }
+});
+// Delete invoice
+app.delete('/api/invoices/:id', authenticateToken, async (req, res) => {
+    try {
+        const invoice = await invoice_entity_1.InvoiceEntity.findByIdAndDelete(req.params.id);
+        if (!invoice) {
+            return res.status(404).json({ error: 'Invoice not found' });
+        }
+        res.json({ message: 'Invoice deleted successfully' });
+    }
+    catch (error) {
+        console.error('❌ Error deleting invoice:', error);
+        res.status(500).json({ error: 'Failed to delete invoice' });
+    }
+});
+// Get invoice statistics
+app.get('/api/invoices/statistics', authenticateToken, async (req, res) => {
+    try {
+        const [totalRevenue] = await invoice_entity_1.InvoiceEntity.getTotalRevenue();
+        const overdueInvoices = await invoice_entity_1.InvoiceEntity.findOverdue();
+        const pendingInvoices = await invoice_entity_1.InvoiceEntity.find({ status: { $in: ['sent', 'viewed'] } });
+        const stats = {
+            totalRevenue: totalRevenue?.total || 0,
+            overdueCount: overdueInvoices.length,
+            pendingCount: pendingInvoices.length,
+            overdueAmount: overdueInvoices.reduce((sum, inv) => sum + inv.total, 0),
+            pendingAmount: pendingInvoices.reduce((sum, inv) => sum + inv.total, 0)
+        };
+        res.json(stats);
+    }
+    catch (error) {
+        console.error('❌ Error fetching invoice statistics:', error);
+        res.status(500).json({ error: 'Failed to fetch invoice statistics' });
+    }
+});
+// === DEALS ENDPOINTS ===
+// Get all deals
+app.get('/api/deals', authenticateToken, async (req, res) => {
+    try {
+        const { stage, clientId, priority } = req.query;
+        const filter = {};
+        if (stage)
+            filter.stage = stage;
+        if (clientId)
+            filter.clientId = clientId;
+        if (priority)
+            filter.priority = priority;
+        const deals = await deal_entity_1.DealEntity.find(filter).sort({ updatedAt: -1 });
+        res.json(deals);
+    }
+    catch (error) {
+        console.error('❌ Error fetching deals:', error);
+        res.status(500).json({ error: 'Failed to fetch deals' });
+    }
+});
+// Get deals by stage (for pipeline view)
+app.get('/api/deals/pipeline', authenticateToken, async (req, res) => {
+    try {
+        const pipeline = await deal_entity_1.DealEntity.aggregate([
+            { $match: { stage: { $nin: ['closed_won', 'closed_lost'] } } },
+            {
+                $group: {
+                    _id: '$stage',
+                    deals: { $push: '$$ROOT' },
+                    totalValue: { $sum: '$value' },
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { '_id': 1 } }
+        ]);
+        res.json(pipeline);
+    }
+    catch (error) {
+        console.error('❌ Error fetching pipeline:', error);
+        res.status(500).json({ error: 'Failed to fetch pipeline' });
+    }
+});
+// Get deals for a client
+app.get('/api/clients/:clientId/deals', authenticateToken, async (req, res) => {
+    try {
+        const deals = await deal_entity_1.DealEntity.findByClient(req.params.clientId);
+        res.json(deals);
+    }
+    catch (error) {
+        console.error('❌ Error fetching client deals:', error);
+        res.status(500).json({ error: 'Failed to fetch client deals' });
+    }
+});
+// Create new deal
+app.post('/api/deals', authenticateToken, async (req, res) => {
+    try {
+        const { clientId, title, description, value, currency, expectedCloseDate, source, priority, tags } = req.body;
+        if (!clientId || !title || !value || !source) {
+            return res.status(400).json({ error: 'Client ID, title, value, and source are required' });
+        }
+        const deal = new deal_entity_1.DealEntity({
+            clientId,
+            title,
+            description,
+            value,
+            currency: currency || 'USD',
+            expectedCloseDate: expectedCloseDate ? new Date(expectedCloseDate) : undefined,
+            source,
+            priority: priority || 'medium',
+            tags
+        });
+        await deal.save();
+        res.status(201).json(deal);
+    }
+    catch (error) {
+        console.error('❌ Error creating deal:', error);
+        res.status(500).json({ error: 'Failed to create deal' });
+    }
+});
+// Update deal
+app.put('/api/deals/:id', authenticateToken, async (req, res) => {
+    try {
+        const deal = await deal_entity_1.DealEntity.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+        if (!deal) {
+            return res.status(404).json({ error: 'Deal not found' });
+        }
+        res.json(deal);
+    }
+    catch (error) {
+        console.error('❌ Error updating deal:', error);
+        res.status(500).json({ error: 'Failed to update deal' });
+    }
+});
+// Move deal to stage
+app.post('/api/deals/:id/move-stage', authenticateToken, async (req, res) => {
+    try {
+        const { stage, probability } = req.body;
+        const deal = await deal_entity_1.DealEntity.findById(req.params.id);
+        if (!deal) {
+            return res.status(404).json({ error: 'Deal not found' });
+        }
+        await deal.moveToStage(stage, probability);
+        res.json(deal);
+    }
+    catch (error) {
+        console.error('❌ Error moving deal stage:', error);
+        res.status(500).json({ error: 'Failed to move deal stage' });
+    }
+});
+// Close deal as won
+app.post('/api/deals/:id/close-won', authenticateToken, async (req, res) => {
+    try {
+        const deal = await deal_entity_1.DealEntity.findById(req.params.id);
+        if (!deal) {
+            return res.status(404).json({ error: 'Deal not found' });
+        }
+        await deal.closeWon();
+        res.json(deal);
+    }
+    catch (error) {
+        console.error('❌ Error closing deal as won:', error);
+        res.status(500).json({ error: 'Failed to close deal as won' });
+    }
+});
+// Close deal as lost
+app.post('/api/deals/:id/close-lost', authenticateToken, async (req, res) => {
+    try {
+        const { reason } = req.body;
+        const deal = await deal_entity_1.DealEntity.findById(req.params.id);
+        if (!deal) {
+            return res.status(404).json({ error: 'Deal not found' });
+        }
+        await deal.closeLost(reason);
+        res.json(deal);
+    }
+    catch (error) {
+        console.error('❌ Error closing deal as lost:', error);
+        res.status(500).json({ error: 'Failed to close deal as lost' });
+    }
+});
+// Add activity to deal
+app.post('/api/deals/:id/activities', authenticateToken, async (req, res) => {
+    try {
+        const { type, description, date, completed } = req.body;
+        const deal = await deal_entity_1.DealEntity.findById(req.params.id);
+        if (!deal) {
+            return res.status(404).json({ error: 'Deal not found' });
+        }
+        await deal.addActivity({ type, description, date: date ? new Date(date) : new Date(), completed });
+        res.json(deal);
+    }
+    catch (error) {
+        console.error('❌ Error adding deal activity:', error);
+        res.status(500).json({ error: 'Failed to add deal activity' });
+    }
+});
+// Delete deal
+app.delete('/api/deals/:id', authenticateToken, async (req, res) => {
+    try {
+        const deal = await deal_entity_1.DealEntity.findByIdAndDelete(req.params.id);
+        if (!deal) {
+            return res.status(404).json({ error: 'Deal not found' });
+        }
+        res.json({ message: 'Deal deleted successfully' });
+    }
+    catch (error) {
+        console.error('❌ Error deleting deal:', error);
+        res.status(500).json({ error: 'Failed to delete deal' });
+    }
+});
+// === NOTES ENDPOINTS ===
+// Get all notes
+app.get('/api/notes', authenticateToken, async (req, res) => {
+    try {
+        const { type, status, clientId, priority } = req.query;
+        const filter = {};
+        if (type)
+            filter.type = type;
+        if (status)
+            filter.status = status;
+        if (clientId)
+            filter.clientId = clientId;
+        if (priority)
+            filter.priority = priority;
+        const notes = await note_entity_1.NoteEntity.find(filter).sort({ createdAt: -1 });
+        res.json(notes);
+    }
+    catch (error) {
+        console.error('❌ Error fetching notes:', error);
+        res.status(500).json({ error: 'Failed to fetch notes' });
+    }
+});
+// Get notes for a client
+app.get('/api/clients/:clientId/notes', authenticateToken, async (req, res) => {
+    try {
+        const notes = await note_entity_1.NoteEntity.findByClient(req.params.clientId);
+        res.json(notes);
+    }
+    catch (error) {
+        console.error('❌ Error fetching client notes:', error);
+        res.status(500).json({ error: 'Failed to fetch client notes' });
+    }
+});
+// Get reminders that need to be sent
+app.get('/api/notes/reminders', authenticateToken, async (req, res) => {
+    try {
+        const reminders = await note_entity_1.NoteEntity.findRemindersToSend();
+        res.json(reminders);
+    }
+    catch (error) {
+        console.error('❌ Error fetching reminders:', error);
+        res.status(500).json({ error: 'Failed to fetch reminders' });
+    }
+});
+// Get overdue notes
+app.get('/api/notes/overdue', authenticateToken, async (req, res) => {
+    try {
+        const overdue = await note_entity_1.NoteEntity.findOverdue();
+        res.json(overdue);
+    }
+    catch (error) {
+        console.error('❌ Error fetching overdue notes:', error);
+        res.status(500).json({ error: 'Failed to fetch overdue notes' });
+    }
+});
+// Create new note
+app.post('/api/notes', authenticateToken, async (req, res) => {
+    try {
+        const { clientId, projectId, dealId, type, title, content, priority, tags, reminderDate, dueDate, color } = req.body;
+        if (!title || !content) {
+            return res.status(400).json({ error: 'Title and content are required' });
+        }
+        const note = new note_entity_1.NoteEntity({
+            clientId,
+            projectId,
+            dealId,
+            type: type || 'note',
+            title,
+            content,
+            priority: priority || 'medium',
+            tags,
+            reminderDate: reminderDate ? new Date(reminderDate) : undefined,
+            dueDate: dueDate ? new Date(dueDate) : undefined,
+            color
+        });
+        await note.save();
+        res.status(201).json(note);
+    }
+    catch (error) {
+        console.error('❌ Error creating note:', error);
+        res.status(500).json({ error: 'Failed to create note' });
+    }
+});
+// Update note
+app.put('/api/notes/:id', authenticateToken, async (req, res) => {
+    try {
+        const note = await note_entity_1.NoteEntity.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+        if (!note) {
+            return res.status(404).json({ error: 'Note not found' });
+        }
+        res.json(note);
+    }
+    catch (error) {
+        console.error('❌ Error updating note:', error);
+        res.status(500).json({ error: 'Failed to update note' });
+    }
+});
+// Mark note as completed
+app.post('/api/notes/:id/complete', authenticateToken, async (req, res) => {
+    try {
+        const note = await note_entity_1.NoteEntity.findById(req.params.id);
+        if (!note) {
+            return res.status(404).json({ error: 'Note not found' });
+        }
+        await note.markAsCompleted();
+        res.json(note);
+    }
+    catch (error) {
+        console.error('❌ Error completing note:', error);
+        res.status(500).json({ error: 'Failed to complete note' });
+    }
+});
+// Archive note
+app.post('/api/notes/:id/archive', authenticateToken, async (req, res) => {
+    try {
+        const note = await note_entity_1.NoteEntity.findById(req.params.id);
+        if (!note) {
+            return res.status(404).json({ error: 'Note not found' });
+        }
+        await note.archive();
+        res.json(note);
+    }
+    catch (error) {
+        console.error('❌ Error archiving note:', error);
+        res.status(500).json({ error: 'Failed to archive note' });
+    }
+});
+// Delete note
+app.delete('/api/notes/:id', authenticateToken, async (req, res) => {
+    try {
+        const note = await note_entity_1.NoteEntity.findByIdAndDelete(req.params.id);
+        if (!note) {
+            return res.status(404).json({ error: 'Note not found' });
+        }
+        res.json({ message: 'Note deleted successfully' });
+    }
+    catch (error) {
+        console.error('❌ Error deleting note:', error);
+        res.status(500).json({ error: 'Failed to delete note' });
+    }
+});
+// Team invitation endpoint
+app.post('/api/team/invitations/send', async (req, res) => {
+    try {
+        const { emails, message } = req.body;
+        if (!emails || !Array.isArray(emails) || emails.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email addresses are required'
+            });
+        }
+        console.log('📧 Sending team invitations to:', emails);
+        console.log('📝 Message:', message);
+        // Set up nodemailer with Gmail
+        const nodemailer = require('nodemailer');
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            host: process.env.SMTP_HOST || 'smtp.gmail.com',
+            port: parseInt(process.env.SMTP_PORT || '587'),
+            secure: false,
+            auth: {
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASS
+            }
+        });
+        // Send real emails
+        const results = [];
+        const successfulEmails = [];
+        const failedEmails = [];
+        for (const email of emails) {
+            try {
+                const inviteLink = `http://localhost:8080/my-team?invited=${encodeURIComponent(email)}`;
+                const emailHtml = `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 30px;">
+              <h1 style="color: white; margin: 0; font-size: 28px;">🎉 You're Invited!</h1>
+              <p style="color: #f0f0f0; margin: 10px 0 0 0; font-size: 16px;">Join our team workspace</p>
+            </div>
+            
+            <div style="padding: 20px; background: #f9f9f9; border-radius: 8px; margin-bottom: 20px;">
+              <h2 style="color: #333; margin-top: 0;">Hi there! 👋</h2>
+              <p style="color: #666; line-height: 1.6; font-size: 16px;">
+                ${message || 'You have been invited to join our team workspace. We would love to have you collaborate with us!'}
+              </p>
+            </div>
+            
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${inviteLink}" 
+                 style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                        color: white; 
+                        padding: 15px 30px; 
+                        text-decoration: none; 
+                        border-radius: 25px; 
+                        font-weight: bold; 
+                        font-size: 16px; 
+                        display: inline-block;
+                        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);">
+                🚀 Join Team Workspace
+              </a>
+            </div>
+            
+            <div style="border-top: 1px solid #eee; padding-top: 20px; text-align: center; color: #999; font-size: 14px;">
+              <p>If the button doesn't work, copy and paste this link in your browser:</p>
+              <p style="word-break: break-all; background: #f5f5f5; padding: 10px; border-radius: 5px;">
+                ${inviteLink}
+              </p>
+            </div>
+          </div>
+        `;
+                await transporter.sendMail({
+                    from: `"Team Workspace" <${process.env.SMTP_USER}>`,
+                    to: email,
+                    subject: '🎉 You\'re invited to join our team!',
+                    html: emailHtml,
+                    text: `Hi there!\n\n${message || 'You have been invited to join our team workspace.'}\n\nClick this link to join: ${inviteLink}`
+                });
+                console.log(`✅ Email sent successfully to ${email}`);
+                results.push({ email, success: true, inviteLink });
+                successfulEmails.push(email);
+            }
+            catch (emailError) {
+                console.error(`❌ Failed to send email to ${email}:`, emailError.message);
+                results.push({ email, success: false, error: emailError.message });
+                failedEmails.push(email);
+            }
+        }
+        res.json({
+            success: true,
+            message: `Successfully sent ${successfulEmails.length} invitation(s)${failedEmails.length > 0 ? ` (${failedEmails.length} failed)` : ''}`,
+            summary: {
+                total: emails.length,
+                invited: successfulEmails.length,
+                failed: failedEmails.length,
+                results
+            }
+        });
+    }
+    catch (error) {
+        console.error('❌ Error sending team invitations:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to send invitations',
+            error: error.message
+        });
+    }
+});
+const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => {
     console.log(`🚀 Temporary server running on http://localhost:${PORT}`);
     console.log(`📧 Email service configured`);

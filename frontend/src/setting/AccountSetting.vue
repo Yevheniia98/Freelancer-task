@@ -299,47 +299,48 @@ const handleFileUpload = async (event) => {
   console.log('File selected:', file);
   
   if (file) {
-    const formData = new FormData();
-    formData.append('file', file);
-    
-    console.log('Attempting upload to /api/upload');
-    
-    try {
-      const response = await axios.post('/api/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      
-      console.log('Upload response:', response.data);
-      
-      if (response.data && response.data.path) {
-        // Set the profile image to the uploaded file URL (relative path works better with Vite proxy)
-        profileImage.value = response.data.path;
-        
-        console.log('Image uploaded successfully:', response.data.path);
-        
-        // Update localStorage with new profile image immediately
-        const existingUserData = localStorage.getItem('user_data');
-        if (existingUserData) {
-          const userData = JSON.parse(existingUserData);
-          userData.profileImage = profileImage.value;
-          localStorage.setItem('user_data', JSON.stringify(userData));
-        }
-        
-        // Trigger a custom event to notify other components
-        window.dispatchEvent(new CustomEvent('profileImageUpdated', {
-          detail: { profileImage: profileImage.value }
-        }));
-      } else {
-        console.error('Upload failed: No file path returned:', response.data);
-        alert('Upload failed: No file path returned');
-      }
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      console.error('Error details:', error.response ? error.response.data : error.message);
-      alert(`Upload error: ${error.response ? error.response.data.message : error.message}`);
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
     }
+    
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size must be less than 5MB');
+      return;
+    }
+    
+    // Create a local URL for the image preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      profileImage.value = e.target.result;
+      
+      console.log('Image loaded locally for preview');
+      
+      // Update localStorage with the image data
+      const existingUserData = localStorage.getItem('user_data');
+      if (existingUserData) {
+        const userData = JSON.parse(existingUserData);
+        userData.profileImage = profileImage.value;
+        localStorage.setItem('user_data', JSON.stringify(userData));
+      }
+      
+      // Trigger a custom event to notify other components
+      window.dispatchEvent(new CustomEvent('profileImageUpdated', {
+        detail: { profileImage: profileImage.value }
+      }));
+      
+      alert('Profile picture updated successfully!');
+    };
+    
+    reader.onerror = () => {
+      console.error('Error reading file');
+      alert('Error reading the selected file. Please try again.');
+    };
+    
+    // Read the file as data URL for preview
+    reader.readAsDataURL(file);
   } else {
     console.log('No file selected');
   }

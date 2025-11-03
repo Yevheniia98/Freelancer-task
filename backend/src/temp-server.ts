@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
+import fs from "fs";
 import cors from "cors";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
@@ -140,9 +141,14 @@ const transporter = nodemailer.createTransport({
 });
 
 // File upload configuration
+const uploadsDir = path.join(process.cwd(), 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, "../uploads/"));
+    cb(null, uploadsDir);
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
