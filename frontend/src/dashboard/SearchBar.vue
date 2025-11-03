@@ -276,7 +276,10 @@ import {
   LogOut,
   MessageSquare,
   Calendar,
-  CheckCircle
+  CheckCircle,
+  Folder,
+  CreditCard,
+  DollarSign
 } from 'lucide-vue-next'
 
 // Router instance
@@ -362,38 +365,8 @@ const availableLanguages = ref([
   { code: 'zh', name: '中文', flag: '🇨🇳' },
 ])
 
-// Notifications
-const notifications = ref([
-  {
-    id: 1,
-    title: 'New Message',
-    message: 'You have received a new message from Emily Johnson',
-    time: new Date(Date.now() - 1000 * 60 * 5),
-    read: false,
-    type: 'message'
-  },
-  {
-    id: 2,
-    title: 'Meeting Reminder',
-    message: 'Your meeting with Design Team starts in 30 minutes',
-    time: new Date(Date.now() - 1000 * 60 * 25),
-    read: false,
-    type: 'calendar'
-  },
-  {
-    id: 3,
-    title: 'Task Completed',
-    message: 'Michael Chen has completed the homepage design task',
-    time: new Date(Date.now() - 1000 * 60 * 60 * 2),
-    read: true,
-    type: 'task'
-  }
-])
-
-// Computed
-const unreadCount = computed(() => {
-  return notifications.value.filter(n => !n.read).length
-})
+// Import notification service
+import notificationService, { notifications, unreadCount } from '@/services/notificationService.js'
 
 // Translation function
 const translations = {
@@ -448,16 +421,16 @@ const changeLanguage = (code) => {
 }
 
 const readNotification = (notification) => {
-  notification.read = true
+  notificationService.markAsRead(notification.id)
 }
 
 const markAllAsRead = () => {
-  notifications.value.forEach(n => n.read = true)
+  notificationService.markAllAsRead()
 }
 
 const viewAllNotifications = () => {
   showNotificationMenu.value = false
-  console.log('Navigate to notifications page')
+  router.push('/notification')
 }
 
 const navigateTo = (path) => {
@@ -497,8 +470,14 @@ const logout = async () => {
 const getNotificationIcon = (type) => {
   const icons = {
     message: MessageSquare,
-    calendar: Calendar, 
-    task: CheckCircle
+    team_chat: MessageSquare,
+    calendar: Calendar,
+    meeting: Calendar,
+    reminder: Bell,
+    task: CheckCircle,
+    project: Folder,
+    billing: CreditCard,
+    payment: DollarSign
   }
   return icons[type] || Bell
 }

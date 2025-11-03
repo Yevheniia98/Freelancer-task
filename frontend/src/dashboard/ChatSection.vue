@@ -46,9 +46,11 @@
               <div class="d-flex">
                 <v-btn
                   icon="mdi-message-plus"
-                  variant="text"
+                  variant="tonal"
                   size="small"
-                  @click="showNewChatDialog = true"
+                  color="green"
+                  @click="openNewChatDialog"
+                  title="Invite team member"
                 />
           <v-btn
             icon="mdi-dots-vertical"
@@ -140,8 +142,45 @@
                 </div>
               </div>
             </div>
-          </div>
+            
+            <!-- Empty state when no chats -->
+            <div v-if="!chats || chats.length === 0" class="empty-chat-state text-center pa-4">
+              <v-icon
+                size="48"
+                color="grey-lighten-2"
+                class="mb-3"
+              >
+                mdi-account-group-outline
+              </v-icon>
+              <h4 class="text-subtitle-1 mb-2 text-medium-emphasis">No team chats yet</h4>
+              <p class="text-body-2 text-medium-emphasis mb-3">
+                Start by inviting team members to collaborate
+              </p>
+              <v-btn
+                color="green"
+                variant="outlined"
+                @click="openNewChatDialog"
+                prepend-icon="mdi-account-plus"
+              >
+                Invite Team Member
+              </v-btn>
             </div>
+          </div>
+            
+            <!-- Floating Action Button for Invite -->
+            <div style="position: relative;">
+              <v-btn
+                fab
+                color="green"
+                style="position: absolute; bottom: 16px; right: 16px; z-index: 10;"
+                @click="openNewChatDialog"
+                title="Invite new team member"
+                size="small"
+              >
+                <v-icon>mdi-account-plus</v-icon>
+              </v-btn>
+            </div>
+          </div>
             
         <!-- Right Side - Chat Window -->
         <div class="chat-window">
@@ -441,48 +480,107 @@
         max-width="500"
       >
         <v-card>
-          <v-card-title>New Chat</v-card-title>
+          <v-card-title>Start New Chat</v-card-title>
           <v-card-text>
-            <v-text-field
-              id="contactSearch"
-              v-model="newChatSearch"
-              label="Search contacts"
-              placeholder="Search contacts"
-              prepend-inner-icon="mdi-magnify"
-              variant="outlined"
-              density="compact"
-              hide-details
-              class="mb-3"
-            />
-            <v-list>
-            <v-list-item
-                v-for="contact in availableContacts"
-              :key="contact.id"
-                @click="startNewChat(contact)"
-            >
-              <template #prepend>
-                <v-avatar 
-                  size="40"
-                  :class="{ 'default-user-avatar': !contact.avatar }"
+            <!-- Invite by Email or Phone -->
+            <div class="mb-4">
+              <h4 class="text-subtitle-1 mb-2">Invite New Team Member</h4>
+              <p class="text-body-2 text-medium-emphasis mb-3">
+                Send an invitation via email or phone to add someone to your team chat
+              </p>
+              
+              <v-text-field
+                v-model="newMemberName"
+                label="Full Name*"
+                placeholder="Enter full name"
+                prepend-inner-icon="mdi-account"
+                variant="outlined"
+                density="compact"
+                class="mb-2"
+                required
+              />
+              <v-text-field
+                v-model="newMemberEmail"
+                label="Email Address*"
+                placeholder="Enter email address"
+                prepend-inner-icon="mdi-email"
+                variant="outlined"
+                density="compact"
+                class="mb-2"
+                type="email"
+                required
+              />
+              <v-text-field
+                v-model="newMemberPhone"
+                label="Phone Number (optional)"
+                placeholder="Enter phone number"
+                prepend-inner-icon="mdi-phone"
+                variant="outlined"
+                density="compact"
+                class="mb-3"
+              />
+              <v-btn
+                color="green"
+                @click="inviteNewMember"
+                :disabled="!newMemberEmail.trim() || !newMemberName.trim() || sendingInvitation"
+                :loading="sendingInvitation"
+                block
+                size="large"
+              >
+                <v-icon left>mdi-account-plus</v-icon>
+                {{ sendingInvitation ? 'Sending...' : 'Send Invitation' }}
+              </v-btn>
+            </div>
+            
+            <v-divider class="mb-4" />
+            
+            <!-- Existing Team Members -->
+            <div>
+              <h4 class="text-subtitle-1 mb-2">Existing Team Members</h4>
+              <v-text-field
+                v-model="newChatSearch"
+                label="Search team members"
+                placeholder="Search team members"
+                prepend-inner-icon="mdi-magnify"
+                variant="outlined"
+                density="compact"
+                hide-details
+                class="mb-3"
+              />
+              <v-list v-if="filteredAvailableContacts.length > 0">
+                <v-list-item
+                  v-for="contact in filteredAvailableContacts"
+                  :key="contact.id"
+                  @click="startNewChat(contact)"
                 >
-                  <v-img
-                    v-if="contact.avatar"
-                    :src="contact.avatar"
-                  />
-                  <div 
-                    v-else 
-                    class="default-user-icon"
-                  >
-                    <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
-                      <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
-                    </svg>
-                  </div>
-                </v-avatar>
-              </template>
-                <v-list-item-title>{{ contact.name }}</v-list-item-title>
-                <v-list-item-subtitle>{{ contact.role }}</v-list-item-subtitle>
-              </v-list-item>
-            </v-list>
+                  <template #prepend>
+                    <v-avatar 
+                      size="40"
+                      :class="{ 'default-user-avatar': !contact.avatar }"
+                    >
+                      <v-img
+                        v-if="contact.avatar"
+                        :src="contact.avatar"
+                      />
+                      <div 
+                        v-else 
+                        class="default-user-icon"
+                      >
+                        <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+                          <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
+                        </svg>
+                      </div>
+                    </v-avatar>
+                  </template>
+                  <v-list-item-title>{{ contact.name }}</v-list-item-title>
+                  <v-list-item-subtitle>{{ contact.email }}</v-list-item-subtitle>
+                </v-list-item>
+              </v-list>
+              <div v-else class="text-center text-medium-emphasis py-4">
+                <v-icon size="48" color="grey-lighten-2" class="mb-2">mdi-account-group-outline</v-icon>
+                <p>No team members yet. Invite someone to start chatting!</p>
+              </div>
+            </div>
           </v-card-text>
           <v-card-actions>
             <v-spacer />
@@ -567,6 +665,8 @@
 </template>
 
 <script>
+import notificationService from '@/services/notificationService.js';
+
 export default {
   name: 'WhatsAppChat',
   data() {
@@ -586,6 +686,12 @@ export default {
       newMessage: '',
       showNewChatDialog: false,
       newChatSearch: '',
+      
+      // Invite new member data
+      newMemberEmail: '',
+      newMemberPhone: '',
+      newMemberName: '',
+      sendingInvitation: false,
       
       // Editing
       editingMessageId: null,
@@ -611,183 +717,40 @@ export default {
       previewImage: null,
       selectedFile: null,
       
-      // Available contacts for new chats
-      availableContacts: [
-        {
-          id: 1,
-          name: 'Emily Johnson',
-          role: 'UI/UX Designer',
-          avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
-          isOnline: true,
-          lastSeen: new Date(2025, 2, 15, 14, 30)
-        },
-        {
-          id: 2,
-          name: 'Michael Chen',
-          role: 'Frontend Developer', 
-          avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-          isOnline: false,
-          lastSeen: new Date(2025, 2, 15, 12, 15)
-        },
-        {
-          id: 3,
-          name: 'Sophia Martinez',
-          role: 'Product Manager',
-          avatar: 'https://randomuser.me/api/portraits/women/3.jpg',
-          isOnline: true,
-          lastSeen: new Date()
-        },
-        {
-          id: 4,
-          name: 'James Wilson',
-          role: 'Backend Developer',
-          avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
-          isOnline: false,
-          lastSeen: new Date(2025, 2, 14, 18, 45)
-        },
-        {
-          id: 5,
-          name: 'Olivia Lee',
-          role: 'Marketing Specialist',
-          avatar: 'https://randomuser.me/api/portraits/women/5.jpg',
-          isOnline: true,
-          lastSeen: new Date()
-        }
-      ],
+      // Available contacts for new chats - starts empty, populated from real team data
+      availableContacts: [],
       
-      // Chats data (individual conversations)
-      chats: [
-        {
-          id: 1,
-          contact: {
-            id: 1,
-            name: 'Emily Johnson',
-            avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
-            isOnline: true,
-            isTyping: false,
-            lastSeen: new Date(2025, 2, 15, 14, 30)
-          },
-          messages: [
-        {
-          id: 1,
-              senderId: 1,
-              text: 'Hey! How are you doing?',
-              timestamp: new Date(2025, 2, 15, 10, 15),
-              type: 'text',
-              status: 'read'
-        },
-        {
-          id: 2,
-              senderId: 0,
-              text: 'I\'m good, thanks! Working on the new dashboard design.',
-              timestamp: new Date(2025, 2, 15, 10, 18),
-              type: 'text',
-              status: 'delivered'
-        },
-        {
-          id: 3,
-              senderId: 1,
-              text: 'That sounds exciting! Can\'t wait to see it.',
-              timestamp: new Date(2025, 2, 15, 10, 20),
-              type: 'text',
-              status: 'read'
-            }
-          ],
-          unreadCount: 0,
-          lastMessage: null
-        },
-        {
-          id: 2,
-          contact: {
-          id: 2,
-          name: 'Michael Chen',
-            avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-            isOnline: false,
-            isTyping: false,
-            lastSeen: new Date(2025, 2, 15, 12, 15)
-          },
-          messages: [
-            {
-              id: 4,
-              senderId: 2,
-              text: 'The new API endpoints are ready for testing',
-              timestamp: new Date(2025, 2, 15, 11, 30),
-              type: 'text',
-              status: 'read'
-            },
-            {
-              id: 5,
-              senderId: 0,
-              text: 'Great! I\'ll test them this afternoon.',
-              timestamp: new Date(2025, 2, 15, 11, 32),
-              type: 'text',
-              status: 'sent'
-            },
-            {
-              id: 6,
-              senderId: 2,
-              text: '',
-              timestamp: new Date(2025, 2, 15, 11, 35),
-              type: 'voice',
-              status: 'read'
-            }
-          ],
-          unreadCount: 1,
-          lastMessage: null
-        },
-        {
-          id: 3,
-          contact: {
-          id: 3,
-          name: 'Sophia Martinez',
-            avatar: 'https://randomuser.me/api/portraits/women/3.jpg',
-            isOnline: true,
-            isTyping: false,
-            lastSeen: new Date()
-          },
-          messages: [
-            {
-              id: 7,
-              senderId: 3,
-              text: 'Check out this mockup',
-              timestamp: new Date(2025, 2, 15, 9, 45),
-              type: 'image',
-              imageUrl: 'https://picsum.photos/300/200',
-              status: 'read'
-            },
-            {
-              id: 8,
-              senderId: 0,
-              text: 'Looks amazing! Love the color scheme.',
-              timestamp: new Date(2025, 2, 15, 9, 47),
-              type: 'text',
-              status: 'delivered'
-            }
-          ],
-          unreadCount: 0,
-          lastMessage: null
-        }
-      ]
+      // Chats data (individual conversations) - starts empty, populated when users invite team members
+      chats: []
     };
   },
   
   computed: {
     selectedChat() {
-      return this.chats.find(chat => chat.id === this.selectedChatId);
+      return (this.chats || []).find(chat => chat.id === this.selectedChatId);
     },
     
     filteredChats() {
-      if (!this.searchQuery) return this.chats;
-      return this.chats.filter(chat => 
+      if (!this.searchQuery) return this.chats || [];
+      return (this.chats || []).filter(chat => 
+        chat.contact && chat.contact.name && 
         chat.contact.name.toLowerCase().includes(this.searchQuery.toLowerCase())
       );
     },
     
+    filteredAvailableContacts() {
+      if (!this.newChatSearch) return this.availableContacts || [];
+      return (this.availableContacts || []).filter(contact => 
+        contact.name.toLowerCase().includes(this.newChatSearch.toLowerCase()) ||
+        (contact.email && contact.email.toLowerCase().includes(this.newChatSearch.toLowerCase()))
+      );
+    },
+    
     groupedMessages() {
-      if (!this.selectedChat) return {};
+      if (!this.selectedChat || !this.selectedChat.messages) return {};
       
       const groups = {};
-      this.selectedChat.messages.forEach(message => {
+      (this.selectedChat.messages || []).forEach(message => {
         const dateKey = new Date(message.timestamp).toDateString();
         if (!groups[dateKey]) {
           groups[dateKey] = [];
@@ -837,13 +800,6 @@ export default {
         }
       });
     }, 10000);
-    
-    // Simulate incoming messages
-    setInterval(() => {
-      if (Math.random() < 0.3) { // 30% chance every 15 seconds
-        this.simulateIncomingMessage();
-      }
-    }, 15000);
   },
   
   beforeDestroy() {
@@ -878,162 +834,28 @@ export default {
       let teamData = localStorage.getItem('teamData');
       
       if (!teamData) {
-        // Create sample team data if none exists
-        const sampleTeam = [
-          {
-            id: 1,
-            name: 'Emily Johnson',
-            role: 'UI/UX Designer',
-            email: 'emily.johnson@company.com',
-            avatar: null // Will use default icon
-          },
-          {
-            id: 2,
-            name: 'Michael Chen',
-            role: 'Frontend Developer',
-            email: 'michael.chen@company.com',
-            avatar: null
-          },
-          {
-            id: 3,
-            name: 'Sophia Martinez',
-            role: 'Product Manager',
-            email: 'sophia.martinez@company.com',
-            avatar: null
-          },
-          {
-            id: 4,
-            name: 'James Wilson',
-            role: 'Backend Developer',
-            email: 'james.wilson@company.com',
-            avatar: null
-          },
-          {
-            id: 5,
-            name: 'Olivia Lee',
-            role: 'Marketing Specialist',
-            email: 'olivia.lee@company.com',
-            avatar: null
-          }
-        ];
-        
-        localStorage.setItem('teamData', JSON.stringify(sampleTeam));
-        teamData = JSON.stringify(sampleTeam);
+        // Start with empty team data - no fake members
+        const emptyTeam = [];
+        localStorage.setItem('teamData', JSON.stringify(emptyTeam));
+        teamData = JSON.stringify(emptyTeam);
       }
       
       const parsedTeam = JSON.parse(teamData);
       
-      // Update available contacts with real team data
+      // Update available contacts with real team data only
       this.availableContacts = parsedTeam.map((member, index) => ({
         id: member.id || index + 1,
         name: member.name,
-        role: member.role,
-        avatar: member.avatar || null, // Set to null if no avatar, let template handle fallback
-        isOnline: Math.random() > 0.5, // Random online status
-        lastSeen: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000) // Random last seen within 24h
+        role: member.role || 'Team Member',
+        email: member.email,
+        phone: member.phone,
+        avatar: member.avatar || null,
+        isOnline: member.isOnline || false,
+        lastSeen: member.lastSeen || new Date()
       }));
       
-      // Update existing chats with real team data
-      this.updateChatsWithRealData();
-    },
-    
-    // Update chats with real team member data
-    updateChatsWithRealData() {
-      if (this.availableContacts.length > 0) {
-        // Create chats with recent realistic messages and current dates
-        const today = new Date();
-        const yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
-        
-        this.chats = this.availableContacts.slice(0, 3).map((contact, index) => {
-          const chatMessages = this.generateRecentMessages(contact, index);
-          return {
-            id: index + 1,
-            contact: {
-              ...contact,
-              isTyping: false
-            },
-            messages: chatMessages,
-            unreadCount: Math.floor(Math.random() * 3), // Random unread count 0-2
-            lastMessage: chatMessages[chatMessages.length - 1] || null
-          };
-        });
-      }
-    },
-    
-    // Generate realistic recent messages
-    generateRecentMessages(contact, chatIndex) {
-      const today = new Date();
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
-      
-      const messageTemplates = [
-        {
-          templates: [
-            'Hey! How are you doing?',
-            'Good morning! Ready for the day?',
-            'Hi there! Hope you\'re having a great day',
-            'Hello! How\'s the project going?'
-          ],
-          responses: [
-            'I\'m good, thanks! Working on the dashboard.',
-            'Doing well! Just finished the morning standup.',
-            'Great! Just reviewed the latest designs.',
-            'All good here! Making good progress.'
-          ]
-        },
-        {
-          templates: [
-            'The new API endpoints are ready for testing',
-            'I\'ve updated the documentation',
-            'Could you review the latest PR?',
-            'The design mockups are ready'
-          ],
-          responses: [
-            'Great! I\'ll test them this afternoon.',
-            'Perfect! I\'ll check it out now.',
-            'Sure! I\'ll review it in a few minutes.',
-            'Awesome! They look fantastic.'
-          ]
-        },
-        {
-          templates: [
-            'Meeting at 2 PM today?',
-            'Can we discuss the timeline?',
-            'Quick sync call in 10 minutes?',
-            'Team standup in the main room'
-          ],
-          responses: [
-            'Sounds good! See you then.',
-            'Yes, let\'s chat about it.',
-            'Perfect! I\'ll join the call.',
-            'On my way! Thanks for the reminder.'
-          ]
-        }
-      ];
-      
-      const template = messageTemplates[chatIndex % messageTemplates.length];
-      const baseTime = chatIndex === 0 ? today : yesterday;
-      baseTime.setHours(9 + Math.floor(Math.random() * 8), Math.floor(Math.random() * 60));
-      
-      return [
-        {
-          id: (chatIndex * 10) + 1,
-          senderId: contact.id,
-          text: template.templates[Math.floor(Math.random() * template.templates.length)],
-          timestamp: new Date(baseTime.getTime()),
-          type: 'text',
-          status: 'read'
-        },
-        {
-          id: (chatIndex * 10) + 2,
-          senderId: 0, // Current user
-          text: template.responses[Math.floor(Math.random() * template.responses.length)],
-          timestamp: new Date(baseTime.getTime() + 120000), // 2 minutes later
-          type: 'text',
-          status: 'delivered'
-        }
-      ];
+      // Start with empty chats - no fake conversations
+      this.chats = [];
     },
     
     // Handle profile updates (both image and name)
@@ -1079,6 +901,10 @@ export default {
       
       chat.messages.push(newMsg);
       chat.lastMessage = newMsg;
+      
+      // Add notification for team chat message
+      notificationService.addTeamChatNotification(this.currentUser.name, chat.name, this.newMessage);
+      
       this.newMessage = '';
       
       this.$nextTick(() => {
@@ -1143,36 +969,6 @@ export default {
             }
           });
         }, 1000 + Math.random() * 3000);
-      }
-    },
-    
-    simulateIncomingMessage() {
-      const randomChat = this.chats[Math.floor(Math.random() * this.chats.length)];
-      const messages = [
-        'Hey, how are you? 😊',
-        'Can we schedule a meeting?',
-        'The project looks great! 🚀',
-        'Any updates on the task?',
-        'Thanks for your help! 🙏',
-        'Let\'s catch up soon',
-        'Check your email when you can 📧',
-        'Good job on the presentation! 👏'
-      ];
-      
-      const newMsg = {
-        id: this.getNextMessageId(),
-        senderId: randomChat.contact.id,
-        text: messages[Math.floor(Math.random() * messages.length)],
-        timestamp: new Date(),
-        type: 'text',
-        status: 'read'
-      };
-      
-      randomChat.messages.push(newMsg);
-      randomChat.lastMessage = newMsg;
-      
-      if (this.selectedChatId !== randomChat.id) {
-        randomChat.unreadCount++;
       }
     },
     
@@ -1846,6 +1642,248 @@ export default {
     
     handleScroll() {
       // Handle scroll events if needed
+    },
+
+    // Invite new team member via email or phone
+    async inviteNewMember() {
+      console.log('🚀 inviteNewMember called');
+      console.log('📝 Form data:', {
+        name: this.newMemberName,
+        email: this.newMemberEmail,
+        phone: this.newMemberPhone
+      });
+
+      // Set loading state
+      this.sendingInvitation = true;
+      
+      // Validate input
+      if (!this.newMemberName.trim()) {
+        alert('Please enter a name for the team member');
+        return;
+      }
+
+      if (!this.newMemberEmail.trim() && !this.newMemberPhone.trim()) {
+        alert('Please provide either an email or phone number');
+        return;
+      }
+
+      // Email validation if provided
+      if (this.newMemberEmail.trim()) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(this.newMemberEmail.trim())) {
+          alert('Please enter a valid email address');
+          return;
+        }
+      }
+
+      // Phone validation if provided (basic check)
+      if (this.newMemberPhone.trim()) {
+        const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+        if (!phoneRegex.test(this.newMemberPhone.replace(/[\s\-\(\)]/g, ''))) {
+          alert('Please enter a valid phone number');
+          return;
+        }
+      }
+
+      // Create new team member
+      const newMember = {
+        id: Date.now(), // Simple ID generation
+        name: this.newMemberName.trim(),
+        email: this.newMemberEmail.trim() || null,
+        phone: this.newMemberPhone.trim() || null,
+        role: 'Team Member',
+        avatar: null,
+        isOnline: false,
+        lastSeen: new Date(),
+        dateInvited: new Date()
+      };
+
+      // Save to team data
+      const currentTeam = JSON.parse(localStorage.getItem('teamData') || '[]');
+      currentTeam.push(newMember);
+      localStorage.setItem('teamData', JSON.stringify(currentTeam));
+
+      // Update local contacts
+      this.availableContacts.push({
+        ...newMember,
+        role: newMember.role || 'Team Member'
+      });
+
+      // Create initial chat with welcome message
+      const welcomeChat = {
+        id: newMember.id,
+        contact: newMember,
+        messages: [
+          {
+            id: Date.now(),
+            senderId: 0, // System/current user
+            text: `Welcome to the team, ${newMember.name}! 👋`,
+            timestamp: new Date(),
+            type: 'text',
+            status: 'sent'
+          }
+        ],
+        unreadCount: 0,
+        lastMessage: null
+      };
+
+      this.chats.push(welcomeChat);
+
+      // Generate invitation link
+      const invitationLink = `${window.location.origin}/dashboard?invite=${encodeURIComponent(newMember.name)}&team=freelancer-task`;
+
+      // Send invitation email if email provided
+      if (newMember.email) {
+        this.sendInvitationEmail(newMember, invitationLink);
+      }
+
+      // Copy invitation link to clipboard
+      this.copyInvitationLink(invitationLink, newMember);
+
+      // Clear form and reset loading state
+      this.newMemberName = '';
+      this.newMemberEmail = '';
+      this.newMemberPhone = '';
+      this.sendingInvitation = false;
+      this.showNewChatDialog = false;
+
+      // Show success message with link
+      if (newMember.email) {
+        this.showSuccessDialog(
+          `Invitation Sent! ✅`,
+          `${newMember.name} has been invited to join your team!\n\n📧 Email sent to: ${newMember.email}\n🔗 Invitation link copied to clipboard\n\nThey can click the link in the email or you can share the clipboard link directly.`,
+          invitationLink
+        );
+      } else {
+        this.showSuccessDialog(
+          `Team Member Added! ✅`,
+          `${newMember.name} has been added to your team!\n\n🔗 Invitation link copied to clipboard\n\nShare this link with them via phone or any messaging app.`,
+          invitationLink
+        );
+      }
+
+      // Emit event for other components to update
+      window.dispatchEvent(new CustomEvent('teamUpdated', { 
+        detail: { 
+          type: 'member_added', 
+          member: newMember 
+        } 
+      }));
+
+      console.log('✅ New team member invited:', newMember);
+      console.log('🔗 Invitation link:', invitationLink);
+    },
+
+    // Open new chat dialog
+    openNewChatDialog() {
+      console.log('🔥 Opening new chat dialog');
+      this.showNewChatDialog = true;
+      this.newMemberName = '';
+      this.newMemberEmail = '';
+      this.newMemberPhone = '';
+    },
+
+    // Close new chat dialog
+    closeNewChatDialog() {
+      this.showNewChatDialog = false;
+      this.newMemberName = '';
+      this.newMemberEmail = '';
+      this.newMemberPhone = '';
+    },
+
+    // Send invitation email
+    async sendInvitationEmail(member, invitationLink) {
+      try {
+        const emailData = {
+          to: member.email,
+          subject: '🎉 You\'re invited to join our Team Chat!',
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f8f9fa; padding: 20px;">
+              <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                <div style="text-align: center; margin-bottom: 30px;">
+                  <h1 style="color: #00796b; margin: 0;">Team Chat Invitation</h1>
+                  <p style="color: #666; font-size: 16px;">You've been invited to collaborate!</p>
+                </div>
+                
+                <div style="background: #e8f5e8; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                  <h2 style="color: #2e7d32; margin: 0 0 10px 0;">Hello ${member.name}! 👋</h2>
+                  <p style="color: #333; line-height: 1.6; margin: 10px 0;">
+                    You've been invited to join our team collaboration workspace. 
+                    Click the button below to access the Team Chat and start collaborating with us!
+                  </p>
+                </div>
+
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="${invitationLink}" 
+                     style="background: #25d366; color: white; padding: 15px 30px; 
+                            text-decoration: none; border-radius: 25px; font-weight: bold; 
+                            display: inline-block; font-size: 16px;">
+                    🚀 Join Team Chat
+                  </a>
+                </div>
+
+                <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                  <p style="margin: 0; color: #666; font-size: 14px;">
+                    <strong>Direct link:</strong><br>
+                    <a href="${invitationLink}" style="color: #00796b; word-break: break-all;">
+                      ${invitationLink}
+                    </a>
+                  </p>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+                  <p style="color: #999; font-size: 12px; margin: 0;">
+                    This invitation was sent from our Team Chat application<br>
+                    If you have any questions, please contact the team administrator.
+                  </p>
+                </div>
+              </div>
+            </div>
+          `
+        };
+
+        console.log('📧 Sending invitation email to:', member.email);
+        
+        const response = await fetch('http://localhost:3002/api/send-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(emailData)
+        });
+
+        if (response.ok) {
+          console.log('✅ Invitation email sent successfully');
+        } else {
+          console.warn('⚠️ Email service unavailable, but invitation link created');
+        }
+      } catch (error) {
+        console.warn('⚠️ Could not send email:', error.message);
+        console.log('📋 Invitation link available for manual sharing');
+      }
+    },
+
+    // Copy invitation link to clipboard
+    async copyInvitationLink(link, member) {
+      try {
+        await navigator.clipboard.writeText(link);
+        console.log('📋 Invitation link copied to clipboard');
+      } catch (error) {
+        console.warn('Could not copy to clipboard:', error);
+        // Fallback: show the link in a prompt
+        prompt('Copy this invitation link to share:', link);
+      }
+    },
+
+    // Show success dialog with invitation details
+    showSuccessDialog(title, message, link) {
+      const fullMessage = `${message}\n\n📋 Link: ${link}`;
+      alert(fullMessage);
+      
+      // Also log for debugging
+      console.log('🎉 ' + title);
+      console.log('📝 ' + message);
+      console.log('🔗 ' + link);
     }
   }
 };

@@ -833,7 +833,8 @@
 <script setup>
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 // Remove this import since you're defining your own implementation
-// import { isSameDay } from 'vuetify/lib/util/dateTimeUtils' 
+// import { isSameDay } from 'vuetify/lib/util/dateTimeUtils'
+import notificationService from '@/services/notificationService.js'; 
 
 
 // State
@@ -1556,6 +1557,18 @@ function createEvent() {
   
   // Save to localStorage
   saveEvents();
+  
+  // Add notification for reminder/meeting creation
+  if (eventType.value === 'task') {
+    notificationService.addReminderNotification(newEvent.value.title, newEvent.value.date);
+  } else if (eventType.value === 'meet') {
+    const attendees = [...selectedPeople.value, ...emailInvitees.value];
+    notificationService.addMeetingNotification(newEvent.value.title, newEvent.value.date, attendees);
+  } else {
+    // Live event
+    const attendees = [...selectedPeople.value, ...emailInvitees.value];
+    notificationService.addMeetingNotification(newEvent.value.title, newEvent.value.date, attendees);
+  }
   
   // Send notifications and invitations
   if (eventType.value !== 'task') {

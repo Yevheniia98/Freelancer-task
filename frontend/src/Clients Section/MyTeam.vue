@@ -1552,6 +1552,7 @@
 import { defineComponent, ref, computed, nextTick, onMounted } from 'vue';
 import LeftMenu from '@/dashboard/LeftMenu.vue';
 import SearchBar from '@/dashboard/SearchBar.vue';
+import notificationService from '@/services/notificationService.js';
   
 export default defineComponent({
   name: 'MyTeamPage',
@@ -1937,6 +1938,11 @@ export default defineComponent({
         chats.value[chatIndex].lastMessage = newMessage.value;
         chats.value[chatIndex].lastMessageTime = new Date();
       }
+      
+      // Add notification for team chat message
+      const currentUser = teamMembers.value.find(member => member.id === currentUserId);
+      const senderName = currentUser ? currentUser.name : 'You';
+      notificationService.addTeamChatNotification(senderName, selectedChat.value.name, newMessage.value);
       
       // Clear input
       newMessage.value = '';

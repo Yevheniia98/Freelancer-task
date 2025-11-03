@@ -722,6 +722,7 @@ import { useRouter } from 'vue-router';
 import LeftMenu from '@/dashboard/LeftMenu.vue';
 import SearchBar from '@/dashboard/SearchBar.vue';
 import { ProjectApiService } from '@/services/projectApi.service.js';
+import notificationService from '@/services/notificationService.js';
 
 const router = useRouter();
 
@@ -1182,6 +1183,9 @@ const submitProject = async () => {
         }
       }
     }
+    
+    // Add notification for project creation
+    notificationService.addProjectNotification(projectTitle.value.trim(), 'created');
     
     showSuccessPopup.value = true;
     setTimeout(() => {
