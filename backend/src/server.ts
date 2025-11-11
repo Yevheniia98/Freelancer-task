@@ -33,6 +33,8 @@ import projectIntegrationRoutes from './routes/project.integration.routes';
 import meetingInvitationRoutes from './routes/meeting-invitation.routes';
 import testEmailRoutes from './routes/test-email.routes';
 import teamManagementRoutes from './routes/team-management.routes';
+import notificationRoutes from './routes/notification.routes';
+import financialRoutes from './routes/financial.routes';
 
 // Import middleware
 import { errorHandler } from './middleware/error.middleware';
@@ -173,6 +175,8 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/integrations', projectIntegrationRoutes);
 app.use('/api/meeting-invitations', meetingInvitationRoutes);
 app.use('/api/test-email', testEmailRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/financial', financialRoutes);
 
 // Image Upload Endpoint - Clean & Simple
 app.post('/upload', (req, res) => {

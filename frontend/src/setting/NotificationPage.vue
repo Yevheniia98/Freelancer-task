@@ -243,7 +243,7 @@
         <div class="section-spacing"></div>
         
         <!-- Recent Notifications -->
-        <div class="content-card settings-card">
+        <div id="recent-notifications" class="content-card settings-card">
           <div class="section-header">
             <h3 class="section-title">
               Recent Notifications

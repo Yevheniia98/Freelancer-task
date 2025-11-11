@@ -301,6 +301,7 @@ export class AuthController {
           email: user.email
         }
       });
+
     } catch (error: any) {
       console.error('Forgot password error:', error);
       res.status(500).json({

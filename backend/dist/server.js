@@ -34,6 +34,8 @@ const project_integration_routes_1 = __importDefault(require("./routes/project.i
 const meeting_invitation_routes_1 = __importDefault(require("./routes/meeting-invitation.routes"));
 const test_email_routes_1 = __importDefault(require("./routes/test-email.routes"));
 const team_management_routes_1 = __importDefault(require("./routes/team-management.routes"));
+const notification_routes_1 = __importDefault(require("./routes/notification.routes"));
+const financial_routes_1 = __importDefault(require("./routes/financial.routes"));
 // Import middleware
 const error_middleware_1 = require("./middleware/error.middleware");
 const notFound_middleware_1 = require("./middleware/notFound.middleware");
@@ -157,6 +159,8 @@ app.use('/api/settings', settings_routes_1.default);
 app.use('/api/integrations', project_integration_routes_1.default);
 app.use('/api/meeting-invitations', meeting_invitation_routes_1.default);
 app.use('/api/test-email', test_email_routes_1.default);
+app.use('/api/notifications', notification_routes_1.default);
+app.use('/api/financial', financial_routes_1.default);
 // Image Upload Endpoint - Clean & Simple
 app.post('/upload', (req, res) => {
     const uploadSingle = (0, multer_1.default)({

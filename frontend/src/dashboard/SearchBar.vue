@@ -132,28 +132,39 @@
                   <p>{{ t('notifications.empty') }}</p>
                 </div>
                 
-                <button
+                <div
                   v-for="notification in notifications"
                   :key="notification.id"
                   class="notification-item"
                   :class="{ 'unread': !notification.read }"
-                  @click="readNotification(notification)"
                 >
-                  <div
-                    class="notification-icon"
-                    :class="`type-${notification.type}`"
+                  <button
+                    class="notification-content-btn"
+                    @click="goToNotificationPage(notification)"
                   >
-                    <component
-                      :is="getNotificationIcon(notification.type)"
-                      :size="16"
-                    />
-                  </div>
-                  <div class="notification-content">
-                    <h4>{{ notification.title }}</h4>
-                    <p>{{ notification.message }}</p>
-                    <span class="notification-time">{{ formatTime(notification.time) }}</span>
-                  </div>
-                </button>
+                    <div
+                      class="notification-icon"
+                      :class="`type-${notification.type}`"
+                    >
+                      <component
+                        :is="getNotificationIcon(notification.type)"
+                        :size="16"
+                      />
+                    </div>
+                    <div class="notification-content">
+                      <h4>{{ notification.title }}</h4>
+                      <p>{{ notification.message }}</p>
+                      <span class="notification-time">{{ formatTime(notification.time) }}</span>
+                    </div>
+                  </button>
+                  <button
+                    class="notification-delete-btn"
+                    @click="deleteNotification(notification, $event)"
+                    title="Delete notification"
+                  >
+                    <X :size="14" />
+                  </button>
+                </div>
               </div>
               
               <div class="dropdown-footer">
@@ -431,6 +442,58 @@ const markAllAsRead = () => {
 const viewAllNotifications = () => {
   showNotificationMenu.value = false
   router.push('/notification')
+}
+
+const goToNotificationPage = (notification) => {
+  // Mark notification as read
+  notificationService.markAsRead(notification.id)
+  
+  // Close dropdown
+  showNotificationMenu.value = false
+  
+  // Navigate to notification page
+  router.push('/notification').then(() => {
+    // Wait for the page to load, then scroll to Recent Notifications section
+    setTimeout(() => {
+      const recentNotificationsSection = document.getElementById('recent-notifications');
+      if (recentNotificationsSection) {
+        // Scroll to the Recent Notifications section
+        recentNotificationsSection.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+        
+        // Add a subtle highlight effect to show which section we scrolled to
+        recentNotificationsSection.style.transition = 'box-shadow 0.3s ease';
+        recentNotificationsSection.style.boxShadow = '0 0 20px rgba(12, 156, 141, 0.4)';
+        
+        // Remove highlight after 3 seconds
+        setTimeout(() => {
+          recentNotificationsSection.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
+        }, 3000);
+      } else {
+        console.warn('Recent notifications section not found');
+      }
+    }, 500); // Increased timeout to 500ms to ensure page is fully loaded
+  }).catch(err => {
+    console.error('Navigation error:', err)
+  })
+}
+
+const deleteNotification = (notification, event) => {
+  // Stop event propagation to prevent triggering the notification click
+  if (event) {
+    event.stopPropagation();
+    event.preventDefault();
+  }
+  
+  // Delete notification using the service
+  notificationService.deleteNotification(notification.id)
+  
+  console.log(`✅ Deleted notification: ${notification.title}`)
+  
+  // Optional: Show a subtle success feedback (you can remove this if not needed)
+  // Could add a toast notification here if you have a toast system
 }
 
 const navigateTo = (path) => {
@@ -933,17 +996,11 @@ onUnmounted(() => {
 
 /* Notification Items */
 .notification-item {
-  width: 100%;
-  background: none;
-  border: none;
-  padding: 16px 20px;
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.2s;
   display: flex;
   align-items: flex-start;
-  gap: 12px;
   border-bottom: 1px solid #f1f5f9;
+  transition: all 0.2s;
+  position: relative;
 }
 
 .notification-item:hover {
@@ -953,6 +1010,41 @@ onUnmounted(() => {
 .notification-item.unread {
   background: rgba(6, 78, 71, 0.02);
   border-left: 3px solid #064E47;
+}
+
+.notification-content-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 16px 20px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.notification-content-btn:hover {
+  background: transparent;
+}
+
+.notification-delete-btn {
+  background: none;
+  border: none;
+  padding: 16px 12px;
+  cursor: pointer;
+  color: #94a3b8;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notification-delete-btn:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
 }
 
 .notification-icon {

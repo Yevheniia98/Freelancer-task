@@ -1983,6 +1983,216 @@ app.post('/api/team/invitations/send', async (req, res) => {
         });
     }
 });
+const inMemoryNotifications = [];
+// Health check for notifications
+app.get('/api/notifications/health', (req, res) => {
+    res.json({
+        success: true,
+        message: 'Notification service is healthy',
+        timestamp: new Date().toISOString()
+    });
+});
+// Get user notifications
+app.get('/api/notifications', authenticateToken, (req, res) => {
+    try {
+        const userId = req.user.id;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 20;
+        const unreadOnly = req.query.unreadOnly === 'true';
+        let userNotifications = inMemoryNotifications.filter(n => n.userId === userId.toString());
+        if (unreadOnly) {
+            userNotifications = userNotifications.filter(n => !n.isRead);
+        }
+        // Sort by creation date (newest first)
+        userNotifications.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+        // Pagination
+        const startIndex = (page - 1) * limit;
+        const endIndex = startIndex + limit;
+        const paginatedNotifications = userNotifications.slice(startIndex, endIndex);
+        res.json({
+            success: true,
+            message: 'Notifications retrieved successfully',
+            data: paginatedNotifications,
+            pagination: {
+                page,
+                limit,
+                total: userNotifications.length,
+                hasMore: endIndex < userNotifications.length
+            }
+        });
+    }
+    catch (error) {
+        console.error('Get notifications error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to retrieve notifications'
+        });
+    }
+});
+// Get notification stats
+app.get('/api/notifications/stats', authenticateToken, (req, res) => {
+    try {
+        const userId = req.user.id;
+        const userNotifications = inMemoryNotifications.filter(n => n.userId === userId.toString());
+        const unreadCount = userNotifications.filter(n => !n.isRead).length;
+        res.json({
+            success: true,
+            message: 'Notification statistics retrieved successfully',
+            data: {
+                total: userNotifications.length,
+                unread: unreadCount
+            }
+        });
+    }
+    catch (error) {
+        console.error('Get notification stats error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to retrieve notification statistics'
+        });
+    }
+});
+// Create notification
+app.post('/api/notifications', authenticateToken, (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { title, message, type, priority, metadata } = req.body;
+        if (!title || !message || !type) {
+            return res.status(400).json({
+                success: false,
+                message: 'Title, message, and type are required'
+            });
+        }
+        const notification = {
+            id: Date.now().toString(),
+            userId: userId.toString(),
+            title,
+            message,
+            type,
+            priority: priority || 'medium',
+            isRead: false,
+            createdAt: new Date(),
+            metadata: metadata || {}
+        };
+        inMemoryNotifications.push(notification);
+        console.log(`✅ Notification created: ${title} for user ${userId}`);
+        res.status(201).json({
+            success: true,
+            message: 'Notification created successfully',
+            data: notification
+        });
+    }
+    catch (error) {
+        console.error('Create notification error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to create notification'
+        });
+    }
+});
+// Mark notification as read
+app.put('/api/notifications/:id/read', authenticateToken, (req, res) => {
+    try {
+        const userId = req.user.id;
+        const notificationId = req.params.id;
+        const notification = inMemoryNotifications.find(n => n.id === notificationId && n.userId === userId.toString());
+        if (!notification) {
+            return res.status(404).json({
+                success: false,
+                message: 'Notification not found'
+            });
+        }
+        notification.isRead = true;
+        res.json({
+            success: true,
+            message: 'Notification marked as read',
+            data: notification
+        });
+    }
+    catch (error) {
+        console.error('Mark as read error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to mark notification as read'
+        });
+    }
+});
+// Mark all notifications as read
+app.put('/api/notifications/read-all', authenticateToken, (req, res) => {
+    try {
+        const userId = req.user.id;
+        let count = 0;
+        inMemoryNotifications.forEach(notification => {
+            if (notification.userId === userId.toString() && !notification.isRead) {
+                notification.isRead = true;
+                count++;
+            }
+        });
+        res.json({
+            success: true,
+            message: `${count} notifications marked as read`,
+            data: { count }
+        });
+    }
+    catch (error) {
+        console.error('Mark all as read error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to mark all notifications as read'
+        });
+    }
+});
+// Delete notification
+app.delete('/api/notifications/:id', authenticateToken, (req, res) => {
+    try {
+        const userId = req.user.id;
+        const notificationId = req.params.id;
+        const index = inMemoryNotifications.findIndex(n => n.id === notificationId && n.userId === userId.toString());
+        if (index === -1) {
+            return res.status(404).json({
+                success: false,
+                message: 'Notification not found'
+            });
+        }
+        inMemoryNotifications.splice(index, 1);
+        res.json({
+            success: true,
+            message: 'Notification deleted successfully'
+        });
+    }
+    catch (error) {
+        console.error('Delete notification error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to delete notification'
+        });
+    }
+});
+// Clear all notifications
+app.post('/api/notifications/clear-all', authenticateToken, (req, res) => {
+    try {
+        const userId = req.user.id;
+        const initialLength = inMemoryNotifications.length;
+        // Remove all notifications for this user
+        const filtered = inMemoryNotifications.filter(n => n.userId !== userId.toString());
+        const removedCount = initialLength - filtered.length;
+        // Clear the array and repopulate with filtered results
+        inMemoryNotifications.length = 0;
+        inMemoryNotifications.push(...filtered);
+        res.json({
+            success: true,
+            message: `${removedCount} notifications cleared successfully`,
+            data: { count: removedCount }
+        });
+    }
+    catch (error) {
+        console.error('Clear all notifications error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to clear all notifications'
+        });
+    }
+});
 const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => {
     console.log(`🚀 Temporary server running on http://localhost:${PORT}`);

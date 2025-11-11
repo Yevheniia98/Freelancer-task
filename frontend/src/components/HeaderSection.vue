@@ -203,12 +203,16 @@ export default {
 
 <style scoped>
 header {
-  background-color: #0A7668;
+  background: linear-gradient(135deg, #10b981 0%, #059669 25%, #047857 75%, #065f46 100%);
   color: white;
-  height: 100px;
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border-bottom: 1px solid rgba(5, 150, 105, 0.3);
+  backdrop-filter: blur(10px);
+  position: relative;
 }
 
 .container {
@@ -217,6 +221,8 @@ header {
   justify-content: space-between;
   width: 80%;
   max-width: 1200px;
+  position: relative;
+  z-index: 1;
 }
 
 .ft-logo {
@@ -249,18 +255,29 @@ header {
 
 .nav {
   display: flex;
-  gap: 50px;
+  gap: 40px;
 }
 
 .nav a, .nav .nav-link {
-  color: white;
+  color: rgba(255, 255, 255, 0.9);
   text-decoration: none;
-  font-weight: bold;
-  transition: color 0.3s ease;
+  font-weight: 500;
+  font-size: 15px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  position: relative;
 }
 
 .nav a:hover, .nav .nav-link:hover {
-  color: #B0B0B0;
+  color: white;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav a.router-link-active, .nav .nav-link.router-link-active {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.15);
+  font-weight: 600;
 }
 
 .auth-buttons {
@@ -270,38 +287,48 @@ header {
 
 .btn-primary, .btn-secondary {
   padding: 10px 20px;
-  border-radius: 5px;
+  border-radius: 8px;
   text-decoration: none;
-  font-weight: bold;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-primary {
-  background-color: white;
-  color: #0A7668;
+  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+  color: #047857;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
 }
 
 .btn-primary:hover {
-  background-color: #B0B0B0;
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  color: #065f46;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
 }
 
 .btn-primary:active {
-  background-color: #505050;
-  color: white;
+  transform: translateY(0);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
 }
 
 .btn-secondary {
-  background: none;
-  color: white;
-  border: none;
-  transition: color 0.3s ease;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .btn-secondary:hover {
-  color: #B0B0B0;
+  color: white;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .btn-secondary:active {
-  color: #505050;
+  background-color: rgba(255, 255, 255, 0.05);
 }
 </style>

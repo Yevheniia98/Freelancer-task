@@ -63,61 +63,99 @@ export default {
 
 <style scoped>
 .footer-section {
-  background-color: #0A8276;
+  background: linear-gradient(135deg, #065f46 0%, #047857 25%, #059669 75%, #10b981 100%);
   margin-top: 100px;
-  height: 250px;
-  color: white;
-  font-family: 'Poppins', sans-serif;
+  min-height: 280px;
+  color: rgba(255, 255, 255, 0.9);
+  font-family: system-ui, -apple-system, sans-serif;
+  border-top: 1px solid rgba(5, 150, 105, 0.3);
+  box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .footer-content {
   display: flex;
-  justify-content: space-around;
-  padding: 50px;
-  margin: 0;
+  justify-content: space-between;
+  padding: 60px 50px 40px;
+  margin: 0 auto;
+  max-width: 1200px;
+  position: relative;
 }
 
 .footer-column {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  margin-right: 40px;
+}
+
+.footer-column:last-child {
+  margin-right: 0;
 }
 
 .footer-heading {
-  font-weight: 500;
-  font-size: 18px;
-  margin-bottom: 15px;
-  padding-left: 0; /* Ensure no extra padding on the heading */
-  text-align: left; /* Align text to the left */
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 20px;
+  padding-left: 0;
+  text-align: left;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .footer-list {
   list-style: none;
-  padding: 0; /* Remove any default padding */
-  margin: 0; /* Remove any default margin */
-  text-align: left; /* Align list items to the left */
+  padding: 0;
+  margin: 0;
+  text-align: left;
 }
 
-
 .footer-list li {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 400;
-  margin-bottom:0px;
+  margin-bottom: 12px;
   cursor: pointer;
-  transition: color 0.3s;
+  transition: all 0.2s ease;
+  color: rgba(255, 255, 255, 0.7);
+  padding: 4px 0;
 }
 
 .footer-list li:hover {
-  color: #ffd700; /* Highlight color on hover */
+  color: white;
+  transform: translateX(2px);
 }
 
 .footer-copyright {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
   text-align: center;
-  margin-top: 20px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 400;
-  color: #ffffff;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.3); /* Add a top border for separation */
+  color: rgba(255, 255, 255, 0.6);
+  padding: 20px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, rgba(4, 120, 87, 0.8) 0%, rgba(6, 95, 70, 0.8) 100%);
+  backdrop-filter: blur(10px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .footer-content {
+    flex-direction: column;
+    padding: 40px 30px;
+  }
+  
+  .footer-column {
+    margin-right: 0;
+    margin-bottom: 30px;
+  }
+  
+  .footer-copyright {
+    position: relative;
+    margin-top: 20px;
+  }
 }
 </style>
 
