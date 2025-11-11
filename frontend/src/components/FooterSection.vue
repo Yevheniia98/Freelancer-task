@@ -48,8 +48,12 @@
           <li>Contact Form</li>
         </ul>
       </div>
-      <div class="footer-copyright">
-        &copy; 2025 Freelance - Tasks. All rights reserved.
+    </div>
+    
+    <!-- Copyright Section -->
+    <div class="footer-bottom">
+      <div class="footer-bottom-content">
+        <p>&copy; 2025 Freelance - Tasks. All rights reserved.</p>
       </div>
     </div>
   </footer>
@@ -64,8 +68,7 @@ export default {
 <style scoped>
 .footer-section {
   background: linear-gradient(135deg, #065f46 0%, #047857 25%, #059669 75%, #10b981 100%);
-  margin-top: 100px;
-  min-height: 280px;
+  margin-top: 0;
   color: rgba(255, 255, 255, 0.9);
   font-family: system-ui, -apple-system, sans-serif;
   border-top: 1px solid rgba(5, 150, 105, 0.3);
@@ -78,7 +81,6 @@ export default {
   padding: 60px 50px 40px;
   margin: 0 auto;
   max-width: 1200px;
-  position: relative;
 }
 
 .footer-column {
@@ -125,19 +127,23 @@ export default {
   transform: translateX(2px);
 }
 
-.footer-copyright {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.footer-bottom-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 50px;
   text-align: center;
-  font-size: 13px;
+}
+
+.footer-bottom-content p {
+  margin: 0;
+  font-size: 14px;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.6);
-  padding: 20px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  background: linear-gradient(135deg, rgba(4, 120, 87, 0.8) 0%, rgba(6, 95, 70, 0.8) 100%);
-  backdrop-filter: blur(10px);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 /* Responsive Design */
@@ -152,9 +158,12 @@ export default {
     margin-bottom: 30px;
   }
   
-  .footer-copyright {
-    position: relative;
-    margin-top: 20px;
+  .footer-bottom-content {
+    padding: 20px 30px;
+  }
+  
+  .footer-bottom-content p {
+    font-size: 13px;
   }
 }
 </style>
