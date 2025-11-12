@@ -137,7 +137,6 @@ export default {
     const loadUserMetrics = () => {
       try {
         // Get user data
-        const userData = localStorage.getItem('user_data');
         const projectsData = localStorage.getItem('projects_data');
         const tasksData = localStorage.getItem('tasks_data');
         const teamData = localStorage.getItem('team_data');

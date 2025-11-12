@@ -714,7 +714,6 @@ export default {
       
       // File upload state
       uploadStatus: null, // null, 'uploading', 'success', 'error'
-      previewImage: null,
       selectedFile: null,
       
       // Available contacts for new chats - starts empty, populated from real team data
@@ -802,7 +801,7 @@ export default {
     }, 10000);
   },
   
-  beforeDestroy() {
+  beforeUnmount() {
     // Remove event listeners
     window.removeEventListener('profileImageUpdated', this.handleProfileUpdate);
     window.removeEventListener('userNameUpdated', this.handleProfileUpdate);
@@ -859,13 +858,13 @@ export default {
     },
     
     // Handle profile updates (both image and name)
-    handleProfileUpdate(event) {
+    handleProfileUpdate() {
       // Always reload user data for consistency
       this.loadUserData();
     },
     
     // Handle team data updates
-    handleTeamUpdate(event) {
+    handleTeamUpdate() {
       console.log('🔄 Team data updated, refreshing chat contacts');
       this.loadTeamMembers();
     },
@@ -1043,7 +1042,7 @@ export default {
       }
     },
     
-    addFileToChat(file, serverResponse) {
+    addFileToChat(file) {
       if (!this.selectedChat) return;
       
       const message = {
@@ -1259,38 +1258,6 @@ export default {
         console.error('Error uploading document file:', error);
         this.showUploadProgress(`Error uploading ${file.name}: ${error.message}`, false);
       }
-    },
-    
-    // Upload file to server
-    async uploadFileToServer(file) {
-      console.log('🌐 Starting file upload to server:', file.name);
-      
-      const formData = new FormData();
-      formData.append('files', file);
-      console.log('📦 FormData created, appended file with key "files"');
-      
-      console.log('🚀 Making POST request to: http://localhost:3002/api/upload');
-      
-      const response = await fetch('http://localhost:3002/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-      
-      console.log('📥 Response received:', {
-        status: response.status,
-        statusText: response.statusText,
-        ok: response.ok
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('❌ Upload failed:', errorText);
-        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
-      }
-      
-      const result = await response.json();
-      console.log('✅ Upload successful:', result);
-      return result;
     },
     
         createImageMessage(file, imageUrl, serverFileInfo) {
@@ -1678,8 +1645,8 @@ export default {
 
       // Phone validation if provided (basic check)
       if (this.newMemberPhone.trim()) {
-        const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-        if (!phoneRegex.test(this.newMemberPhone.replace(/[\s\-\(\)]/g, ''))) {
+        const phoneRegex = /^[+]?[1-9][\d]{0,15}$/;
+        if (!phoneRegex.test(this.newMemberPhone.replace(/[\s\-()]/g, ''))) {
           alert('Please enter a valid phone number');
           return;
         }

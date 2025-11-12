@@ -249,6 +249,8 @@ const router = createRouter({
 
 // Route guards for authentication
 router.beforeEach((to, from, next) => {
+  console.log('Navigation to:', to.name, 'Authenticated:', apiUtils.isAuthenticated());
+  
   const isAuthenticated = apiUtils.isAuthenticated();
   
   // Define routes that require authentication
@@ -266,16 +268,19 @@ router.beforeEach((to, from, next) => {
   
   if (protectedRoutes.includes(to.name) && !isAuthenticated) {
     // Redirect to login if trying to access protected route without authentication
+    console.log('Redirecting to login - not authenticated');
     next({ name: 'Login' });
   } else if (publicRoutes.includes(to.name) && isAuthenticated && to.name !== 'Home') {
     // If user is already authenticated and trying to access login/signup, redirect to dashboard
     // Exception: Allow access to Home page even when authenticated
     if (to.name === 'Login' || to.name === 'CreateAccount' || to.name === 'ForgotPassword' || to.name === 'ResetPassword') {
+      console.log('Redirecting authenticated user to dashboard');
       next({ name: 'DashboardPage' });
     } else {
       next();
     }
   } else {
+    console.log('Allowing navigation');
     next();
   }
 });

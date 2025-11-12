@@ -14,9 +14,10 @@ class MeetingInvitationApiService {
     // Add auth token to requests (temporarily disabled for testing)
     this.apiClient.interceptors.request.use((config) => {
       const token = localStorage.getItem('token');
-      if (token && false) { // Temporarily disabled
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+      // Authorization temporarily disabled for development
+      // if (token) {
+      //   config.headers.Authorization = `Bearer ${token}`;
+      // }
       return config;
     });
 

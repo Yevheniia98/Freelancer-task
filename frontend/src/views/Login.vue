@@ -8,7 +8,7 @@
         <h1>Welcome Back!</h1>
         <p>Sign in to your account to access your project management dashboard.</p>
           
-        <form @submit.prevent="submitForm" @submit="submitForm" method="post" novalidate>
+        <form @submit.prevent="submitForm" method="post" novalidate>
           <!-- Error Messages -->
           <div v-if="errors.length > 0" class="error-messages">
             <div 
@@ -73,13 +73,6 @@
             Create Account
           </router-link>
         </p>
-      </div>
-  
-      <div class="image-container">
-        <img
-          src="/sign.png"
-          alt="Login illustration"
-        />
       </div>
     </div>
   
@@ -159,15 +152,20 @@ export default {
           
           // Redirect to dashboard after a short delay
           setTimeout(() => {
-            router.push('/dashboard');
-          }, 1500);
+            console.log('Attempting to redirect to dashboard...');
+            router.push({ name: 'DashboardPage' });
+          }, 500);
         }
 
       } catch (error) {
         console.error('Login error:', error);
         
         // Handle API errors with improved error display
-        if (error.errors && Array.isArray(error.errors)) {
+        if (error.response && error.response.data && error.response.data.errors && Array.isArray(error.response.data.errors)) {
+          errors.value = error.response.data.errors;
+        } else if (error.response && error.response.data && error.response.data.message) {
+          errors.value = [error.response.data.message];
+        } else if (error.errors && Array.isArray(error.errors)) {
           errors.value = error.errors;
         } else if (error.message) {
           errors.value = [error.message];
@@ -196,35 +194,49 @@ export default {
 </script>
   
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
 .container {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  gap: 50px;
-  margin-left: 100px;
-  margin-right: 100px;
+  min-height: 100vh;
+  padding: 40px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
 }
 
 .form-container {
-  width: 500px;
-  height: auto;
-  padding: 0px;
+  width: 460px;
+  background: white;
+  padding: 48px;
+  border-radius: 16px;
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.1), 
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(229, 231, 235, 0.8);
 }
 
 h1 {
-  margin-top: 100px;
-  font-size: 24px;
-  color: #000;
-  text-align: left;
-  font-weight: 600;
+  margin: 0 0 16px 0;
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
+  color: #111827;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
 p {
   font-size: 16px;
-  color: #555;
-  text-align: left;
-  margin-bottom: 30px;
+  color: #6b7280;
+  text-align: center;
+  margin-bottom: 40px;
+  line-height: 1.6;
+  font-weight: 400;
 }
 
 form {
@@ -233,18 +245,40 @@ form {
 }
 
 label {
-  font-size: 16px;
-  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 20px 0 8px 0;
   text-align: left;
+  color: #374151;
 }
 
 input {
-  padding: 10px;
-  margin-top: 0px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  padding: 12px 16px;
+  margin-bottom: 4px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
   width: 100%;
+  font-size: 16px;
+  font-weight: 400;
+  transition: all 0.2s ease;
+  background: white;
+  color: #111827;
+  box-sizing: border-box;
+}
+
+input::placeholder {
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+input:focus {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+input:hover:not(:focus) {
+  border-color: #9ca3af;
 }
 
 .password-field {
@@ -253,122 +287,154 @@ input {
   position: relative;
 }
 
+.password-field input {
+  padding-right: 54px;
+}
+
 .eye-icon {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   cursor: pointer;
   position: absolute;
-  right: 10px;
+  right: 18px;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.eye-icon:hover {
+  opacity: 1;
 }
 
 .forgot-password {
   text-align: right;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  margin-top: 12px;
 }
 
 .forgot-password a {
-  color: #007b5e;
+  color: #10b981;
   text-decoration: none;
   font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s ease;
 }
 
 .forgot-password a:hover {
+  color: #059669;
   text-decoration: underline;
 }
 
 button {
-  margin-top: 30px;
-  padding: 10px;
+  margin-top: 32px;
+  padding: 14px 24px;
   border: none;
-  background-color: #007b5e;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
   font-size: 16px;
-  border-radius: 5px;
+  font-weight: 600;
+  border-radius: 8px;
   cursor: pointer;
   width: 100%;
-  transition: background-color 0.3s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 button:hover:not(:disabled) {
-  background-color: #005f47;
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 button:disabled {
-  background-color: #cccccc;
+  background: #d1d5db;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  color: #9ca3af;
 }
 
 /* Error and Success Messages */
 .error-messages {
-  margin-bottom: 15px;
-  animation: slideIn 0.3s ease-out;
-  min-height: auto;
-  z-index: 1000;
-  position: relative;
+  margin-bottom: 20px;
 }
 
 .error-message {
-  background-color: #fef2f2;
-  color: #dc2626;
-  padding: 12px 16px;
-  border-radius: 8px;
+  background: #fef2f2;
   border: 1px solid #fecaca;
-  border-left: 4px solid #dc2626;
+  border-radius: 8px;
+  color: #dc2626;
+  padding: 16px;
   margin-bottom: 8px;
   font-size: 14px;
   font-weight: 500;
   display: flex;
   align-items: center;
-  position: relative;
-  opacity: 1;
-  transition: opacity 0.3s ease-in-out;
 }
 
 .error-message::before {
   content: "⚠️";
   margin-right: 8px;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  font-size: 16px;
 }
 
 .success-message {
-  background-color: #f0fff4;
-  color: #38a169;
-  padding: 8px 12px;
-  border-radius: 4px;
-  border-left: 4px solid #48bb78;
-  margin-bottom: 15px;
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
   font-size: 14px;
+  font-weight: 500;
 }
 
 .signup-text {
-  margin-top: 10px;
-  font-size: 16px;
+  margin-top: 24px;
+  font-size: 14px;
   text-align: center;
+  color: #6b7280;
+  line-height: 1.5;
 }
 
 .signup-text a {
-  color: #007b5e;
+  color: #10b981;
   text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
 }
 
 .signup-text a:hover {
+  color: #059669;
   text-decoration: underline;
 }
 
-.image-container img {
-  border-radius: 10px;
-  height: 600px;
-  width: auto;
-  margin-top: 80px;
+/* Responsive Design */
+@media (max-width: 600px) {
+  .container {
+    padding: 20px;
+  }
+  
+  .form-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 40px 32px;
+  }
+  
+  h1 {
+    font-size: 28px;
+  }
+  
+  input {
+    padding: 10px 14px;
+  }
+  
+  button {
+    padding: 12px 20px;
+  }
 }
 </style>

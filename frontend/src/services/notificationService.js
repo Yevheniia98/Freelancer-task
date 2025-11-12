@@ -303,7 +303,6 @@ class NotificationService {
    */
   checkUpcomingPayments(payments = []) {
     const now = new Date()
-    const threeDaysFromNow = new Date(now.getTime() + (3 * 24 * 60 * 60 * 1000))
     
     payments.forEach(payment => {
       const dueDate = new Date(payment.dueDate)

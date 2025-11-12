@@ -154,7 +154,7 @@ class BillingService {
   /**
    * Simulate a payment processing
    */
-  async processPayment(paymentId, paymentMethod = {}) {
+  async processPayment(paymentId) {
     const payment = this.payments.find(p => p.id === paymentId)
     if (!payment) {
       throw new Error('Payment not found')

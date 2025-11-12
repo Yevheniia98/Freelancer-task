@@ -16,8 +16,8 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 
 // Import configurations
-// import { connectDB } from './config/database';
-// import { connectRedis } from './config/redis';
+import { connectDB } from './config/database';
+import { connectRedis } from './config/redis';
 // import { SecurityMonitor } from './services/security.monitor';
 
 // Import routes
@@ -34,7 +34,7 @@ import meetingInvitationRoutes from './routes/meeting-invitation.routes';
 import testEmailRoutes from './routes/test-email.routes';
 import teamManagementRoutes from './routes/team-management.routes';
 import notificationRoutes from './routes/notification.routes';
-import financialRoutes from './routes/financial.routes';
+// import financialRoutes from './routes/financial.routes';
 
 // Import middleware
 import { errorHandler } from './middleware/error.middleware';
@@ -176,7 +176,7 @@ app.use('/api/integrations', projectIntegrationRoutes);
 app.use('/api/meeting-invitations', meetingInvitationRoutes);
 app.use('/api/test-email', testEmailRoutes);
 app.use('/api/notifications', notificationRoutes);
-app.use('/api/financial', financialRoutes);
+// app.use('/api/financial', financialRoutes);
 
 // Image Upload Endpoint - Clean & Simple
 app.post('/upload', (req, res) => {
@@ -278,16 +278,13 @@ app.use(errorHandler);
 // Database connections
 const startServer = async () => {
   try {
-    // Temporarily skip MongoDB connection for email functionality
-    console.log('⚠️ MongoDB connection skipped - running in email-only mode');
-    
-    // Comment out MongoDB connection temporarily
-    // await connectDB();
-    // console.log('✅ MongoDB connected');
+    // Connect to MongoDB
+    await connectDB();
+    console.log('✅ MongoDB connected');
 
-    // Comment out Redis connection temporarily  
-    // await connectRedis();
-    // console.log('✅ Redis connected');
+    // Connect to Redis  
+    await connectRedis();
+    console.log('✅ Redis connected');
 
     // Comment out Security Monitor temporarily
     // const securityMonitor = SecurityMonitor.getInstance();

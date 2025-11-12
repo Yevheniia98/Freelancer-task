@@ -33,7 +33,7 @@
             {{ successMessage }}
           </div>
 
-          <label>Enter your full name</label>
+          
           <input
             v-model="fullName"
             type="text"
@@ -41,7 +41,7 @@
             :disabled="isLoading"
           >
   
-          <label>Enter your email address</label>
+          
           <input
             v-model="email"
             type="email"
@@ -49,7 +49,7 @@
             :disabled="isLoading"
           >
 
-          <label>Enter your phone number</label>
+          
           <input
             v-model="phoneNumber"
             type="tel"
@@ -57,7 +57,7 @@
             :disabled="isLoading"
           >
 
-          <label>Enter your country</label>
+          
           <input
             v-model="country"
             type="text"
@@ -65,7 +65,7 @@
             :disabled="isLoading"
           >
   
-          <label>Create your password</label>
+          
           <div class="password-field">
             <input
               v-model="password"
@@ -109,7 +109,7 @@
             </div>
           </div>
   
-          <label>Confirm your password</label>
+          
           <div class="password-field">
             <input
               v-model="confirmPassword"
@@ -136,13 +136,6 @@
             Login
           </router-link>
         </p>
-      </div>
-  
-      <div class="image-container">
-        <img
-          src="/sign.png"
-          alt="Workspace setup"
-        >
       </div>
     </div>
   
@@ -396,9 +389,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
-    gap: 80px;
-    padding: 40px;
+    min-height: calc(100vh - 140px);
+    padding: 40px 20px;
     background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
     position: relative;
   }
@@ -406,13 +398,14 @@
 
 
   .form-container {
-    width: 520px;
+    width: 100%;
+    max-width: 480px;
     background: white;
     padding: 48px;
-    border-radius: 16px;
+    border-radius: 24px;
     box-shadow: 
-      0 20px 25px -5px rgba(0, 0, 0, 0.1), 
-      0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      0 25px 50px -12px rgba(0, 0, 0, 0.05), 
+      0 10px 25px -5px rgba(0, 0, 0, 0.04);
     border: 1px solid rgba(229, 231, 235, 0.8);
     position: relative;
     z-index: 1;
@@ -444,26 +437,14 @@
     flex-direction: column;
   }
 
-  label {
-    font-size: 14px;
-    font-weight: 600;
-    margin: 20px 0 8px 0;
-    text-align: left;
-    color: #374151;
-  }
+   
 
   input {
     padding: 12px 16px;
-    margin-bottom: 4px;
+    margin-bottom: 10px;
     border: 1px solid #d1d5db;
     border-radius: 8px;
-    width: 100%;
-    font-size: 16px;
-    font-weight: 400;
-    transition: all 0.2s ease;
-    background: white;
-    color: #111827;
-    box-sizing: border-box;
+  
   }
 
   input::placeholder {
@@ -695,59 +676,30 @@
     text-decoration: underline;
   }
 
-  .image-container {
-    flex-shrink: 0;
-  }
-
-  .image-container img {
-    border-radius: 16px;
-    height: 600px;
-    width: auto;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  }
-
   /* Responsive Design */
-  @media (max-width: 1200px) {
+  @media (max-width: 768px) {
     .container {
-      gap: 60px;
-      padding: 30px 40px;
+      padding: 16px;
+      min-height: calc(100vh - 120px);
     }
     
-    .form-container {
-      width: 480px;
-      padding: 40px;
-    }
-    
-    .image-container img {
-      height: 550px;
-    }
-  }
-
-  @media (max-width: 900px) {
-    .container {
-      flex-direction: column;
-      gap: 40px;
-      padding: 20px;
-    }
-    
-    .form-container {
-      width: 100%;
-      max-width: 500px;
-      padding: 40px 32px;
-    }
-    
-    .image-container img {
-      height: 400px;
-    }
-  }
-
-  @media (max-width: 600px) {
     .form-container {
       padding: 32px 24px;
+      border-radius: 16px;
     }
     
     h1 {
       font-size: 28px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .form-container {
+      padding: 24px 20px;
+    }
+    
+    h1 {
+      font-size: 24px;
     }
     
     input {
@@ -756,10 +708,6 @@
     
     button {
       padding: 12px 20px;
-    }
-    
-    .image-container img {
-      height: 300px;
     }
   }
 

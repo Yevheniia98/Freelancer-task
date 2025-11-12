@@ -292,7 +292,7 @@ const loadUserData = () => {
 const formData = ref(loadUserData())
 
 // File upload handler
-import axios from 'axios';
+// import axios from 'axios';
 
 const handleFileUpload = async (event) => {
   const file = event.target.files[0];

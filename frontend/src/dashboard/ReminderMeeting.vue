@@ -996,9 +996,9 @@ watch(() => newEvent.value.repeatEvery, (newValue) => {
 
 // Formatted dates for display
 const formattedDate = computed(() => formatDateForDisplay(newEvent.value.date));
-const formattedTimeFrom = computed(() => formatTimeForDisplay(newEvent.value.timeFrom));
-const formattedTimeTo = computed(() => formatTimeForDisplay(newEvent.value.timeTo));
-const formattedEndDate = computed(() => formatDateForDisplay(newEvent.value.endRepeatDate));
+// const formattedTimeFrom = computed(() => formatTimeForDisplay(newEvent.value.timeFrom));
+// const formattedTimeTo = computed(() => formatTimeForDisplay(newEvent.value.timeTo));
+// const formattedEndDate = computed(() => formatDateForDisplay(newEvent.value.endRepeatDate));
 const formattedSelectedDate = computed(() => formatDateForDisplay(newEvent.value.date, { includeDay: true }));
 
 const todayISO = dateToISO(new Date());
@@ -1720,7 +1720,7 @@ function loadUserData() {
 // Handle profile updates
 function handleProfileUpdate(event) {
   if (event.detail) {
-    if (event.detail.hasOwnProperty('profileImage')) {
+    if (Object.prototype.hasOwnProperty.call(event.detail, 'profileImage')) {
       userAvatar.value = event.detail.profileImage;
     }
     if (event.detail.fullName || event.detail.name) {

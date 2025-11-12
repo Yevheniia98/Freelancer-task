@@ -18,8 +18,8 @@ const fs_1 = __importDefault(require("fs"));
 const http_1 = require("http");
 const socket_io_1 = require("socket.io");
 // Import configurations
-// import { connectDB } from './config/database';
-// import { connectRedis } from './config/redis';
+const database_1 = require("./config/database");
+const redis_1 = require("./config/redis");
 // import { SecurityMonitor } from './services/security.monitor';
 // Import routes
 const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
@@ -35,7 +35,7 @@ const meeting_invitation_routes_1 = __importDefault(require("./routes/meeting-in
 const test_email_routes_1 = __importDefault(require("./routes/test-email.routes"));
 const team_management_routes_1 = __importDefault(require("./routes/team-management.routes"));
 const notification_routes_1 = __importDefault(require("./routes/notification.routes"));
-const financial_routes_1 = __importDefault(require("./routes/financial.routes"));
+// import financialRoutes from './routes/financial.routes';
 // Import middleware
 const error_middleware_1 = require("./middleware/error.middleware");
 const notFound_middleware_1 = require("./middleware/notFound.middleware");
@@ -160,7 +160,7 @@ app.use('/api/integrations', project_integration_routes_1.default);
 app.use('/api/meeting-invitations', meeting_invitation_routes_1.default);
 app.use('/api/test-email', test_email_routes_1.default);
 app.use('/api/notifications', notification_routes_1.default);
-app.use('/api/financial', financial_routes_1.default);
+// app.use('/api/financial', financialRoutes);
 // Image Upload Endpoint - Clean & Simple
 app.post('/upload', (req, res) => {
     const uploadSingle = (0, multer_1.default)({
@@ -249,14 +249,12 @@ app.use(error_middleware_1.errorHandler);
 // Database connections
 const startServer = async () => {
     try {
-        // Temporarily skip MongoDB connection for email functionality
-        console.log('⚠️ MongoDB connection skipped - running in email-only mode');
-        // Comment out MongoDB connection temporarily
-        // await connectDB();
-        // console.log('✅ MongoDB connected');
-        // Comment out Redis connection temporarily  
-        // await connectRedis();
-        // console.log('✅ Redis connected');
+        // Connect to MongoDB
+        await (0, database_1.connectDB)();
+        console.log('✅ MongoDB connected');
+        // Connect to Redis  
+        await (0, redis_1.connectRedis)();
+        console.log('✅ Redis connected');
         // Comment out Security Monitor temporarily
         // const securityMonitor = SecurityMonitor.getInstance();
         // await securityMonitor.initialize();

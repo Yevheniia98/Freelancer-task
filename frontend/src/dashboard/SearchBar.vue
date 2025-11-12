@@ -273,7 +273,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { authAPI } from '@/services/api.js'
 import { 
@@ -348,21 +348,21 @@ const loadUserData = () => {
 }
 
 // Listen for profile image updates
-const handleProfileImageUpdate = (event) => {
-  if (event.detail && event.detail.hasOwnProperty('profileImage')) {
-    user.value.avatar = event.detail.profileImage;
-  }
-}
+// const handleProfileImageUpdate = (event) => {
+//   if (event.detail && Object.prototype.hasOwnProperty.call(event.detail, 'profileImage')) {
+//     user.value.avatar = event.detail.profileImage;
+//   }
+// }
 
 // Listen for user name updates
-const handleUserNameUpdate = (event) => {
-  if (event.detail && (event.detail.fullName || event.detail.name)) {
-    user.value.name = event.detail.fullName || event.detail.name;
-  }
-}
+// const handleUserNameUpdate = (event) => {
+//   if (event.detail && (event.detail.fullName || event.detail.name)) {
+//     user.value.name = event.detail.fullName || event.detail.name;
+//   }
+// }
 
 // Handle all profile updates
-const handleProfileUpdate = (event) => {
+const handleProfileUpdate = () => {
   // Reload all user data to ensure consistency
   loadUserData();
 }
@@ -431,9 +431,9 @@ const changeLanguage = (code) => {
   showLanguageMenu.value = false
 }
 
-const readNotification = (notification) => {
-  notificationService.markAsRead(notification.id)
-}
+// const readNotification = (notification) => {
+//   notificationService.markAsRead(notification.id)
+// }
 
 const markAllAsRead = () => {
   notificationService.markAllAsRead()

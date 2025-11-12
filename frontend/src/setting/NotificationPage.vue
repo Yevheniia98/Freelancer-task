@@ -358,7 +358,7 @@ import { useRouter } from 'vue-router'
 import LeftMenu from '@/dashboard/LeftMenu.vue'
 import SearchBar from '@/dashboard/SearchBar.vue'
 import notificationService, { notifications, notificationSettings } from '@/services/notificationService.js'
-import billingService from '@/services/billingService.js'
+// import billingService from '@/services/billingService.js'
 
 // Setup router
 const router = useRouter()
@@ -566,14 +566,14 @@ const formatNotificationTime = (time) => {
   return notificationTime.toLocaleDateString()
 }
 
-const testBillingNotifications = () => {
-  // Add sample billing notifications for demonstration
-  notificationService.addBillingNotification(29.99, new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), 'Pro Plan Subscription')
-  notificationService.addBillingNotification(15.00, new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), 'Additional Storage')
-  
-  // Show success message
-  console.log('✅ Sample billing notifications added!')
-}
+// const testBillingNotifications = () => {
+//   // Add sample billing notifications for demonstration
+//   notificationService.addBillingNotification(29.99, new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), 'Pro Plan Subscription')
+//   notificationService.addBillingNotification(15.00, new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), 'Additional Storage')
+//   
+//   // Show success message
+//   console.log('✅ Sample billing notifications added!')
+// }
 
 
 

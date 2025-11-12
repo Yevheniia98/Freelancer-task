@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
-// Removed User model import - running in email-only mode without MongoDB
+import { User } from '../models/user.model';
 import { TwoFactorService } from './twoFactor.service';
 import SessionManager from './session.manager';
 
@@ -49,6 +49,24 @@ export class AuthService {
     },
     {
       id: 'demo-user-4',
+      email: 'suprun.jen@gmail.com', 
+      password: 'test123',
+      firstName: 'Evgeniia',
+      lastName: 'Suprun',
+      twoFactorEnabled: false,
+      twoFactorSecret: null
+    },
+    {
+      id: 'demo-user-5',
+      email: 'suprun.jen@gmail.com', 
+      password: 'test123',
+      firstName: 'Evgeniia',
+      lastName: 'Suprun',
+      twoFactorEnabled: false,
+      twoFactorSecret: null
+    },
+    {
+      id: 'demo-user-4',
       email: 'freelancer@example.com', 
       password: 'freelancer123',
       firstName: 'John',
@@ -71,38 +89,38 @@ export class AuthService {
     lastName: string;
   }) {
     try {
-      // Check if user already exists in mock data
-      const existingUser = this.mockUsers.find(u => u.email.toLowerCase() === userData.email.toLowerCase());
+      // Check if user already exists in database
+      const existingUser = await User.findOne({ email: userData.email.toLowerCase() });
       if (existingUser) {
         throw new Error('User already exists');
       }
 
-      // Create new mock user (in demo mode, we just simulate registration)
-      const newUserId = `demo-user-${Date.now()}`;
-      const newUser = {
-        id: newUserId,
-        email: userData.email,
-        password: userData.password, // In demo mode, storing plain password
+      // Hash password
+      const saltRounds = 12;
+      const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
+
+      // Create new user in database
+      const newUser = new User({
+        email: userData.email.toLowerCase(),
+        password: hashedPassword,
         firstName: userData.firstName,
         lastName: userData.lastName,
-        twoFactorEnabled: false,
-        twoFactorSecret: null
-      };
+        twoFactorEnabled: false
+      });
 
-      // In a real app, we would add to database, here we just simulate
-      // this.mockUsers.push(newUser); // Commented out to keep original demo users
+      const savedUser = await newUser.save();
 
       // Generate token
-      const token = this.generateToken(newUserId);
+      const token = this.generateToken(String(savedUser._id));
 
       return {
         token,
         user: {
-          id: newUser.id,
-          email: newUser.email,
-          firstName: newUser.firstName,
-          lastName: newUser.lastName,
-          twoFactorEnabled: newUser.twoFactorEnabled
+          id: String(savedUser._id),
+          email: savedUser.email,
+          firstName: savedUser.firstName,
+          lastName: savedUser.lastName,
+          twoFactorEnabled: savedUser.twoFactorEnabled
         }
       };
     } catch (error) {
@@ -112,20 +130,21 @@ export class AuthService {
 
   public async login(email: string, password: string) {
     try {
-      // Find user in mock data (email-only mode)
-      const user = this.mockUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
+      // Find user in database
+      const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
       if (!user) {
         throw new Error('Invalid credentials');
       }
 
-      // Check password (direct comparison for demo)
-      if (user.password !== password) {
+      // Check password using bcrypt
+      const isValidPassword = await bcrypt.compare(password, user.password);
+      if (!isValidPassword) {
         throw new Error('Invalid credentials');
       }
 
       // Check if 2FA is enabled
       if (user.twoFactorEnabled) {
-        const tempToken = this.generateTempToken(user.id);
+        const tempToken = this.generateTempToken(String(user._id));
         return {
           requiresTwoFactor: true,
           tempToken
@@ -133,12 +152,12 @@ export class AuthService {
       }
 
       // Generate token
-      const token = this.generateToken(user.id);
+      const token = this.generateToken(String(user._id));
 
       return {
         token,
         user: {
-          id: user.id,
+          id: String(user._id),
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,

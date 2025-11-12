@@ -851,8 +851,9 @@ const downloadInvoice = async (invoice) => {
     // PDF download functionality would be implemented here
     console.log('Download PDF for invoice:', invoice)
     // const response = await invoiceService.downloadPDF(invoice._id)
-    // Create download link
-    const url = window.URL.createObjectURL(new Blob([response.data]))
+    // Create download link (mock implementation)
+    const mockData = new Blob(['Mock PDF content'], { type: 'application/pdf' })
+    const url = window.URL.createObjectURL(mockData)
     const link = document.createElement('a')
     link.href = url
     link.setAttribute('download', `${invoice.invoiceNumber}.pdf`)
