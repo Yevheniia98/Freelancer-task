@@ -33,21 +33,31 @@ class MeetingInvitationApiService {
 
   /**
    * Send meeting invitations to multiple recipients
-   * @param {Array} recipients - Array of {email, name?} objects
+   * @param {Array} recipients - Array of recipient objects with email and name
    * @param {Object} meetingData - Meeting information
    * @returns {Promise<Object>} API response
    */
   async sendMultipleInvitations(recipients, meetingData) {
     try {
+      console.log('📧 Sending meeting invitations:', { recipients, meetingData });
+      
       const response = await this.apiClient.post('/send-multiple', {
         recipients,
         meetingData
       });
+      
+      console.log('✅ Meeting invitations sent successfully:', response.data);
       return response.data;
     } catch (error) {
-      throw new Error(
-        error.response?.data?.message || 'Failed to send meeting invitations'
-      );
+      console.error('❌ Meeting invitation error:', error.response?.data || error.message);
+      
+      // Provide more detailed error information
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.statusText || 
+                          error.message || 
+                          'Failed to send meeting invitations';
+      
+      throw new Error(errorMessage);
     }
   }
 
