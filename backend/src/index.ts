@@ -2,8 +2,15 @@ import express, { Request, Response } from "express";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
+import cors from "cors";
 
 const app = express();
+
+// Enable CORS for all requests
+app.use(cors());
+
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Указываем хранилище для файлов
 const storage = multer.diskStorage({

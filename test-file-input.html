@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>File Input Test</title>
+</head>
+<body>
+    <h1>File Input Test</h1>
+    
+    <h3>Test 1: All files</h3>
+    <input type="file" id="allFiles" multiple accept="*/*">
+    
+    <h3>Test 2: No accept attribute</h3>
+    <input type="file" id="noAccept" multiple>
+    
+    <h3>Test 3: Specific file types</h3>
+    <input type="file" id="specificTypes" multiple accept=".pdf,.txt,.doc,.docx">
+    
+    <div id="results"></div>
+
+    <script>
+        function logFileSelection(inputId, files) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.innerHTML = `<strong>${inputId}:</strong> ${files.length} files selected: ${Array.from(files).map(f => f.name).join(', ')}`;
+            results.appendChild(div);
+            console.log(inputId, files);
+        }
+
+        document.getElementById('allFiles').addEventListener('change', function(e) {
+            logFileSelection('All Files (*/*)', e.target.files);
+        });
+
+        document.getElementById('noAccept').addEventListener('change', function(e) {
+            logFileSelection('No Accept Attribute', e.target.files);
+        });
+
+        document.getElementById('specificTypes').addEventListener('change', function(e) {
+            logFileSelection('Specific Types (.pdf,.txt,.doc,.docx)', e.target.files);
+        });
+    </script>
+</body>
+</html>

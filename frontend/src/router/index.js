@@ -14,6 +14,7 @@ import ProjectTaskVue from '@/views/ProjectTaskVue.vue';
 import ProjectCreate from '@/views/ProjectCreate.vue';
 import ProjectDetail from '@/views/ProjectDetail.vue';
 import ClientMain from '@/Clients Section/ClientMain.vue';
+import CRMDashboard from '@/Clients Section/CRMDashboard.vue';
 import CreateClient from '@/Clients Section/CreateClient.vue';
 import MyTeam from '@/Clients Section/MyTeam.vue';
 import InviteMember from '@/Invite member/InviteMember.vue';
@@ -34,7 +35,6 @@ import SecurityPage from '@/setting/SecurityPage.vue';
 import IntegretionPage from '@/setting/IntegretionPage.vue';
 import BackUp from '@/setting/BackUp.vue';
 import SupportPage from '@/setting/SupportPage.vue';
-import AcceptInvite from '@/views/AcceptInvite.vue';
 
 const routes = [
   {
@@ -68,11 +68,6 @@ const routes = [
     component: ResetPassword,
   },
   { 
-    path: '/invite/accept',
-    name: 'AcceptInvite',
-    component: AcceptInvite,
-  },
-  { 
     path: '/pricing',
     name: 'Pricing',
     component: PricingSection // ✅ Fixed the component reference
@@ -92,7 +87,7 @@ const routes = [
   { 
     path: '/projects',
     name: 'Projects',
-    component: ProjectSection 
+    component: ProjectSection
   }, 
 
   { 
@@ -110,13 +105,19 @@ const routes = [
   { 
     path: '/projects/:id',
     name: 'ProjectDetail',
-    component: ProjectDetail 
+    component: ProjectDetail
   },
 
   {
     path: '/client-main',
     name: 'ClientMain',
     component: ClientMain,
+  },
+
+  {
+    path: '/crm',
+    name: 'CRMDashboard',
+    component: CRMDashboard,
   },
 
   {
@@ -146,7 +147,7 @@ const routes = [
   {
     path: '/my-team',
     name: 'MyTeam',
-    component: MyTeam,
+    component: MyTeam
   },
 
   {
@@ -248,12 +249,14 @@ const router = createRouter({
 
 // Route guards for authentication
 router.beforeEach((to, from, next) => {
+  console.log('Navigation to:', to.name, 'Authenticated:', apiUtils.isAuthenticated());
+  
   const isAuthenticated = apiUtils.isAuthenticated();
   
   // Define routes that require authentication
   const protectedRoutes = [
     'DashboardPage', 'ProjectSection', 'ProjectTaskVue', 'ProjectCreate', 'ProjectDetail',
-    'ClientMain', 'CreateClient', 'MyTeam', 'InviteMember', 'InviteEmail', 
+    'ClientMain', 'CRMDashboard', 'CreateClient', 'MyTeam', 'InviteMember', 'InviteEmail', 
     'InviteApp', 'TaskDashboard', 'FinanceDashboard', 'CalendarSection',
     'DesignTools', 'AccountSetting', 'PasswordSecurity', 'NotificationPage',
     'DataExport', 'LogOut', 'Subscription', 'Customization', 'Security',
@@ -265,16 +268,19 @@ router.beforeEach((to, from, next) => {
   
   if (protectedRoutes.includes(to.name) && !isAuthenticated) {
     // Redirect to login if trying to access protected route without authentication
+    console.log('Redirecting to login - not authenticated');
     next({ name: 'Login' });
   } else if (publicRoutes.includes(to.name) && isAuthenticated && to.name !== 'Home') {
     // If user is already authenticated and trying to access login/signup, redirect to dashboard
     // Exception: Allow access to Home page even when authenticated
     if (to.name === 'Login' || to.name === 'CreateAccount' || to.name === 'ForgotPassword' || to.name === 'ResetPassword') {
+      console.log('Redirecting authenticated user to dashboard');
       next({ name: 'DashboardPage' });
     } else {
       next();
     }
   } else {
+    console.log('Allowing navigation');
     next();
   }
 });

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Storage Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .button { padding: 8px 16px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .button:hover { background: #0056b3; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Meeting Storage Test</h1>
+    
+    <div class="section">
+        <h2>Current localStorage Data</h2>
+        <button class="button" onclick="displayStoredEvents()">Show Stored Events</button>
+        <button class="button" onclick="clearEvents()">Clear Events</button>
+        <pre id="eventData">Click "Show Stored Events" to view data</pre>
+    </div>
+    
+    <div class="section">
+        <h2>Test Operations</h2>
+        <button class="button" onclick="addSampleEvent()">Add Sample Event</button>
+        <button class="button" onclick="testPersistence()">Test Persistence</button>
+        <button class="button" onclick="resetToNewSampleEvents()">Clear All Reminders (Empty State)</button>
+        <div id="testResults"></div>
+    </div>
+
+    <script>
+        function displayStoredEvents() {
+            const events = localStorage.getItem('userEvents');
+            const eventData = document.getElementById('eventData');
+            
+            if (events) {
+                const parsed = JSON.parse(events);
+                eventData.textContent = JSON.stringify(parsed, null, 2);
+            } else {
+                eventData.textContent = 'No events stored in localStorage';
+            }
+        }
+        
+        function clearEvents() {
+            localStorage.removeItem('userEvents');
+            displayStoredEvents();
+            document.getElementById('testResults').innerHTML = '<p style="color: green;">Events cleared from localStorage</p>';
+        }
+        
+        function addSampleEvent() {
+            const events = JSON.parse(localStorage.getItem('userEvents') || '[]');
+            const newEvent = {
+                id: Math.max(...events.map(e => e.id || 0), 0) + 1,
+                title: 'Test Event',
+                description: 'This is a test event created via localStorage',
+                date: new Date().toISOString().slice(0, 10),
+                timeFrom: '10:00',
+                timeTo: '11:00',
+                type: 'Meeting',
+                platform: 'zoom',
+                meetingLink: 'https://zoom.us/test',
+                attendees: [],
+                emailInvitees: [],
+                repeatEvery: 'On',
+                repeatDays: [],
+                endRepeatDate: null,
+                organizer: {
+                    name: 'Test User',
+                    avatar: null
+                }
+            };
+            
+            events.push(newEvent);
+            localStorage.setItem('userEvents', JSON.stringify(events));
+            displayStoredEvents();
+            document.getElementById('testResults').innerHTML = '<p style="color: green;">Sample event added to localStorage</p>';
+        }
+        
+        function testPersistence() {
+            const beforeRefresh = localStorage.getItem('userEvents');
+            document.getElementById('testResults').innerHTML = `
+                <p><strong>Persistence Test:</strong></p>
+                <p>Events before refresh: ${beforeRefresh ? JSON.parse(beforeRefresh).length : 0} events</p>
+                <p style="color: blue;">Now refresh the page and check if data persists...</p>
+            `;
+        }
+        
+        function resetToNewSampleEvents() {
+            localStorage.removeItem('userEvents');
+            document.getElementById('testResults').innerHTML = `
+                <p style="color: green;">All reminders cleared! The "Your Reminders" section will now be empty for new users.</p>
+                <p><strong>Expected behavior:</strong></p>
+                <p>• New users see empty "Your Reminders" section with "No reminders created yet" message</p>
+                <p>• When users create new reminders, they will be saved and persist</p>
+                <p>• No sample/example events will show up automatically</p>
+                <p><a href="http://localhost:3030/dashboard" target="_blank" style="color: #007bff;">→ Open Dashboard (should be empty now)</a></p>
+            `;
+            displayStoredEvents();
+        }
+        
+        // Auto-display on page load
+        window.addEventListener('load', displayStoredEvents);
+    </script>
+</body>
+</html>

@@ -132,28 +132,39 @@
                   <p>{{ t('notifications.empty') }}</p>
                 </div>
                 
-                <button
+                <div
                   v-for="notification in notifications"
                   :key="notification.id"
                   class="notification-item"
                   :class="{ 'unread': !notification.read }"
-                  @click="readNotification(notification)"
                 >
-                  <div
-                    class="notification-icon"
-                    :class="`type-${notification.type}`"
+                  <button
+                    class="notification-content-btn"
+                    @click="goToNotificationPage(notification)"
                   >
-                    <component
-                      :is="getNotificationIcon(notification.type)"
-                      :size="16"
-                    />
-                  </div>
-                  <div class="notification-content">
-                    <h4>{{ notification.title }}</h4>
-                    <p>{{ notification.message }}</p>
-                    <span class="notification-time">{{ formatTime(notification.time) }}</span>
-                  </div>
-                </button>
+                    <div
+                      class="notification-icon"
+                      :class="`type-${notification.type}`"
+                    >
+                      <component
+                        :is="getNotificationIcon(notification.type)"
+                        :size="16"
+                      />
+                    </div>
+                    <div class="notification-content">
+                      <h4>{{ notification.title }}</h4>
+                      <p>{{ notification.message }}</p>
+                      <span class="notification-time">{{ formatTime(notification.time) }}</span>
+                    </div>
+                  </button>
+                  <button
+                    class="notification-delete-btn"
+                    @click="deleteNotification(notification, $event)"
+                    title="Delete notification"
+                  >
+                    <X :size="14" />
+                  </button>
+                </div>
               </div>
               
               <div class="dropdown-footer">
@@ -178,12 +189,21 @@
             :class="{ 'active': showUserMenu }"
             @click="toggleUserMenu"
           >
-            <div class="user-avatar">
+            <div class="user-avatar" :class="{ 'default-avatar': !user.avatar }">
               <img 
+                v-if="user.avatar"
                 :src="user.avatar" 
                 :alt="user.name"
                 class="avatar-image"
               >
+              <div 
+                v-else 
+                class="default-avatar-icon"
+              >
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
+                </svg>
+              </div>
               <div class="status-indicator online" />
             </div>
           </button>
@@ -197,10 +217,19 @@
               <div class="dropdown-header user-header" @click="navigateTo('/account')">
                 <div class="user-info">
                   <img
+                    v-if="user.avatar"
                     :src="user.avatar"
                     :alt="user.name"
                     class="user-profile-image"
                   >
+                  <div 
+                    v-else 
+                    class="user-profile-image default-profile-icon"
+                  >
+                    <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor">
+                      <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
+                    </svg>
+                  </div>
                   <div class="user-details">
                     <h3>{{ user.name }}</h3>
                     <p>{{ user.email }}</p>
@@ -219,7 +248,7 @@
                 
                 <button
                   class="dropdown-item"
-                  @click="navigateTo('/settings')"
+                  @click="navigateTo('/account')"
                 >
                   <Settings :size="18" />
                   <span>{{ t('user.settings') }}</span>
@@ -244,7 +273,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { authAPI } from '@/services/api.js'
 import { 
@@ -258,7 +287,10 @@ import {
   LogOut,
   MessageSquare,
   Calendar,
-  CheckCircle
+  CheckCircle,
+  Folder,
+  CreditCard,
+  DollarSign
 } from 'lucide-vue-next'
 
 // Router instance
@@ -299,8 +331,41 @@ const userRef = ref(null)
 const user = ref({
   name: 'Isabella Morgan',
   email: 'isabella@example.com',
-  avatar: 'https://images.unsplash.com/photo-1494790108755-2616c06146b9?w=150&h=150&fit=crop&crop=face'
+  avatar: null
 })
+
+// Load user data from localStorage
+const loadUserData = () => {
+  const userData = localStorage.getItem('user_data');
+  if (userData) {
+    const parsedData = JSON.parse(userData);
+    user.value = {
+      name: parsedData.fullName || parsedData.name || 'User',
+      email: parsedData.email || 'user@example.com',
+      avatar: parsedData.profileImage || parsedData.avatar || null
+    };
+  }
+}
+
+// Listen for profile image updates
+// const handleProfileImageUpdate = (event) => {
+//   if (event.detail && Object.prototype.hasOwnProperty.call(event.detail, 'profileImage')) {
+//     user.value.avatar = event.detail.profileImage;
+//   }
+// }
+
+// Listen for user name updates
+// const handleUserNameUpdate = (event) => {
+//   if (event.detail && (event.detail.fullName || event.detail.name)) {
+//     user.value.name = event.detail.fullName || event.detail.name;
+//   }
+// }
+
+// Handle all profile updates
+const handleProfileUpdate = () => {
+  // Reload all user data to ensure consistency
+  loadUserData();
+}
 
 // Languages
 const availableLanguages = ref([
@@ -311,38 +376,8 @@ const availableLanguages = ref([
   { code: 'zh', name: '中文', flag: '🇨🇳' },
 ])
 
-// Notifications
-const notifications = ref([
-  {
-    id: 1,
-    title: 'New Message',
-    message: 'You have received a new message from Emily Johnson',
-    time: new Date(Date.now() - 1000 * 60 * 5),
-    read: false,
-    type: 'message'
-  },
-  {
-    id: 2,
-    title: 'Meeting Reminder',
-    message: 'Your meeting with Design Team starts in 30 minutes',
-    time: new Date(Date.now() - 1000 * 60 * 25),
-    read: false,
-    type: 'calendar'
-  },
-  {
-    id: 3,
-    title: 'Task Completed',
-    message: 'Michael Chen has completed the homepage design task',
-    time: new Date(Date.now() - 1000 * 60 * 60 * 2),
-    read: true,
-    type: 'task'
-  }
-])
-
-// Computed
-const unreadCount = computed(() => {
-  return notifications.value.filter(n => !n.read).length
-})
+// Import notification service
+import notificationService, { notifications, unreadCount } from '@/services/notificationService.js'
 
 // Translation function
 const translations = {
@@ -396,17 +431,69 @@ const changeLanguage = (code) => {
   showLanguageMenu.value = false
 }
 
-const readNotification = (notification) => {
-  notification.read = true
-}
+// const readNotification = (notification) => {
+//   notificationService.markAsRead(notification.id)
+// }
 
 const markAllAsRead = () => {
-  notifications.value.forEach(n => n.read = true)
+  notificationService.markAllAsRead()
 }
 
 const viewAllNotifications = () => {
   showNotificationMenu.value = false
-  console.log('Navigate to notifications page')
+  router.push('/notification')
+}
+
+const goToNotificationPage = (notification) => {
+  // Mark notification as read
+  notificationService.markAsRead(notification.id)
+  
+  // Close dropdown
+  showNotificationMenu.value = false
+  
+  // Navigate to notification page
+  router.push('/notification').then(() => {
+    // Wait for the page to load, then scroll to Recent Notifications section
+    setTimeout(() => {
+      const recentNotificationsSection = document.getElementById('recent-notifications');
+      if (recentNotificationsSection) {
+        // Scroll to the Recent Notifications section
+        recentNotificationsSection.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+        
+        // Add a subtle highlight effect to show which section we scrolled to
+        recentNotificationsSection.style.transition = 'box-shadow 0.3s ease';
+        recentNotificationsSection.style.boxShadow = '0 0 20px rgba(12, 156, 141, 0.4)';
+        
+        // Remove highlight after 3 seconds
+        setTimeout(() => {
+          recentNotificationsSection.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
+        }, 3000);
+      } else {
+        console.warn('Recent notifications section not found');
+      }
+    }, 500); // Increased timeout to 500ms to ensure page is fully loaded
+  }).catch(err => {
+    console.error('Navigation error:', err)
+  })
+}
+
+const deleteNotification = (notification, event) => {
+  // Stop event propagation to prevent triggering the notification click
+  if (event) {
+    event.stopPropagation();
+    event.preventDefault();
+  }
+  
+  // Delete notification using the service
+  notificationService.deleteNotification(notification.id)
+  
+  console.log(`✅ Deleted notification: ${notification.title}`)
+  
+  // Optional: Show a subtle success feedback (you can remove this if not needed)
+  // Could add a toast notification here if you have a toast system
 }
 
 const navigateTo = (path) => {
@@ -446,8 +533,14 @@ const logout = async () => {
 const getNotificationIcon = (type) => {
   const icons = {
     message: MessageSquare,
-    calendar: Calendar, 
-    task: CheckCircle
+    team_chat: MessageSquare,
+    calendar: Calendar,
+    meeting: Calendar,
+    reminder: Bell,
+    task: CheckCircle,
+    project: Folder,
+    billing: CreditCard,
+    payment: DollarSign
   }
   return icons[type] || Bell
 }
@@ -481,10 +574,15 @@ const handleClickOutside = (event) => {
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
+  loadUserData()
+  window.addEventListener('profileImageUpdated', handleProfileUpdate)
+  window.addEventListener('userNameUpdated', handleProfileUpdate)
 })
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
+  window.removeEventListener('profileImageUpdated', handleProfileUpdate)
+  window.removeEventListener('userNameUpdated', handleProfileUpdate)
 })
 </script>
 
@@ -713,6 +811,21 @@ onUnmounted(() => {
   object-fit: cover;
 }
 
+.user-avatar.default-avatar {
+  background-color: #f9fafb;
+  border-color: #e5e7eb;
+}
+
+.default-avatar-icon {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  background-color: #f9fafb;
+}
+
 .status-indicator {
   position: absolute;
   bottom: 2px;
@@ -813,6 +926,15 @@ onUnmounted(() => {
   border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
+.default-profile-icon {
+  background-color: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.7);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
 .user-details h3 {
   color: white;
   margin: 0;
@@ -874,17 +996,11 @@ onUnmounted(() => {
 
 /* Notification Items */
 .notification-item {
-  width: 100%;
-  background: none;
-  border: none;
-  padding: 16px 20px;
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.2s;
   display: flex;
   align-items: flex-start;
-  gap: 12px;
   border-bottom: 1px solid #f1f5f9;
+  transition: all 0.2s;
+  position: relative;
 }
 
 .notification-item:hover {
@@ -894,6 +1010,41 @@ onUnmounted(() => {
 .notification-item.unread {
   background: rgba(6, 78, 71, 0.02);
   border-left: 3px solid #064E47;
+}
+
+.notification-content-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 16px 20px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.notification-content-btn:hover {
+  background: transparent;
+}
+
+.notification-delete-btn {
+  background: none;
+  border: none;
+  padding: 16px 12px;
+  cursor: pointer;
+  color: #94a3b8;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notification-delete-btn:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
 }
 
 .notification-icon {

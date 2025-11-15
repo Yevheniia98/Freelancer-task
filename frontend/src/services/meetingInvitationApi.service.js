@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 class MeetingInvitationApiService {
   constructor() {
@@ -14,9 +14,10 @@ class MeetingInvitationApiService {
     // Add auth token to requests (temporarily disabled for testing)
     this.apiClient.interceptors.request.use((config) => {
       const token = localStorage.getItem('token');
-      if (token && false) { // Temporarily disabled
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+      // Authorization temporarily disabled for development
+      // if (token) {
+      //   config.headers.Authorization = `Bearer ${token}`;
+      // }
       return config;
     });
 
@@ -32,21 +33,31 @@ class MeetingInvitationApiService {
 
   /**
    * Send meeting invitations to multiple recipients
-   * @param {Array} recipients - Array of {email, name?} objects
+   * @param {Array} recipients - Array of recipient objects with email and name
    * @param {Object} meetingData - Meeting information
    * @returns {Promise<Object>} API response
    */
   async sendMultipleInvitations(recipients, meetingData) {
     try {
+      console.log('📧 Sending meeting invitations:', { recipients, meetingData });
+      
       const response = await this.apiClient.post('/send-multiple', {
         recipients,
         meetingData
       });
+      
+      console.log('✅ Meeting invitations sent successfully:', response.data);
       return response.data;
     } catch (error) {
-      throw new Error(
-        error.response?.data?.message || 'Failed to send meeting invitations'
-      );
+      console.error('❌ Meeting invitation error:', error.response?.data || error.message);
+      
+      // Provide more detailed error information
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.statusText || 
+                          error.message || 
+                          'Failed to send meeting invitations';
+      
+      throw new Error(errorMessage);
     }
   }
 

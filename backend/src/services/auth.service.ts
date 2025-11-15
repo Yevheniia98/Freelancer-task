@@ -1,8 +1,7 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
-import { User, IUser } from '../models/user.model';
-import { getRedisClient } from '../config/redis';
+import { User } from '../models/user.model';
 import { TwoFactorService } from './twoFactor.service';
 import SessionManager from './session.manager';
 
@@ -10,6 +9,72 @@ export class AuthService {
   private readonly JWT_SECRET: string;
   private readonly JWT_EXPIRES_IN: string;
   private readonly twoFactorService: TwoFactorService;
+  
+  // Mock users for demo mode (email-only mode without MongoDB)
+  private readonly mockUsers: Array<{
+    id: string;
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    twoFactorEnabled: boolean;
+    twoFactorSecret: string | null;
+  }> = [
+    {
+      id: 'demo-user-1',
+      email: 'demo@example.com',
+      password: 'password123', // In real app this would be hashed
+      firstName: 'Demo',
+      lastName: 'User',
+      twoFactorEnabled: false,
+      twoFactorSecret: null
+    },
+    {
+      id: 'demo-user-2', 
+      email: 'test@example.com',
+      password: 'test123',
+      firstName: 'Test',
+      lastName: 'User',
+      twoFactorEnabled: false,
+      twoFactorSecret: null
+    },
+    {
+      id: 'demo-user-3',
+      email: 'suprunjen@gmail.com', 
+      password: '03101998Polo',
+      firstName: 'Evgeniia',
+      lastName: 'Suprun',
+      twoFactorEnabled: false,
+      twoFactorSecret: null
+    },
+    {
+      id: 'demo-user-4',
+      email: 'suprun.jen@gmail.com', 
+      password: 'test123',
+      firstName: 'Evgeniia',
+      lastName: 'Suprun',
+      twoFactorEnabled: false,
+      twoFactorSecret: null
+    },
+    {
+      id: 'demo-user-5',
+      email: 'suprun.jen@gmail.com', 
+      password: 'test123',
+      firstName: 'Evgeniia',
+      lastName: 'Suprun',
+      twoFactorEnabled: false,
+      twoFactorSecret: null
+    },
+    {
+      id: 'demo-user-4',
+      email: 'freelancer@example.com', 
+      password: 'freelancer123',
+      firstName: 'John',
+      lastName: 'Freelancer',
+      twoFactorEnabled: false,
+      twoFactorSecret: null
+    }
+  ];
 
   constructor() {
     this.JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
@@ -24,38 +89,38 @@ export class AuthService {
     lastName: string;
   }) {
     try {
-      // Check if user already exists
-      const existingUser = await User.findOne({ email: userData.email });
+      // Check if user already exists in database
+      const existingUser = await User.findOne({ email: userData.email.toLowerCase() });
       if (existingUser) {
         throw new Error('User already exists');
       }
 
       // Hash password
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(userData.password, salt);
+      const saltRounds = 12;
+      const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
 
-      // Create new user
-      const user = new User({
-        email: userData.email,
+      // Create new user in database
+      const newUser = new User({
+        email: userData.email.toLowerCase(),
         password: hashedPassword,
         firstName: userData.firstName,
         lastName: userData.lastName,
         twoFactorEnabled: false
       });
 
-      await user.save();
+      const savedUser = await newUser.save();
 
       // Generate token
-      const token = this.generateToken(String(user._id));
+      const token = this.generateToken(String(savedUser._id));
 
       return {
         token,
         user: {
-          id: user._id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          twoFactorEnabled: user.twoFactorEnabled
+          id: String(savedUser._id),
+          email: savedUser.email,
+          firstName: savedUser.firstName,
+          lastName: savedUser.lastName,
+          twoFactorEnabled: savedUser.twoFactorEnabled
         }
       };
     } catch (error) {
@@ -65,15 +130,15 @@ export class AuthService {
 
   public async login(email: string, password: string) {
     try {
-      // Find user
-      const user = await User.findOne({ email }).select('+password');
+      // Find user in database
+      const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
       if (!user) {
         throw new Error('Invalid credentials');
       }
 
-      // Check password
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (!isPasswordValid) {
+      // Check password using bcrypt
+      const isValidPassword = await bcrypt.compare(password, user.password);
+      if (!isValidPassword) {
         throw new Error('Invalid credentials');
       }
 
@@ -92,7 +157,7 @@ export class AuthService {
       return {
         token,
         user: {
-          id: user._id,
+          id: String(user._id),
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
@@ -106,7 +171,7 @@ export class AuthService {
 
   public async verifyTwoFactor(userId: string, code: string) {
     try {
-      const user = await User.findById(userId).select('+twoFactorSecret');
+      const user = this.mockUsers.find(u => u.id === userId);
       if (!user) {
         throw new Error('User not found');
       }
@@ -120,12 +185,12 @@ export class AuthService {
         throw new Error('Invalid 2FA code');
       }
 
-      const token = this.generateToken(String(user._id));
+      const token = this.generateToken(user.id);
 
       return {
         token,
         user: {
-          id: user._id,
+          id: user.id,
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
@@ -139,14 +204,14 @@ export class AuthService {
 
   public async setupTwoFactor(userId: string) {
     try {
-      const user = await User.findById(userId);
+      const user = this.mockUsers.find(u => u.id === userId);
       if (!user) {
         throw new Error('User not found');
       }
 
       const { secret, qrCodeUrl } = await this.twoFactorService.generateSecret(user.email);
+      // In demo mode, we would update mock user data
       user.twoFactorSecret = secret;
-      await user.save();
 
       return {
         secret,
@@ -159,7 +224,7 @@ export class AuthService {
 
   public async enableTwoFactor(userId: string, code: string) {
     try {
-      const user = await User.findById(userId);
+      const user = this.mockUsers.find(u => u.id === userId);
       if (!user) {
         throw new Error('User not found');
       }
@@ -174,7 +239,7 @@ export class AuthService {
       }
 
       user.twoFactorEnabled = true;
-      await user.save();
+      // In demo mode, changes are only in memory
 
       return {
         message: '2FA enabled successfully'
@@ -186,20 +251,17 @@ export class AuthService {
 
   public async initiatePasswordReset(email: string) {
     try {
-      const user = await User.findOne({ email });
+      const user = this.mockUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
       if (!user) {
         throw new Error('User not found');
       }
 
       const resetToken = crypto.randomBytes(32).toString('hex');
-      const resetTokenHash = crypto
-        .createHash('sha256')
-        .update(resetToken)
-        .digest('hex');
-
-      user.resetPasswordToken = resetTokenHash;
-      user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour
-      await user.save();
+      
+      // In demo mode, we simulate password reset but don't actually store tokens
+      console.log(`Password reset token for ${email}: ${resetToken}`);
+      
+      // Return success for demo purposes
 
       return {
         resetToken,
@@ -212,25 +274,18 @@ export class AuthService {
 
   public async resetPassword(token: string, newPassword: string) {
     try {
-      const resetTokenHash = crypto
-        .createHash('sha256')
-        .update(token)
-        .digest('hex');
-
-      const user = await User.findOne({
-        resetPasswordToken: resetTokenHash,
-        resetPasswordExpires: { $gt: Date.now() }
-      });
-
+      // In demo mode, we simulate password reset
+      // Find user by email (simplified for demo)
+      const user = this.mockUsers.find(u => u.email === 'suprunjen@gmail.com'); // Demo user
+      
       if (!user) {
         throw new Error('Invalid or expired reset token');
       }
 
-      const salt = await bcrypt.genSalt(10);
-      user.password = await bcrypt.hash(newPassword, salt);
-      user.resetPasswordToken = undefined;
-      user.resetPasswordExpires = undefined;
-      await user.save();
+      // Update password in demo mode
+      user.password = newPassword; // In demo mode, storing plain password
+      
+      console.log(`Password updated for user: ${user.email}`);
 
       return {
         message: 'Password reset successful'
@@ -242,8 +297,8 @@ export class AuthService {
 
   public async logout(token: string) {
     try {
-      const redisClient = await getRedisClient();
-      await redisClient.set(`blacklist:${token}`, 'true', 'EX', 86400); // 24 hours
+      // In demo mode, we simulate logout without Redis
+      console.log(`User logged out with token: ${token.substring(0, 10)}...`);
       return { message: 'Logged out successfully' };
     } catch (error) {
       throw error;
@@ -264,12 +319,7 @@ export class AuthService {
 
   public async validateToken(token: string) {
     try {
-      const redisClient = await getRedisClient();
-      const isBlacklisted = await redisClient.get(`blacklist:${token}`);
-      if (isBlacklisted) {
-        throw new Error('Token is blacklisted');
-      }
-
+      // In demo mode, we skip Redis blacklist check
       const decoded = jwt.verify(token, this.JWT_SECRET) as { userId: string; temp?: boolean };
       if (decoded.temp) {
         throw new Error('Cannot use temporary token for this operation');

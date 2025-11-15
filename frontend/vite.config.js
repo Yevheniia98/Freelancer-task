@@ -10,13 +10,29 @@ export default defineConfig({
     }
   },
   server: {
-    port: 3001,
+    port: 3030,
     strictPort: true, // Don't automatically try other ports
-    host: '0.0.0.0', // Allow external connections
+    host: 'localhost', // Use localhost instead of 0.0.0.0 to fix ping issues
+    cors: true,
+    hmr: {
+      port: 3030,
+      host: 'localhost'
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:3002',
-        changeOrigin: true
+        changeOrigin: true,
+        secure: false
+      },
+      '/upload': {
+        target: 'http://localhost:3002',
+        changeOrigin: true,
+        secure: false
+      },
+      '/uploads': {
+        target: 'http://localhost:3002',
+        changeOrigin: true,
+        secure: false
       }
     }
   },

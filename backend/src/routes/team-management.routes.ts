@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { TeamManagementController } from '../controllers/team-management.controller';
-import { authenticateToken } from '../middleware/auth.middleware';
+import { authenticate } from '../middleware/auth.middleware';
 import rateLimit from 'express-rate-limit';
 
 const router = Router();
@@ -37,7 +37,7 @@ const acceptRateLimit = rateLimit({
  * @access Private
  * @body { inviteEmail: string, inviteeName: string }
  */
-router.post('/invite', inviteRateLimit, authenticateToken, TeamManagementController.sendInvitation);
+router.post('/invite', inviteRateLimit, authenticate, TeamManagementController.sendInvitation);
 
 /**
  * @route POST /api/team/accept
@@ -47,7 +47,7 @@ router.post('/invite', inviteRateLimit, authenticateToken, TeamManagementControl
  */
 router.post('/accept', acceptRateLimit, (req, res, next) => {
   // Try to authenticate, but don't require it
-  authenticateToken(req, res, (error) => {
+  authenticate(req, res, (error: any) => {
     // Continue regardless of auth status
     next();
   });
@@ -58,21 +58,21 @@ router.post('/accept', acceptRateLimit, (req, res, next) => {
  * @desc Get team members and pending invitations
  * @access Private
  */
-router.get('/members', authenticateToken, TeamManagementController.getTeamMembers);
+router.get('/members', authenticate, TeamManagementController.getTeamMembers);
 
 /**
  * @route DELETE /api/team/members/:memberId
  * @desc Remove team member
  * @access Private
  */
-router.delete('/members/:memberId', authenticateToken, TeamManagementController.removeMember);
+router.delete('/members/:memberId', authenticate, TeamManagementController.removeMember);
 
 /**
  * @route DELETE /api/team/invitations/:invitationId
  * @desc Cancel pending invitation
  * @access Private
  */
-router.delete('/invitations/:invitationId', authenticateToken, TeamManagementController.cancelInvitation);
+router.delete('/invitations/:invitationId', authenticate, TeamManagementController.cancelInvitation);
 
 /**
  * @route GET /api/team/invitation/:token

@@ -100,7 +100,7 @@ export class TeamManagementController {
 
       // Generate token with invitation ID
       const tokenPayload = {
-        invitationId: savedInvitation._id.toString(),
+        invitationId: (savedInvitation._id as any).toString(),
         inviteEmail: inviteEmail.toLowerCase(),
         inviterId: inviter.id,
         inviterName: inviter.fullName,
@@ -135,7 +135,7 @@ export class TeamManagementController {
         success: true,
         message: 'Invitation sent successfully',
         data: {
-          invitationId: savedInvitation._id.toString(),
+          invitationId: (savedInvitation._id as any).toString(),
           inviteEmail: savedInvitation.inviteEmail,
           inviteeName: savedInvitation.inviteeName,
           expiresAt: savedInvitation.expiresAt,
@@ -265,7 +265,7 @@ export class TeamManagementController {
         success: true,
         message: 'Invitation accepted successfully',
         data: {
-          teamMemberId: teamMember._id.toString(),
+          teamMemberId: (teamMember._id as any).toString(),
           ownerId: teamMember.ownerId.toString(),
           role: teamMember.role,
           hasProjectAccess: teamMember.hasProjectAccess,
@@ -331,7 +331,7 @@ export class TeamManagementController {
       }
 
       const members = teamMembers.map(tm => ({
-        id: tm._id.toString(),
+        id: (tm._id as any).toString(),
         memberId: tm.memberId._id.toString(),
         memberName: (tm.memberId as any).fullName,
         memberEmail: (tm.memberId as any).email,
@@ -344,7 +344,7 @@ export class TeamManagementController {
       }));
 
       const invitations = validInvitations.map(inv => ({
-        id: inv._id.toString(),
+        id: (inv._id as any).toString(),
         inviteEmail: inv.inviteEmail,
         inviteeName: inv.inviteeName,
         status: inv.status,

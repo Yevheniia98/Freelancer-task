@@ -2,10 +2,10 @@
   <div>
     <HeaderSection :hide-get-started="true" />
   
-    <div class="container">
-      <div class="form-container">
+    <div class="main-container">
+      <div class="form-card">
         <h1>Forgot Your Password?</h1>
-        <p>Enter your email address and we'll send you a verification code to reset your password.</p>
+        <p class="subtitle">Enter your email address and we'll send you a verification code to reset your password.</p>
           
         <form @submit.prevent="submitForm">
           <!-- Error Messages -->
@@ -24,18 +24,22 @@
             {{ successMessage }}
           </div>
 
-          <label>Enter your email address</label>
-          <input
-            v-model="email"
-            type="email"
-            placeholder="Enter your email address"
-            :disabled="isLoading"
-            autocomplete="email"
-            required
-          />
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input
+              id="email"
+              v-model="email"
+              type="email"
+              placeholder="Enter your email address"
+              :disabled="isLoading"
+              autocomplete="email"
+              required
+            />
+          </div>
   
           <button 
             type="submit" 
+            class="submit-btn"
             :disabled="isLoading || !email"
           >
             <span v-if="isLoading">Sending...</span>
@@ -49,13 +53,6 @@
             Back to Login
           </router-link>
         </p>
-      </div>
-  
-      <div class="image-container">
-        <img
-          src="/sign.png"
-          alt="Forgot password illustration"
-        />
       </div>
     </div>
   
@@ -129,9 +126,7 @@ export default {
         }
 
       } catch (error) {
-        console.error('Forgot password error:', error);
-        console.error('Error response:', error.response);
-        console.error('Error data:', error.response?.data);
+        console.error('Forgot password error:', error.message || error);
         
         // Handle API errors
         if (error.errors && Array.isArray(error.errors)) {
@@ -158,35 +153,45 @@ export default {
 </script>
   
 <style scoped>
-.container {
+* {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
+
+.main-container {
+  min-height: calc(100vh - 140px);
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  gap: 50px;
-  margin-left: 100px;
-  margin-right: 100px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
 }
 
-.form-container {
-  width: 500px;
-  height: auto;
-  padding: 0px;
+.form-card {
+  background: white;
+  padding: 48px;
+  border-radius: 24px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05), 0 10px 25px -5px rgba(0, 0, 0, 0.04);
+  width: 100%;
+  max-width: 420px;
+  border: 1px solid rgba(229, 231, 235, 0.8);
 }
 
 h1 {
-  margin-top: 100px;
-  font-size: 24px;
-  color: #000;
-  text-align: left;
-  font-weight: 600;
+  color: #111827;
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 12px;
+  letter-spacing: -0.025em;
 }
 
-p {
+.subtitle {
+  color: #6b7280;
   font-size: 16px;
-  color: #555;
-  text-align: left;
-  margin-bottom: 30px;
+  line-height: 1.6;
+  text-align: center;
+  margin-bottom: 32px;
+  font-weight: 400;
 }
 
 form {
@@ -194,54 +199,93 @@ form {
   flex-direction: column;
 }
 
+.form-group {
+  margin-bottom: 24px;
+}
+
 label {
-  font-size: 16px;
-  margin-top: 10px;
-  text-align: left;
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
 }
 
 input {
-  padding: 10px;
-  margin-top: 0px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
   width: 100%;
-}
-
-button {
-  margin-top: 30px;
-  padding: 10px;
-  border: none;
-  background-color: #007b5e;
-  color: white;
+  padding: 16px 18px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
   font-size: 16px;
-  border-radius: 5px;
-  cursor: pointer;
-  width: 100%;
-  transition: background-color 0.3s ease;
+  color: #111827;
+  background-color: #ffffff;
+  transition: all 0.2s ease;
+  outline: none;
+  box-sizing: border-box;
 }
 
-button:hover:not(:disabled) {
-  background-color: #005f47;
+input:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.08);
 }
 
-button:disabled {
-  background-color: #cccccc;
+input:disabled {
+  background-color: #f9fafb;
+  color: #9ca3af;
   cursor: not-allowed;
+}
+
+input::placeholder {
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 8px;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25);
+  transform: translateY(-1px);
+}
+
+.submit-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+}
+
+.submit-btn:disabled {
+  background: #d1d5db;
+  color: #9ca3af;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 /* Error and Success Messages */
 .error-messages {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   animation: slideIn 0.3s ease-out;
 }
 
 .error-message {
   background-color: #fef2f2;
   color: #dc2626;
-  padding: 12px 16px;
-  border-radius: 8px;
+  padding: 14px 16px;
+  border-radius: 12px;
   border: 1px solid #fecaca;
   border-left: 4px solid #dc2626;
   margin-bottom: 8px;
@@ -268,35 +312,66 @@ button:disabled {
 }
 
 .success-message {
-  background-color: #f0fff4;
-  color: #38a169;
-  padding: 12px 16px;
-  border-radius: 8px;
-  border-left: 4px solid #48bb78;
-  margin-bottom: 15px;
+  background-color: #f0fdf4;
+  color: #166534;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid #bbf7d0;
+  border-left: 4px solid #16a34a;
+  margin-bottom: 20px;
   font-size: 14px;
   font-weight: 500;
+  animation: slideIn 0.3s ease-out;
 }
 
 .back-to-login {
-  margin-top: 20px;
-  font-size: 16px;
+  margin-top: 24px;
+  font-size: 15px;
   text-align: center;
+  color: #6b7280;
+  font-weight: 400;
 }
 
 .back-to-login a {
-  color: #007b5e;
+  color: #10b981;
   text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
 }
 
 .back-to-login a:hover {
+  color: #059669;
   text-decoration: underline;
 }
 
-.image-container img {
-  border-radius: 10px;
-  height: 600px;
-  width: auto;
-  margin-top: 80px;
+/* Responsive design */
+@media (max-width: 768px) {
+  .main-container {
+    padding: 16px;
+    min-height: calc(100vh - 120px);
+  }
+  
+  .form-card {
+    padding: 32px 24px;
+    border-radius: 16px;
+  }
+  
+  h1 {
+    font-size: 28px;
+  }
+  
+  .subtitle {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-card {
+    padding: 24px 20px;
+  }
+  
+  h1 {
+    font-size: 24px;
+  }
 }
 </style>

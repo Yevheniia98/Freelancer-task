@@ -181,208 +181,151 @@
 
     <!-- Middle Column - Create Reminder -->
     <div class="reminder-create">
-      <!-- User Info -->
-      <div class="user-info d-flex align-center mb-4">
-        <v-avatar
-          size="40"
-          class="mr-3"
-        >
-          <v-img :src="userAvatar" />
-        </v-avatar>
-        <span class="user-name text-h6">{{ userName }} (You)</span>
+      <!-- User Info Box -->
+      <div class="user-info-box">
+        <div class="user-info d-flex align-center">
+          <v-avatar
+            size="48"
+            class="mr-3"
+            :class="{ 'default-user-avatar': !userAvatar }"
+          >
+            <v-img
+              v-if="userAvatar"
+              :src="userAvatar"
+            />
+            <div 
+              v-else 
+              class="default-user-icon"
+            >
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+                <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
+              </svg>
+            </div>
+          </v-avatar>
+          <span class="user-name text-h6 font-weight-medium">{{ userName }}</span>
+        </div>
       </div>
 
-      <!-- Event Type Selection -->
-      <div class="event-type-toggle mb-4">
+      <!-- Event Type Selection Box -->
+      <div class="event-type-box">
         <v-btn-toggle
           v-model="eventType"
           mandatory
-          rounded="pill"
-          density="comfortable"
-          color="primary"
-          class="mb-4"
+          class="event-type-buttons"
+          color="teal"
         >
           <v-btn
             value="event"
-            variant="text"
-            class="event-btn"
+            class="event-type-btn"
+            :class="{ 'active': eventType === 'event' }"
           >
-            <v-icon left size="small">mdi-calendar</v-icon>
             Event
           </v-btn>
           <v-btn
             value="task"
-            variant="text"
-            class="event-btn"
+            class="event-type-btn"
+            :class="{ 'active': eventType === 'task' }"
           >
-            <v-icon left size="small">mdi-clipboard-check</v-icon>
             Task
           </v-btn>
           <v-btn
             value="meet"
-            variant="text"
-            class="event-btn"
+            class="event-type-btn"
+            :class="{ 'active': eventType === 'meet' }"
           >
-            <v-icon left size="small">mdi-video</v-icon>
             Meet
           </v-btn>
         </v-btn-toggle>
       </div>
 
-      <!-- Title Input -->
-      <v-text-field
-        v-model="newEvent.title"
-        placeholder="Add title"
-        variant="outlined"
-        density="comfortable"
-        hide-details
-        class="title-input mb-4"
-        prepend-inner-icon="mdi-format-title"
-      />
+      <!-- Title Input Box -->
+      <div class="input-box title-box">
+        <input
+          v-model="newEvent.title"
+          placeholder="Add title"
+          class="title-input"
+        />
+      </div>
 
-      <!-- Enhanced Date and Time Section -->
-      <v-card
-        class="reminder-section mb-4 elevation-4"
-        style="border-radius: 15px; background: linear-gradient(145deg, #f8f9ff 0%, #e3f2fd 100%);"
-      >
-        <v-card-title class="pa-4 pb-2">
-          <div class="d-flex align-center">
-            <v-icon
-              color="primary"
-              class="mr-3"
-              size="24"
-            >
-              mdi-calendar-clock
-            </v-icon>
-            <span class="text-h6 font-weight-medium text-primary">Schedule & Timing</span>
-          </div>
-        </v-card-title>
-        
-        <v-card-text class="pa-4 pt-2">
+      <!-- Description Box -->
+      <div class="input-box description-box">
+        <textarea
+          v-model="newEvent.description"
+          placeholder="Add description"
+          class="description-input"
+          rows="3"
+          @input="autoResize"
+          ref="descriptionTextarea"
+        ></textarea>
+        <div class="description-resize-indicator">
+          <v-icon size="small" color="grey">mdi-resize-bottom-right</v-icon>
+        </div>
+      </div>
 
-          <!-- Enhanced Date Selection -->
-          <div class="date-section mb-4">
-            <div class="input-label-enhanced d-flex align-center mb-2">
-              <v-icon size="small" color="primary" class="mr-2">mdi-calendar</v-icon>
-              <span class="font-weight-medium">Date</span>
-            </div>
-            <v-menu
-              v-model="dateMenu"
-              :close-on-content-click="false"
-              transition="scale-transition"
-              location="bottom"
-            >
-              <template #activator="{ props }">
-                <v-text-field
-                  v-model="formattedDate"
-                  density="comfortable"
-                  variant="outlined"
-                  readonly
-                  hide-details
-                  v-bind="props"
-                  prepend-inner-icon="mdi-calendar"
-                  style="border-radius: 12px;"
-                  color="primary"
-                />
-              </template>
-              <v-date-picker
-                v-model="newEvent.date"
-                @update:model-value="dateMenu = false"
+      <!-- Date and Time Section -->
+      <div class="input-box datetime-box">
+        <div class="datetime-header">
+          <v-icon class="datetime-icon">mdi-clock-outline</v-icon>
+          <span class="datetime-title">Date and time</span>
+        </div>
+
+        <!-- Date Selection Row -->
+        <div class="datetime-row">
+          <span class="datetime-label">On</span>
+          <v-menu
+            v-model="dateMenu"
+            :close-on-content-click="false"
+            transition="scale-transition"
+            location="bottom"
+          >
+            <template #activator="{ props }">
+              <input
+                :value="formattedDate || 'Select the day'"
+                readonly
+                class="datetime-input"
+                v-bind="props"
+                placeholder="Select the day"
               />
-            </v-menu>
-          </div>
+            </template>
+            <v-date-picker
+              v-model="newEvent.date"
+              @update:model-value="dateMenu = false"
+            />
+          </v-menu>
+        </div>
 
-          <!-- Enhanced Time Section -->
-          <div class="time-section">
-            <div class="time-inputs-container d-flex gap-3">
-              <!-- Time From -->
-              <div class="time-input-group flex-1">
-                <div class="input-label-enhanced d-flex align-center mb-2">
-                  <v-icon size="small" color="success" class="mr-2">mdi-clock-start</v-icon>
-                  <span class="font-weight-medium">From</span>
-                </div>
-                <v-menu
-                  v-model="timeFromMenu"
-                  :close-on-content-click="false"
-                  transition="scale-transition"
-                  location="bottom"
-                >
-                  <template #activator="{ props }">
-                    <v-text-field
-                      v-model="formattedTimeFrom"
-                      density="comfortable"
-                      variant="outlined"
-                      readonly
-                      hide-details
-                      v-bind="props"
-                      prepend-inner-icon="mdi-clock-outline"
-                      style="border-radius: 12px;"
-                      color="success"
-                    />
-                  </template>
-                  <v-time-picker
-                    v-model="newEvent.timeFrom"
-                    @update:model-value="timeFromMenu = false"
-                  />
-                </v-menu>
-              </div>
+        <!-- Time From Row -->
+        <div class="datetime-row">
+          <span class="datetime-label">From</span>
+          <input
+            v-model="newEvent.timeFrom"
+            type="time"
+            class="datetime-input time-input"
+            placeholder="09:00"
+          />
+        </div>
 
-              <!-- Time To -->
-              <div class="time-input-group flex-1">
-                <div class="input-label-enhanced d-flex align-center mb-2">
-                  <v-icon size="small" color="error" class="mr-2">mdi-clock-end</v-icon>
-                  <span class="font-weight-medium">To</span>
-                </div>
-                <v-menu
-                  v-model="timeToMenu"
-                  :close-on-content-click="false"
-                  transition="scale-transition"
-                  location="bottom"
-                >
-                  <template #activator="{ props }">
-                    <v-text-field
-                      v-model="formattedTimeTo"
-                      density="comfortable"
-                      variant="outlined"
-                      readonly
-                      hide-details
-                      v-bind="props"
-                      prepend-inner-icon="mdi-clock-outline"
-                      style="border-radius: 12px;"
-                      color="error"
-                    />
-                  </template>
-                  <v-time-picker
-                    v-model="newEvent.timeTo"
-                    @update:model-value="timeToMenu = false"
-                  />
-                </v-menu>
-              </div>
-            </div>
-          </div>
-        </v-card-text>
-      </v-card>
+        <!-- Time To Row -->
+        <div class="datetime-row">
+          <span class="datetime-label">To</span>
+          <input
+            v-model="newEvent.timeTo"
+            type="time"
+            class="datetime-input time-input"
+            placeholder="10:00"
+          />
+        </div>
+      </div>
 
-      <!-- Enhanced People Section -->
-      <v-card
+      <!-- Add People Section -->
+      <div 
         v-if="eventType !== 'task'"
-        class="reminder-section mb-4 elevation-4"
-        style="border-radius: 15px; background: linear-gradient(145deg, #fff3e0 0%, #ffecb3 100%);"
+        class="input-box people-box"
       >
-        <v-card-title class="pa-4 pb-2">
-          <div class="d-flex align-center">
-            <v-icon
-              color="orange-darken-1"
-              class="mr-3"
-              size="24"
-            >
-              mdi-account-multiple-plus
-            </v-icon>
-            <span class="text-h6 font-weight-medium text-orange-darken-1">Invite Participants</span>
-          </div>
-        </v-card-title>
-        
-        <v-card-text class="pa-4 pt-2">
+        <div class="people-header">
+          <v-icon class="people-icon">mdi-account-multiple-plus</v-icon>
+          <span class="people-title">Add people</span>
+        </div>
 
         <!-- Invitation Type Toggle -->
         <div class="invitation-type-toggle mb-3">
@@ -572,29 +515,17 @@
             </span>
           </div>
         </div>
-        </v-card-text>
-      </v-card>
+      </div>
 
-      <!-- Enhanced Meeting Link Section -->
-      <v-card
+      <!-- Add Meeting Link Section -->
+      <div 
         v-if="eventType !== 'task'"
-        class="reminder-section mb-4 elevation-4"
-        style="border-radius: 15px; background: linear-gradient(145deg, #e8f5e8 0%, #c8e6c9 100%);"
+        class="input-box meeting-link-box"
       >
-        <v-card-title class="pa-4 pb-2">
-          <div class="d-flex align-center">
-            <v-icon
-              color="green-darken-1"
-              class="mr-3"
-              size="24"
-            >
-              mdi-video-plus
-            </v-icon>
-            <span class="text-h6 font-weight-medium text-green-darken-1">Meeting Platform</span>
-          </div>
-        </v-card-title>
-        
-        <v-card-text class="pa-4 pt-2">
+        <div class="meeting-link-header">
+          <v-icon class="meeting-link-icon">mdi-link</v-icon>
+          <span class="meeting-link-title">Add meeting link</span>
+        </div>
 
           <!-- Enhanced Platform Selection -->
           <div class="platform-selection-enhanced mb-4">
@@ -718,123 +649,54 @@
             </template>
           </v-text-field>
         </div>
-        </v-card-text>
-      </v-card>
-
-      <!-- Description Section (New) -->
-      <v-card
-        class="reminder-section mb-4"
-        variant="outlined"
-      >
-        <div class="d-flex align-center px-3 py-2">
-          <v-icon
-            size="small"
-            class="mr-2"
-          >
-            mdi-text-box-outline
-          </v-icon>
-          <v-textarea
-            v-model="newEvent.description"
-            placeholder="Add description"
-            variant="plain"
-            density="compact"
-            hide-details
-            auto-grow
-            rows="2"
-            class="description-input"
-          />
-        </div>
-      </v-card>
+      </div>
 
       <!-- Repeat Section -->
-      <v-card
-        class="reminder-section"
-        variant="outlined"
-      >
-        <div class="section-header">
-          <v-icon
-            size="small"
-            class="mr-2"
-          >
-            mdi-repeat
-          </v-icon>
-          <span class="section-title">Repeat</span>
+      <div class="input-box repeat-box">
+        <div class="repeat-header">
+          <v-icon class="repeat-icon">mdi-repeat</v-icon>
+          <span class="repeat-title">Repeat</span>
         </div>
 
-        <!-- Repeat Frequency -->
-        <div class="input-row">
-          <div class="input-label">
-            Every
-          </div>
+        <!-- Repeat Frequency Row -->
+        <div class="repeat-row">
+          <span class="repeat-label">Every</span>
           <v-select
             v-model="newEvent.repeatEvery"
             :items="repeatOptions"
             density="compact"
             variant="outlined"
             hide-details
+            class="repeat-select"
           />
         </div>
 
-        <!-- Repeat Days -->
+        <!-- Repeat Days Row -->
         <div
           v-if="newEvent.repeatEvery === 'Weekly'"
-          class="input-row"
+          class="repeat-row days-row"
         >
-          <div class="input-label">
-            On
-          </div>
-          <div class="day-toggles">
+          <span class="repeat-label">On</span>
+          <div class="weekdays-container">
             <v-btn-toggle
               v-model="newEvent.repeatDays"
               multiple
-              density="comfortable"
-              class="day-toggle-group"
+              class="weekdays-toggle"
             >
               <v-btn
                 v-for="day in weekDays" 
                 :key="day.value"
                 :value="day.value"
-                size="x-small"
-                class="day-btn"
-                variant="text"
+                size="small"
+                class="weekday-btn"
+                variant="outlined"
               >
                 {{ day.label }}
               </v-btn>
             </v-btn-toggle>
           </div>
         </div>
-        
-        <!-- End Repeat (New) -->
-        <div
-          v-if="newEvent.repeatEvery !== 'On'"
-          class="input-row"
-        >
-          <div class="input-label">
-            Until
-          </div>
-          <v-menu
-            v-model="endDateMenu"
-            :close-on-content-click="false"
-            transition="scale-transition"
-            location="bottom"
-          >
-            <template #activator="{ props }">
-              <v-text-field
-                v-model="formattedEndDate"
-                density="compact"
-                variant="outlined"
-                readonly
-                hide-details
-                v-bind="props"
-              />
-            </template>
-            <v-date-picker
-              v-model="newEvent.endRepeatDate"
-              @update:model-value="endDateMenu = false"
-            />
-          </v-menu>
-        </div>
-      </v-card>
+      </div>
 
       <!-- Create Button -->
       <v-btn 
@@ -969,9 +831,10 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 // Remove this import since you're defining your own implementation
-// import { isSameDay } from 'vuetify/lib/util/dateTimeUtils' 
+// import { isSameDay } from 'vuetify/lib/util/dateTimeUtils'
+import notificationService from '@/services/notificationService.js'; 
 
 
 // State
@@ -980,7 +843,7 @@ const peopleMenu = ref(false);
 const peopleSearch = ref('');
 const selectedPeople = ref([]);
 const userName = ref('Isabella');
-const userAvatar = ref('https://randomuser.me/api/portraits/women/85.jpg');
+const userAvatar = ref(null);
 
 // Enhanced meeting functionality
 const selectedPlatform = ref('zoom');
@@ -989,6 +852,7 @@ const emailInviteInput = ref('');
 const emailInvitees = ref([]);
 const notifications = ref([]);
 const joiningMeeting = ref(null); // Track which meeting is being joined
+const descriptionTextarea = ref(null); // Reference to description textarea
 
 // For date and time menus
 const dateMenu = ref(false);
@@ -1132,9 +996,9 @@ watch(() => newEvent.value.repeatEvery, (newValue) => {
 
 // Formatted dates for display
 const formattedDate = computed(() => formatDateForDisplay(newEvent.value.date));
-const formattedTimeFrom = computed(() => formatTimeForDisplay(newEvent.value.timeFrom));
-const formattedTimeTo = computed(() => formatTimeForDisplay(newEvent.value.timeTo));
-const formattedEndDate = computed(() => formatDateForDisplay(newEvent.value.endRepeatDate));
+// const formattedTimeFrom = computed(() => formatTimeForDisplay(newEvent.value.timeFrom));
+// const formattedTimeTo = computed(() => formatTimeForDisplay(newEvent.value.timeTo));
+// const formattedEndDate = computed(() => formatDateForDisplay(newEvent.value.endRepeatDate));
 const formattedSelectedDate = computed(() => formatDateForDisplay(newEvent.value.date, { includeDay: true }));
 
 const todayISO = dateToISO(new Date());
@@ -1157,76 +1021,28 @@ const weekDays = [
 
 const repeatOptions = ['On', 'Daily', 'Weekly', 'Monthly', 'Yearly'];
 
-const events = ref([
-  {
-    id: 1,
-    title: 'Meeting with Company',
-    description: 'Quarterly review with stakeholders',
-    date: '2025-09-10',
-    timeFrom: '09:00',
-    timeTo: '10:00',
-    type: 'Live event',
-    platform: 'zoom',
-    meetingLink: 'https://meet.google.com/sic-bhis-jpu',
-    attendees: [
-      { id: 1, name: 'John Smith', avatar: 'https://randomuser.me/api/portraits/men/1.jpg' },
-      { id: 2, name: 'Emma Johnson', avatar: 'https://randomuser.me/api/portraits/women/2.jpg' },
-      { id: 3, name: 'Michael Brown', avatar: 'https://randomuser.me/api/portraits/men/3.jpg' },
-      { id: 4, name: 'Sarah Davis', avatar: 'https://randomuser.me/api/portraits/women/4.jpg' }
-    ],
-    emailInvitees: ['client@company.com'],
-    repeatEvery: 'Monthly',
-    repeatDays: [],
-    endRepeatDate: '2025-10-05',
-    organizer: {
-      name: 'Isabella',
-      avatar: 'https://randomuser.me/api/portraits/women/85.jpg'
-    }
-  },
-  {
-    id: 2,
-    title: 'Project Planning Session',
-    description: 'Weekly planning and sprint review',
-    date: '2025-09-12',
-    timeFrom: '14:00',
-    timeTo: '15:30',
-    type: 'Meeting',
-    platform: 'meet',
-    meetingLink: 'https://meet.google.com/abc-defg-hij',
-    attendees: [
-      { id: 3, name: 'Michael Brown', avatar: 'https://randomuser.me/api/portraits/men/3.jpg' },
-      { id: 5, name: 'David Wilson', avatar: 'https://randomuser.me/api/portraits/men/5.jpg' }
-    ],
-    emailInvitees: ['external@partner.com', 'consultant@agency.com'],
-    repeatEvery: 'Weekly',
-    repeatDays: ['F'],
-    endRepeatDate: '2025-12-12',
-    organizer: {
-      name: 'Isabella',
-      avatar: 'https://randomuser.me/api/portraits/women/85.jpg'
-    }
-  },
-  {
-    id: 3,
-    title: 'Complete Project Documentation',
-    description: 'Finish writing user manuals and API docs',
-    date: '2025-09-15',
-    timeFrom: '09:00',
-    timeTo: '17:00',
-    type: 'Task',
-    platform: null,
-    meetingLink: null,
-    attendees: [],
-    emailInvitees: [],
-    repeatEvery: 'On',
-    repeatDays: [],
-    endRepeatDate: null,
-    organizer: {
-      name: 'Isabella',
-      avatar: 'https://randomuser.me/api/portraits/women/85.jpg'
-    }
+// Load events from localStorage or initialize with empty array
+function loadEvents() {
+  const savedEvents = localStorage.getItem('userEvents');
+  if (savedEvents) {
+    return JSON.parse(savedEvents);
   }
-]);
+  
+  // Return empty array for new users - no sample events
+  return [];
+}
+
+// Save events to localStorage
+function saveEvents() {
+  localStorage.setItem('userEvents', JSON.stringify(events.value));
+}
+
+const events = ref(loadEvents());
+
+// Update nextEventId after events are loaded
+function updateNextEventId() {
+  nextEventId.value = getNextEventId();
+}
 
 const people = [
   { id: 1, name: 'John Smith', email: 'john.smith@company.com', avatar: 'https://randomuser.me/api/portraits/men/1.jpg' },
@@ -1243,7 +1059,13 @@ const people = [
 const currentMonth = ref(todayDate.getMonth());
 const currentYear = ref(todayDate.getFullYear());
 const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const nextEventId = ref(2);
+// Calculate next event ID based on existing events
+function getNextEventId() {
+  if (events.value.length === 0) return 1;
+  return Math.max(...events.value.map(e => e.id)) + 1;
+}
+
+const nextEventId = ref(getNextEventId());
 
 // Select date from calendar
 function selectDateFromCalendar(date) {
@@ -1520,7 +1342,7 @@ async function sendEmailInvitations(event) {
     // If no organizer email is set, prompt for it or use a default
     if (!organizerEmail || organizerEmail === 'organizer@example.com') {
       // For demo purposes, let's set a default email. In production, this would come from user authentication
-      organizerEmail = 'suprun.jen@gmail.com'; // Using your email for testing
+      organizerEmail = 'freelancetasker0@gmail.com'; // Using the configured email
       localStorage.setItem('userEmail', organizerEmail);
       console.log('📧 Using organizer email:', organizerEmail);
     }
@@ -1589,8 +1411,8 @@ async function sendEmailInvitations(event) {
     console.log('✅ Email invitations sent successfully:', result);
     
     // Show success notification with details
-    const totalSent = result.data.sentSuccessfully;
-    const totalFailed = result.data.failed;
+    const totalSent = result.data?.sentSuccessfully || result.sentSuccessfully || 0;
+    const totalFailed = result.data?.failed || result.failed || 0;
     
     if (totalFailed > 0) {
       showNotification(
@@ -1679,6 +1501,8 @@ function deleteEvent(eventId) {
     const index = events.value.findIndex(event => event.id === eventId);
     if (index > -1) {
       events.value.splice(index, 1);
+      // Save to localStorage after deletion
+      saveEvents();
       showNotification('Reminder deleted successfully!', 'success');
     }
   }
@@ -1731,6 +1555,21 @@ function createEvent() {
     return a.timeFrom < b.timeFrom ? -1 : 1;
   });
   
+  // Save to localStorage
+  saveEvents();
+  
+  // Add notification for reminder/meeting creation
+  if (eventType.value === 'task') {
+    notificationService.addReminderNotification(newEvent.value.title, newEvent.value.date);
+  } else if (eventType.value === 'meet') {
+    const attendees = [...selectedPeople.value, ...emailInvitees.value];
+    notificationService.addMeetingNotification(newEvent.value.title, newEvent.value.date, attendees);
+  } else {
+    // Live event
+    const attendees = [...selectedPeople.value, ...emailInvitees.value];
+    notificationService.addMeetingNotification(newEvent.value.title, newEvent.value.date, attendees);
+  }
+  
   // Send notifications and invitations
   if (eventType.value !== 'task') {
     // Send in-app notifications to selected users
@@ -1738,25 +1577,22 @@ function createEvent() {
       sendInAppNotifications(createdEvent);
     }
     
-      // Send email invitations only if there are participants
-  const totalInvitees = selectedPeople.value.length + emailInvitees.value.length;
-  if (totalInvitees > 0) {
-    // Wait for email sending to complete before resetting form
-    sendEmailInvitations(createdEvent).then(() => {
-      showNotification(`${eventType.value === 'event' ? 'Event' : 'Meeting'} created and ${totalInvitees} invitation(s) sent!`, 'success');
-      // Reset form after emails are sent
+    // Try to send email invitations
+    const totalInvitees = selectedPeople.value.length + emailInvitees.value.length;
+    if (totalInvitees > 0) {
+      // Attempt to send email invitations with error handling
+      sendEmailInvitations(createdEvent).then(() => {
+        showNotification(`${eventType.value === 'event' ? 'Event' : 'Meeting'} created and ${totalInvitees} invitation(s) sent!`, 'success');
+        resetForm();
+      }).catch((error) => {
+        console.error('Email sending failed:', error);
+        showNotification(`${eventType.value === 'event' ? 'Event' : 'Meeting'} created successfully! Note: Email invitations failed to send - backend service unavailable.`, 'warning');
+        resetForm();
+      });
+    } else {
+      showNotification(`${eventType.value === 'event' ? 'Event' : 'Meeting'} created successfully!`, 'success');
       resetForm();
-    }).catch((error) => {
-      console.error('Email sending failed:', error);
-      showNotification(`${eventType.value === 'event' ? 'Event' : 'Meeting'} created but email sending failed!`, 'warning');
-      // Reset form even if email fails
-      resetForm();
-    });
-  } else {
-    showNotification(`${eventType.value === 'event' ? 'Event' : 'Meeting'} created successfully!`, 'success');
-    // Reset form immediately if no emails to send
-    resetForm();
-  }
+    }
 } else {
   showNotification('Task created successfully!', 'success');
   // Reset form immediately for tasks
@@ -1839,6 +1675,9 @@ function generateRecurringEvents(sourceEvent) {
     if (a.date > b.date) return 1;
     return a.timeFrom < b.timeFrom ? -1 : 1;
   });
+  
+  // Save recurring events to localStorage
+  saveEvents();
 }
 
 // Initialize when component is mounted
@@ -1856,6 +1695,46 @@ onMounted(() => {
   
   // Set default end repeat date
   setDefaultEndDate();
+  
+  // Load user data from localStorage
+  loadUserData();
+  
+  // Update next event ID after events are loaded
+  updateNextEventId();
+  
+  // Listen for profile updates
+  window.addEventListener('profileImageUpdated', handleProfileUpdate);
+  window.addEventListener('userNameUpdated', handleProfileUpdate);
+});
+
+// Load user data from localStorage
+function loadUserData() {
+  const userData = localStorage.getItem('user_data');
+  if (userData) {
+    const parsedData = JSON.parse(userData);
+    userName.value = parsedData.fullName || parsedData.name || 'User';
+    userAvatar.value = parsedData.profileImage || parsedData.avatar || null;
+  }
+}
+
+// Handle profile updates
+function handleProfileUpdate(event) {
+  if (event.detail) {
+    if (Object.prototype.hasOwnProperty.call(event.detail, 'profileImage')) {
+      userAvatar.value = event.detail.profileImage;
+    }
+    if (event.detail.fullName || event.detail.name) {
+      userName.value = event.detail.fullName || event.detail.name;
+    }
+    // Reload all user data to ensure consistency
+    loadUserData();
+  }
+}
+
+// Cleanup event listeners
+onBeforeUnmount(() => {
+  window.removeEventListener('profileImageUpdated', handleProfileUpdate);
+  window.removeEventListener('userNameUpdated', handleProfileUpdate);
 });
 
 function getNotificationIcon(type) {
@@ -1958,6 +1837,16 @@ function completeTask(event) {
     showNotification(`Task "${event.title}" completed!`, 'success');
   }
 }
+
+// Auto-resize description textarea
+function autoResize() {
+  if (descriptionTextarea.value) {
+    const textarea = descriptionTextarea.value;
+    textarea.style.height = 'auto';
+    const newHeight = Math.min(Math.max(textarea.scrollHeight, 80), 200);
+    textarea.style.height = newHeight + 'px';
+  }
+}
 </script>
 
 <style scoped>
@@ -1971,6 +1860,327 @@ function completeTask(event) {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   background-color: white;
   margin-left: 0px;
+}
+
+/* New UI Box Styles */
+.input-box {
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  margin-bottom: 16px;
+  padding: 16px;
+}
+
+/* User Info Box */
+.user-info-box {
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+}
+
+.user-name {
+  color: #333;
+  font-weight: 500;
+}
+
+.default-user-avatar {
+  background-color: #f9fafb;
+  border: 2px solid #e5e7eb;
+}
+
+.default-user-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #6b7280;
+}
+
+/* Event Type Box */
+.event-type-box {
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  margin-bottom: 16px;
+  padding: 8px;
+}
+
+.event-type-buttons {
+  width: 100%;
+  background-color: #e8e8e8;
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.event-type-btn {
+  flex: 1;
+  border-radius: 4px !important;
+  font-weight: 500;
+  text-transform: none;
+  color: #666;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.event-type-btn.active,
+.event-type-btn.v-btn--active {
+  background-color: #4db6ac !important;
+  color: white !important;
+}
+
+/* Title Box */
+.title-box {
+  padding: 0;
+}
+
+.title-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.title-input::placeholder {
+  color: #999;
+}
+
+/* Description Box */
+.description-box {
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.description-input {
+  
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 16px 40px 16px 16px;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: #333;
+  resize: none;
+  min-height: 60px;
+  max-height: 200px;
+  font-family: inherit;
+  box-sizing: border-box;
+  word-wrap: break-word;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
+  line-height: 1.4;
+  margin: 0px, 0px, 0px, 16px;
+
+}
+
+.description-input::-webkit-scrollbar {
+  width: 4px;
+}
+
+.description-input::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.description-input::-webkit-scrollbar-thumb {
+  background-color: #ddd;
+  border-radius: 2px;
+}
+
+.description-input::-webkit-scrollbar-thumb:hover {
+  background-color: #ccc;
+}
+
+.description-input::placeholder {
+  color: #999;
+}
+
+.description-resize-indicator {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  pointer-events: none;
+  opacity: 0.4;
+  transition: opacity 0.2s ease;
+}
+
+.description-box:hover .description-resize-indicator {
+  opacity: 0.7;
+}
+
+/* Date and Time Box */
+.datetime-box {
+  padding: 16px;
+}
+
+.datetime-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.datetime-icon {
+  color: #666;
+  margin-right: 8px;
+}
+
+.datetime-title {
+  font-weight: 500;
+  color: #333;
+}
+
+.datetime-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.datetime-label {
+  min-width: 60px;
+  font-weight: 500;
+  color: #666;
+  margin-right: 16px;
+}
+
+.datetime-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background-color: white;
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.datetime-input::placeholder {
+  color: #999;
+}
+
+.time-input {
+  cursor: text !important;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.time-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.time-input:hover::-webkit-calendar-picker-indicator {
+  opacity: 1;
+}
+
+/* People Box */
+.people-box {
+  padding: 16px;
+}
+
+.people-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.people-icon {
+  color: #666;
+  margin-right: 8px;
+}
+
+.people-title {
+  font-weight: 500;
+  color: #333;
+}
+
+/* Meeting Link Box */
+.meeting-link-box {
+  padding: 16px;
+}
+
+.meeting-link-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.meeting-link-icon {
+  color: #666;
+  margin-right: 8px;
+}
+
+.meeting-link-title {
+  font-weight: 500;
+  color: #333;
+}
+
+/* Repeat Box */
+.repeat-box {
+  padding: 16px;
+}
+
+.repeat-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.repeat-icon {
+  color: #666;
+  margin-right: 8px;
+}
+
+.repeat-title {
+  font-weight: 500;
+  color: #333;
+}
+
+.repeat-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.repeat-label {
+  min-width: 60px;
+  font-weight: 500;
+  color: #666;
+  margin-right: 16px;
+}
+
+.repeat-select {
+  flex: 1;
+}
+
+.days-row {
+  align-items: flex-start;
+}
+
+.weekdays-container {
+  flex: 1;
+}
+
+.weekdays-toggle {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.weekday-btn {
+  min-width: 40px !important;
+  width: 40px;
+  height: 40px;
+  border-radius: 50% !important;
+  font-weight: 500;
+  border: 1px solid #ddd !important;
 }
 
 /* Left Column - Meeting Cards */

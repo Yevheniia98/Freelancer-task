@@ -53,7 +53,7 @@ export class InviteTokenService {
 
       return decoded;
     } catch (error) {
-      console.error('Token verification failed:', error.message);
+      console.error('Token verification failed:', (error as Error).message);
       return null;
     }
   }

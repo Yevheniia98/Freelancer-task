@@ -48,6 +48,17 @@
       >
         <!-- Task Statistics Section -->
         <div class="tool-section">
+          <!-- Error Message -->
+          <v-alert
+            v-if="errorMessage"
+            type="error"
+            class="mb-4"
+            closable
+            @click:close="errorMessage = ''"
+          >
+            {{ errorMessage }}
+          </v-alert>
+          
           <div class="section-header">
             <div class="section-title">
               <v-icon
@@ -87,13 +98,13 @@
                     Total Tasks
                   </h3>
                   <div class="stat-amount">
-                    103k
+                    {{ isLoadingStats ? '...' : statistics.totalTasks.toLocaleString() }}
                   </div>
                   <div class="stat-change positive">
                     <v-icon size="small">
                       mdi-arrow-up
                     </v-icon>
-                    15.03% vs. previous month
+                    Total tasks in your account
                   </div>
                 </div>
               </div>
@@ -115,13 +126,13 @@
                     Pending Tasks
                   </h3>
                   <div class="stat-amount">
-                    5k
+                    {{ isLoadingStats ? '...' : statistics.pendingTasks.toLocaleString() }}
                   </div>
                   <div class="stat-change negative">
                     <v-icon size="small">
-                      mdi-arrow-down
+                      mdi-clock-outline
                     </v-icon>
-                    3.5% vs. previous month
+                    Tasks awaiting progress
                   </div>
                 </div>
               </div>
@@ -143,19 +154,19 @@
                     Completed Tasks
                   </h3>
                   <div class="stat-amount">
-                    98k
+                    {{ isLoadingStats ? '...' : statistics.completedTasks.toLocaleString() }}
                   </div>
-                  <div class="stat-change negative">
+                  <div class="stat-change positive">
                     <v-icon size="small">
-                      mdi-arrow-down
+                      mdi-check
                     </v-icon>
-                    0.5% vs. previous month
+                    Successfully finished tasks
                   </div>
                 </div>
               </div>
             </div>
             
-            <!-- Deleted Tasks Card -->
+            <!-- Completion Rate Card -->
             <div class="stat-item">
               <div class="stat-card deleted-tasks-card">
                 <div class="stat-icon-wrapper deleted-tasks-icon">
@@ -163,21 +174,21 @@
                     class="stat-icon"
                     color="white"
                   >
-                    mdi-delete
+                    mdi-chart-line
                   </v-icon>
                 </div>
                 <div class="stat-info">
                   <h3 class="stat-title">
-                    Deleted Tasks
+                    Completion Rate
                   </h3>
                   <div class="stat-amount">
-                    12.8%
+                    {{ isLoadingStats ? '...' : statistics.completionRate.toFixed(1) }}%
                   </div>
                   <div class="stat-change positive">
                     <v-icon size="small">
-                      mdi-arrow-up
+                      mdi-trending-up
                     </v-icon>
-                    5.1% vs. previous month
+                    Your productivity metric
                   </div>
                 </div>
               </div>
@@ -356,39 +367,35 @@
             v-model="isFormValid"
           >
             <v-row>
-              <v-col
-                cols="12"
-                sm="6"
-              >
+              <v-col cols="12">
                 <v-text-field
-                  v-model="currentTask.project"
-                  label="Project"
+                  v-model="currentTask.title"
+                  label="Title"
                   variant="outlined"
                   required
-                  :rules="[v => !!v || 'Project is required']"
-                />
-              </v-col>
-                
-              <v-col
-                cols="12"
-                sm="6"
-              >
-                <v-text-field
-                  v-model="currentTask.clientName"
-                  label="Client Name"
-                  variant="outlined"
-                  required
-                  :rules="[v => !!v || 'Client name is required']"
+                  :rules="[v => !!v || 'Title is required']"
                 />
               </v-col>
                 
               <v-col cols="12">
-                <v-text-field
-                  v-model="currentTask.task"
-                  label="Task"
+                <v-textarea
+                  v-model="currentTask.description"
+                  label="Description"
                   variant="outlined"
                   required
-                  :rules="[v => !!v || 'Task is required']"
+                  :rules="[v => !!v || 'Description is required']"
+                  rows="3"
+                />
+              </v-col>
+              
+              <v-col cols="12">
+                <v-select
+                  v-model="currentTask.clientId"
+                  :items="clients.map(c => ({ title: c.name, value: c.id }))"
+                  label="Client (Optional)"
+                  variant="outlined"
+                  clearable
+                  @update:model-value="updateClientName"
                 />
               </v-col>
                 
@@ -541,6 +548,7 @@
 import { defineComponent, ref, computed, onMounted, nextTick } from 'vue';
 import LeftMenu from '@/dashboard/LeftMenu.vue';
 import SearchBar from '@/dashboard/SearchBar.vue';
+import { taskService } from '@/services/taskService.js';
 
 export default defineComponent({
   name: 'TasksPage',
@@ -591,80 +599,78 @@ export default defineComponent({
     const form = ref(null);
     const editingTask = ref(false);
     const taskToDeleteId = ref(null);
-
-    const tasks = ref([
+    
+    // Client data (should match ClientMain.vue)
+    const clients = ref([
       {
         id: 1,
-        project: 'Symax v1.0.0',
-        task: 'Add Dynamic Contact List',
-        clientName: 'RH Nichols',
-        dueDate: '2020-12-15',
-        status: 'Inprogress',
-        priority: 'Medium'
+        name: 'TechFlow Solutions',
+        platform: 'Upwork'
       },
       {
         id: 2,
-        project: 'Doot - Chat App Template',
-        task: 'Additional Calendar',
-        clientName: 'Henry Baird',
-        dueDate: '2019-01-11',
-        status: 'Completed',
-        priority: 'Low'
+        name: 'Digital Marketing Pro',
+        platform: 'Fiverr'
       },
       {
         id: 3,
-        project: 'Dorshin - Landing Page',
-        task: 'Brand Logo design',
-        clientName: 'Nathan Cole',
-        dueDate: '2021-10-23',
-        status: 'New',
-        priority: 'High'
+        name: 'StartupBridge Inc',
+        platform: 'Freelancer.com'
       },
       {
         id: 4,
-        project: 'Symax v1.0.0',
-        task: 'Add Dynamic Contact List',
-        clientName: 'RH Nichols',
-        dueDate: '2020-12-15',
-        status: 'Inprogress',
-        priority: 'Medium'
+        name: 'Creative Studios',
+        platform: 'Direct Client'
       },
       {
         id: 5,
-        project: 'Doot - Chat App Template',
-        task: 'Additional Calendar',
-        clientName: 'Henry Baird',
-        dueDate: '2019-01-11',
-        status: 'Completed',
-        priority: 'Low'
-      },
-      {
-        id: 6,
-        project: 'Dorshin - Landing Page',
-        task: 'Brand Logo design',
-        clientName: 'Nathan Cole',
-        dueDate: '2021-10-23',
-        status: 'New',
-        priority: 'High'
+        name: 'E-commerce Solutions Ltd',
+        platform: 'Upwork'
       }
     ]);
 
+    // Statistics data from API
+    const statistics = ref({
+      totalTasks: 0,
+      completedTasks: 0,
+      inProgressTasks: 0,
+      pendingTasks: 0,
+      completionRate: 0,
+      overdueCount: 0,
+      priorityBreakdown: {
+        high: 0,
+        medium: 0,
+        low: 0
+      }
+    });
+
+    // Loading states
+    const isLoadingStats = ref(false);
+    const isLoadingTasks = ref(false);
+    const errorMessage = ref('');
+
+    // Tasks data from API
+    const tasks = ref([]);
+    const totalTasksCount = ref(0);
+    const currentPage = ref(1);
+    const itemsPerPage = ref(10);
+
     const emptyTask = {
-      id: null,
-      project: '',
-      task: '',
-      clientName: '',
+      _id: null,
+      title: '',
+      description: '',
       dueDate: new Date().toISOString().substr(0, 10),
-      status: 'New',
-      priority: 'Medium'
+      status: 'TODO',
+      priority: 'medium',
+      clientId: null,
+      clientName: ''
     };
 
     const currentTask = ref({...emptyTask});
 
     const baseHeaders = [
-      { title: 'Project', key: 'project', sortable: true },
-      { title: 'Task', key: 'task', sortable: true },
-      { title: 'Client Name', key: 'clientName', sortable: true },
+      { title: 'Title', key: 'title', sortable: true },
+      { title: 'Description', key: 'description', sortable: true },
       { title: 'Due Date', key: 'dueDate', sortable: true },
       { title: 'Status', key: 'status', sortable: true },
       { title: 'Priority', key: 'priority', sortable: true },
@@ -675,15 +681,14 @@ export default defineComponent({
     const responsiveHeaders = computed(() => {
       if (isMobile.value) {
         return [
-          { title: 'Task', key: 'task', sortable: true },
+          { title: 'Title', key: 'title', sortable: true },
           { title: 'Status', key: 'status', sortable: true },
           { title: 'Priority', key: 'priority', sortable: true },
           { title: '', key: 'actions', sortable: false, align: 'end' },
         ];
       } else if (isTablet.value) {
         return [
-          { title: 'Project', key: 'project', sortable: true },
-          { title: 'Task', key: 'task', sortable: true },
+          { title: 'Title', key: 'title', sortable: true },
           { title: 'Due Date', key: 'dueDate', sortable: true },
           { title: 'Status', key: 'status', sortable: true },
           { title: '', key: 'actions', sortable: false, align: 'end' },
@@ -696,35 +701,99 @@ export default defineComponent({
     const filteredTasks = computed(() => {
       return tasks.value.filter(task => {
         if (!taskSearch.value) return true;
+        const searchTerm = taskSearch.value.toLowerCase();
         return (
-          task.project.toLowerCase().includes(taskSearch.value.toLowerCase()) ||
-          task.task.toLowerCase().includes(taskSearch.value.toLowerCase()) ||
-          task.clientName.toLowerCase().includes(taskSearch.value.toLowerCase())
+          (task.title || '').toLowerCase().includes(searchTerm) ||
+          (task.description || '').toLowerCase().includes(searchTerm) ||
+          (task.status || '').toLowerCase().includes(searchTerm) ||
+          (task.priority || '').toLowerCase().includes(searchTerm)
         );
       });
     });
 
     // Methods
+    const fetchStatistics = async () => {
+      isLoadingStats.value = true;
+      errorMessage.value = '';
+      
+      try {
+        const data = await taskService.getTaskStatistics();
+        statistics.value = {
+          totalTasks: data.totalTasks || 0,
+          completedTasks: data.completedTasks || 0,
+          inProgressTasks: data.inProgressTasks || 0,
+          pendingTasks: data.pendingTasks || 0,
+          completionRate: data.completionRate || 0,
+          overdueCount: data.overdueCount || 0,
+          priorityBreakdown: data.priorityBreakdown || { high: 0, medium: 0, low: 0 }
+        };
+      } catch (error) {
+        console.error('Failed to fetch statistics:', error);
+        errorMessage.value = 'Failed to load task statistics. Please check your connection.';
+      } finally {
+        isLoadingStats.value = false;
+      }
+    };
+
+    const fetchTasks = async (page = 1) => {
+      isLoadingTasks.value = true;
+      errorMessage.value = '';
+      
+      try {
+        const options = {
+          page: page,
+          limit: itemsPerPage.value,
+          search: taskSearch.value || undefined
+        };
+        
+        const data = await taskService.getUserTasks(options);
+        tasks.value = data.tasks || [];
+        totalTasksCount.value = data.totalCount || 0;
+        currentPage.value = data.currentPage || 1;
+      } catch (error) {
+        console.error('Failed to fetch tasks:', error);
+        errorMessage.value = 'Failed to load tasks. Please check your connection.';
+        tasks.value = [];
+      } finally {
+        isLoadingTasks.value = false;
+      }
+    };
+
+    const refreshData = async () => {
+      await Promise.all([
+        fetchStatistics(),
+        fetchTasks(currentPage.value)
+      ]);
+    };
+
     const getStatusColor = (status) => {
       switch (status) {
+        case 'COMPLETED':
         case 'Completed':
           return { color: 'success', textColor: 'success' };
+        case 'IN_PROGRESS':
         case 'Inprogress':
           return { color: 'primary', textColor: 'primary' };
+        case 'TODO':
         case 'New':
           return { color: 'warning', textColor: 'warning' };
+        case 'IN_REVIEW':
+          return { color: 'info', textColor: 'info' };
+        case 'CANCELLED':
+          return { color: 'error', textColor: 'error' };
         default:
           return { color: 'grey', textColor: 'grey' };
       }
     };
 
     const getPriorityColor = (priority) => {
-      switch (priority) {
-        case 'High':
+      const priorityLower = (priority || '').toLowerCase();
+      switch (priorityLower) {
+        case 'high':
           return { color: 'error', textColor: 'error' };
-        case 'Medium':
+        case 'medium':
           return { color: 'warning', textColor: 'warning' };
-        case 'Low':
+        case 'low':
           return { color: 'info', textColor: 'info' };
         default:
           return { color: 'grey', textColor: 'grey' };
@@ -742,6 +811,11 @@ export default defineComponent({
       return new Date(dateString).toLocaleDateString();
     };
 
+    const updateClientName = (clientId) => {
+      const client = clients.value.find(c => c.id === clientId);
+      currentTask.value.clientName = client ? client.name : '';
+    };
+
     const openCreateDialog = () => {
       editingTask.value = false;
       currentTask.value = {...emptyTask};
@@ -754,36 +828,48 @@ export default defineComponent({
       taskDialog.value = true;
     };
 
-    const saveTask = () => {
-      if (editingTask.value) {
-        // Update existing task
-        const index = tasks.value.findIndex(task => task.id === currentTask.value.id);
-        if (index !== -1) {
-          tasks.value[index] = {...currentTask.value};
+    const saveTask = async () => {
+      if (!isFormValid.value) return;
+      
+      try {
+        console.log('📝 Saving task with data:', currentTask.value);
+        
+        if (editingTask.value) {
+          // Update existing task
+          await taskService.updateTask(currentTask.value._id, currentTask.value);
+        } else {
+          // Create new task
+          await taskService.createTask(currentTask.value);
         }
-      } else {
-        // Create new task
-        const newId = Math.max(0, ...tasks.value.map(t => t.id)) + 1;
-        tasks.value.push({
-          ...currentTask.value,
-          id: newId
-        });
+        
+        taskDialog.value = false;
+        // Refresh data after save
+        await refreshData();
+      } catch (error) {
+        console.error('Failed to save task:', error);
+        errorMessage.value = 'Failed to save task. Please try again.';
       }
-      taskDialog.value = false;
     };
 
-    const deleteTask = (id) => {
-      taskToDeleteId.value = id;
+    const deleteTask = (task) => {
+      taskToDeleteId.value = task._id || task.id;
       deleteDialog.value = true;
     };
 
-    const confirmDelete = () => {
-      tasks.value = tasks.value.filter(task => task.id !== taskToDeleteId.value);
-      deleteDialog.value = false;
+    const confirmDelete = async () => {
+      try {
+        await taskService.deleteTask(taskToDeleteId.value);
+        deleteDialog.value = false;
+        // Refresh data after delete
+        await refreshData();
+      } catch (error) {
+        console.error('Failed to delete task:', error);
+        errorMessage.value = 'Failed to delete task. Please try again.';
+      }
     };
 
     // Lifecycle hooks
-    onMounted(() => {
+    onMounted(async () => {
       // Initialize window resize listener
       window.addEventListener('resize', handleResize);
       updateResponsiveState();
@@ -797,6 +883,16 @@ export default defineComponent({
       nextTick(() => {
         checkMenuState();
       });
+      
+      // Load initial data
+      try {
+        console.log('✅ Loading data...');
+        // Fetch initial data
+        await refreshData();
+      } catch (error) {
+        console.error('❌ Error loading data:', error);
+        errorMessage.value = 'Authentication error. Please refresh the page.';
+      }
       
       // Remove event listener on component unmount
       return () => {
@@ -825,6 +921,16 @@ export default defineComponent({
       tasks,
       currentTask,
       responsiveHeaders,
+      clients,
+      
+      // API data
+      statistics,
+      isLoadingStats,
+      isLoadingTasks,
+      errorMessage,
+      totalTasksCount,
+      currentPage,
+      itemsPerPage,
       
       // Computed
       filteredTasks,
@@ -833,11 +939,15 @@ export default defineComponent({
       getStatusColor,
       getPriorityColor,
       formatDate,
+      updateClientName,
       openCreateDialog,
       editTask,
       saveTask,
       deleteTask,
-      confirmDelete
+      confirmDelete,
+      fetchStatistics,
+      fetchTasks,
+      refreshData
     };
   }
 });

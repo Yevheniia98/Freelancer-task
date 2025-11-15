@@ -33,7 +33,7 @@
             {{ successMessage }}
           </div>
 
-          <label>Enter your full name</label>
+          
           <input
             v-model="fullName"
             type="text"
@@ -41,7 +41,7 @@
             :disabled="isLoading"
           >
   
-          <label>Enter your email address</label>
+          
           <input
             v-model="email"
             type="email"
@@ -49,7 +49,7 @@
             :disabled="isLoading"
           >
 
-          <label>Enter your phone number</label>
+          
           <input
             v-model="phoneNumber"
             type="tel"
@@ -57,7 +57,7 @@
             :disabled="isLoading"
           >
 
-          <label>Enter your country</label>
+          
           <input
             v-model="country"
             type="text"
@@ -65,7 +65,7 @@
             :disabled="isLoading"
           >
   
-          <label>Create your password</label>
+          
           <div class="password-field">
             <input
               v-model="password"
@@ -109,7 +109,7 @@
             </div>
           </div>
   
-          <label>Confirm your password</label>
+          
           <div class="password-field">
             <input
               v-model="confirmPassword"
@@ -136,13 +136,6 @@
             Login
           </router-link>
         </p>
-      </div>
-  
-      <div class="image-container">
-        <img
-          src="/sign.png"
-          alt="Workspace setup"
-        >
       </div>
     </div>
   
@@ -386,232 +379,337 @@
   </script>
   
   <style scoped>
-  .container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  gap: 50px; /* Increased space between form and image */
-  margin-left: 100px;
-  margin-right: 100px;
-}
-
-.form-container {
-  width: 500px;
-  height: auto;
-  padding: 0px;
-}
-
-h1 {
-  margin-top: 100px;
-  font-size: 24px;
-  color: #000;
-  text-align: left;
-  font-weight: 600; /* Semi-bold */
-}
-
-p {
-  font-size: 16px;
-  color: #555;
-  text-align: left;
-  margin-bottom: 30px;
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-}
-
-label {
-  font-size: 16px;
-  margin-top: 10px;
-  text-align:left;
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
   
-}
+  * {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
 
-input {
-  padding: 10px;
-  margin-top: 0px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  width: 100%;
-}
+  .container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 140px);
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    position: relative;
+  }
 
-.password-field {
-  display: flex;
-  align-items: center;
-  position: relative;
-}
 
-.eye-icon {
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-  position: absolute;
-  right: 10px;
-}
 
-button {
-  margin-top: 30px;
-  padding: 10px;
-  border: none;
-  background-color: #007b5e;
-  color: white;
-  font-size: 16px;
-  border-radius: 5px;
-  cursor: pointer;
-  width: 100%;
-  transition: background-color 0.3s ease;
-}
+  .form-container {
+    width: 100%;
+    max-width: 480px;
+    background: white;
+    padding: 48px;
+    border-radius: 24px;
+    box-shadow: 
+      0 25px 50px -12px rgba(0, 0, 0, 0.05), 
+      0 10px 25px -5px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(229, 231, 235, 0.8);
+    position: relative;
+    z-index: 1;
+  }
 
-button:hover:not(:disabled) {
-  background-color: #005f47;
-}
 
-button:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-}
 
-/* Error and Success Messages */
-.error-container {
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 20px;
-}
+  h1 {
+    margin: 0 0 16px 0;
+    font-size: 32px;
+    font-weight: 700;
+    text-align: center;
+    color: #111827;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
 
-.error-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-}
+  p {
+    font-size: 16px;
+    color: #6b7280;
+    text-align: center;
+    margin-bottom: 40px;
+    line-height: 1.6;
+    font-weight: 400;
+  }
 
-.error-icon {
-  font-size: 18px;
-  margin-right: 8px;
-}
+  form {
+    display: flex;
+    flex-direction: column;
+  }
 
-.error-title {
-  font-weight: 600;
-  color: #dc2626;
-  font-size: 16px;
-}
+   
 
-.error-details ul,
-.error-suggestions ul {
-  margin: 8px 0;
-  padding-left: 20px;
-}
+  input {
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+  
+  }
 
-.error-details li,
-.error-suggestions li {
-  color: #dc2626;
-  margin-bottom: 4px;
-  font-size: 14px;
-}
+  input::placeholder {
+    color: #9ca3af;
+    font-weight: 400;
+  }
 
-.suggestions-header {
-  font-weight: 600;
-  color: #059669;
-  margin-bottom: 4px;
-  font-size: 14px;
-}
+  input:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  }
 
-.error-suggestions li {
-  color: #059669;
-}
+  input:hover:not(:focus) {
+    border-color: #9ca3af;
+  }
 
-.success-message {
-  background-color: #f0fff4;
-  color: #38a169;
-  padding: 12px 16px;
-  border-radius: 8px;
-  border-left: 4px solid #48bb78;
-  margin-bottom: 20px;
-  font-size: 14px;
-  font-weight: 500;
-}
+  .password-field {
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
 
-/* Password Strength Indicator */
-.password-strength {
-  margin-top: 5px;
-  margin-bottom: 10px;
-}
+  .password-field input {
+    padding-right: 54px;
+  }
 
-.strength-bar {
-  width: 100%;
-  height: 6px;
-  background-color: #e2e8f0;
-  border-radius: 3px;
-  overflow: hidden;
-  margin-bottom: 5px;
-}
+  .eye-icon {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    position: absolute;
+    right: 18px;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+    filter: invert(1);
+  }
 
-.strength-fill {
-  height: 100%;
-  transition: width 0.3s ease, background-color 0.3s ease;
-  border-radius: 3px;
-}
+  .eye-icon:hover {
+    opacity: 1;
+    transform: scale(1.1);
+  }
 
-.strength-text {
-  font-size: 12px;
-  font-weight: 600;
-  margin-bottom: 5px;
-}
+  button {
+    margin-top: 32px;
+    padding: 14px 24px;
+    border: none;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
 
-.password-suggestions {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-bottom: 5px;
-}
+  button:hover:not(:disabled) {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transform: translateY(-1px);
+  }
 
-.suggestions-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: #4a5568;
-  margin-bottom: 3px;
-}
+  button:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
 
-.password-suggestions small {
-  color: #666;
-  font-size: 11px;
-}
+  button:disabled {
+    background: #d1d5db;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    color: #9ca3af;
+  }
 
-.password-errors {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-bottom: 5px;
-}
+  /* Error and Success Messages */
+  .error-container {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+  }
 
-.errors-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: #e53e3e;
-  margin-bottom: 3px;
-}
+  .error-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
 
-.password-error {
-  color: #e53e3e !important;
-  font-size: 11px;
-}
+  .error-icon {
+    font-size: 16px;
+    margin-right: 8px;
+  }
 
-.login-text {
-  margin-top: 10px;
-  font-size: 16px;
-  text-align: center;
-}
+  .error-title {
+    font-weight: 600;
+    color: #dc2626;
+    font-size: 14px;
+  }
 
-.image-container img {
-  border-radius: 10px;
-  height: 600px;
-  width: auto;
-  margin-top: 80px;
-}
+  .error-details ul,
+  .error-suggestions ul {
+    margin: 8px 0;
+    padding-left: 20px;
+  }
+
+  .error-details li,
+  .error-suggestions li {
+    color: #dc2626;
+    margin-bottom: 4px;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .suggestions-header {
+    font-weight: 600;
+    color: #059669;
+    margin-bottom: 4px;
+    font-size: 13px;
+  }
+
+  .error-suggestions li {
+    color: #059669;
+  }
+
+  .success-message {
+    background: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  /* Password Strength Indicator */
+  .password-strength {
+    margin-top: 8px;
+    margin-bottom: 16px;
+    padding: 16px;
+    background: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+  }
+
+  .strength-bar {
+    width: 100%;
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .strength-fill {
+    height: 100%;
+    transition: width 0.3s ease, background-color 0.3s ease;
+    border-radius: 3px;
+  }
+
+  .strength-text {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #374151;
+  }
+
+  .password-suggestions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
+  .suggestions-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 4px;
+  }
+
+  .password-suggestions small {
+    color: #6b7280;
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  .password-errors {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
+  .errors-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #dc2626;
+    margin-bottom: 4px;
+  }
+
+  .password-error {
+    color: #dc2626 !important;
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  .login-text {
+    margin-top: 24px;
+    font-size: 14px;
+    text-align: center;
+    color: #6b7280;
+    line-height: 1.5;
+  }
+
+  .login-text a {
+    color: #10b981;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+  }
+
+  .login-text a:hover {
+    color: #059669;
+    text-decoration: underline;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .container {
+      padding: 16px;
+      min-height: calc(100vh - 120px);
+    }
+    
+    .form-container {
+      padding: 32px 24px;
+      border-radius: 16px;
+    }
+    
+    h1 {
+      font-size: 28px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .form-container {
+      padding: 24px 20px;
+    }
+    
+    h1 {
+      font-size: 24px;
+    }
+    
+    input {
+      padding: 10px 14px;
+    }
+    
+    button {
+      padding: 12px 20px;
+    }
+  }
 
   </style>
   

@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <LeftMenu 
-      сlass="left-menu-component"
+      class="left-menu-component"
     />
     <SearchBar />
       
@@ -553,6 +553,49 @@
                               <v-icon size="small">
                                 mdi-pencil
                               </v-icon>
+                            </v-btn>
+                          </div>
+                          <div class="detail-item">
+                            <v-icon
+                              size="small"
+                              color="primary"
+                            >
+                              mdi-shield-account
+                            </v-icon>
+                            <span>{{ selectedMember.role || 'member' }}</span>
+                            <v-btn
+                              icon
+                              size="x-small"
+                              variant="text"
+                              @click="openEditRoleDialog(selectedMember)"
+                            >
+                              <v-icon size="small">
+                                mdi-pencil
+                              </v-icon>
+                            </v-btn>
+                          </div>
+                        </div>
+                        
+                        <div class="detail-section">
+                          <h4 class="section-title">
+                            Team Actions
+                          </h4>
+                          <div class="detail-item">
+                            <v-btn
+                              color="error"
+                              variant="outlined"
+                              size="small"
+                              rounded="lg"
+                              :disabled="selectedMember.role === 'owner'"
+                              @click="confirmRemoveMember(selectedMember)"
+                            >
+                              <v-icon
+                                size="small"
+                                class="mr-1"
+                              >
+                                mdi-account-remove
+                              </v-icon>
+                              Remove from Team
                             </v-btn>
                           </div>
                         </div>
@@ -1213,6 +1256,141 @@
       </v-card>
     </v-dialog>
 
+    <!-- Edit Role Dialog -->
+    <v-dialog
+      v-model="editRoleDialog"
+      max-width="400px"
+      fullscreen-breakpoint="sm"
+    >
+      <v-card
+        rounded="xl"
+        flat
+        border
+      >
+        <v-card-title class="hero-modal-header pa-6">
+          <div class="modal-title">
+            <v-icon
+              class="mr-3"
+              color="white"
+            >
+              mdi-shield-account
+            </v-icon>
+            Update Role
+          </div>
+        </v-card-title>
+          
+        <v-card-text class="pa-6">
+          <v-form
+            ref="roleForm"
+            v-model="isRoleFormValid"
+          >
+            <v-select
+              v-model="editedRole"
+              label="Select Role"
+              variant="outlined"
+              :items="availableRoles"
+              required
+              :rules="[v => !!v || 'Role is required']"
+            />
+            <div class="role-descriptions mt-3">
+              <v-card 
+                variant="tonal" 
+                color="info" 
+                class="pa-3"
+              >
+                <div class="text-caption">
+                  <strong>Admin:</strong> Can invite/remove members and manage projects<br>
+                  <strong>Member:</strong> Can access assigned projects<br>
+                  <strong>Viewer:</strong> Read-only access to assigned projects
+                </div>
+              </v-card>
+            </div>
+          </v-form>
+        </v-card-text>
+          
+        <v-card-actions class="pa-6 pt-0">
+          <v-spacer />
+          <v-btn 
+            color="grey-darken-1" 
+            variant="text" 
+            @click="editRoleDialog = false"
+          >
+            Cancel
+          </v-btn>
+          <v-btn 
+            color="primary"
+            variant="elevated"
+            rounded="lg"
+            :disabled="!isRoleFormValid"
+            :loading="updatingRole"
+            @click="updateRole"
+          >
+            <v-icon class="mr-2">
+              mdi-content-save
+            </v-icon>
+            Update
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Remove Member Confirmation Dialog -->
+    <v-dialog
+      v-model="removeConfirmDialog"
+      max-width="400px"
+      fullscreen-breakpoint="sm"
+    >
+      <v-card
+        rounded="xl"
+        flat
+        border
+      >
+        <v-card-title class="pa-6">
+          <div class="d-flex align-center">
+            <v-icon
+              class="mr-3"
+              color="error"
+            >
+              mdi-alert-circle
+            </v-icon>
+            <span>Remove Team Member</span>
+          </div>
+        </v-card-title>
+          
+        <v-card-text class="pa-6">
+          <p>
+            Are you sure you want to remove <strong>{{ memberToRemove?.name }}</strong> from the team?
+          </p>
+          <p class="text-caption text-error mt-3">
+            This action cannot be undone. The member will lose access to all projects and team resources.
+          </p>
+        </v-card-text>
+          
+        <v-card-actions class="pa-6 pt-0">
+          <v-spacer />
+          <v-btn 
+            color="grey-darken-1" 
+            variant="text" 
+            @click="removeConfirmDialog = false"
+          >
+            Cancel
+          </v-btn>
+          <v-btn 
+            color="error"
+            variant="elevated"
+            rounded="lg"
+            :loading="removingMember"
+            @click="removeMember"
+          >
+            <v-icon class="mr-2">
+              mdi-account-remove
+            </v-icon>
+            Remove
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <!-- Add Member Dialog -->
     <v-dialog
       v-model="addMemberDialog"
@@ -1374,6 +1552,7 @@
 import { defineComponent, ref, computed, nextTick, onMounted } from 'vue';
 import LeftMenu from '@/dashboard/LeftMenu.vue';
 import SearchBar from '@/dashboard/SearchBar.vue';
+import notificationService from '@/services/notificationService.js';
   
 export default defineComponent({
   name: 'MyTeamPage',
@@ -1585,6 +1764,13 @@ export default defineComponent({
       'Product Launch',
       'CRM Integration'
     ];
+
+    // Available roles
+    const availableRoles = [
+      { title: 'Admin', value: 'admin' },
+      { title: 'Member', value: 'member' },
+      { title: 'Viewer', value: 'viewer' }
+    ];
     
     // Selected items
     const selectedChat = ref(null);
@@ -1625,6 +1811,19 @@ export default defineComponent({
       currentProject: '',
       skills: []
     });
+
+    // Role dialog
+    const editRoleDialog = ref(false);
+    const isRoleFormValid = ref(true);
+    const roleForm = ref(null);
+    const editedRole = ref('');
+    const memberToEditRole = ref(null);
+    const updatingRole = ref(false);
+
+    // Remove member dialog
+    const removeConfirmDialog = ref(false);
+    const memberToRemove = ref(null);
+    const removingMember = ref(false);
     
     // New chat dialog
     const newChatDialog = ref(false);
@@ -1739,6 +1938,11 @@ export default defineComponent({
         chats.value[chatIndex].lastMessage = newMessage.value;
         chats.value[chatIndex].lastMessageTime = new Date();
       }
+      
+      // Add notification for team chat message
+      const currentUser = teamMembers.value.find(member => member.id === currentUserId);
+      const senderName = currentUser ? currentUser.name : 'You';
+      notificationService.addTeamChatNotification(senderName, selectedChat.value.name, newMessage.value);
       
       // Clear input
       newMessage.value = '';
@@ -1915,13 +2119,33 @@ export default defineComponent({
         // Split emails by commas and trim whitespace
         const emails = emailAddresses.value.split(',').map(email => email.trim());
         
-        // Mock API call - replace with your actual API endpoint
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        // Call the backend API
+        const response = await fetch('http://localhost:3030/api/team/invitations/send', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            emails: emails,
+            message: inviteMessage.value || 'You have been invited to join our team workspace!'
+          })
+        });
+
+        const data = await response.json();
         
-        // Show success message
-        snackbarMessage.value = `Invitations sent successfully to ${emails.length} recipient(s)!`;
-        showSnackbar.value = true;
-        
+        if (data.success) {
+          // Show success message
+          snackbarMessage.value = `Email invitations sent successfully to ${emails.length} recipient(s)!`;
+          showSnackbar.value = true;
+          
+          // Log the invite links for testing
+          console.log('📧 Invitation links generated:');
+          data.summary.results.forEach(result => {
+            console.log(`${result.email}: ${result.inviteLink}`);
+          });
+        } else {
+          throw new Error(data.message || 'Failed to send invitations');
+        }
         // Reset form
         emailAddresses.value = '';
         inviteMessage.value = '';
@@ -1929,9 +2153,10 @@ export default defineComponent({
         
         // Close dialog
         emailInviteDialog.value = false;
+        
       } catch (error) {
         console.error('Error sending invites:', error);
-        snackbarMessage.value = 'Failed to send invitations. Please try again.';
+        snackbarMessage.value = error.message || 'Failed to send invitations. Please try again.';
         showSnackbar.value = true;
       } finally {
         sendingInvites.value = false;
@@ -1994,6 +2219,113 @@ export default defineComponent({
         console.error('Error inviting user:', error);
         snackbarMessage.value = 'Failed to send invitation. Please try again.';
         showSnackbar.value = true;
+      }
+    };
+
+    const openEditRoleDialog = (member) => {
+      memberToEditRole.value = member;
+      editedRole.value = member.role || 'member';
+      editRoleDialog.value = true;
+    };
+
+    const updateRole = async () => {
+      if (!memberToEditRole.value || !isRoleFormValid.value) return;
+      
+      updatingRole.value = true;
+      
+      try {
+        // Call API to update member role
+        const response = await fetch(`http://localhost:3030/api/team/members/${memberToEditRole.value.id}/role`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            // Add auth token if you have one
+            // 'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify({
+            role: editedRole.value
+          })
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          // Update local data
+          const index = teamMembers.value.findIndex(m => m.id === memberToEditRole.value.id);
+          if (index !== -1) {
+            teamMembers.value[index].role = editedRole.value;
+            
+            // If this is the currently selected member, update that too
+            if (selectedMember.value && selectedMember.value.id === memberToEditRole.value.id) {
+              selectedMember.value = {...teamMembers.value[index]};
+            }
+          }
+          
+          snackbarMessage.value = 'Member role updated successfully!';
+          showSnackbar.value = true;
+        } else {
+          throw new Error(data.message || 'Failed to update role');
+        }
+      } catch (error) {
+        console.error('Error updating member role:', error);
+        snackbarMessage.value = error.message || 'Failed to update member role. Please try again.';
+        showSnackbar.value = true;
+      } finally {
+        updatingRole.value = false;
+        editRoleDialog.value = false;
+      }
+    };
+
+    const confirmRemoveMember = (member) => {
+      if (member.role === 'owner') {
+        snackbarMessage.value = 'Cannot remove the team owner.';
+        showSnackbar.value = true;
+        return;
+      }
+      
+      memberToRemove.value = member;
+      removeConfirmDialog.value = true;
+    };
+
+    const removeMember = async () => {
+      if (!memberToRemove.value) return;
+      
+      removingMember.value = true;
+      
+      try {
+        // Call API to remove member
+        const response = await fetch(`http://localhost:3030/api/team/members/${memberToRemove.value.id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            // Add auth token if you have one
+            // 'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          // Remove from local data
+          teamMembers.value = teamMembers.value.filter(m => m.id !== memberToRemove.value.id);
+          
+          // Clear selected member if it was the removed one
+          if (selectedMember.value && selectedMember.value.id === memberToRemove.value.id) {
+            selectedMember.value = null;
+          }
+          
+          snackbarMessage.value = 'Team member removed successfully!';
+          showSnackbar.value = true;
+        } else {
+          throw new Error(data.message || 'Failed to remove member');
+        }
+      } catch (error) {
+        console.error('Error removing member:', error);
+        snackbarMessage.value = error.message || 'Failed to remove member. Please try again.';
+        showSnackbar.value = true;
+      } finally {
+        removingMember.value = false;
+        removeConfirmDialog.value = false;
       }
     };
     
@@ -2081,6 +2413,19 @@ export default defineComponent({
       memberForm,
       newMember,
       
+      // Role dialog
+      editRoleDialog,
+      isRoleFormValid,
+      roleForm,
+      editedRole,
+      memberToEditRole,
+      updatingRole,
+      
+      // Remove member dialog
+      removeConfirmDialog,
+      memberToRemove,
+      removingMember,
+      
       // New chat dialog
       newChatDialog,
 
@@ -2134,7 +2479,12 @@ export default defineComponent({
       validateEmails,
       sendEmailInvites,
       searchUsers,
-      inviteUser
+      inviteUser,
+      openEditRoleDialog,
+      updateRole,
+      confirmRemoveMember,
+      removeMember,
+      availableRoles
     };
   }
 });

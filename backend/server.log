@@ -1,0 +1,23 @@
+[dotenv@17.2.1] injecting env (20) from .env -- tip: 📡 auto-backup env with Radar: https://dotenvx.com/radar
+📧 Real email service initialized with: freelancetasker0@gmail.com
+📧 Real email service initialized with: freelancetasker0@gmail.com
+📧 Real email service initialized with: freelancetasker0@gmail.com
+✅ TeamManagementController initialized
+⚠️ MongoDB connection skipped - running in email-only mode
+🚀 Server running on port 3002
+📊 Environment: development
+🌐 Frontend URL: http://localhost:3030
+Error: Not Found - /
+    at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
+    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
+    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
+    at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
+    at session (/Users/evgenya/freelancer-task/backend/node_modules/express-session/index.js:487:7)
+    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
+    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
+::ffff:127.0.0.1 - - [27/Oct/2025:15:15:11 +0000] "GET / HTTP/1.1" 404 1022 "-" "curl/7.77.0"
+✅ Email sent: <09cedd0f-fa9f-12f8-081b-ad8732bb77b7@localhost>
+::ffff:127.0.0.1 - - [27/Oct/2025:15:16:21 +0000] "POST /api/meeting-invitations/send-multiple HTTP/1.1" 200 204 "http://localhost:3030/dashboard" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"

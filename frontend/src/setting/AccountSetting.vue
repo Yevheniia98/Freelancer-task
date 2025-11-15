@@ -90,17 +90,21 @@
                 <v-avatar
                   size="100"
                   class="profile-avatar"
+                  :class="{ 'default-avatar': !profileImage }"
                 >
                   <v-img
                     v-if="profileImage"
                     :src="profileImage"
                     cover
                   />
-                  <v-img
-                    v-else
-                    src="https://cdn.vuetifyjs.com/images/john.jpg"
-                    cover
-                  />
+                  <div 
+                    v-else 
+                    class="default-account-icon"
+                  >
+                    <svg viewBox="0 0 24 24" width="60" height="60" fill="currentColor">
+                      <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
+                    </svg>
+                  </div>
                 </v-avatar>
               </div>
               
@@ -288,28 +292,57 @@ const loadUserData = () => {
 const formData = ref(loadUserData())
 
 // File upload handler
-import axios from 'axios';
+// import axios from 'axios';
 
 const handleFileUpload = async (event) => {
   const file = event.target.files[0];
+  console.log('File selected:', file);
+  
   if (file) {
-    const formData = new FormData();
-    formData.append('file', file);
-    try {
-      const response = await axios.post('http://localhost:3001/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      if (response.data && response.data.path) {
-        // Set the profile image to the uploaded file URL
-        profileImage.value = response.data.path;
-      } else {
-        console.error('Upload failed: No file path returned');
-      }
-    } catch (error) {
-      console.error('Error uploading file:', error);
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
     }
+    
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size must be less than 5MB');
+      return;
+    }
+    
+    // Create a local URL for the image preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      profileImage.value = e.target.result;
+      
+      console.log('Image loaded locally for preview');
+      
+      // Update localStorage with the image data
+      const existingUserData = localStorage.getItem('user_data');
+      if (existingUserData) {
+        const userData = JSON.parse(existingUserData);
+        userData.profileImage = profileImage.value;
+        localStorage.setItem('user_data', JSON.stringify(userData));
+      }
+      
+      // Trigger a custom event to notify other components
+      window.dispatchEvent(new CustomEvent('profileImageUpdated', {
+        detail: { profileImage: profileImage.value }
+      }));
+      
+      alert('Profile picture updated successfully!');
+    };
+    
+    reader.onerror = () => {
+      console.error('Error reading file');
+      alert('Error reading the selected file. Please try again.');
+    };
+    
+    // Read the file as data URL for preview
+    reader.readAsDataURL(file);
+  } else {
+    console.log('No file selected');
   }
 }
 
@@ -319,6 +352,21 @@ const removeProfilePicture = () => {
   if (fileInput.value) {
     fileInput.value.value = ''
   }
+  
+  // Update localStorage to remove profile image
+  const existingUserData = localStorage.getItem('user_data');
+  if (existingUserData) {
+    const userData = JSON.parse(existingUserData);
+    userData.profileImage = null;
+    localStorage.setItem('user_data', JSON.stringify(userData));
+  }
+  
+  // Trigger event to notify other components
+  window.dispatchEvent(new CustomEvent('profileImageUpdated', {
+    detail: { profileImage: null }
+  }));
+  
+  console.log('Profile picture removed successfully');
 }
 
 // Save profile
@@ -329,18 +377,48 @@ const saveProfile = async () => {
     const existingUserData = localStorage.getItem('user_data');
     if (existingUserData) {
       const userData = JSON.parse(existingUserData);
-      // Update user data with form data
+      // Update user data with form data and profile image
       const updatedUserData = {
         ...userData,
         fullName: formData.value.fullName,
         email: formData.value.email,
         phoneNumber: formData.value.phoneNumber,
-        country: formData.value.country
+        country: formData.value.country,
+        profileImage: profileImage.value
       };
       localStorage.setItem('user_data', JSON.stringify(updatedUserData));
+      
+      // Dispatch events for real-time updates across the app
+      window.dispatchEvent(new CustomEvent('userNameUpdated', {
+        detail: { 
+          fullName: formData.value.fullName,
+          name: formData.value.fullName
+        }
+      }));
+      
+      window.dispatchEvent(new CustomEvent('profileImageUpdated', {
+        detail: { profileImage: profileImage.value }
+      }));
+      
     } else {
       // Create new user data if none exists
-      localStorage.setItem('user_data', JSON.stringify(formData.value));
+      const newUserData = {
+        ...formData.value,
+        profileImage: profileImage.value
+      };
+      localStorage.setItem('user_data', JSON.stringify(newUserData));
+      
+      // Dispatch events for new user data
+      window.dispatchEvent(new CustomEvent('userNameUpdated', {
+        detail: { 
+          fullName: formData.value.fullName,
+          name: formData.value.fullName
+        }
+      }));
+      
+      window.dispatchEvent(new CustomEvent('profileImageUpdated', {
+        detail: { profileImage: profileImage.value }
+      }));
     }
     
     // Simulate API call
@@ -374,6 +452,25 @@ onMounted(() => {
   const pathSegment = route.path.split('/').pop()
   if (pathSegment && ['profile', 'password1', 'notifications', 'data-export', 'log-out'].includes(pathSegment)) {
     tab.value = pathSegment
+  }
+  
+  // Load user data from localStorage
+  const userData = localStorage.getItem('user_data');
+  if (userData) {
+    const parsedData = JSON.parse(userData);
+    
+    // Set form data
+    formData.value = {
+      fullName: parsedData.fullName || '',
+      email: parsedData.email || '',
+      phoneNumber: parsedData.phoneNumber || '',
+      country: parsedData.country || ''
+    };
+    
+    // Set profile image
+    if (parsedData.profileImage) {
+      profileImage.value = parsedData.profileImage;
+    }
   }
 })
 </script>
@@ -482,6 +579,23 @@ onMounted(() => {
 .profile-avatar {
   border: 4px solid #f3f4f6;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.profile-avatar.default-avatar {
+  background-color: #f9fafb;
+  border: 4px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.default-account-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #6b7280;
 }
 
 /* Form Styles */

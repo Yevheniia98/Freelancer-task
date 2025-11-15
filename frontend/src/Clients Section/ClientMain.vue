@@ -15,10 +15,10 @@
           <div class="hero-content">
             <div class="title-section">
               <h1 class="hero-title">
-                <span class="gradient-text">Client</span> Management
+                <span class="gradient-text">Client</span> Portfolio
               </h1>
               <p class="hero-subtitle">
-                Manage your client relationships and track project success
+                Professional client relationships and project success tracking
               </p>
             </div>
             <div class="hero-actions">
@@ -210,107 +210,125 @@
               :key="client.id"
               class="client-item"
             >
-              <div class="client-card">
-                <!-- Client Header -->
-                <div class="client-header">
-                  <div class="client-avatar">
-                    <v-icon
-                      size="24"
-                      color="white"
-                    >
-                      mdi-account
-                    </v-icon>
-                  </div>
-                  <div class="client-basic-info">
-                    <h3 class="client-name">
-                      {{ client.name }}
-                    </h3>
-                    <div class="client-platform">
+              <v-card class="client-profile-card" elevation="3">
+                <v-card-text class="pa-8">
+                  <div class="client-content">
+                    <div class="client-avatar-section">
+                      <v-avatar size="80" :color="getPlatformColor(client.platform)">
+                        <span class="text-h4 white--text">{{ client.name.charAt(0) }}</span>
+                      </v-avatar>
                       <v-chip
                         size="small"
                         :color="getPlatformColor(client.platform)"
-                        variant="tonal"
+                        variant="outlined"
+                        class="platform-chip mt-2"
                       >
                         {{ client.platform }}
                       </v-chip>
                     </div>
+                    <div class="client-info-section">
+                      <h3 class="client-profile-name">{{ client.name }}</h3>
+                      <p class="client-status">Active Client</p>
+                      <div class="client-details">
+                        <div class="client-detail-item">
+                          <v-icon class="mr-2" size="small">mdi-email</v-icon>
+                          <span>{{ client.email }}</span>
+                        </div>
+                        <div class="client-detail-item">
+                          <v-icon class="mr-2" size="small">mdi-phone</v-icon>
+                          <span>{{ client.phone }}</span>
+                        </div>
+                        <div class="client-detail-item">
+                          <v-icon class="mr-2" size="small">mdi-briefcase-check</v-icon>
+                          <span>{{ client.projects }} projects completed</span>
+                        </div>
+                        <div class="client-detail-item">
+                          <v-icon class="mr-2" size="small" :color="getActiveTasksForClient(client.id).length > 0 ? 'success' : 'grey'">mdi-clock-outline</v-icon>
+                          <span :class="getActiveTasksForClient(client.id).length > 0 ? 'text-success font-weight-medium' : ''">{{ getActiveTasksText(client.id) }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="client-stats-section">
+                      <div class="stat-item">
+                        <div class="stat-value">{{ client.projects }}</div>
+                        <div class="stat-label">Projects</div>
+                      </div>
+                      <div class="stat-item earnings-stat">
+                        <div class="stat-value-editable" v-if="!client.editingEarnings">
+                          €{{ client.earn.toLocaleString() }}
+                          <v-btn 
+                            icon 
+                            size="x-small" 
+                            variant="text" 
+                            class="ml-1"
+                            @click="startEditingEarnings(client)"
+                          >
+                            <v-icon size="12">mdi-pencil</v-icon>
+                          </v-btn>
+                        </div>
+                        <div v-else class="earnings-edit">
+                          <v-text-field
+                            v-model="client.tempEarnings"
+                            prefix="€"
+                            type="number"
+                            density="compact"
+                            hide-details
+                            @keyup.enter="saveEarnings(client)"
+                            @keyup.escape="cancelEditingEarnings(client)"
+                          />
+                          <div class="earnings-actions mt-1">
+                            <v-btn 
+                              size="x-small" 
+                              color="success" 
+                              variant="text"
+                              @click="saveEarnings(client)"
+                            >
+                              <v-icon size="12">mdi-check</v-icon>
+                            </v-btn>
+                            <v-btn 
+                              size="x-small" 
+                              color="error" 
+                              variant="text"
+                              @click="cancelEditingEarnings(client)"
+                            >
+                              <v-icon size="12">mdi-close</v-icon>
+                            </v-btn>
+                          </div>
+                        </div>
+                        <div class="stat-label">Total Earned</div>
+                      </div>
+                      <div class="stat-item">
+                        <div class="stat-value">Active</div>
+                        <div class="stat-label">Status</div>
+                      </div>
+                    </div>
                   </div>
-                  <div class="client-actions">
+                  <div class="client-review mt-4" v-if="client.review">
+                    <h4 class="review-title">Review & Notes</h4>
+                    <p class="review-text">{{ client.review }}</p>
+                  </div>
+                  <div class="client-actions-bottom mt-4">
                     <v-btn
-                      icon
-                      size="small"
                       color="primary"
-                      variant="text"
-                      class="action-btn"
+                      variant="outlined"
+                      size="small"
                       @click="openClientDialog(client)"
                     >
-                      <v-icon>mdi-pencil</v-icon>
+                      <v-icon class="mr-1" size="small">mdi-pencil</v-icon>
+                      Edit
                     </v-btn>
                     <v-btn
-                      icon
-                      size="small"
                       color="error"
-                      variant="text"
-                      class="action-btn"
+                      variant="outlined"
+                      size="small"
                       @click="confirmDeleteDialog(client)"
                     >
-                      <v-icon>mdi-delete-outline</v-icon>
+                      <v-icon class="mr-1" size="small">mdi-delete</v-icon>
+                      Delete
                     </v-btn>
                   </div>
-                </div>
-
-                <!-- Client Details Grid -->
-                <div class="client-details">
-                  <div class="client-detail-item">
-                    <div class="detail-label">
-                      Contact
-                    </div>
-                    <div class="detail-value">
-                      {{ client.email }}
-                    </div>
-                    <div class="detail-secondary">
-                      {{ client.phone }}
-                    </div>
-                  </div>
-                  
-                  <div class="client-detail-item">
-                    <div class="detail-label">
-                      Projects
-                    </div>
-                    <div class="detail-value">
-                      {{ client.projects }}
-                    </div>
-                    <div class="detail-secondary">
-                      Completed
-                    </div>
-                  </div>
-                  
-                  <div class="client-detail-item">
-                    <div class="detail-label">
-                      Earnings
-                    </div>
-                    <div class="detail-value">
-                      ${{ client.earn.toLocaleString() }}
-                    </div>
-                    <div class="detail-secondary">
-                      Total revenue
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Client Review -->
-                <div
-                  v-if="client.review"
-                  class="client-review"
-                >
-                  <div class="review-label">
-                    My Review
-                  </div>
-                  <div class="review-content">
-                    {{ client.review }}
-                  </div>
-                </div>
-              </div>
+                </v-card-text>
+              </v-card>
             </div>
           </div>
         </div>
@@ -526,43 +544,53 @@ export default defineComponent({
     const clients = ref([
       {
         id: 1,
-        name: 'Jane Smith',
-        platform: 'Fiverr',
-        email: 'jane.29@gmail.com',
-        phone: '+987654321',
-        projects: 10,
-        earn: 9420,
-        review: 'Nice client, easy to work'
+        name: 'TechFlow Solutions',
+        platform: 'Upwork',
+        email: 'contact@techflowsolutions.com',
+        phone: '+1-555-0123',
+        projects: 8,
+        earn: 12450,
+        review: 'Excellent client, clear requirements, pays on time. Long-term collaboration.'
       },
       {
         id: 2,
-        name: 'Arina Kalom',
-        platform: 'UpWork',
-        email: 'kalom185@gmail.com',
-        phone: '+970316937',
-        projects: 2,
-        earn: 895,
-        review: "I'm waiting for big project"
+        name: 'Digital Marketing Pro',
+        platform: 'Fiverr',
+        email: 'hello@digitalmarketingpro.com',
+        phone: '+44-20-7946-0958',
+        projects: 5,
+        earn: 6800,
+        review: 'Great to work with, responsive communication, appreciates quality work.'
       },
       {
         id: 3,
-        name: 'Nayla Masood',
+        name: 'StartupBridge Inc',
         platform: 'Freelancer.com',
-        email: 'masood@gmail.com',
-        phone: '+970316937',
-        projects: 5,
-        earn: 3106,
-        review: 'good to work, but problem with communication (take time to explain my design)'
+        email: 'dev@startupbridge.io',
+        phone: '+1-415-555-0187',
+        projects: 12,
+        earn: 18750,
+        review: 'Amazing client! Multiple successful projects, trusts my expertise, great feedback.'
       },
       {
         id: 4,
-        name: 'John Doe',
+        name: 'Creative Studios',
         platform: 'Direct Client',
-        email: 'john.doe@example.com',
-        phone: '+987654321',
-        projects: 0,
-        earn: 0,
-        review: 'New client, middle project'
+        email: 'projects@creativestudios.design',
+        phone: '+49-30-12345678',
+        projects: 3,
+        earn: 4200,
+        review: 'Creative agency with interesting projects, good collaboration on UI/UX work.'
+      },
+      {
+        id: 5,
+        name: 'E-commerce Solutions Ltd',
+        platform: 'Upwork',
+        email: 'tech@ecommercesolutions.co.uk',
+        phone: '+44-161-555-0199',
+        projects: 7,
+        earn: 9650,
+        review: 'Professional client, complex e-commerce projects, values attention to detail.'
       }
     ]);
 
@@ -688,6 +716,45 @@ export default defineComponent({
         clientToDelete.value = null;
       }
     };
+
+    // Earnings editing methods
+    const startEditingEarnings = (client) => {
+      client.editingEarnings = true;
+      client.tempEarnings = client.earn;
+    };
+
+    const saveEarnings = (client) => {
+      const newEarnings = parseFloat(client.tempEarnings);
+      if (!isNaN(newEarnings) && newEarnings >= 0) {
+        client.earn = newEarnings;
+      }
+      client.editingEarnings = false;
+      delete client.tempEarnings;
+    };
+
+    const cancelEditingEarnings = (client) => {
+      client.editingEarnings = false;
+      delete client.tempEarnings;
+    };
+
+    // Mock task data - in real app, this would come from an API
+    const getActiveTasksForClient = (clientId) => {
+      // Mock active tasks
+      const mockTasks = [
+        { clientId: 1, title: 'Website Redesign', status: 'In Progress' },
+        { clientId: 1, title: 'Mobile App Development', status: 'TODO' },
+        { clientId: 3, title: 'E-commerce Platform', status: 'In Progress' },
+        { clientId: 5, title: 'Database Optimization', status: 'TODO' }
+      ];
+      return mockTasks.filter(task => task.clientId === clientId);
+    };
+
+    const getActiveTasksText = (clientId) => {
+      const tasks = getActiveTasksForClient(clientId);
+      if (tasks.length === 0) return 'No active tasks';
+      if (tasks.length === 1) return `Working on: ${tasks[0].title}`;
+      return `${tasks.length} active tasks`;
+    };
     
     // Lifecycle hooks
     onMounted(() => {
@@ -718,7 +785,12 @@ export default defineComponent({
       openClientDialog,
       saveClient,
       confirmDeleteDialog,
-      deleteClient
+      deleteClient,
+      startEditingEarnings,
+      saveEarnings,
+      cancelEditingEarnings,
+      getActiveTasksForClient,
+      getActiveTasksText
     };
   }
 });
@@ -989,8 +1061,8 @@ export default defineComponent({
 /* Client Directory */
 .clients-directory {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 2rem;
 }
 
 .client-item {
@@ -1328,6 +1400,339 @@ export default defineComponent({
     padding: 8px;
     min-width: 40px;
     min-height: 40px;
+  }
+}
+
+/* Profile Section Styles */
+.profile-card {
+  border-radius: 16px;
+  border: 1px solid rgba(99, 102, 241, 0.1);
+  box-shadow: 0 8px 32px rgba(99, 102, 241, 0.1);
+  transition: all 0.3s ease;
+}
+
+.profile-card:hover {
+  box-shadow: 0 12px 48px rgba(99, 102, 241, 0.15);
+  transform: translateY(-2px);
+}
+
+.profile-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.profile-avatar {
+  flex-shrink: 0;
+}
+
+.profile-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 4px 0;
+}
+
+.profile-title {
+  font-size: 1rem;
+  color: #6366f1;
+  font-weight: 500;
+  margin: 0 0 16px 0;
+}
+
+.profile-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profile-detail-item {
+  display: flex;
+  align-items: center;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.profile-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 120px;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 16px 12px;
+  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  border-radius: 12px;
+  border: 1px solid rgba(99, 102, 241, 0.1);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #6366f1;
+  line-height: 1;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 4px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.profile-specialties {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 16px;
+}
+
+.specialties-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 12px 0;
+}
+
+.specialties-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.status-chip {
+  font-weight: 500;
+}
+
+/* Responsive Profile */
+@media (max-width: 768px) {
+  .profile-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+  }
+  
+  .profile-stats {
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-around;
+  }
+  
+  .stat-item {
+    flex: 1;
+    margin: 0 4px;
+  }
+  
+  .profile-details {
+    align-items: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-stats {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .stat-item {
+    margin: 0;
+  }
+}
+
+/* New Client Profile Card Styles */
+.client-profile-card {
+  border-radius: 16px;
+  border: 1px solid rgba(99, 102, 241, 0.1);
+  box-shadow: 0 8px 32px rgba(99, 102, 241, 0.1);
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.client-profile-card:hover {
+  box-shadow: 0 12px 48px rgba(99, 102, 241, 0.15);
+  transform: translateY(-2px);
+}
+
+.client-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 32px;
+  min-height: 200px;
+}
+
+.client-avatar-section {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.platform-chip {
+  font-weight: 500;
+}
+
+.client-info-section {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.client-profile-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 4px 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.client-status {
+  font-size: 1rem;
+  color: #10b981;
+  font-weight: 500;
+  margin: 0 0 16px 0;
+}
+
+.client-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.client-detail-item {
+  display: flex;
+  align-items: center;
+  color: #64748b;
+  font-size: 0.9rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.client-stats-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 140px;
+  flex-shrink: 0;
+}
+
+.earnings-stat {
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  transition: border-color 0.3s ease;
+}
+
+.earnings-stat:hover {
+  border-color: #6366f1;
+}
+
+.stat-value-editable {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.earnings-edit {
+  width: 100%;
+}
+
+.earnings-actions {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+.client-review {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 16px;
+}
+
+.review-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+}
+
+.review-text {
+  color: #64748b;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+  font-style: italic;
+}
+
+.client-actions-bottom {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 16px;
+}
+
+/* Responsive Client Cards */
+@media (max-width: 1200px) {
+  .clients-directory {
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .clients-directory {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .client-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 20px;
+  }
+  
+  .client-stats-section {
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-around;
+    min-width: auto;
+  }
+  
+  .stat-item {
+    flex: 1;
+    margin: 0 4px;
+  }
+  
+  .client-details {
+    align-items: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .client-stats-section {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .stat-item {
+    margin: 0;
+  }
+  
+  .client-actions-bottom {
+    flex-direction: column;
+    gap: 8px;
   }
 }
 </style>

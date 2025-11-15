@@ -82,7 +82,7 @@
               Notification Preferences
             </h3>
             <p class="section-description">
-              Choose how you want to be notified about important updates and activities. You can customize your preferences for different types of notifications below.
+              Stay informed about your projects, deadlines, and team activities. Customize your notification preferences to receive alerts that matter most to you.
             </p>
           </div>
           
@@ -239,6 +239,96 @@
           </div>
         </div>
         
+        <!-- Spacing between sections -->
+        <div class="section-spacing"></div>
+        
+        <!-- Recent Notifications -->
+        <div id="recent-notifications" class="content-card settings-card">
+          <div class="section-header">
+            <h3 class="section-title">
+              Recent Notifications
+            </h3>
+            <div class="notification-actions">
+              <button
+                v-if="notifications.length > 0"
+                class="btn btn-secondary"
+                @click="clearAllNotifications"
+              >
+                Clear All
+              </button>
+              <button
+                class="btn btn-secondary"
+                @click="refreshNotifications"
+              >
+                Refresh
+              </button>
+              <button
+                class="btn btn-primary"
+                @click="prepareForNewUser"
+              >
+                New User Setup
+              </button>
+            </div>
+          </div>
+          
+          <div class="notifications-list">
+            <div
+              v-if="notifications.length === 0"
+              class="empty-notifications"
+            >
+              <div class="empty-state">
+                <v-icon
+                  size="48"
+                  color="grey-lighten-2"
+                  class="mb-3"
+                >
+                  mdi-bell-outline
+                </v-icon>
+                <h4 class="text-subtitle-1 mb-2 text-medium-emphasis">You're all caught up!</h4>
+                <p class="text-body-2 text-medium-emphasis">
+                  Your notification center is ready.
+                </p>
+                <p class="text-body-2 text-medium-emphasis" style="margin-top: 16px;">
+                  Try the <strong>Refresh</strong> button to see sample notifications!
+                </p>
+              </div>
+            </div>
+            
+            <div
+              v-for="notification in notifications"
+              :key="notification.id"
+              class="notification-item"
+              :class="{ 'unread': !notification.read }"
+              @click="markNotificationAsRead(notification)"
+            >
+              <div class="notification-icon">
+                <v-icon
+                  :color="getNotificationIconColor(notification.type)"
+                  size="20"
+                >
+                  {{ getNotificationIcon(notification.type) }}
+                </v-icon>
+              </div>
+              <div class="notification-content">
+                <h4 class="notification-title">{{ notification.title }}</h4>
+                <p class="notification-message">{{ notification.message }}</p>
+                <div class="notification-meta">
+                  <span class="notification-time">{{ formatNotificationTime(notification.time) }}</span>
+                  <span class="notification-type">{{ getNotificationTypeLabel(notification.type) }}</span>
+                </div>
+              </div>
+              <div class="notification-actions">
+                <button
+                  class="delete-notification-btn"
+                  @click.stop="deleteNotification(notification.id)"
+                >
+                  <v-icon size="16">mdi-close</v-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
         <!-- Success Notification -->
         <div
           v-if="snackbar"
@@ -263,10 +353,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import LeftMenu from '@/dashboard/LeftMenu.vue'
 import SearchBar from '@/dashboard/SearchBar.vue'
+import notificationService, { notifications, notificationSettings } from '@/services/notificationService.js'
+// import billingService from '@/services/billingService.js'
 
 // Setup router
 const router = useRouter()
@@ -277,16 +369,65 @@ const sidebarExpanded = ref(true)
 const saving = ref(false)
 const snackbar = ref(false)
 
-// Notification settings
-const emailNotifications = ref(true)
-const pushNotifications = ref(false)
-const accountActivity = ref(true)
-const billingAlerts = ref(false)
+// Use notification settings from service
+const emailNotifications = computed({
+  get: () => notificationSettings.value.emailNotifications,
+  set: (value) => notificationService.updateSettings({ emailNotifications: value })
+})
+
+const pushNotifications = computed({
+  get: () => notificationSettings.value.pushNotifications,
+  set: (value) => notificationService.updateSettings({ pushNotifications: value })
+})
+
+const accountActivity = computed({
+  get: () => notificationSettings.value.inAppNotifications,
+  set: (value) => notificationService.updateSettings({ inAppNotifications: value })
+})
+
+const billingAlerts = computed({
+  get: () => notificationSettings.value.billingNotifications,
+  set: (value) => notificationService.updateSettings({ billingNotifications: value })
+})
 
 // Set the correct tab on component mount
 onMounted(() => {
   tab.value = 'notification'
+  
+  // For new user experience, do a complete cleanup
+  prepareForNewUser()
 })
+
+// Clean up test notifications for production
+const cleanupTestNotifications = () => {
+  // Remove any notifications that were added for testing or have formatting issues
+  const testTitles = [
+    'Payment Successful',
+    'Payment Failed', 
+    'Payment Reminder',
+    'System Ready', // Remove old system ready notifications
+    'Get Started with Projects', // Remove old getting started notifications
+    'Set Your First Reminder',
+    'Team Collaboration Ready'
+  ]
+  
+  // Filter out test notifications and any that might have spacing issues
+  const cleanedNotifications = notifications.value.filter(notification => 
+    !testTitles.includes(notification.title) &&
+    !notification.message.includes('$19.99') &&
+    !notification.message.includes('$49.99') &&
+    !notification.message.includes('$29.99') &&
+    !notification.message.includes('$15') && // Remove the problematic $15 notification
+    !notification.message.includes('Start creating projects and tasks') // Remove old system ready messages
+  )
+  
+  // Only update if we found test notifications to remove
+  if (cleanedNotifications.length !== notifications.value.length) {
+    notifications.value = cleanedNotifications
+    notificationService.saveToStorage()
+    console.log('✅ Test notifications cleaned up for production')
+  }
+}
 
 // Methods
 const navigateTo = (componentName) => {
@@ -295,40 +436,160 @@ const navigateTo = (componentName) => {
 
 const toggleEmailNotifications = () => {
   emailNotifications.value = !emailNotifications.value
-  saveNotificationSettings()
 }
 
 const togglePushNotifications = () => {
   pushNotifications.value = !pushNotifications.value
-  saveNotificationSettings()
 }
 
 const toggleAccountActivity = () => {
   accountActivity.value = !accountActivity.value
-  saveNotificationSettings()
 }
 
 const toggleBillingAlerts = () => {
   billingAlerts.value = !billingAlerts.value
-  saveNotificationSettings()
 }
 
-const saveNotificationSettings = () => {
-  console.log('Saving notification settings:', {
-    emailNotifications: emailNotifications.value,
-    pushNotifications: pushNotifications.value,
-    accountActivity: accountActivity.value,
-    billingAlerts: billingAlerts.value
+// Notification management methods
+const markNotificationAsRead = (notification) => {
+  notificationService.markAsRead(notification.id)
+}
+
+const deleteNotification = (notificationId) => {
+  notificationService.deleteNotification(notificationId)
+}
+
+const clearAllNotifications = () => {
+  if (confirm('Are you sure you want to clear all notifications?')) {
+    notificationService.clearAll()
+  }
+}
+
+const refreshNotifications = () => {
+  // Clean up any problematic notifications and refresh the display
+  cleanupTestNotifications()
+  
+  // If no notifications exist, add some welcoming sample notifications
+  if (notifications.value.length === 0) {
+    addWelcomeNotifications()
+  }
+  
+  // Force reactivity update
+  notifications.value = [...notifications.value]
+  
+  console.log('✅ Notifications refreshed and cleaned')
+}
+
+const prepareForNewUser = () => {
+  // Complete reset for new user experience
+  notificationService.clearAll()
+  
+  // Clear localStorage completely
+  localStorage.removeItem('app_notifications')
+  localStorage.removeItem('notification_settings')
+  localStorage.removeItem('user_payments')
+  
+  // Add fresh welcome notifications
+  addWelcomeNotifications()
+  
+  console.log('✅ System prepared for new user')
+}
+
+const addWelcomeNotifications = () => {
+  // Add only the main welcome notification that users love
+  notificationService.addNotification({
+    type: 'general',
+    title: 'Welcome to Your Dashboard!',
+    message: 'Your notification system is now active. You\'ll see updates here when you create projects, set reminders, or receive team messages.',
+    icon: 'mdi-hand-wave',
+    category: 'welcome'
   })
 }
+
+const getNotificationIcon = (type) => {
+  const icons = {
+    project: 'mdi-folder-plus',
+    reminder: 'mdi-bell-plus',
+    meeting: 'mdi-calendar-plus',
+    team_chat: 'mdi-message-text',
+    task: 'mdi-check-circle',
+    billing: 'mdi-credit-card-clock',
+    payment: 'mdi-bell-alert',
+    general: 'mdi-bell'
+  }
+  return icons[type] || 'mdi-bell'
+}
+
+const getNotificationIconColor = (type) => {
+  const colors = {
+    project: '#4CAF50',
+    reminder: '#FF9800',
+    meeting: '#2196F3',
+    team_chat: '#9C27B0',
+    task: '#00BCD4',
+    billing: '#F44336',
+    payment: '#FF5722',
+    general: '#757575'
+  }
+  return colors[type] || '#757575'
+}
+
+const getNotificationTypeLabel = (type) => {
+  const labels = {
+    project: 'Project',
+    reminder: 'Reminder',
+    meeting: 'Meeting',
+    team_chat: 'Team Chat',
+    task: 'Task',
+    billing: 'Billing',
+    payment: 'Payment',
+    general: 'General'
+  }
+  return labels[type] || 'Notification'
+}
+
+const formatNotificationTime = (time) => {
+  if (!time) return ''
+  const now = new Date()
+  const notificationTime = new Date(time)
+  const diffInMinutes = Math.floor((now - notificationTime) / (1000 * 60))
+  
+  if (diffInMinutes < 1) return 'Just now'
+  if (diffInMinutes < 60) return `${diffInMinutes}m ago`
+  
+  const diffInHours = Math.floor(diffInMinutes / 60)
+  if (diffInHours < 24) return `${diffInHours}h ago`
+  
+  const diffInDays = Math.floor(diffInHours / 24)
+  if (diffInDays < 7) return `${diffInDays}d ago`
+  
+  return notificationTime.toLocaleDateString()
+}
+
+// const testBillingNotifications = () => {
+//   // Add sample billing notifications for demonstration
+//   notificationService.addBillingNotification(29.99, new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), 'Pro Plan Subscription')
+//   notificationService.addBillingNotification(15.00, new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), 'Additional Storage')
+//   
+//   // Show success message
+//   console.log('✅ Sample billing notifications added!')
+// }
+
+
 
 const saveAllSettings = async () => {
   saving.value = true
   try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    saveNotificationSettings()
+    // Settings are automatically saved through computed properties
+    // Just simulate a brief loading state for user feedback
+    await new Promise(resolve => setTimeout(resolve, 500))
+    
+    console.log('All notification settings saved:', notificationSettings.value)
+    
+    // Show success notification
     snackbar.value = true
+    
+    // Auto-hide after 3 seconds
     setTimeout(() => {
       snackbar.value = false
     }, 3000)
@@ -612,6 +873,18 @@ const saveAllSettings = async () => {
   box-shadow: 0 4px 12px rgba(12, 156, 141, 0.3);
 }
 
+.btn-secondary {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.btn-secondary:hover {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+  transform: translateY(-1px);
+}
+
 .btn-large {
   padding: 16px 32px;
   font-size: 16px;
@@ -621,6 +894,148 @@ const saveAllSettings = async () => {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none !important;
+}
+
+/* Section Spacing */
+.section-spacing {
+  height: 32px;
+}
+
+/* Recent Notifications */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.notification-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.notifications-list {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.empty-notifications {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.notification-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 16px;
+  border: 1px solid #f3f4f6;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.notification-item:hover {
+  background: #f9fafb;
+  border-color: #e5e7eb;
+}
+
+.notification-item.unread {
+  background: #eff6ff;
+  border-color: #dbeafe;
+}
+
+.notification-item.unread::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: #3b82f6;
+  border-radius: 0 4px 4px 0;
+}
+
+.notification-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.notification-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 16px 0 !important;
+  padding-bottom: 4px;
+  display: block;
+}
+
+.notification-message {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0 0 20px 0 !important;
+  margin-top: 8px !important;
+  line-height: 1.4;
+  display: block;
+  padding-top: 4px;
+}
+
+.notification-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: 8px;
+}
+
+.notification-time {
+  font-weight: 500;
+}
+
+.notification-type {
+  padding: 2px 8px;
+  background: #f3f4f6;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.notification-actions {
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+.delete-notification-btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #9ca3af;
+  transition: all 0.2s ease;
+}
+
+.delete-notification-btn:hover {
+  background: #fee2e2;
+  color: #dc2626;
 }
 
 /* Success Notification */
