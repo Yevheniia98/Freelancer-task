@@ -6,6 +6,7 @@ import CreateAccount from '@/views/CreateAccount.vue';
 import Login from '@/views/Login.vue';
 import ForgotPassword from '@/views/ForgotPassword.vue';
 import ResetPassword from '@/views/ResetPassword.vue';
+import TeamInvite from '@/views/TeamInvite.vue';
 import PricingSection from '@/components/PricingSection.vue'; // ✅ Correct import
 import CardPayment from '@/views/CardPayment.vue';
 import DashboardPage from '@/views/DashboardPage.vue';
@@ -65,7 +66,12 @@ const routes = [
   { 
     path: '/reset-password',
     name: 'ResetPassword',
-    component: ResetPassword,
+    component: ResetPassword 
+  },
+  { 
+    path: '/team-invite',
+    name: 'TeamInvite',
+    component: TeamInvite 
   },
   { 
     path: '/pricing',

@@ -33,57 +33,69 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.User = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const userSchema = new mongoose_1.Schema({
-    email: {
-        type: String,
-        required: true,
-        trim: true,
-        lowercase: true,
-    },
-    password: {
-        type: String,
-        required: true,
-        select: false,
-    },
-    firstName: {
-        type: String,
-        required: true,
-        trim: true,
-    },
-    lastName: {
-        type: String,
-        required: true,
-        trim: true,
-    },
-    twoFactorEnabled: {
-        type: Boolean,
-        default: false,
-    },
-    twoFactorSecret: {
-        type: String,
-        select: false,
-    },
-    resetPasswordToken: String,
-    resetPasswordExpires: Date,
-    invitedBy: {
+const FinancialTransactionSchema = new mongoose_1.Schema({
+    userId: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: 'User',
-        default: null
+        required: true,
+        index: true,
     },
-    inviteToken: {
+    platform: {
         type: String,
-        default: null
+        enum: ['upwork', 'freelancer', 'fiverr', 'toptal', 'guru'],
+        required: true,
+        index: true,
     },
-    isInvitedUser: {
-        type: Boolean,
-        default: false
-    }
+    transactionId: {
+        type: String,
+        required: true,
+    },
+    type: {
+        type: String,
+        enum: ['earning', 'withdrawal', 'refund', 'fee', 'bonus'],
+        required: true,
+        default: 'earning',
+    },
+    amount: {
+        type: Number,
+        required: true,
+    },
+    currency: {
+        type: String,
+        required: true,
+        default: 'USD',
+    },
+    description: {
+        type: String,
+    },
+    projectId: {
+        type: String,
+    },
+    projectName: {
+        type: String,
+    },
+    clientName: {
+        type: String,
+    },
+    status: {
+        type: String,
+        enum: ['pending', 'completed', 'failed', 'cancelled'],
+        default: 'completed',
+    },
+    transactionDate: {
+        type: Date,
+        required: true,
+        index: true,
+    },
+    metadata: {
+        type: mongoose_1.Schema.Types.Mixed,
+    },
 }, {
     timestamps: true,
 });
-// Create indexes
-userSchema.index({ email: 1 }, { unique: true });
-userSchema.index({ resetPasswordToken: 1 }, { sparse: true });
-exports.User = mongoose_1.default.model('User', userSchema);
+// Compound index for unique transaction per platform
+FinancialTransactionSchema.index({ userId: 1, platform: 1, transactionId: 1 }, { unique: true });
+// Index for date range queries
+FinancialTransactionSchema.index({ userId: 1, transactionDate: -1 });
+exports.default = mongoose_1.default.model('FinancialTransaction', FinancialTransactionSchema);

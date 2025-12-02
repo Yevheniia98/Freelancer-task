@@ -238,7 +238,7 @@
                     <div class="text-subtitle-1 font-weight-medium">
                       {{ selectedChat?.contact.name }}
                     </div>
-                    <div class="text-caption text-medium-emphasis">
+                    <div class="text-caption" :style="{ color: selectedChat?.contact.isOnline ? '#DCDCDC' : '#666' }">
                       {{ selectedChat?.contact.isOnline ? 'online' : `last seen ${formatLastSeen(selectedChat?.contact.lastSeen)}` }}
                     </div>
                   </div>
@@ -666,6 +666,7 @@
 
 <script>
 import notificationService from '@/services/notificationService.js';
+import { teamService, subscriptionService } from '@/services/teamService.js';
 
 export default {
   name: 'WhatsAppChat',
@@ -1626,11 +1627,13 @@ export default {
       // Validate input
       if (!this.newMemberName.trim()) {
         alert('Please enter a name for the team member');
+        this.sendingInvitation = false;
         return;
       }
 
       if (!this.newMemberEmail.trim() && !this.newMemberPhone.trim()) {
         alert('Please provide either an email or phone number');
+        this.sendingInvitation = false;
         return;
       }
 
@@ -1639,8 +1642,90 @@ export default {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(this.newMemberEmail.trim())) {
           alert('Please enter a valid email address');
+          this.sendingInvitation = false;
           return;
         }
+      }
+
+      try {
+        // Check if user can invite more members (subscription check)
+        const canInviteResponse = await subscriptionService.canInvite();
+        
+        if (!canInviteResponse.canInvite) {
+          alert(canInviteResponse.reason || 'You cannot invite more members. Please upgrade your subscription.');
+          this.sendingInvitation = false;
+          return;
+        }
+
+        // Send invitation via backend
+        const response = await teamService.sendInvitation(
+          this.newMemberEmail.trim(),
+          this.newMemberName.trim()
+        );
+
+        if (response.success) {
+          const invitationLink = response.inviteUrl;
+
+          // Create new member chat locally
+          const newMember = {
+            id: response.invitation.id,
+            name: this.newMemberName.trim(),
+            email: this.newMemberEmail.trim(),
+            phone: this.newMemberPhone.trim(),
+            avatar: null,
+            isOnline: false,
+            lastSeen: new Date(),
+            pendingInvite: true
+          };
+
+          const welcomeChat = {
+            id: newMember.id,
+            contact: newMember,
+            messages: [
+              {
+                id: Date.now(),
+                senderId: 0,
+                text: `Invitation sent to ${newMember.name}! 👋 Waiting for them to accept...`,
+                timestamp: new Date(),
+                type: 'text',
+                status: 'sent'
+              }
+            ],
+            unreadCount: 0,
+            lastMessage: null
+          };
+
+          this.chats.push(welcomeChat);
+
+          // Send email notification
+          await this.sendInvitationEmail(newMember, invitationLink);
+
+          // Copy link to clipboard
+          this.copyInvitationLink(invitationLink, newMember);
+
+          // Clear form
+          this.newMemberName = '';
+          this.newMemberEmail = '';
+          this.newMemberPhone = '';
+          this.sendingInvitation = false;
+          this.showNewChatDialog = false;
+
+          // Show success message
+          this.showSuccessDialog(
+            `Invitation Sent! ✅`,
+            `${newMember.name} has been invited to join your team!\n\n📧 Email sent to: ${newMember.email}\n🔗 Invitation link copied to clipboard\n\nRemaining invites: ${canInviteResponse.remaining}`,
+            invitationLink
+          );
+
+          console.log('✅ Invitation sent successfully');
+        } else {
+          alert(response.error || 'Failed to send invitation');
+          this.sendingInvitation = false;
+        }
+      } catch (error) {
+        console.error('Error sending invitation:', error);
+        alert(error.response?.data?.error || 'Failed to send invitation. Please try again.');
+        this.sendingInvitation = false;
       }
 
       // Phone validation if provided (basic check)
@@ -1697,7 +1782,7 @@ export default {
       this.chats.push(welcomeChat);
 
       // Generate invitation link
-      const invitationLink = `${window.location.origin}/dashboard?invite=${encodeURIComponent(newMember.name)}&team=freelancer-task`;
+      const invitationLink = `${window.location.origin}/team-invite?invite=${encodeURIComponent(newMember.name)}&team=freelancer-task`;
 
       // Send invitation email if email provided
       if (newMember.email) {
@@ -1782,11 +1867,17 @@ export default {
 
                 <div style="text-align: center; margin: 30px 0;">
                   <a href="${invitationLink}" 
-                     style="background: #25d366; color: white; padding: 15px 30px; 
-                            text-decoration: none; border-radius: 25px; font-weight: bold; 
-                            display: inline-block; font-size: 16px;">
-                    🚀 Join Team Chat
+                     style="background: #0C9C8D; color: white; padding: 15px 30px; 
+                            text-decoration: none; border-radius: 8px; font-weight: bold; 
+                            display: inline-block; font-size: 16px; box-shadow: 0 4px 12px rgba(12, 156, 141, 0.3);">
+                    🚀 Accept Invitation & Join Team
                   </a>
+                </div>
+                
+                <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 15px; margin: 20px 0;">
+                  <p style="margin: 0; font-size: 14px; color: #856404;">
+                    <strong>📝 Note:</strong> If you don't have an account yet, clicking the button above will guide you through creating one. Once registered, you'll automatically get access to our team workspace!
+                  </p>
                 </div>
 
                 <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0;">

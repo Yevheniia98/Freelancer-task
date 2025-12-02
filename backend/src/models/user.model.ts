@@ -9,6 +9,9 @@ export interface IUser extends Document {
   twoFactorSecret?: string;
   resetPasswordToken?: string;
   resetPasswordExpires?: Date;
+  invitedBy?: mongoose.Types.ObjectId; // User who invited this user
+  inviteToken?: string; // Token from the invitation
+  isInvitedUser: boolean; // Whether this user joined via invitation (gets free access)
   createdAt: Date;
   updatedAt: Date;
 }
@@ -46,6 +49,19 @@ const userSchema = new Schema<IUser>(
     },
     resetPasswordToken: String,
     resetPasswordExpires: Date,
+    invitedBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
+    },
+    inviteToken: {
+      type: String,
+      default: null
+    },
+    isInvitedUser: {
+      type: Boolean,
+      default: false
+    }
   },
   {
     timestamps: true,

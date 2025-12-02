@@ -9,6 +9,7 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const crypto_1 = __importDefault(require("crypto"));
 const user_model_1 = require("../models/user.model");
 const twoFactor_service_1 = require("./twoFactor.service");
+const subscription_service_1 = require("./subscription.service");
 class AuthService {
     constructor() {
         // Mock users for demo mode (email-only mode without MongoDB)
@@ -71,6 +72,7 @@ class AuthService {
         this.JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
         this.JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
         this.twoFactorService = new twoFactor_service_1.TwoFactorService();
+        this.subscriptionService = new subscription_service_1.SubscriptionService();
     }
     async register(userData) {
         try {
@@ -91,6 +93,17 @@ class AuthService {
                 twoFactorEnabled: false
             });
             const savedUser = await newUser.save();
+            // Create free subscription for new user (not invited users - they get free access)
+            if (!newUser.isInvitedUser) {
+                try {
+                    await this.subscriptionService.createFreeSubscription(savedUser._id);
+                    console.log('✅ Free subscription created for user:', savedUser.email);
+                }
+                catch (subError) {
+                    console.error('⚠️ Failed to create subscription:', subError);
+                    // Don't fail registration if subscription creation fails
+                }
+            }
             // Generate token
             const token = this.generateToken(String(savedUser._id));
             return {

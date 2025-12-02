@@ -28,6 +28,7 @@ import clientRoutes from './routes/client.routes';
 import taskRoutes from './routes/task.routes';
 import teamRoutes from './routes/team.routes';
 import financeRoutes from './routes/finance.routes';
+import subscriptionRoutes from './routes/subscription.routes';
 import settingsRoutes from './routes/settings.routes';
 import projectIntegrationRoutes from './routes/project.integration.routes';
 import meetingInvitationRoutes from './routes/meeting-invitation.routes';
@@ -171,12 +172,61 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/team', teamRoutes);
 app.use('/api/team-management', teamManagementRoutes);
 app.use('/api/finance', financeRoutes);
+app.use('/api/subscription', subscriptionRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/integrations', projectIntegrationRoutes);
 app.use('/api/meeting-invitations', meetingInvitationRoutes);
 app.use('/api/test-email', testEmailRoutes);
 app.use('/api/notifications', notificationRoutes);
 // app.use('/api/financial', financialRoutes);
+
+// Team Invitation Email Endpoint
+app.post('/api/send-email', async (req, res) => {
+  try {
+    const { to, subject, html } = req.body;
+
+    if (!to || !subject || !html) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required fields: to, subject, html'
+      });
+    }
+
+    // Import EmailService dynamically
+    const { EmailService } = await import('./services/email.service');
+    const emailService = new EmailService();
+
+    // Send the email
+    const emailSent = await emailService.sendEmail({
+      to,
+      subject,
+      html,
+      text: subject // Fallback text version
+    });
+
+    if (emailSent) {
+      console.log(`✅ Team invitation email sent to: ${to}`);
+      res.status(200).json({
+        success: true,
+        message: 'Email sent successfully'
+      });
+    } else {
+      console.error(`❌ Failed to send email to: ${to}`);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to send email'
+      });
+    }
+
+  } catch (error: any) {
+    console.error('❌ Email sending error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
 
 // Image Upload Endpoint - Clean & Simple
 app.post('/upload', (req, res) => {

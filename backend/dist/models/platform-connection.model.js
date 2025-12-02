@@ -33,57 +33,50 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.User = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const userSchema = new mongoose_1.Schema({
-    email: {
-        type: String,
-        required: true,
-        trim: true,
-        lowercase: true,
-    },
-    password: {
-        type: String,
-        required: true,
-        select: false,
-    },
-    firstName: {
-        type: String,
-        required: true,
-        trim: true,
-    },
-    lastName: {
-        type: String,
-        required: true,
-        trim: true,
-    },
-    twoFactorEnabled: {
-        type: Boolean,
-        default: false,
-    },
-    twoFactorSecret: {
-        type: String,
-        select: false,
-    },
-    resetPasswordToken: String,
-    resetPasswordExpires: Date,
-    invitedBy: {
+const PlatformConnectionSchema = new mongoose_1.Schema({
+    userId: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: 'User',
-        default: null
+        required: true,
+        index: true,
     },
-    inviteToken: {
+    platform: {
         type: String,
-        default: null
+        enum: ['upwork', 'freelancer', 'fiverr', 'toptal', 'guru'],
+        required: true,
     },
-    isInvitedUser: {
+    accessToken: {
+        type: String,
+        required: true,
+        select: false, // Don't return in queries by default
+    },
+    refreshToken: {
+        type: String,
+        select: false,
+    },
+    tokenExpiry: {
+        type: Date,
+    },
+    platformUserId: {
+        type: String,
+    },
+    platformUsername: {
+        type: String,
+    },
+    isActive: {
         type: Boolean,
-        default: false
-    }
+        default: true,
+    },
+    lastSyncedAt: {
+        type: Date,
+    },
+    metadata: {
+        type: mongoose_1.Schema.Types.Mixed,
+    },
 }, {
     timestamps: true,
 });
-// Create indexes
-userSchema.index({ email: 1 }, { unique: true });
-userSchema.index({ resetPasswordToken: 1 }, { sparse: true });
-exports.User = mongoose_1.default.model('User', userSchema);
+// Compound index for unique platform per user
+PlatformConnectionSchema.index({ userId: 1, platform: 1 }, { unique: true });
+exports.default = mongoose_1.default.model('PlatformConnection', PlatformConnectionSchema);

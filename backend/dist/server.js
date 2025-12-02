@@ -1,4 +1,37 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -29,6 +62,7 @@ const client_routes_1 = __importDefault(require("./routes/client.routes"));
 const task_routes_1 = __importDefault(require("./routes/task.routes"));
 const team_routes_1 = __importDefault(require("./routes/team.routes"));
 const finance_routes_1 = __importDefault(require("./routes/finance.routes"));
+const subscription_routes_1 = __importDefault(require("./routes/subscription.routes"));
 const settings_routes_1 = __importDefault(require("./routes/settings.routes"));
 const project_integration_routes_1 = __importDefault(require("./routes/project.integration.routes"));
 const meeting_invitation_routes_1 = __importDefault(require("./routes/meeting-invitation.routes"));
@@ -155,12 +189,57 @@ app.use('/api/tasks', task_routes_1.default);
 app.use('/api/team', team_routes_1.default);
 app.use('/api/team-management', team_management_routes_1.default);
 app.use('/api/finance', finance_routes_1.default);
+app.use('/api/subscription', subscription_routes_1.default);
 app.use('/api/settings', settings_routes_1.default);
 app.use('/api/integrations', project_integration_routes_1.default);
 app.use('/api/meeting-invitations', meeting_invitation_routes_1.default);
 app.use('/api/test-email', test_email_routes_1.default);
 app.use('/api/notifications', notification_routes_1.default);
 // app.use('/api/financial', financialRoutes);
+// Team Invitation Email Endpoint
+app.post('/api/send-email', async (req, res) => {
+    try {
+        const { to, subject, html } = req.body;
+        if (!to || !subject || !html) {
+            return res.status(400).json({
+                success: false,
+                message: 'Missing required fields: to, subject, html'
+            });
+        }
+        // Import EmailService dynamically
+        const { EmailService } = await Promise.resolve().then(() => __importStar(require('./services/email.service')));
+        const emailService = new EmailService();
+        // Send the email
+        const emailSent = await emailService.sendEmail({
+            to,
+            subject,
+            html,
+            text: subject // Fallback text version
+        });
+        if (emailSent) {
+            console.log(`✅ Team invitation email sent to: ${to}`);
+            res.status(200).json({
+                success: true,
+                message: 'Email sent successfully'
+            });
+        }
+        else {
+            console.error(`❌ Failed to send email to: ${to}`);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to send email'
+            });
+        }
+    }
+    catch (error) {
+        console.error('❌ Email sending error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+});
 // Image Upload Endpoint - Clean & Simple
 app.post('/upload', (req, res) => {
     const uploadSingle = (0, multer_1.default)({
