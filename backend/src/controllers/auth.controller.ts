@@ -4,6 +4,7 @@ import { EmailService } from '../services/email.service';
 import { PasswordValidator } from '../utils/password.validator';
 import { User } from '../models/user.model';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 
 export class AuthController {
@@ -251,19 +252,44 @@ export class AuthController {
         return;
       }
 
+      // Find user by email
+      const user = await User.findOne({ email: email.toLowerCase() });
+
+      if (!user) {
+        // For security, don't reveal if email exists
+        res.status(200).json({
+          success: true,
+          message: 'If an account with this email exists, a reset code will be sent'
+        });
+        return;
+      }
+
       // Generate verification code (6 digits)
       const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
       
       console.log(`🔑 Generated verification code for ${email}: ${verificationCode}`);
       
+      // Hash the verification code before storing
+      const hashedCode = await bcrypt.hash(verificationCode, 10);
+      
+      // Save the hashed code and expiration to user
+      user.resetPasswordToken = hashedCode;
+      user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+      await user.save();
+      
       // Send reset email
       const emailSent = await this.emailService.sendPasswordResetEmail(
         email.toLowerCase(),
         verificationCode,
-        'User' // Default name for demo mode
+        user.firstName || 'User'
       );
 
       if (!emailSent) {
+        // Clear the token if email fails
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+        await user.save();
+        
         res.status(500).json({
           success: false,
           message: 'Failed to send reset email',
@@ -278,7 +304,8 @@ export class AuthController {
         data: {
           email: email.toLowerCase(),
           // For demo purposes, also include the code in response (remove in production)
-          verificationCode: verificationCode
+          verificationCode: verificationCode,
+          expiresIn: '15 minutes'
         }
       });
 
@@ -391,11 +418,25 @@ export class AuthController {
       user.resetPasswordExpires = undefined;
       await user.save();
 
+      // Generate JWT token for automatic login
+      const token = jwt.sign(
+        { userId: user._id, email: user.email },
+        process.env.JWT_SECRET || 'your-secret-key',
+        { expiresIn: '24h' }
+      );
+
       res.status(200).json({
         success: true,
         message,
         data: {
-          action: action
+          action: action,
+          token: token,
+          user: {
+            id: user._id,
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName
+          }
         }
       });
 
