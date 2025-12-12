@@ -466,12 +466,38 @@ const logout = async () => {
   try {
     console.log('Logging out...')
     
+    // Preserve user profile data including photos before logout
+    const userData = localStorage.getItem('user_data');
+    let preservedData = null;
+    
+    if (userData) {
+      try {
+        const parsedData = JSON.parse(userData);
+        preservedData = {
+          fullName: parsedData.fullName,
+          email: parsedData.email,
+          phoneNumber: parsedData.phoneNumber,
+          country: parsedData.country,
+          profileImage: parsedData.profileImage,
+          firstName: parsedData.firstName,
+          lastName: parsedData.lastName
+        };
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+      }
+    }
+    
     // Call logout API to clear server-side session
     authAPI.logout()
     
-    // Clear all user data from localStorage
+    // Clear authentication tokens
     localStorage.removeItem('auth_token')
     localStorage.removeItem('user_data')
+    
+    // Restore preserved user data
+    if (preservedData) {
+      localStorage.setItem('user_data_preserved', JSON.stringify(preservedData));
+    }
     
     // Clear session storage
     sessionStorage.clear()

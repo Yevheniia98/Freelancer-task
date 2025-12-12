@@ -460,7 +460,19 @@ onMounted(() => {
   }
   
   // Load user data from localStorage
-  const userData = localStorage.getItem('user_data');
+  let userData = localStorage.getItem('user_data');
+  
+  // If no user_data but preserved data exists (user logged out and back in)
+  if (!userData) {
+    const preservedData = localStorage.getItem('user_data_preserved');
+    if (preservedData) {
+      userData = preservedData;
+      // Restore it to user_data for consistency
+      localStorage.setItem('user_data', preservedData);
+      localStorage.removeItem('user_data_preserved');
+    }
+  }
+  
   if (userData) {
     const parsedData = JSON.parse(userData);
     
@@ -472,7 +484,7 @@ onMounted(() => {
       country: parsedData.country || ''
     };
     
-    // Set profile image
+    // Set profile image - preserved across logout/login
     if (parsedData.profileImage) {
       profileImage.value = parsedData.profileImage;
     }
