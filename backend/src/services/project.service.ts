@@ -3,18 +3,30 @@ import mongoose from 'mongoose';
 
 export interface CreateProjectDto {
   title: string;
+  name?: string;
   description: string;
   status?: ProjectStatus;
   priority?: ProjectPriority;
   deadline?: Date;
+  privacy?: string;
+  category?: string;
+  skills?: string[];
+  teamLead?: string;
+  teamMembers?: any[];
 }
 
 export interface UpdateProjectDto {
   title?: string;
+  name?: string;
   description?: string;
   status?: ProjectStatus;
   priority?: ProjectPriority;
   deadline?: Date;
+  privacy?: string;
+  category?: string;
+  skills?: string[];
+  teamLead?: string;
+  teamMembers?: any[];
 }
 
 export interface ProjectQuery {

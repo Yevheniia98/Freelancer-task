@@ -240,10 +240,13 @@
         </div>
         
         <!-- Spacing between sections -->
-        <div class="section-spacing"></div>
+        <div class="section-spacing" />
         
         <!-- Recent Notifications -->
-        <div id="recent-notifications" class="content-card settings-card">
+        <div
+          id="recent-notifications"
+          class="content-card settings-card"
+        >
           <div class="section-header">
             <h3 class="section-title">
               Recent Notifications
@@ -284,11 +287,16 @@
                 >
                   mdi-bell-outline
                 </v-icon>
-                <h4 class="text-subtitle-1 mb-2 text-medium-emphasis">You're all caught up!</h4>
+                <h4 class="text-subtitle-1 mb-2 text-medium-emphasis">
+                  You're all caught up!
+                </h4>
                 <p class="text-body-2 text-medium-emphasis">
                   Your notification center is ready.
                 </p>
-                <p class="text-body-2 text-medium-emphasis" style="margin-top: 16px;">
+                <p
+                  class="text-body-2 text-medium-emphasis"
+                  style="margin-top: 16px;"
+                >
                   Try the <strong>Refresh</strong> button to see sample notifications!
                 </p>
               </div>
@@ -310,8 +318,12 @@
                 </v-icon>
               </div>
               <div class="notification-content">
-                <h4 class="notification-title">{{ notification.title }}</h4>
-                <p class="notification-message">{{ notification.message }}</p>
+                <h4 class="notification-title">
+                  {{ notification.title }}
+                </h4>
+                <p class="notification-message">
+                  {{ notification.message }}
+                </p>
                 <div class="notification-meta">
                   <span class="notification-time">{{ formatNotificationTime(notification.time) }}</span>
                   <span class="notification-type">{{ getNotificationTypeLabel(notification.type) }}</span>
@@ -322,7 +334,9 @@
                   class="delete-notification-btn"
                   @click.stop="deleteNotification(notification.id)"
                 >
-                  <v-icon size="16">mdi-close</v-icon>
+                  <v-icon size="16">
+                    mdi-close
+                  </v-icon>
                 </button>
               </div>
             </div>

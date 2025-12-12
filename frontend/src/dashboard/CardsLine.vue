@@ -10,29 +10,48 @@
       >
         <!-- Card Header -->
         <div class="card-header">
-          <div class="icon-container" :class="`icon-${index + 1}`">
-            <v-icon class="metric-icon">{{ stat.icon }}</v-icon>
+          <div
+            class="icon-container"
+            :class="`icon-${index + 1}`"
+          >
+            <v-icon class="metric-icon">
+              {{ stat.icon }}
+            </v-icon>
           </div>
-          <div class="trend-indicator" :class="stat.trend">
-            <v-icon class="trend-icon">{{ getTrendIcon(stat.trend) }}</v-icon>
+          <div
+            class="trend-indicator"
+            :class="stat.trend"
+          >
+            <v-icon class="trend-icon">
+              {{ getTrendIcon(stat.trend) }}
+            </v-icon>
             <span class="trend-text">{{ stat.change }}</span>
           </div>
         </div>
 
         <!-- Card Content -->
         <div class="card-content">
-          <h3 class="metric-title">{{ stat.title }}</h3>
+          <h3 class="metric-title">
+            {{ stat.title }}
+          </h3>
           <div class="metric-value-container">
             <span class="metric-value">{{ stat.value }}</span>
-            <span class="metric-unit" v-if="stat.unit">{{ stat.unit }}</span>
+            <span
+              v-if="stat.unit"
+              class="metric-unit"
+            >{{ stat.unit }}</span>
           </div>
-          <p class="metric-description">{{ stat.description }}</p>
+          <p class="metric-description">
+            {{ stat.description }}
+          </p>
         </div>
 
         <!-- Card Footer -->
         <div class="card-footer">
           <div class="time-period">
-            <v-icon class="period-icon">mdi-calendar-clock</v-icon>
+            <v-icon class="period-icon">
+              mdi-calendar-clock
+            </v-icon>
             <span>{{ selectedOptions[stat.title] || 'Last 7 days' }}</span>
           </div>
           
@@ -54,9 +73,14 @@
               </v-btn>
             </template>
 
-            <v-card class="dropdown-card" elevation="12">
+            <v-card
+              class="dropdown-card"
+              elevation="12"
+            >
               <v-card-title class="dropdown-title">
-                <v-icon class="mr-2">mdi-clock-outline</v-icon>
+                <v-icon class="mr-2">
+                  mdi-clock-outline
+                </v-icon>
                 Time Period
               </v-card-title>
               <v-list class="dropdown-list">
@@ -68,11 +92,20 @@
                   @click="selectTime(stat.title, option.value)"
                 >
                   <template #prepend>
-                    <v-icon class="option-icon">{{ option.icon }}</v-icon>
+                    <v-icon class="option-icon">
+                      {{ option.icon }}
+                    </v-icon>
                   </template>
-                  <v-list-item-title class="option-text">{{ option.label }}</v-list-item-title>
-                  <template #append v-if="selectedOptions[stat.title] === option.value">
-                    <v-icon color="primary">mdi-check-circle</v-icon>
+                  <v-list-item-title class="option-text">
+                    {{ option.label }}
+                  </v-list-item-title>
+                  <template
+                    v-if="selectedOptions[stat.title] === option.value"
+                    #append
+                  >
+                    <v-icon color="primary">
+                      mdi-check-circle
+                    </v-icon>
                   </template>
                 </v-list-item>
               </v-list>
@@ -81,8 +114,11 @@
         </div>
 
         <!-- Animated Background Elements -->
-        <div class="card-bg-pattern"></div>
-        <div class="card-glow" :class="`glow-${index + 1}`"></div>
+        <div class="card-bg-pattern" />
+        <div
+          class="card-glow"
+          :class="`glow-${index + 1}`"
+        />
       </div>
     </div>
   </div>

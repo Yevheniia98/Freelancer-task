@@ -1,12 +1,17 @@
 <template>
   <v-container fluid>
     <v-row class="mb-4">
-      <v-col cols="12" class="d-flex justify-space-between align-center">
-        <h2 class="text-h4">Communications</h2>
+      <v-col
+        cols="12"
+        class="d-flex justify-space-between align-center"
+      >
+        <h2 class="text-h4">
+          Communications
+        </h2>
         <v-btn
           color="primary"
-          @click="openCommunicationDialog()"
           prepend-icon="mdi-plus"
+          @click="openCommunicationDialog()"
         >
           Add Communication
         </v-btn>
@@ -15,7 +20,10 @@
 
     <!-- Filters and Search -->
     <v-row class="mb-4">
-      <v-col cols="12" md="4">
+      <v-col
+        cols="12"
+        md="4"
+      >
         <v-text-field
           v-model="searchQuery"
           label="Search communications..."
@@ -25,7 +33,10 @@
           clearable
         />
       </v-col>
-      <v-col cols="12" md="2">
+      <v-col
+        cols="12"
+        md="2"
+      >
         <v-select
           v-model="typeFilter"
           :items="typeOptions"
@@ -35,7 +46,10 @@
           clearable
         />
       </v-col>
-      <v-col cols="12" md="2">
+      <v-col
+        cols="12"
+        md="2"
+      >
         <v-select
           v-model="directionFilter"
           :items="directionOptions"
@@ -45,7 +59,10 @@
           clearable
         />
       </v-col>
-      <v-col cols="12" md="2">
+      <v-col
+        cols="12"
+        md="2"
+      >
         <v-select
           v-model="clientFilter"
           :items="clientOptions"
@@ -55,7 +72,10 @@
           clearable
         />
       </v-col>
-      <v-col cols="12" md="2">
+      <v-col
+        cols="12"
+        md="2"
+      >
         <v-select
           v-model="importantFilter"
           :items="[{ title: 'Important Only', value: true }, { title: 'All', value: false }]"
@@ -70,22 +90,39 @@
     <!-- Communications Timeline -->
     <v-card class="mb-4">
       <v-card-title class="d-flex align-center">
-        <v-icon class="mr-2">mdi-timeline</v-icon>
+        <v-icon class="mr-2">
+          mdi-timeline
+        </v-icon>
         Communication Timeline
         <v-spacer />
-        <v-btn-toggle v-model="viewMode" mandatory>
-          <v-btn value="timeline" size="small">
+        <v-btn-toggle
+          v-model="viewMode"
+          mandatory
+        >
+          <v-btn
+            value="timeline"
+            size="small"
+          >
             <v-icon>mdi-timeline</v-icon>
           </v-btn>
-          <v-btn value="table" size="small">
+          <v-btn
+            value="table"
+            size="small"
+          >
             <v-icon>mdi-table</v-icon>
           </v-btn>
         </v-btn-toggle>
       </v-card-title>
       <v-card-text>
         <!-- Timeline View -->
-        <div v-if="viewMode === 'timeline'" class="timeline-container">
-          <v-timeline side="end" density="compact">
+        <div
+          v-if="viewMode === 'timeline'"
+          class="timeline-container"
+        >
+          <v-timeline
+            side="end"
+            density="compact"
+          >
             <v-timeline-item
               v-for="comm in filteredCommunications"
               :key="comm._id"
@@ -93,14 +130,19 @@
               size="small"
             >
               <template #icon>
-                <v-icon size="small">{{ getTypeIcon(comm.type) }}</v-icon>
+                <v-icon size="small">
+                  {{ getTypeIcon(comm.type) }}
+                </v-icon>
               </template>
               <template #opposite>
                 <div class="text-caption text-grey">
                   {{ formatDateTime(comm.date) }}
                 </div>
               </template>
-              <v-card class="mb-2" elevation="1">
+              <v-card
+                class="mb-2"
+                elevation="1"
+              >
                 <v-card-text class="pb-2">
                   <div class="d-flex align-center mb-2">
                     <v-chip
@@ -141,17 +183,26 @@
                           <v-list-item-title>Edit</v-list-item-title>
                         </v-list-item>
                         <v-list-item @click="deleteCommunication(comm)">
-                          <v-list-item-title class="text-error">Delete</v-list-item-title>
+                          <v-list-item-title class="text-error">
+                            Delete
+                          </v-list-item-title>
                         </v-list-item>
                       </v-list>
                     </v-menu>
                   </div>
-                  <div class="font-weight-medium mb-1">{{ comm.subject }}</div>
+                  <div class="font-weight-medium mb-1">
+                    {{ comm.subject }}
+                  </div>
                   <div class="text-body-2 text-grey-darken-1 mb-2">
                     Client: {{ getClientName(comm.clientId) }}
                   </div>
-                  <div class="text-body-2">{{ comm.content }}</div>
-                  <div v-if="comm.attachments && comm.attachments.length" class="mt-2">
+                  <div class="text-body-2">
+                    {{ comm.content }}
+                  </div>
+                  <div
+                    v-if="comm.attachments && comm.attachments.length"
+                    class="mt-2"
+                  >
                     <v-chip
                       v-for="attachment in comm.attachments"
                       :key="attachment"
@@ -159,7 +210,9 @@
                       variant="outlined"
                       class="mr-1"
                     >
-                      <v-icon start>mdi-attachment</v-icon>
+                      <v-icon start>
+                        mdi-attachment
+                      </v-icon>
                       {{ attachment }}
                     </v-chip>
                   </div>
@@ -184,7 +237,12 @@
               size="small"
               class="mr-1"
             >
-              <v-icon start size="small">{{ getTypeIcon(item.type) }}</v-icon>
+              <v-icon
+                start
+                size="small"
+              >
+                {{ getTypeIcon(item.type) }}
+              </v-icon>
               {{ item.type }}
             </v-chip>
           </template>
@@ -219,8 +277,12 @@
 
           <template #item.date="{ item }">
             <div>
-              <div class="text-body-2">{{ formatDate(item.date) }}</div>
-              <div class="text-caption text-grey">{{ formatTime(item.date) }}</div>
+              <div class="text-body-2">
+                {{ formatDate(item.date) }}
+              </div>
+              <div class="text-caption text-grey">
+                {{ formatTime(item.date) }}
+              </div>
             </div>
           </template>
 
@@ -239,7 +301,9 @@
                   <v-list-item-title>Edit</v-list-item-title>
                 </v-list-item>
                 <v-list-item @click="deleteCommunication(item)">
-                  <v-list-item-title class="text-error">Delete</v-list-item-title>
+                  <v-list-item-title class="text-error">
+                    Delete
+                  </v-list-item-title>
                 </v-list-item>
               </v-list>
             </v-menu>
@@ -249,7 +313,11 @@
     </v-card>
 
     <!-- Communication Dialog -->
-    <v-dialog v-model="communicationDialog" max-width="800px" persistent>
+    <v-dialog
+      v-model="communicationDialog"
+      max-width="800px"
+      persistent
+    >
       <v-card>
         <v-card-title>
           <span class="text-h5">{{ editingCommunication ? 'Edit Communication' : 'Add New Communication' }}</span>
@@ -257,7 +325,10 @@
         <v-card-text>
           <v-container>
             <v-row>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-select
                   v-model="communicationForm.clientId"
                   :items="clientOptions"
@@ -266,7 +337,10 @@
                   :rules="[v => !!v || 'Client is required']"
                 />
               </v-col>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-select
                   v-model="communicationForm.type"
                   :items="typeOptions"
@@ -275,7 +349,10 @@
                   :rules="[v => !!v || 'Type is required']"
                 />
               </v-col>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-select
                   v-model="communicationForm.direction"
                   :items="directionOptions"
@@ -284,7 +361,10 @@
                   :rules="[v => !!v || 'Direction is required']"
                 />
               </v-col>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-text-field
                   v-model="communicationForm.date"
                   label="Date & Time*"
@@ -310,14 +390,20 @@
                   :rules="[v => !!v || 'Content is required']"
                 />
               </v-col>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-text-field
                   v-model="communicationForm.contactPerson"
                   label="Contact Person"
                   variant="outlined"
                 />
               </v-col>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-switch
                   v-model="communicationForm.isImportant"
                   label="Mark as Important"
@@ -333,13 +419,16 @@
                   @click:append-inner="addAttachment"
                   @keyup.enter="addAttachment"
                 />
-                <div v-if="communicationForm.attachments.length" class="mt-2">
+                <div
+                  v-if="communicationForm.attachments.length"
+                  class="mt-2"
+                >
                   <v-chip
                     v-for="(attachment, index) in communicationForm.attachments"
                     :key="index"
                     closable
-                    @click:close="removeAttachment(index)"
                     class="mr-1 mb-1"
+                    @click:close="removeAttachment(index)"
                   >
                     {{ attachment }}
                   </v-chip>
@@ -350,10 +439,18 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="grey" variant="text" @click="closeCommunicationDialog">
+          <v-btn
+            color="grey"
+            variant="text"
+            @click="closeCommunicationDialog"
+          >
             Cancel
           </v-btn>
-          <v-btn color="primary" variant="flat" @click="saveCommunication">
+          <v-btn
+            color="primary"
+            variant="flat"
+            @click="saveCommunication"
+          >
             {{ editingCommunication ? 'Update' : 'Create' }}
           </v-btn>
         </v-card-actions>
@@ -361,18 +458,31 @@
     </v-dialog>
 
     <!-- Delete Confirmation Dialog -->
-    <v-dialog v-model="deleteDialog" max-width="400px">
+    <v-dialog
+      v-model="deleteDialog"
+      max-width="400px"
+    >
       <v-card>
-        <v-card-title class="text-h5">Confirm Delete</v-card-title>
+        <v-card-title class="text-h5">
+          Confirm Delete
+        </v-card-title>
         <v-card-text>
           Are you sure you want to delete this communication? This action cannot be undone.
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="grey" variant="text" @click="deleteDialog = false">
+          <v-btn
+            color="grey"
+            variant="text"
+            @click="deleteDialog = false"
+          >
             Cancel
           </v-btn>
-          <v-btn color="error" variant="flat" @click="confirmDelete">
+          <v-btn
+            color="error"
+            variant="flat"
+            @click="confirmDelete"
+          >
             Delete
           </v-btn>
         </v-card-actions>

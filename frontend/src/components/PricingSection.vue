@@ -110,7 +110,7 @@
             </p>
           </div>
 
-          <div class="features-divider"></div>
+          <div class="features-divider" />
 
           <div class="features-list">
             <div class="feature-item">
@@ -341,7 +341,7 @@
             </p>
           </div>
 
-          <div class="features-divider"></div>
+          <div class="features-divider" />
 
           <div class="features-list">
             <div class="feature-item">
@@ -553,7 +553,7 @@
             </p>
           </div>
 
-          <div class="features-divider"></div>
+          <div class="features-divider" />
 
           <div class="features-list">
             <div class="feature-item">

@@ -59,13 +59,13 @@
 <script>
 export default {
   name: 'WarningDesktop',
-  emits: ['close'],
   props: {
     isOpen: {
       type: Boolean,
       default: false
     }
-  }
+  },
+  emits: ['close']
 };
 </script>
 

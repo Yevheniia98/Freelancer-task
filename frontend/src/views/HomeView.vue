@@ -1,7 +1,10 @@
 <template>
   <div class="home">
     <v-row justify="center">
-      <v-col cols="12" md="8">
+      <v-col
+        cols="12"
+        md="8"
+      >
         <v-card class="pa-6">
           <v-card-title class="text-h4 text-center mb-4">
             Welcome to Freelancer Task Manager
@@ -12,31 +15,73 @@
               Manage your freelance projects efficiently and stay organized
             </p>
             
-            <v-row justify="center" class="mt-8">
-              <v-col cols="12" sm="6" md="4">
-                <v-card variant="outlined" class="feature-card">
+            <v-row
+              justify="center"
+              class="mt-8"
+            >
+              <v-col
+                cols="12"
+                sm="6"
+                md="4"
+              >
+                <v-card
+                  variant="outlined"
+                  class="feature-card"
+                >
                   <v-card-text class="text-center">
-                    <v-icon size="48" color="primary" class="mb-2">mdi-folder-multiple</v-icon>
+                    <v-icon
+                      size="48"
+                      color="primary"
+                      class="mb-2"
+                    >
+                      mdi-folder-multiple
+                    </v-icon>
                     <h3>Project Management</h3>
                     <p>Organize your projects and track progress efficiently</p>
                   </v-card-text>
                 </v-card>
               </v-col>
               
-              <v-col cols="12" sm="6" md="4">
-                <v-card variant="outlined" class="feature-card">
+              <v-col
+                cols="12"
+                sm="6"
+                md="4"
+              >
+                <v-card
+                  variant="outlined"
+                  class="feature-card"
+                >
                   <v-card-text class="text-center">
-                    <v-icon size="48" color="primary" class="mb-2">mdi-clock-outline</v-icon>
+                    <v-icon
+                      size="48"
+                      color="primary"
+                      class="mb-2"
+                    >
+                      mdi-clock-outline
+                    </v-icon>
                     <h3>Time Tracking</h3>
                     <p>Track time spent on tasks and projects automatically</p>
                   </v-card-text>
                 </v-card>
               </v-col>
               
-              <v-col cols="12" sm="6" md="4">
-                <v-card variant="outlined" class="feature-card">
+              <v-col
+                cols="12"
+                sm="6"
+                md="4"
+              >
+                <v-card
+                  variant="outlined"
+                  class="feature-card"
+                >
                   <v-card-text class="text-center">
-                    <v-icon size="48" color="primary" class="mb-2">mdi-view-dashboard</v-icon>
+                    <v-icon
+                      size="48"
+                      color="primary"
+                      class="mb-2"
+                    >
+                      mdi-view-dashboard
+                    </v-icon>
                     <h3>Dashboard</h3>
                     <p>View all your projects and tasks in one place</p>
                   </v-card-text>
@@ -51,7 +96,9 @@
                 to="/dashboard"
                 variant="elevated"
               >
-                <v-icon left>mdi-view-dashboard</v-icon>
+                <v-icon left>
+                  mdi-view-dashboard
+                </v-icon>
                 Go to Dashboard
               </v-btn>
             </div>

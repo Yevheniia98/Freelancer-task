@@ -18,10 +18,16 @@ export enum ProjectPriority {
 export interface IProjectEntity extends Document {
   id: string;
   title: string;
+  name?: string;
   description: string;
   status: ProjectStatus;
   priority: ProjectPriority;
   deadline?: Date;
+  privacy?: string;
+  category?: string;
+  skills?: string[];
+  teamLead?: string;
+  teamMembers?: any[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -32,6 +38,11 @@ const ProjectEntitySchema = new Schema<IProjectEntity>({
     required: [true, 'Project title is required'],
     trim: true,
     maxlength: [200, 'Title cannot exceed 200 characters']
+  },
+  name: {
+    type: String,
+    trim: true,
+    maxlength: [200, 'Name cannot exceed 200 characters']
   },
   description: {
     type: String,
@@ -54,6 +65,26 @@ const ProjectEntitySchema = new Schema<IProjectEntity>({
   deadline: {
     type: Date,
     required: false
+  },
+  privacy: {
+    type: String,
+    trim: true
+  },
+  category: {
+    type: String,
+    trim: true
+  },
+  skills: {
+    type: [String],
+    default: []
+  },
+  teamLead: {
+    type: String,
+    trim: true
+  },
+  teamMembers: {
+    type: Schema.Types.Mixed,
+    default: []
   }
 }, {
   timestamps: true, // This automatically adds createdAt and updatedAt

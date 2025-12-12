@@ -9,7 +9,10 @@
           
         <form @submit.prevent="submitForm">
           <!-- Error Messages -->
-          <div v-if="errors.length > 0" class="error-messages">
+          <div
+            v-if="errors.length > 0"
+            class="error-messages"
+          >
             <div 
               v-for="error in errors" 
               :key="error" 
@@ -20,7 +23,10 @@
           </div>
 
           <!-- Success Message -->
-          <div v-if="successMessage" class="success-message">
+          <div
+            v-if="successMessage"
+            class="success-message"
+          >
             {{ successMessage }}
           </div>
 
@@ -32,20 +38,23 @@
             :disabled="isLoading"
             maxlength="6"
             required
-          />
+          >
 
           <!-- Password Options -->
           <div class="password-options">
             <h3>Choose an option:</h3>
             
-            <div class="option-card" :class="{ 'selected': selectedOption === 'keep' }">
+            <div
+              class="option-card"
+              :class="{ 'selected': selectedOption === 'keep' }"
+            >
               <label class="option-label">
                 <input 
-                  type="radio" 
                   v-model="selectedOption" 
+                  type="radio" 
                   value="keep"
                   :disabled="isLoading"
-                />
+                >
                 <div class="option-content">
                   <strong>Keep Current Password</strong>
                   <p>Continue using your existing password</p>
@@ -53,14 +62,17 @@
               </label>
             </div>
 
-            <div class="option-card" :class="{ 'selected': selectedOption === 'change' }">
+            <div
+              class="option-card"
+              :class="{ 'selected': selectedOption === 'change' }"
+            >
               <label class="option-label">
                 <input 
-                  type="radio" 
                   v-model="selectedOption" 
+                  type="radio" 
                   value="change"
                   :disabled="isLoading"
-                />
+                >
                 <div class="option-content">
                   <strong>Create New Password</strong>
                   <p>Set a new password for your account</p>
@@ -70,7 +82,10 @@
           </div>
 
           <!-- New Password Fields (shown only if changing password) -->
-          <div v-if="selectedOption === 'change'" class="new-password-section">
+          <div
+            v-if="selectedOption === 'change'"
+            class="new-password-section"
+          >
             <label>New Password</label>
             <div class="password-field">
               <input
@@ -80,13 +95,13 @@
                 :disabled="isLoading"
                 autocomplete="new-password"
                 required
-              />
+              >
               <img 
                 :src="showNewPassword ? '/eye-open.svg' : '/eye-close.svg'" 
                 class="eye-icon" 
                 alt="Toggle password visibility" 
                 @click="toggleNewPassword"
-              />
+              >
             </div>
 
             <label>Confirm New Password</label>
@@ -98,13 +113,13 @@
                 :disabled="isLoading"
                 autocomplete="new-password"
                 required
-              />
+              >
               <img 
                 :src="showConfirmPassword ? '/eye-open.svg' : '/eye-close.svg'" 
                 class="eye-icon" 
                 alt="Toggle password visibility" 
                 @click="toggleConfirmPassword"
-              />
+              >
             </div>
           </div>
   
@@ -123,8 +138,8 @@
           <button 
             type="button" 
             class="resend-btn"
-            @click="resendCode"
             :disabled="isLoading || resendCooldown > 0"
+            @click="resendCode"
           >
             <span v-if="resendCooldown > 0">Resend in {{ resendCooldown }}s</span>
             <span v-else>Resend Code</span>
@@ -142,7 +157,7 @@
         <img
           src="/sign.png"
           alt="Reset password illustration"
-        />
+        >
       </div>
     </div>
   

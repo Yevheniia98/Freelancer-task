@@ -16,14 +16,13 @@
           <div class="hero-content">
             <div class="title-section">
               <h1 class="hero-title">
-                Create New <span class="gradient-text">Project</span>
+                {{ isEditMode ? 'Edit' : 'Create New' }} <span class="gradient-text">Project</span>
               </h1>
               <p class="hero-subtitle">
-                Build something amazing with your team
+                {{ isEditMode ? 'Update your project details' : 'Build something amazing with your team' }}
               </p>
             </div>
-            <div class="hero-actions">
-            </div>
+            <div class="hero-actions" />
           </div>
         </v-container>
       </div>
@@ -282,12 +281,11 @@
                           ref="descriptionTextarea"
                           class="rich-text-editor"
                           contenteditable="true"
+                          :data-placeholder="editorFocused || description ? '' : 'Describe your project goals, requirements, and expectations...'"
                           @input="handleRichTextInput"
                           @focus="onEditorFocus"
                           @blur="onEditorBlur"
-                          :data-placeholder="editorFocused || description ? '' : 'Describe your project goals, requirements, and expectations...'"
-                        >
-                        </div>
+                        />
                       </div>
                     </div>
 
@@ -360,11 +358,11 @@
                   <div class="card-content">
                     <div
                       class="file-drop-zone"
+                      style="min-height: 200px; border: 3px dashed #2196F3; border-radius: 12px; transition: all 0.3s ease;"
                       @drop="handleFileDrop"
                       @dragover.prevent
                       @dragenter="handleDragEnter"
                       @dragleave="handleDragLeave"
-                      style="min-height: 200px; border: 3px dashed #2196F3; border-radius: 12px; transition: all 0.3s ease;"
                     >
                       <div class="drop-zone-content">
                         <v-icon
@@ -376,9 +374,7 @@
                         <h4 class="drop-title">
                           Drop files here or click to upload.
                         </h4>
-                        <p class="drop-subtitle">
-                          
-                        </p>
+                        <p class="drop-subtitle" />
                         
                         <div class="upload-actions">
                           <v-btn 
@@ -596,7 +592,10 @@
                                 :src="member.profilePicture" 
                                 :alt="member.name"
                               />
-                              <span v-else class="avatar-initials">
+                              <span
+                                v-else
+                                class="avatar-initials"
+                              >
                                 {{ getAvatarContent(member) }}
                               </span>
                             </v-avatar>
@@ -619,7 +618,9 @@
                               class="delete-member-btn"
                               @click="removeTeamMember(index)"
                             >
-                              <v-icon size="12">mdi-close</v-icon>
+                              <v-icon size="12">
+                                mdi-close
+                              </v-icon>
                             </v-btn>
                           </div>
                           <v-btn
@@ -685,9 +686,9 @@
                   class="action-btn create-btn"
                 >
                   <v-icon class="mr-2">
-                    mdi-rocket-launch
+                    {{ isEditMode ? 'mdi-content-save' : 'mdi-rocket-launch' }}
                   </v-icon>
-                  Create Project
+                  {{ isEditMode ? 'Update Project' : 'Create Project' }}
                 </v-btn>
               </div>
             </div>
@@ -703,7 +704,7 @@
       color="success"
       location="top"
     >
-      🎉 Project created successfully and added to your workspace!
+      🎉 Project {{ isEditMode ? 'updated' : 'created' }} successfully and added to your workspace!
       <template #actions>
         <v-btn
           variant="text"
@@ -718,13 +719,18 @@
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import LeftMenu from '@/dashboard/LeftMenu.vue';
 import SearchBar from '@/dashboard/SearchBar.vue';
 import { ProjectApiService } from '@/services/projectApi.service.js';
 import notificationService from '@/services/notificationService.js';
 
 const router = useRouter();
+const route = useRoute();
+
+// Check if we're in edit mode
+const isEditMode = computed(() => !!route.query.edit);
+const editProjectId = computed(() => route.query.edit);
 
 // Form data
 const projectTitle = ref('');
@@ -825,14 +831,55 @@ const triggerFileInput = () => {
 };
 
 // Component mounted
-onMounted(() => {
+onMounted(async () => {
   console.log('ProjectCreate component loaded and upload functionality ready');
+  
+  // Check if we're editing an existing project
+  const editProjectId = route.query.edit;
+  if (editProjectId) {
+    console.log('Loading project for editing:', editProjectId);
+    await loadProjectForEditing(editProjectId);
+  }
   
   // Initialize rich text editor content
   if (descriptionTextarea.value && description.value) {
     descriptionTextarea.value.innerHTML = description.value;
   }
 });
+
+// Load project data for editing
+const loadProjectForEditing = async (projectId) => {
+  try {
+    console.log('Fetching project data for ID:', projectId);
+    const project = await ProjectApiService.getById(projectId);
+    
+    if (project) {
+      console.log('Project data loaded:', project);
+      
+      // Populate form fields
+      projectTitle.value = project.name || project.title || '';
+      description.value = project.description || '';
+      priority.value = project.priority || 'high';
+      status.value = project.status || 'pending';
+      deadline.value = project.deadline ? new Date(project.deadline).toISOString().split('T')[0] : '';
+      privacy.value = project.privacy || 'Private';
+      category.value = project.category || 'Designing';
+      skills.value = project.skills || [];
+      teamLead.value = project.teamLead || '';
+      teamMembers.value = project.teamMembers || [];
+      
+      // Update rich text editor if available
+      if (descriptionTextarea.value && description.value) {
+        descriptionTextarea.value.innerHTML = description.value;
+      }
+      
+      console.log('✅ Project loaded successfully for editing');
+    }
+  } catch (error) {
+    console.error('❌ Error loading project:', error);
+    notificationService.showNotification('Error loading project data', 'error');
+  }
+};
 
 // Watch for team lead changes to automatically add them to team members
 watch(teamLead, (newTeamLead) => {
@@ -1055,7 +1102,7 @@ const addTeamMember = async () => {
   if (newMemberEmail.value) {
     try {
       // Try to fetch real user data from backend
-      const response = await fetch(`http://localhost:3030/api/users/by-email/${newMemberEmail.value}`);
+      const response = await fetch(`http://localhost:3002/api/users/by-email/${newMemberEmail.value}`);
       
       let newMember;
       if (response.ok) {
@@ -1140,16 +1187,36 @@ const submitProject = async () => {
       return;
     }
     
-    // Create project first
+    // Prepare project data
     const projectData = {
       title: projectTitle.value.trim(),
+      name: projectTitle.value.trim(),
       description: description.value.trim(),
       priority: priority.value || 'medium',
       status: status.value || 'pending',
-      deadline: deadline.value ? deadline.value : undefined
+      deadline: deadline.value ? deadline.value : undefined,
+      privacy: privacy.value,
+      category: category.value,
+      skills: skills.value,
+      teamLead: teamLead.value,
+      teamMembers: teamMembers.value
     };
     
-    const createdProject = await ProjectApiService.create(projectData);
+    let project;
+    
+    if (isEditMode.value) {
+      // Update existing project
+      console.log('Updating project:', editProjectId.value, projectData);
+      project = await ProjectApiService.update(editProjectId.value, projectData);
+      console.log('✅ Project updated successfully');
+      notificationService.showNotification('Project updated successfully', 'success');
+    } else {
+      // Create new project
+      console.log('Creating new project:', projectData);
+      project = await ProjectApiService.create(projectData);
+      console.log('✅ Project created successfully');
+      notificationService.addProjectNotification(projectTitle.value.trim(), 'created');
+    }
     
     // Upload files if any
     if (uploadedFiles.value.length > 0 || thumbnailFile.value) {
@@ -1164,7 +1231,7 @@ const submitProject = async () => {
           const formData = new FormData();
           formData.append('file', file);
           
-          const response = await fetch(`http://localhost:3030/api/projects/${createdProject.id}/files`, {
+          const response = await fetch(`http://localhost:3002/api/projects/${project.id || editProjectId.value}/files`, {
             method: 'POST',
             body: formData
           });
@@ -1184,15 +1251,13 @@ const submitProject = async () => {
       }
     }
     
-    // Add notification for project creation
-    notificationService.addProjectNotification(projectTitle.value.trim(), 'created');
-    
     showSuccessPopup.value = true;
     setTimeout(() => {
       router.push('/projects');
     }, 2000);
   } catch (error) {
-    alert(error.message || 'Failed to create project. Please try again.');
+    console.error('Error submitting project:', error);
+    alert(error.message || `Failed to ${isEditMode.value ? 'update' : 'create'} project. Please try again.`);
   }
 };
 </script>

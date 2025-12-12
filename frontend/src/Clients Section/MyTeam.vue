@@ -2120,7 +2120,7 @@ export default defineComponent({
         const emails = emailAddresses.value.split(',').map(email => email.trim());
         
         // Call the backend API
-        const response = await fetch('http://localhost:3030/api/team/invitations/send', {
+        const response = await fetch('http://localhost:3002/api/team/invitations/send', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -2235,7 +2235,7 @@ export default defineComponent({
       
       try {
         // Call API to update member role
-        const response = await fetch(`http://localhost:3030/api/team/members/${memberToEditRole.value.id}/role`, {
+        const response = await fetch(`http://localhost:3002/api/team/members/${memberToEditRole.value.id}/role`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -2294,7 +2294,7 @@ export default defineComponent({
       
       try {
         // Call API to remove member
-        const response = await fetch(`http://localhost:3030/api/team/members/${memberToRemove.value.id}`, {
+        const response = await fetch(`http://localhost:3002/api/team/members/${memberToRemove.value.id}`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',

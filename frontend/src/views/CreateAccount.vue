@@ -10,26 +10,50 @@
           
         <form @submit.prevent="submitForm">
           <!-- Error Messages -->
-          <div v-if="errorMessage" class="error-container">
+          <div
+            v-if="errorMessage"
+            class="error-container"
+          >
             <div class="error-header">
               <span class="error-icon">⚠️</span>
               <span class="error-title">{{ errorMessage.title }}</span>
             </div>
-            <div v-if="errorMessage.details && errorMessage.details.length > 0" class="error-details">
+            <div
+              v-if="errorMessage.details && errorMessage.details.length > 0"
+              class="error-details"
+            >
               <ul>
-                <li v-for="detail in errorMessage.details" :key="detail">{{ detail }}</li>
+                <li
+                  v-for="detail in errorMessage.details"
+                  :key="detail"
+                >
+                  {{ detail }}
+                </li>
               </ul>
             </div>
-            <div v-if="errorMessage.suggestions && errorMessage.suggestions.length > 0" class="error-suggestions">
-              <div class="suggestions-header">💡 Suggestions:</div>
+            <div
+              v-if="errorMessage.suggestions && errorMessage.suggestions.length > 0"
+              class="error-suggestions"
+            >
+              <div class="suggestions-header">
+                💡 Suggestions:
+              </div>
               <ul>
-                <li v-for="suggestion in errorMessage.suggestions" :key="suggestion">{{ suggestion }}</li>
+                <li
+                  v-for="suggestion in errorMessage.suggestions"
+                  :key="suggestion"
+                >
+                  {{ suggestion }}
+                </li>
               </ul>
             </div>
           </div>
 
           <!-- Success Message -->
-          <div v-if="successMessage" class="success-message">
+          <div
+            v-if="successMessage"
+            class="success-message"
+          >
             {{ successMessage }}
           </div>
 
@@ -82,7 +106,10 @@
           </div>
 
           <!-- Password Strength Indicator -->
-          <div v-if="showPasswordStrength" class="password-strength">
+          <div
+            v-if="showPasswordStrength"
+            class="password-strength"
+          >
             <div class="strength-bar">
               <div 
                 class="strength-fill" 
@@ -90,20 +117,40 @@
                   width: `${getPasswordStrengthPercentage()}%`, 
                   backgroundColor: getPasswordStrengthColor() 
                 }"
-              ></div>
+              />
             </div>
-            <div class="strength-text" :style="{ color: getPasswordStrengthColor() }">
+            <div
+              class="strength-text"
+              :style="{ color: getPasswordStrengthColor() }"
+            >
               Password Strength: {{ getPasswordStrengthText() }}
             </div>
-            <div v-if="passwordValidation && passwordValidation.suggestions.length > 0" class="password-suggestions">
-              <div class="suggestions-title">💡 Password Tips:</div>
-              <small v-for="suggestion in passwordValidation.suggestions" :key="suggestion">
+            <div
+              v-if="passwordValidation && passwordValidation.suggestions.length > 0"
+              class="password-suggestions"
+            >
+              <div class="suggestions-title">
+                💡 Password Tips:
+              </div>
+              <small
+                v-for="suggestion in passwordValidation.suggestions"
+                :key="suggestion"
+              >
                 • {{ suggestion }}
               </small>
             </div>
-            <div v-if="passwordValidation && passwordValidation.errors.length > 0" class="password-errors">
-              <div class="errors-title">⚠️ Password Requirements:</div>
-              <small v-for="error in passwordValidation.errors" :key="error" class="password-error">
+            <div
+              v-if="passwordValidation && passwordValidation.errors.length > 0"
+              class="password-errors"
+            >
+              <div class="errors-title">
+                ⚠️ Password Requirements:
+              </div>
+              <small
+                v-for="error in passwordValidation.errors"
+                :key="error"
+                class="password-error"
+              >
                 • {{ error }}
               </small>
             </div>
@@ -125,7 +172,10 @@
             >
           </div>
   
-          <button type="submit" :disabled="isLoading || isFormInvalid">
+          <button
+            type="submit"
+            :disabled="isLoading || isFormInvalid"
+          >
             <span v-if="isLoading">Creating Account...</span>
             <span v-else>Create your account</span>
           </button>

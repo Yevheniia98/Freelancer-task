@@ -202,15 +202,24 @@
       </h2>
       
       <!-- Loading state -->
-      <div v-if="loading" class="loading-state">
-        <div class="loading-spinner"></div>
+      <div
+        v-if="loading"
+        class="loading-state"
+      >
+        <div class="loading-spinner" />
         <p>Loading financial data...</p>
       </div>
 
       <!-- Error state -->
-      <div v-else-if="error" class="error-state">
+      <div
+        v-else-if="error"
+        class="error-state"
+      >
         <p>{{ error }}</p>
-        <button @click="loadFinancialData" class="retry-button">
+        <button
+          class="retry-button"
+          @click="loadFinancialData"
+        >
           Retry
         </button>
       </div>
@@ -255,32 +264,35 @@
           </div>
 
           <!-- Show message if no platforms connected -->
-          <div v-if="platformEarnings.length === 0" class="no-platforms">
+          <div
+            v-if="platformEarnings.length === 0"
+            class="no-platforms"
+          >
             <p>No platforms connected</p>
             <small>Connect your freelance platforms to see real earnings data</small>
             
             <!-- Platform connection buttons -->
             <div class="platform-connect-buttons">
               <button 
-                @click="connectPlatform('upwork')"
                 class="connect-button upwork"
                 :disabled="syncing"
+                @click="connectPlatform('upwork')"
               >
                 <span class="button-icon">💼</span>
                 Connect Upwork
               </button>
               <button 
-                @click="connectPlatform('freelancer')"
                 class="connect-button freelancer"
                 :disabled="syncing"
+                @click="connectPlatform('freelancer')"
               >
                 <span class="button-icon">👔</span>
                 Connect Freelancer
               </button>
               <button 
-                @click="connectPlatform('fiverr')"
                 class="connect-button fiverr"
                 :disabled="syncing"
+                @click="connectPlatform('fiverr')"
               >
                 <span class="button-icon">🛍️</span>
                 Connect Fiverr
@@ -289,23 +301,32 @@
           </div>
 
           <!-- Sync button if platforms connected -->
-          <div v-if="platformEarnings.length > 0" class="sync-section">
+          <div
+            v-if="platformEarnings.length > 0"
+            class="sync-section"
+          >
             <button 
-              @click="syncAllPlatforms" 
-              class="sync-button"
+              class="sync-button" 
               :disabled="syncing"
+              @click="syncAllPlatforms"
             >
               <span v-if="!syncing">🔄 Sync Earnings</span>
               <span v-else>⏳ Syncing...</span>
             </button>
-            <small v-if="financialSummary?.platforms?.[0]?.lastSynced" class="last-synced">
+            <small
+              v-if="financialSummary?.platforms?.[0]?.lastSynced"
+              class="last-synced"
+            >
               Last synced: {{ formatDate(financialSummary.platforms[0].lastSynced) }}
             </small>
           </div>
         </div>
 
         <!-- Financial statistics -->
-        <div v-if="financialSummary" class="financial-stats">
+        <div
+          v-if="financialSummary"
+          class="financial-stats"
+        >
           <div class="stat-item">
             <span class="stat-label">Total Projects:</span>
             <span class="stat-value">{{ financialSummary.statistics?.totalProjects || 0 }}</span>
@@ -316,7 +337,10 @@
           </div>
           <div class="stat-item">
             <span class="stat-label">Monthly Growth:</span>
-            <span class="stat-value" :class="{ positive: (financialSummary.statistics?.monthlyGrowth || 0) > 0, negative: (financialSummary.statistics?.monthlyGrowth || 0) < 0 }">
+            <span
+              class="stat-value"
+              :class="{ positive: (financialSummary.statistics?.monthlyGrowth || 0) > 0, negative: (financialSummary.statistics?.monthlyGrowth || 0) < 0 }"
+            >
               {{ (financialSummary.statistics?.monthlyGrowth || 0).toFixed(1) }}%
             </span>
           </div>
@@ -464,7 +488,6 @@ export default {
       taxCategory,
       salary,
       salaryPeriod,
-      colors,
       
       // Financial data
       financialSummary,
@@ -571,10 +594,6 @@ export default {
       pieSlices: []
     };
   },
-  mounted() {
-    this.calculateTaxes();
-    this.loadFinancialData();
-  },
         computed: {
         filteredTaxBreakdown() {
             // Create a new object with only the tax components (excluding netSalary and total)
@@ -601,6 +620,10 @@ export default {
         this.generatePieChart();
       }
     }
+  },
+  mounted() {
+    this.calculateTaxes();
+    this.loadFinancialData();
   },
 
 

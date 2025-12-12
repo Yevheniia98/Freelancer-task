@@ -40,6 +40,8 @@ import notificationRoutes from './routes/notification.routes';
 // Import middleware
 import { errorHandler } from './middleware/error.middleware';
 import { notFound } from './middleware/notFound.middleware';
+import { strictInputSanitization } from './middleware/input-sanitization.middleware';
+import { csrfTokenGenerator, getCsrfToken } from './middleware/csrf-protection.middleware';
 
 // Create Express app
 const app = express();
@@ -153,6 +155,15 @@ const limiter = rateLimit({
   legacyHeaders: false
 });
 app.use('/api/', limiter);
+
+// Security: Input sanitization middleware - protects against XSS, SQL injection, NoSQL injection, and prompt injection
+app.use('/api/', strictInputSanitization);
+
+// Security: CSRF token generation
+app.use(csrfTokenGenerator);
+
+// CSRF token endpoint
+app.get('/api/csrf-token', getCsrfToken);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

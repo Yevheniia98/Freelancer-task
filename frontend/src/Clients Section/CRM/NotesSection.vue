@@ -1,20 +1,25 @@
 <template>
   <v-container fluid>
     <v-row class="mb-4">
-      <v-col cols="12" class="d-flex justify-space-between align-center">
-        <h2 class="text-h4">Notes & Reminders</h2>
+      <v-col
+        cols="12"
+        class="d-flex justify-space-between align-center"
+      >
+        <h2 class="text-h4">
+          Notes & Reminders
+        </h2>
         <div class="d-flex gap-2">
           <v-btn
             color="primary"
-            @click="openNoteDialog()"
             prepend-icon="mdi-note-plus"
+            @click="openNoteDialog()"
           >
             Add Note
           </v-btn>
           <v-btn
             color="warning"
-            @click="openReminderDialog()"
             prepend-icon="mdi-alarm-plus"
+            @click="openReminderDialog()"
           >
             Add Reminder
           </v-btn>
@@ -24,35 +29,75 @@
 
     <!-- Quick Stats -->
     <v-row class="mb-4">
-      <v-col cols="12" md="3">
-        <v-card color="primary" variant="flat">
+      <v-col
+        cols="12"
+        md="3"
+      >
+        <v-card
+          color="primary"
+          variant="flat"
+        >
           <v-card-text class="text-center">
-            <div class="text-h4 font-weight-bold text-white">{{ noteStats.totalNotes }}</div>
-            <div class="text-white">Total Notes</div>
+            <div class="text-h4 font-weight-bold text-white">
+              {{ noteStats.totalNotes }}
+            </div>
+            <div class="text-white">
+              Total Notes
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
-      <v-col cols="12" md="3">
-        <v-card color="warning" variant="flat">
+      <v-col
+        cols="12"
+        md="3"
+      >
+        <v-card
+          color="warning"
+          variant="flat"
+        >
           <v-card-text class="text-center">
-            <div class="text-h4 font-weight-bold text-white">{{ noteStats.activeReminders }}</div>
-            <div class="text-white">Active Reminders</div>
+            <div class="text-h4 font-weight-bold text-white">
+              {{ noteStats.activeReminders }}
+            </div>
+            <div class="text-white">
+              Active Reminders
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
-      <v-col cols="12" md="3">
-        <v-card color="error" variant="flat">
+      <v-col
+        cols="12"
+        md="3"
+      >
+        <v-card
+          color="error"
+          variant="flat"
+        >
           <v-card-text class="text-center">
-            <div class="text-h4 font-weight-bold text-white">{{ noteStats.overdueReminders }}</div>
-            <div class="text-white">Overdue Reminders</div>
+            <div class="text-h4 font-weight-bold text-white">
+              {{ noteStats.overdueReminders }}
+            </div>
+            <div class="text-white">
+              Overdue Reminders
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
-      <v-col cols="12" md="3">
-        <v-card color="success" variant="flat">
+      <v-col
+        cols="12"
+        md="3"
+      >
+        <v-card
+          color="success"
+          variant="flat"
+        >
           <v-card-text class="text-center">
-            <div class="text-h4 font-weight-bold text-white">{{ noteStats.todayReminders }}</div>
-            <div class="text-white">Due Today</div>
+            <div class="text-h4 font-weight-bold text-white">
+              {{ noteStats.todayReminders }}
+            </div>
+            <div class="text-white">
+              Due Today
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
@@ -60,7 +105,10 @@
 
     <!-- Filters and Search -->
     <v-row class="mb-4">
-      <v-col cols="12" md="3">
+      <v-col
+        cols="12"
+        md="3"
+      >
         <v-text-field
           v-model="searchQuery"
           label="Search notes..."
@@ -70,7 +118,10 @@
           clearable
         />
       </v-col>
-      <v-col cols="12" md="2">
+      <v-col
+        cols="12"
+        md="2"
+      >
         <v-select
           v-model="typeFilter"
           :items="typeOptions"
@@ -80,7 +131,10 @@
           clearable
         />
       </v-col>
-      <v-col cols="12" md="2">
+      <v-col
+        cols="12"
+        md="2"
+      >
         <v-select
           v-model="priorityFilter"
           :items="priorityOptions"
@@ -90,7 +144,10 @@
           clearable
         />
       </v-col>
-      <v-col cols="12" md="2">
+      <v-col
+        cols="12"
+        md="2"
+      >
         <v-select
           v-model="clientFilter"
           :items="clientOptions"
@@ -100,7 +157,10 @@
           clearable
         />
       </v-col>
-      <v-col cols="12" md="2">
+      <v-col
+        cols="12"
+        md="2"
+      >
         <v-select
           v-model="statusFilter"
           :items="statusOptions"
@@ -110,12 +170,24 @@
           clearable
         />
       </v-col>
-      <v-col cols="12" md="1">
-        <v-btn-toggle v-model="viewMode" mandatory>
-          <v-btn value="cards" size="small">
+      <v-col
+        cols="12"
+        md="1"
+      >
+        <v-btn-toggle
+          v-model="viewMode"
+          mandatory
+        >
+          <v-btn
+            value="cards"
+            size="small"
+          >
             <v-icon>mdi-view-grid</v-icon>
           </v-btn>
-          <v-btn value="list" size="small">
+          <v-btn
+            value="list"
+            size="small"
+          >
             <v-icon>mdi-view-list</v-icon>
           </v-btn>
         </v-btn-toggle>
@@ -130,7 +202,9 @@
       class="mb-4"
     >
       <template #title>
-        <v-icon class="mr-2">mdi-alarm</v-icon>
+        <v-icon class="mr-2">
+          mdi-alarm
+        </v-icon>
         Upcoming Reminders
       </template>
       <div class="d-flex flex-wrap gap-2 mt-2">
@@ -141,7 +215,12 @@
           size="small"
           @click="viewNote(reminder)"
         >
-          <v-icon start size="small">mdi-clock</v-icon>
+          <v-icon
+            start
+            size="small"
+          >
+            mdi-clock
+          </v-icon>
           {{ reminder.title }} - {{ formatReminderTime(reminder.reminderDate) }}
         </v-chip>
         <v-chip
@@ -194,11 +273,16 @@
                   <v-list-item @click="editNote(note)">
                     <v-list-item-title>Edit</v-list-item-title>
                   </v-list-item>
-                  <v-list-item v-if="note.isReminder" @click="markReminderComplete(note)">
+                  <v-list-item
+                    v-if="note.isReminder"
+                    @click="markReminderComplete(note)"
+                  >
                     <v-list-item-title>Mark Complete</v-list-item-title>
                   </v-list-item>
                   <v-list-item @click="deleteNote(note)">
-                    <v-list-item-title class="text-error">Delete</v-list-item-title>
+                    <v-list-item-title class="text-error">
+                      Delete
+                    </v-list-item-title>
                   </v-list-item>
                 </v-list>
               </v-menu>
@@ -225,18 +309,32 @@
               </div>
 
               <!-- Content Preview -->
-              <div class="text-body-2 mb-3" style="min-height: 60px;">
+              <div
+                class="text-body-2 mb-3"
+                style="min-height: 60px;"
+              >
                 {{ truncateText(note.content, 120) }}
               </div>
 
               <!-- Client Info -->
-              <div v-if="note.clientId" class="text-caption text-grey mb-2">
-                <v-icon size="small" class="mr-1">mdi-account</v-icon>
+              <div
+                v-if="note.clientId"
+                class="text-caption text-grey mb-2"
+              >
+                <v-icon
+                  size="small"
+                  class="mr-1"
+                >
+                  mdi-account
+                </v-icon>
                 {{ getClientName(note.clientId) }}
               </div>
 
               <!-- Reminder Date -->
-              <div v-if="note.isReminder && note.reminderDate" class="text-caption mb-2">
+              <div
+                v-if="note.isReminder && note.reminderDate"
+                class="text-caption mb-2"
+              >
                 <v-icon 
                   size="small" 
                   class="mr-1"
@@ -250,7 +348,10 @@
               </div>
 
               <!-- Tags -->
-              <div v-if="note.tags && note.tags.length" class="mb-2">
+              <div
+                v-if="note.tags && note.tags.length"
+                class="mb-2"
+              >
                 <v-chip
                   v-for="tag in note.tags.slice(0, 3)"
                   :key="tag"
@@ -264,7 +365,12 @@
 
               <!-- Created Date -->
               <div class="text-caption text-grey">
-                <v-icon size="small" class="mr-1">mdi-calendar</v-icon>
+                <v-icon
+                  size="small"
+                  class="mr-1"
+                >
+                  mdi-calendar
+                </v-icon>
                 {{ formatDate(note.createdAt) }}
               </div>
             </v-card-text>
@@ -289,7 +395,10 @@
           size="small"
           variant="flat"
         >
-          <v-icon start size="small">
+          <v-icon
+            start
+            size="small"
+          >
             {{ item.isReminder ? 'mdi-alarm' : 'mdi-note-text' }}
           </v-icon>
           {{ item.isReminder ? 'Reminder' : 'Note' }}
@@ -299,8 +408,12 @@
       <!-- Title Column -->
       <template #item.title="{ item }">
         <div>
-          <div class="font-weight-medium">{{ item.title }}</div>
-          <div class="text-caption text-grey">{{ truncateText(item.content, 60) }}</div>
+          <div class="font-weight-medium">
+            {{ item.title }}
+          </div>
+          <div class="text-caption text-grey">
+            {{ truncateText(item.content, 60) }}
+          </div>
         </div>
       </template>
 
@@ -323,14 +436,23 @@
       <!-- Reminder Date Column -->
       <template #item.reminderDate="{ item }">
         <div v-if="item.isReminder && item.reminderDate">
-          <div class="text-body-2" :class="{ 'text-error': isReminderOverdue(item) }">
+          <div
+            class="text-body-2"
+            :class="{ 'text-error': isReminderOverdue(item) }"
+          >
             {{ formatDateTime(item.reminderDate) }}
           </div>
-          <div v-if="isReminderOverdue(item)" class="text-caption text-error">
+          <div
+            v-if="isReminderOverdue(item)"
+            class="text-caption text-error"
+          >
             Overdue
           </div>
         </div>
-        <span v-else class="text-grey">-</span>
+        <span
+          v-else
+          class="text-grey"
+        >-</span>
       </template>
 
       <!-- Status Column -->
@@ -362,11 +484,16 @@
             <v-list-item @click="editNote(item)">
               <v-list-item-title>Edit</v-list-item-title>
             </v-list-item>
-            <v-list-item v-if="item.isReminder" @click="markReminderComplete(item)">
+            <v-list-item
+              v-if="item.isReminder"
+              @click="markReminderComplete(item)"
+            >
               <v-list-item-title>Mark Complete</v-list-item-title>
             </v-list-item>
             <v-list-item @click="deleteNote(item)">
-              <v-list-item-title class="text-error">Delete</v-list-item-title>
+              <v-list-item-title class="text-error">
+                Delete
+              </v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -374,7 +501,11 @@
     </v-data-table>
 
     <!-- Note/Reminder Dialog -->
-    <v-dialog v-model="noteDialog" max-width="800px" persistent>
+    <v-dialog
+      v-model="noteDialog"
+      max-width="800px"
+      persistent
+    >
       <v-card>
         <v-card-title>
           <span class="text-h5">
@@ -385,7 +516,10 @@
         <v-card-text>
           <v-container>
             <v-row>
-              <v-col cols="12" md="8">
+              <v-col
+                cols="12"
+                md="8"
+              >
                 <v-text-field
                   v-model="noteForm.title"
                   label="Title*"
@@ -393,7 +527,10 @@
                   :rules="[v => !!v || 'Title is required']"
                 />
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col
+                cols="12"
+                md="4"
+              >
                 <v-select
                   v-model="noteForm.priority"
                   :items="priorityOptions"
@@ -410,7 +547,10 @@
                   :rules="[v => !!v || 'Content is required']"
                 />
               </v-col>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-select
                   v-model="noteForm.clientId"
                   :items="clientOptions"
@@ -419,7 +559,10 @@
                   clearable
                 />
               </v-col>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-select
                   v-model="noteForm.category"
                   :items="categoryOptions"
@@ -430,7 +573,10 @@
               
               <!-- Reminder specific fields -->
               <template v-if="noteForm.isReminder">
-                <v-col cols="12" md="6">
+                <v-col
+                  cols="12"
+                  md="6"
+                >
                   <v-text-field
                     v-model="noteForm.reminderDate"
                     label="Reminder Date & Time*"
@@ -439,7 +585,10 @@
                     :rules="noteForm.isReminder ? [v => !!v || 'Reminder date is required'] : []"
                   />
                 </v-col>
-                <v-col cols="12" md="6">
+                <v-col
+                  cols="12"
+                  md="6"
+                >
                   <v-select
                     v-model="noteForm.status"
                     :items="statusOptions"
@@ -466,13 +615,16 @@
                   @click:append-inner="addTag"
                   @keyup.enter="addTag"
                 />
-                <div v-if="noteForm.tags.length" class="mt-2">
+                <div
+                  v-if="noteForm.tags.length"
+                  class="mt-2"
+                >
                   <v-chip
                     v-for="(tag, index) in noteForm.tags"
                     :key="index"
                     closable
-                    @click:close="removeTag(index)"
                     class="mr-1 mb-1"
+                    @click:close="removeTag(index)"
                   >
                     {{ tag }}
                   </v-chip>
@@ -480,8 +632,13 @@
               </v-col>
 
               <!-- Color Picker -->
-              <v-col cols="12" md="6">
-                <div class="mb-2">Color</div>
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <div class="mb-2">
+                  Color
+                </div>
                 <div class="d-flex gap-2">
                   <v-btn
                     v-for="color in colorOptions"
@@ -500,10 +657,18 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="grey" variant="text" @click="closeNoteDialog">
+          <v-btn
+            color="grey"
+            variant="text"
+            @click="closeNoteDialog"
+          >
             Cancel
           </v-btn>
-          <v-btn color="primary" variant="flat" @click="saveNote">
+          <v-btn
+            color="primary"
+            variant="flat"
+            @click="saveNote"
+          >
             {{ editingNote ? 'Update' : 'Create' }}
           </v-btn>
         </v-card-actions>
@@ -511,7 +676,10 @@
     </v-dialog>
 
     <!-- Note View Dialog -->
-    <v-dialog v-model="viewNoteDialog" max-width="600px">
+    <v-dialog
+      v-model="viewNoteDialog"
+      max-width="600px"
+    >
       <v-card v-if="selectedNote">
         <v-card-title class="d-flex align-center">
           <v-icon
@@ -549,15 +717,26 @@
           </div>
 
           <!-- Content -->
-          <div class="mb-4" style="white-space: pre-wrap;">{{ selectedNote.content }}</div>
+          <div
+            class="mb-4"
+            style="white-space: pre-wrap;"
+          >
+            {{ selectedNote.content }}
+          </div>
 
           <!-- Client Info -->
-          <div v-if="selectedNote.clientId" class="mb-3">
+          <div
+            v-if="selectedNote.clientId"
+            class="mb-3"
+          >
             <strong>Client:</strong> {{ getClientName(selectedNote.clientId) }}
           </div>
 
           <!-- Reminder Date -->
-          <div v-if="selectedNote.isReminder && selectedNote.reminderDate" class="mb-3">
+          <div
+            v-if="selectedNote.isReminder && selectedNote.reminderDate"
+            class="mb-3"
+          >
             <strong>Reminder Date:</strong>
             <span :class="{ 'text-error': isReminderOverdue(selectedNote) }">
               {{ formatDateTime(selectedNote.reminderDate) }}
@@ -565,12 +744,18 @@
           </div>
 
           <!-- Category -->
-          <div v-if="selectedNote.category" class="mb-3">
+          <div
+            v-if="selectedNote.category"
+            class="mb-3"
+          >
             <strong>Category:</strong> {{ selectedNote.category }}
           </div>
 
           <!-- Tags -->
-          <div v-if="selectedNote.tags && selectedNote.tags.length" class="mb-3">
+          <div
+            v-if="selectedNote.tags && selectedNote.tags.length"
+            class="mb-3"
+          >
             <strong>Tags:</strong>
             <div class="mt-1">
               <v-chip
@@ -592,7 +777,11 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="grey" variant="text" @click="editNote(selectedNote)">
+          <v-btn
+            color="grey"
+            variant="text"
+            @click="editNote(selectedNote)"
+          >
             Edit
           </v-btn>
           <v-btn
@@ -608,18 +797,31 @@
     </v-dialog>
 
     <!-- Delete Confirmation Dialog -->
-    <v-dialog v-model="deleteDialog" max-width="400px">
+    <v-dialog
+      v-model="deleteDialog"
+      max-width="400px"
+    >
       <v-card>
-        <v-card-title class="text-h5">Confirm Delete</v-card-title>
+        <v-card-title class="text-h5">
+          Confirm Delete
+        </v-card-title>
         <v-card-text>
           Are you sure you want to delete "{{ noteToDelete?.title }}"? This action cannot be undone.
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="grey" variant="text" @click="deleteDialog = false">
+          <v-btn
+            color="grey"
+            variant="text"
+            @click="deleteDialog = false"
+          >
             Cancel
           </v-btn>
-          <v-btn color="error" variant="flat" @click="confirmDelete">
+          <v-btn
+            color="error"
+            variant="flat"
+            @click="confirmDelete"
+          >
             Delete
           </v-btn>
         </v-card-actions>

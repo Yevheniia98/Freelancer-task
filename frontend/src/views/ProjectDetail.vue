@@ -10,8 +10,14 @@
     <!-- Main Content -->
     <v-main class="main-content">
       <!-- Loading State -->
-      <div v-if="loading" class="loading-container">
-        <v-container fluid class="px-6 py-8">
+      <div
+        v-if="loading"
+        class="loading-container"
+      >
+        <v-container
+          fluid
+          class="px-6 py-8"
+        >
           <div class="loading-content">
             <v-progress-circular
               :size="70"
@@ -19,24 +25,41 @@
               color="primary"
               indeterminate
             />
-            <h2 class="loading-text">Loading project details...</h2>
+            <h2 class="loading-text">
+              Loading project details...
+            </h2>
           </div>
         </v-container>
       </div>
 
       <!-- Error State -->
-      <div v-else-if="error" class="error-container">
-        <v-container fluid class="px-6 py-8">
+      <div
+        v-else-if="error"
+        class="error-container"
+      >
+        <v-container
+          fluid
+          class="px-6 py-8"
+        >
           <div class="error-content">
-            <v-icon size="64" color="error">mdi-alert-circle</v-icon>
-            <h2 class="error-title">{{ error }}</h2>
+            <v-icon
+              size="64"
+              color="error"
+            >
+              mdi-alert-circle
+            </v-icon>
+            <h2 class="error-title">
+              {{ error }}
+            </h2>
             <v-btn 
               color="primary" 
               variant="elevated" 
-              @click="$router.push('/projects')"
               class="mt-4"
+              @click="$router.push('/projects')"
             >
-              <v-icon class="mr-2">mdi-arrow-left</v-icon>
+              <v-icon class="mr-2">
+                mdi-arrow-left
+              </v-icon>
               Back to Projects
             </v-btn>
           </div>
@@ -44,20 +67,28 @@
       </div>
 
       <!-- Project Details -->
-      <div v-else-if="project" class="project-detail-container">
+      <div
+        v-else-if="project"
+        class="project-detail-container"
+      >
         <!-- Hero Section -->
         <div class="hero-section">
-          <v-container fluid class="px-6 py-8">
+          <v-container
+            fluid
+            class="px-6 py-8"
+          >
             <div class="hero-content">
               <div class="title-section">
                 <div class="breadcrumb">
                   <v-btn 
                     variant="text" 
                     color="white" 
-                    @click="$router.push('/projects')"
                     class="breadcrumb-btn"
+                    @click="$router.push('/projects')"
                   >
-                    <v-icon class="mr-2">mdi-arrow-left</v-icon>
+                    <v-icon class="mr-2">
+                      mdi-arrow-left
+                    </v-icon>
                     Projects
                   </v-btn>
                   <span class="breadcrumb-divider">/</span>
@@ -75,7 +106,9 @@
                     variant="elevated" 
                     class="status-chip"
                   >
-                    <v-icon class="mr-2">{{ getStatusIcon(project.status) }}</v-icon>
+                    <v-icon class="mr-2">
+                      {{ getStatusIcon(project.status) }}
+                    </v-icon>
                     {{ formatStatus(project.status) }}
                   </v-chip>
                   <v-chip 
@@ -83,11 +116,20 @@
                     variant="elevated" 
                     class="priority-chip"
                   >
-                    <v-icon class="mr-2">mdi-flag</v-icon>
+                    <v-icon class="mr-2">
+                      mdi-flag
+                    </v-icon>
                     {{ formatPriority(project.priority) }}
                   </v-chip>
-                  <v-chip v-if="project.deadline" variant="outlined" color="white" class="deadline-chip">
-                    <v-icon class="mr-2">mdi-calendar</v-icon>
+                  <v-chip
+                    v-if="project.deadline"
+                    variant="outlined"
+                    color="white"
+                    class="deadline-chip"
+                  >
+                    <v-icon class="mr-2">
+                      mdi-calendar
+                    </v-icon>
                     Due {{ formatDeadline(project.deadline) }}
                   </v-chip>
                 </div>
@@ -101,7 +143,9 @@
                   class="hero-btn"
                   @click="editProject"
                 >
-                  <v-icon class="mr-2">mdi-pencil</v-icon>
+                  <v-icon class="mr-2">
+                    mdi-pencil
+                  </v-icon>
                   Edit Project
                 </v-btn>
                 <v-btn 
@@ -112,7 +156,9 @@
                   class="hero-btn-outline ml-3"
                   @click="deleteProject"
                 >
-                  <v-icon class="mr-2">mdi-delete</v-icon>
+                  <v-icon class="mr-2">
+                    mdi-delete
+                  </v-icon>
                   Delete
                 </v-btn>
               </div>
@@ -120,13 +166,23 @@
           </v-container>
         </div>
 
-        <v-container fluid class="content-container px-6 pb-8">
+        <v-container
+          fluid
+          class="content-container px-6 pb-8"
+        >
           <!-- Project Overview Cards -->
           <div class="tool-section">
             <div class="section-header">
               <div class="section-title">
-                <v-icon class="section-icon" color="primary">mdi-chart-donut</v-icon>
-                <h2 class="section-heading">Project Overview</h2>
+                <v-icon
+                  class="section-icon"
+                  color="primary"
+                >
+                  mdi-chart-donut
+                </v-icon>
+                <h2 class="section-heading">
+                  Project Overview
+                </h2>
               </div>
             </div>
             
@@ -135,14 +191,23 @@
               <div class="overview-item">
                 <div class="overview-card status-card">
                   <div class="overview-icon-wrapper status-icon">
-                    <v-icon class="overview-icon" color="white">
+                    <v-icon
+                      class="overview-icon"
+                      color="white"
+                    >
                       {{ getStatusIcon(project.status) }}
                     </v-icon>
                   </div>
                   <div class="overview-info">
-                    <h3 class="overview-title">Status</h3>
-                    <div class="overview-amount">{{ formatStatus(project.status) }}</div>
-                    <div class="overview-description">Current state</div>
+                    <h3 class="overview-title">
+                      Status
+                    </h3>
+                    <div class="overview-amount">
+                      {{ formatStatus(project.status) }}
+                    </div>
+                    <div class="overview-description">
+                      Current state
+                    </div>
                   </div>
                 </div>
               </div>
@@ -151,12 +216,23 @@
               <div class="overview-item">
                 <div class="overview-card priority-card">
                   <div class="overview-icon-wrapper priority-icon">
-                    <v-icon class="overview-icon" color="white">mdi-flag</v-icon>
+                    <v-icon
+                      class="overview-icon"
+                      color="white"
+                    >
+                      mdi-flag
+                    </v-icon>
                   </div>
                   <div class="overview-info">
-                    <h3 class="overview-title">Priority</h3>
-                    <div class="overview-amount">{{ formatPriority(project.priority) }}</div>
-                    <div class="overview-description">Project importance</div>
+                    <h3 class="overview-title">
+                      Priority
+                    </h3>
+                    <div class="overview-amount">
+                      {{ formatPriority(project.priority) }}
+                    </div>
+                    <div class="overview-description">
+                      Project importance
+                    </div>
                   </div>
                 </div>
               </div>
@@ -165,12 +241,23 @@
               <div class="overview-item">
                 <div class="overview-card created-card">
                   <div class="overview-icon-wrapper created-icon">
-                    <v-icon class="overview-icon" color="white">mdi-calendar-plus</v-icon>
+                    <v-icon
+                      class="overview-icon"
+                      color="white"
+                    >
+                      mdi-calendar-plus
+                    </v-icon>
                   </div>
                   <div class="overview-info">
-                    <h3 class="overview-title">Created</h3>
-                    <div class="overview-amount">{{ formatDate(project.createdAt) }}</div>
-                    <div class="overview-description">Project start date</div>
+                    <h3 class="overview-title">
+                      Created
+                    </h3>
+                    <div class="overview-amount">
+                      {{ formatDate(project.createdAt) }}
+                    </div>
+                    <div class="overview-description">
+                      Project start date
+                    </div>
                   </div>
                 </div>
               </div>
@@ -179,10 +266,17 @@
               <div class="overview-item">
                 <div class="overview-card deadline-card">
                   <div class="overview-icon-wrapper deadline-icon">
-                    <v-icon class="overview-icon" color="white">mdi-calendar-clock</v-icon>
+                    <v-icon
+                      class="overview-icon"
+                      color="white"
+                    >
+                      mdi-calendar-clock
+                    </v-icon>
                   </div>
                   <div class="overview-info">
-                    <h3 class="overview-title">Deadline</h3>
+                    <h3 class="overview-title">
+                      Deadline
+                    </h3>
                     <div class="overview-amount">
                       {{ project.deadline ? formatDate(project.deadline) : 'No deadline' }}
                     </div>
@@ -199,17 +293,29 @@
           <div class="tool-section">
             <div class="section-header">
               <div class="section-title">
-                <v-icon class="section-icon" color="warning">mdi-clipboard-text</v-icon>
-                <h2 class="section-heading">Project Details</h2>
+                <v-icon
+                  class="section-icon"
+                  color="warning"
+                >
+                  mdi-clipboard-text
+                </v-icon>
+                <h2 class="section-heading">
+                  Project Details
+                </h2>
               </div>
             </div>
             
             <v-row>
               <!-- Main Details -->
-              <v-col cols="12" md="8">
+              <v-col
+                cols="12"
+                md="8"
+              >
                 <div class="project-card">
                   <div class="card-header">
-                    <h3 class="card-title">Description</h3>
+                    <h3 class="card-title">
+                      Description
+                    </h3>
                   </div>
                   <div class="card-content">
                     <div class="description-content">
@@ -221,36 +327,59 @@
                 <!-- Project Timeline -->
                 <div class="project-card">
                   <div class="card-header">
-                    <h3 class="card-title">Timeline</h3>
+                    <h3 class="card-title">
+                      Timeline
+                    </h3>
                   </div>
                   <div class="card-content">
                     <div class="timeline-item">
                       <div class="timeline-icon created">
-                        <v-icon color="white">mdi-calendar-plus</v-icon>
+                        <v-icon color="white">
+                          mdi-calendar-plus
+                        </v-icon>
                       </div>
                       <div class="timeline-content">
-                        <h4 class="timeline-title">Project Created</h4>
-                        <p class="timeline-date">{{ formatFullDate(project.createdAt) }}</p>
+                        <h4 class="timeline-title">
+                          Project Created
+                        </h4>
+                        <p class="timeline-date">
+                          {{ formatFullDate(project.createdAt) }}
+                        </p>
                       </div>
                     </div>
                     
                     <div class="timeline-item">
                       <div class="timeline-icon updated">
-                        <v-icon color="white">mdi-pencil</v-icon>
+                        <v-icon color="white">
+                          mdi-pencil
+                        </v-icon>
                       </div>
                       <div class="timeline-content">
-                        <h4 class="timeline-title">Last Updated</h4>
-                        <p class="timeline-date">{{ formatFullDate(project.updatedAt) }}</p>
+                        <h4 class="timeline-title">
+                          Last Updated
+                        </h4>
+                        <p class="timeline-date">
+                          {{ formatFullDate(project.updatedAt) }}
+                        </p>
                       </div>
                     </div>
                     
-                    <div v-if="project.deadline" class="timeline-item">
+                    <div
+                      v-if="project.deadline"
+                      class="timeline-item"
+                    >
                       <div class="timeline-icon deadline">
-                        <v-icon color="white">mdi-calendar-clock</v-icon>
+                        <v-icon color="white">
+                          mdi-calendar-clock
+                        </v-icon>
                       </div>
                       <div class="timeline-content">
-                        <h4 class="timeline-title">Deadline</h4>
-                        <p class="timeline-date">{{ formatFullDate(project.deadline) }}</p>
+                        <h4 class="timeline-title">
+                          Deadline
+                        </h4>
+                        <p class="timeline-date">
+                          {{ formatFullDate(project.deadline) }}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -258,48 +387,84 @@
               </v-col>
 
               <!-- Sidebar Information -->
-              <v-col cols="12" md="4">
+              <v-col
+                cols="12"
+                md="4"
+              >
                 <div class="project-card">
                   <div class="card-header">
-                    <h3 class="card-title">Project Information</h3>
+                    <h3 class="card-title">
+                      Project Information
+                    </h3>
                   </div>
                   <div class="card-content">
                     <div class="info-item">
-                      <div class="info-label">Project ID</div>
-                      <div class="info-value">{{ project.id }}</div>
+                      <div class="info-label">
+                        Project ID
+                      </div>
+                      <div class="info-value">
+                        {{ project.id }}
+                      </div>
                     </div>
                     
                     <div class="info-item">
-                      <div class="info-label">Status</div>
+                      <div class="info-label">
+                        Status
+                      </div>
                       <div class="info-value">
-                        <v-chip :color="getStatusColor(project.status)" size="small" variant="tonal">
+                        <v-chip
+                          :color="getStatusColor(project.status)"
+                          size="small"
+                          variant="tonal"
+                        >
                           {{ formatStatus(project.status) }}
                         </v-chip>
                       </div>
                     </div>
                     
                     <div class="info-item">
-                      <div class="info-label">Priority</div>
+                      <div class="info-label">
+                        Priority
+                      </div>
                       <div class="info-value">
-                        <v-chip :color="getPriorityColor(project.priority)" size="small" variant="tonal">
+                        <v-chip
+                          :color="getPriorityColor(project.priority)"
+                          size="small"
+                          variant="tonal"
+                        >
                           {{ formatPriority(project.priority) }}
                         </v-chip>
                       </div>
                     </div>
                     
                     <div class="info-item">
-                      <div class="info-label">Created</div>
-                      <div class="info-value">{{ formatDate(project.createdAt) }}</div>
+                      <div class="info-label">
+                        Created
+                      </div>
+                      <div class="info-value">
+                        {{ formatDate(project.createdAt) }}
+                      </div>
                     </div>
                     
                     <div class="info-item">
-                      <div class="info-label">Last Modified</div>
-                      <div class="info-value">{{ formatDate(project.updatedAt) }}</div>
+                      <div class="info-label">
+                        Last Modified
+                      </div>
+                      <div class="info-value">
+                        {{ formatDate(project.updatedAt) }}
+                      </div>
                     </div>
                     
-                    <div v-if="project.deadline" class="info-item">
-                      <div class="info-label">Deadline</div>
-                      <div class="info-value">{{ formatDate(project.deadline) }}</div>
+                    <div
+                      v-if="project.deadline"
+                      class="info-item"
+                    >
+                      <div class="info-label">
+                        Deadline
+                      </div>
+                      <div class="info-value">
+                        {{ formatDate(project.deadline) }}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -307,7 +472,9 @@
                 <!-- Actions Card -->
                 <div class="project-card">
                   <div class="card-header">
-                    <h3 class="card-title">Actions</h3>
+                    <h3 class="card-title">
+                      Actions
+                    </h3>
                   </div>
                   <div class="card-content">
                     <div class="action-buttons">
@@ -318,7 +485,9 @@
                         class="mb-3"
                         @click="editProject"
                       >
-                        <v-icon class="mr-2">mdi-pencil</v-icon>
+                        <v-icon class="mr-2">
+                          mdi-pencil
+                        </v-icon>
                         Edit Project
                       </v-btn>
                       
@@ -327,10 +496,12 @@
                         variant="outlined" 
                         block 
                         class="mb-3"
-                        @click="changeStatus('completed')"
                         :disabled="project.status === 'completed'"
+                        @click="changeStatus('completed')"
                       >
-                        <v-icon class="mr-2">mdi-check</v-icon>
+                        <v-icon class="mr-2">
+                          mdi-check
+                        </v-icon>
                         Mark Complete
                       </v-btn>
                       
@@ -340,7 +511,9 @@
                         block
                         @click="deleteProject"
                       >
-                        <v-icon class="mr-2">mdi-delete</v-icon>
+                        <v-icon class="mr-2">
+                          mdi-delete
+                        </v-icon>
                         Delete Project
                       </v-btn>
                     </div>
@@ -351,11 +524,21 @@
           </div>
 
           <!-- Project Files Section -->
-          <div v-if="project.files && project.files.length > 0" class="tool-section">
+          <div
+            v-if="project.files && project.files.length > 0"
+            class="tool-section"
+          >
             <div class="section-header">
               <div class="section-title">
-                <v-icon class="section-icon" color="info">mdi-file-multiple</v-icon>
-                <h2 class="section-heading">Project Files</h2>
+                <v-icon
+                  class="section-icon"
+                  color="info"
+                >
+                  mdi-file-multiple
+                </v-icon>
+                <h2 class="section-heading">
+                  Project Files
+                </h2>
               </div>
             </div>
             
@@ -366,24 +549,39 @@
                 class="file-card"
               >
                 <div class="file-preview">
-                  <div v-if="isImage(file.mimetype)" class="image-preview">
+                  <div
+                    v-if="isImage(file.mimetype)"
+                    class="image-preview"
+                  >
                     <img 
                       :src="`http://localhost:3030${file.path}`" 
                       :alt="file.originalName"
                       class="preview-image"
-                    />
+                    >
                   </div>
-                  <div v-else class="file-icon-preview">
-                    <v-icon :color="getFileIconColor(file.mimetype)" size="48">
+                  <div
+                    v-else
+                    class="file-icon-preview"
+                  >
+                    <v-icon
+                      :color="getFileIconColor(file.mimetype)"
+                      size="48"
+                    >
                       {{ getFileIcon(file.mimetype) }}
                     </v-icon>
                   </div>
                 </div>
                 
                 <div class="file-info">
-                  <h4 class="file-name">{{ file.originalName }}</h4>
-                  <p class="file-size">{{ formatFileSize(file.size) }}</p>
-                  <p class="file-date">{{ formatFileDate(file.uploadedAt) }}</p>
+                  <h4 class="file-name">
+                    {{ file.originalName }}
+                  </h4>
+                  <p class="file-size">
+                    {{ formatFileSize(file.size) }}
+                  </p>
+                  <p class="file-date">
+                    {{ formatFileDate(file.uploadedAt) }}
+                  </p>
                 </div>
                 
                 <div class="file-actions">
@@ -395,7 +593,9 @@
                     size="small"
                     class="mr-2"
                   >
-                    <v-icon class="mr-1">mdi-download</v-icon>
+                    <v-icon class="mr-1">
+                      mdi-download
+                    </v-icon>
                     Download
                   </v-btn>
                   <v-btn 
@@ -405,7 +605,9 @@
                     variant="text" 
                     size="small"
                   >
-                    <v-icon class="mr-1">mdi-eye</v-icon>
+                    <v-icon class="mr-1">
+                      mdi-eye
+                    </v-icon>
                     View
                   </v-btn>
                 </div>
@@ -417,16 +619,33 @@
     </v-main>
 
     <!-- Delete Confirmation Dialog -->
-    <v-dialog v-model="deleteDialog" max-width="500">
+    <v-dialog
+      v-model="deleteDialog"
+      max-width="500"
+    >
       <v-card>
-        <v-card-title class="headline">Delete Project</v-card-title>
+        <v-card-title class="headline">
+          Delete Project
+        </v-card-title>
         <v-card-text>
           Are you sure you want to delete "{{ project?.title }}"? This action cannot be undone.
         </v-card-text>
         <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="grey" variant="text" @click="deleteDialog = false">Cancel</v-btn>
-          <v-btn color="error" variant="elevated" @click="confirmDelete">Delete</v-btn>
+          <v-spacer />
+          <v-btn
+            color="grey"
+            variant="text"
+            @click="deleteDialog = false"
+          >
+            Cancel
+          </v-btn>
+          <v-btn
+            color="error"
+            variant="elevated"
+            @click="confirmDelete"
+          >
+            Delete
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -439,7 +658,9 @@
       location="top right"
     >
       <div class="d-flex align-center">
-        <v-icon class="mr-2">{{ snackbarIcon }}</v-icon>
+        <v-icon class="mr-2">
+          {{ snackbarIcon }}
+        </v-icon>
         {{ snackbarText }}
       </div>
     </v-snackbar>

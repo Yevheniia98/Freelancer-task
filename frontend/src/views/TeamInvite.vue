@@ -3,23 +3,57 @@
     <HeaderSection :hide-get-started="true" />
     
     <div class="container">
-      <div v-if="loading" class="invite-card text-center">
-        <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
-        <p class="mt-4">Loading invitation...</p>
+      <div
+        v-if="loading"
+        class="invite-card text-center"
+      >
+        <v-progress-circular
+          indeterminate
+          color="primary"
+          size="64"
+        />
+        <p class="mt-4">
+          Loading invitation...
+        </p>
       </div>
 
-      <div v-else-if="error" class="invite-card text-center">
-        <v-icon size="64" color="error" class="mb-4">mdi-alert-circle</v-icon>
-        <h2 class="text-h5 mb-2">{{ error }}</h2>
+      <div
+        v-else-if="error"
+        class="invite-card text-center"
+      >
+        <v-icon
+          size="64"
+          color="error"
+          class="mb-4"
+        >
+          mdi-alert-circle
+        </v-icon>
+        <h2 class="text-h5 mb-2">
+          {{ error }}
+        </h2>
         <p class="text-body-1 text-medium-emphasis mb-4">
           This invitation link may have expired or is invalid.
         </p>
-        <v-btn color="primary" to="/login">Go to Login</v-btn>
+        <v-btn
+          color="primary"
+          to="/login"
+        >
+          Go to Login
+        </v-btn>
       </div>
 
-      <div v-else class="invite-card">
+      <div
+        v-else
+        class="invite-card"
+      >
         <div class="invite-header">
-          <v-icon size="64" color="primary" class="mb-4">mdi-account-group</v-icon>
+          <v-icon
+            size="64"
+            color="primary"
+            class="mb-4"
+          >
+            mdi-account-group
+          </v-icon>
           <h1 class="text-h4 font-weight-bold text-center mb-2">
             You're Invited to Join!
           </h1>
@@ -30,22 +64,38 @@
 
         <div class="invite-content">
           <div class="inviter-info mb-6">
-            <v-card variant="outlined" class="pa-4">
+            <v-card
+              variant="outlined"
+              class="pa-4"
+            >
               <div class="d-flex align-center">
-                <v-avatar size="48" color="primary" class="mr-3">
+                <v-avatar
+                  size="48"
+                  color="primary"
+                  class="mr-3"
+                >
                   <span class="text-h6">{{ getInitials(inviteData.inviterName) }}</span>
                 </v-avatar>
                 <div>
-                  <div class="text-subtitle-1 font-weight-medium">{{ inviteData.inviterName }}</div>
-                  <div class="text-body-2 text-medium-emphasis">{{ inviteData.inviterEmail }}</div>
+                  <div class="text-subtitle-1 font-weight-medium">
+                    {{ inviteData.inviterName }}
+                  </div>
+                  <div class="text-body-2 text-medium-emphasis">
+                    {{ inviteData.inviterEmail }}
+                  </div>
                 </div>
               </div>
             </v-card>
           </div>
 
           <!-- Registration Form -->
-          <div v-if="showRegistrationForm" class="registration-form mb-6">
-            <h3 class="text-h6 mb-4">Create Your Account</h3>
+          <div
+            v-if="showRegistrationForm"
+            class="registration-form mb-6"
+          >
+            <h3 class="text-h6 mb-4">
+              Create Your Account
+            </h3>
             <v-form @submit.prevent="acceptInvitation">
               <v-text-field
                 v-model="registrationData.email"
@@ -54,7 +104,7 @@
                 readonly
                 variant="outlined"
                 class="mb-3"
-              ></v-text-field>
+              />
 
               <v-text-field
                 v-model="registrationData.firstName"
@@ -62,7 +112,7 @@
                 required
                 variant="outlined"
                 class="mb-3"
-              ></v-text-field>
+              />
 
               <v-text-field
                 v-model="registrationData.lastName"
@@ -70,7 +120,7 @@
                 required
                 variant="outlined"
                 class="mb-3"
-              ></v-text-field>
+              />
 
               <v-text-field
                 v-model="registrationData.password"
@@ -80,7 +130,7 @@
                 variant="outlined"
                 hint="At least 8 characters"
                 class="mb-3"
-              ></v-text-field>
+              />
 
               <v-text-field
                 v-model="registrationData.confirmPassword"
@@ -89,9 +139,13 @@
                 required
                 variant="outlined"
                 class="mb-4"
-              ></v-text-field>
+              />
 
-              <v-alert type="info" variant="tonal" class="mb-4">
+              <v-alert
+                type="info"
+                variant="tonal"
+                class="mb-4"
+              >
                 <strong>Free Access:</strong> As an invited member, you'll get free access to the team workspace!
               </v-alert>
 
@@ -108,36 +162,51 @@
           </div>
 
           <!-- Benefits List (shown before registration form) -->
-          <div v-else class="benefits mb-6">
-            <h3 class="text-h6 mb-3">What you'll get access to:</h3>
+          <div
+            v-else
+            class="benefits mb-6"
+          >
+            <h3 class="text-h6 mb-3">
+              What you'll get access to:
+            </h3>
             <v-list>
               <v-list-item>
-                <template v-slot:prepend>
-                  <v-icon color="success">mdi-check-circle</v-icon>
+                <template #prepend>
+                  <v-icon color="success">
+                    mdi-check-circle
+                  </v-icon>
                 </template>
                 <v-list-item-title>Shared project management workspace</v-list-item-title>
               </v-list-item>
               <v-list-item>
-                <template v-slot:prepend>
-                  <v-icon color="success">mdi-check-circle</v-icon>
+                <template #prepend>
+                  <v-icon color="success">
+                    mdi-check-circle
+                  </v-icon>
                 </template>
                 <v-list-item-title>Real-time team chat and collaboration</v-list-item-title>
               </v-list-item>
               <v-list-item>
-                <template v-slot:prepend>
-                  <v-icon color="success">mdi-check-circle</v-icon>
+                <template #prepend>
+                  <v-icon color="success">
+                    mdi-check-circle
+                  </v-icon>
                 </template>
                 <v-list-item-title>Task tracking and progress monitoring</v-list-item-title>
               </v-list-item>
               <v-list-item>
-                <template v-slot:prepend>
-                  <v-icon color="success">mdi-check-circle</v-icon>
+                <template #prepend>
+                  <v-icon color="success">
+                    mdi-check-circle
+                  </v-icon>
                 </template>
                 <v-list-item-title>File sharing and document management</v-list-item-title>
               </v-list-item>
               <v-list-item>
-                <template v-slot:prepend>
-                  <v-icon color="success">mdi-check-circle</v-icon>
+                <template #prepend>
+                  <v-icon color="success">
+                    mdi-check-circle
+                  </v-icon>
                 </template>
                 <v-list-item-title>✨ <strong>100% FREE access</strong> as an invited member!</v-list-item-title>
               </v-list-item>
@@ -145,7 +214,10 @@
           </div>
 
           <!-- Action Buttons -->
-          <div class="actions" v-if="!showRegistrationForm">
+          <div
+            v-if="!showRegistrationForm"
+            class="actions"
+          >
             <v-btn
               color="primary"
               size="large"
@@ -153,13 +225,18 @@
               class="mb-3"
               @click="acceptInvitation"
             >
-              <v-icon start>mdi-account-plus</v-icon>
+              <v-icon start>
+                mdi-account-plus
+              </v-icon>
               Accept Invitation & Create Account
             </v-btn>
             
             <div class="text-center">
               <span class="text-body-2 text-medium-emphasis">Already have an account? </span>
-              <router-link to="/login" class="text-primary text-decoration-none">
+              <router-link
+                to="/login"
+                class="text-primary text-decoration-none"
+              >
                 Sign in instead
               </router-link>
             </div>

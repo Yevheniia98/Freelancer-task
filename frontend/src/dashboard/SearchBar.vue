@@ -159,8 +159,8 @@
                   </button>
                   <button
                     class="notification-delete-btn"
-                    @click="deleteNotification(notification, $event)"
                     title="Delete notification"
+                    @click="deleteNotification(notification, $event)"
                   >
                     <X :size="14" />
                   </button>
@@ -189,7 +189,10 @@
             :class="{ 'active': showUserMenu }"
             @click="toggleUserMenu"
           >
-            <div class="user-avatar" :class="{ 'default-avatar': !user.avatar }">
+            <div
+              class="user-avatar"
+              :class="{ 'default-avatar': !user.avatar }"
+            >
               <img 
                 v-if="user.avatar"
                 :src="user.avatar" 
@@ -200,7 +203,12 @@
                 v-else 
                 class="default-avatar-icon"
               >
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="20"
+                  height="20"
+                  fill="currentColor"
+                >
                   <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
                 </svg>
               </div>
@@ -214,7 +222,10 @@
               v-if="showUserMenu"
               class="dropdown-menu user-dropdown"
             >
-              <div class="dropdown-header user-header" @click="navigateTo('/account')">
+              <div
+                class="dropdown-header user-header"
+                @click="navigateTo('/account')"
+              >
                 <div class="user-info">
                   <img
                     v-if="user.avatar"
@@ -226,7 +237,12 @@
                     v-else 
                     class="user-profile-image default-profile-icon"
                   >
-                    <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor">
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="30"
+                      height="30"
+                      fill="currentColor"
+                    >
                       <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
                     </svg>
                   </div>

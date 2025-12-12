@@ -26,29 +26,39 @@
                 {{ formatDay(event.date) }}
               </div>
             </div>
-                      <div class="meeting-info">
-            <div class="event-type-container">
-              <span class="event-type">{{ event.type }}</span>
-              <v-chip
-                v-if="event.platform && event.meetingLink"
-                size="x-small"
-                :color="getMeetingButtonColor(event)"
-                variant="elevated"
-                class="platform-chip"
-              >
-                <v-icon size="x-small" class="mr-1">{{ getMeetingIcon(event) }}</v-icon>
-                {{ event.platform.toUpperCase() }}
-              </v-chip>
+            <div class="meeting-info">
+              <div class="event-type-container">
+                <span class="event-type">{{ event.type }}</span>
+                <v-chip
+                  v-if="event.platform && event.meetingLink"
+                  size="x-small"
+                  :color="getMeetingButtonColor(event)"
+                  variant="elevated"
+                  class="platform-chip"
+                >
+                  <v-icon
+                    size="x-small"
+                    class="mr-1"
+                  >
+                    {{ getMeetingIcon(event) }}
+                  </v-icon>
+                  {{ event.platform.toUpperCase() }}
+                </v-chip>
+              </div>
+              <div class="event-title">
+                {{ event.title }}
+              </div>
             </div>
-            <div class="event-title">
-              {{ event.title }}
-            </div>
-          </div>
           </div>
 
           <!-- Meeting Description -->
-          <div v-if="event.description" class="meeting-description">
-            <p class="description-text">{{ event.description }}</p>
+          <div
+            v-if="event.description"
+            class="meeting-description"
+          >
+            <p class="description-text">
+              {{ event.description }}
+            </p>
           </div>
           
           <!-- Time Info -->
@@ -153,7 +163,9 @@
             class="delete-btn"
             @click="deleteEvent(event.id)"
           >
-            <v-icon size="small">mdi-delete</v-icon>
+            <v-icon size="small">
+              mdi-delete
+            </v-icon>
             <v-tooltip
               activator="parent"
               location="top"
@@ -197,7 +209,12 @@
               v-else 
               class="default-user-icon"
             >
-              <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+              <svg
+                viewBox="0 0 24 24"
+                width="32"
+                height="32"
+                fill="currentColor"
+              >
                 <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
               </svg>
             </div>
@@ -244,28 +261,35 @@
           v-model="newEvent.title"
           placeholder="Add title"
           class="title-input"
-        />
+        >
       </div>
 
       <!-- Description Box -->
       <div class="input-box description-box">
         <textarea
+          ref="descriptionTextarea"
           v-model="newEvent.description"
           placeholder="Add description"
           class="description-input"
           rows="3"
           @input="autoResize"
-          ref="descriptionTextarea"
-        ></textarea>
+        />
         <div class="description-resize-indicator">
-          <v-icon size="small" color="grey">mdi-resize-bottom-right</v-icon>
+          <v-icon
+            size="small"
+            color="grey"
+          >
+            mdi-resize-bottom-right
+          </v-icon>
         </div>
       </div>
 
       <!-- Date and Time Section -->
       <div class="input-box datetime-box">
         <div class="datetime-header">
-          <v-icon class="datetime-icon">mdi-clock-outline</v-icon>
+          <v-icon class="datetime-icon">
+            mdi-clock-outline
+          </v-icon>
           <span class="datetime-title">Date and time</span>
         </div>
 
@@ -285,7 +309,7 @@
                 class="datetime-input"
                 v-bind="props"
                 placeholder="Select the day"
-              />
+              >
             </template>
             <v-date-picker
               v-model="newEvent.date"
@@ -302,7 +326,7 @@
             type="time"
             class="datetime-input time-input"
             placeholder="09:00"
-          />
+          >
         </div>
 
         <!-- Time To Row -->
@@ -313,7 +337,7 @@
             type="time"
             class="datetime-input time-input"
             placeholder="10:00"
-          />
+          >
         </div>
       </div>
 
@@ -323,7 +347,9 @@
         class="input-box people-box"
       >
         <div class="people-header">
-          <v-icon class="people-icon">mdi-account-multiple-plus</v-icon>
+          <v-icon class="people-icon">
+            mdi-account-multiple-plus
+          </v-icon>
           <span class="people-title">Add people</span>
         </div>
 
@@ -341,7 +367,9 @@
               variant="outlined"
               class="invitation-btn"
             >
-              <v-icon class="mr-1">mdi-account-circle</v-icon>
+              <v-icon class="mr-1">
+                mdi-account-circle
+              </v-icon>
               App Users
             </v-btn>
             <v-btn
@@ -349,14 +377,19 @@
               variant="outlined"
               class="invitation-btn"
             >
-              <v-icon class="mr-1">mdi-email</v-icon>
+              <v-icon class="mr-1">
+                mdi-email
+              </v-icon>
               Email
             </v-btn>
           </v-btn-toggle>
         </div>
 
         <!-- App Users Selection -->
-        <div v-if="invitationType === 'app-users'" class="d-flex align-center px-3 py-2">
+        <div
+          v-if="invitationType === 'app-users'"
+          class="d-flex align-center px-3 py-2"
+        >
           <v-text-field
             v-model="peopleSearch"
             placeholder="Search app users"
@@ -384,17 +417,26 @@
                     </v-icon>
                   </v-btn>
                 </template>
-                <v-card class="people-dropdown" elevation="8">
+                <v-card
+                  class="people-dropdown"
+                  elevation="8"
+                >
                   <v-card-title class="pa-3">
-                    <v-icon class="mr-2">mdi-account-search</v-icon>
+                    <v-icon class="mr-2">
+                      mdi-account-search
+                    </v-icon>
                     Available Users
                   </v-card-title>
-                  <v-list density="compact" max-height="200" class="overflow-y-auto">
+                  <v-list
+                    density="compact"
+                    max-height="200"
+                    class="overflow-y-auto"
+                  >
                     <v-list-item
                       v-for="person in filteredPeople"
                       :key="person.id"
-                      @click="addPerson(person)"
                       class="person-option"
+                      @click="addPerson(person)"
                     >
                       <template #prepend>
                         <v-avatar size="32">
@@ -404,10 +446,15 @@
                       <v-list-item-title>{{ person.name }}</v-list-item-title>
                       <v-list-item-subtitle>{{ person.email }}</v-list-item-subtitle>
                       <template #append>
-                        <v-icon color="success">mdi-plus-circle</v-icon>
+                        <v-icon color="success">
+                          mdi-plus-circle
+                        </v-icon>
                       </template>
                     </v-list-item>
-                    <v-list-item v-if="filteredPeople.length === 0" disabled>
+                    <v-list-item
+                      v-if="filteredPeople.length === 0"
+                      disabled
+                    >
                       <v-list-item-title class="text-center text-grey">
                         No users found
                       </v-list-item-title>
@@ -420,7 +467,10 @@
         </div>
 
         <!-- Email Invitation -->
-        <div v-else class="email-invitation px-3 py-2">
+        <div
+          v-else
+          class="email-invitation px-3 py-2"
+        >
           <v-text-field
             v-model="emailInviteInput"
             placeholder="Enter email addresses (comma separated)"
@@ -435,19 +485,22 @@
                 icon="mdi-plus"
                 size="small"
                 variant="text"
-                @click="addEmailInvitees"
                 :disabled="!emailInviteInput.trim()"
+                @click="addEmailInvitees"
               />
             </template>
           </v-text-field>
           
 
           <div class="email-hint mt-1">
-            <v-icon size="small" class="mr-1">mdi-information-outline</v-icon>
+            <v-icon
+              size="small"
+              class="mr-1"
+            >
+              mdi-information-outline
+            </v-icon>
             <span class="text-caption text-grey">Press Enter or click + to add emails</span>
           </div>
-          
-
         </div>
         
         <!-- Selected People and Email Invitees -->
@@ -490,7 +543,9 @@
               class="mr-2"
               color="grey-lighten-2"
             >
-              <v-icon size="16">mdi-email</v-icon>
+              <v-icon size="16">
+                mdi-email
+              </v-icon>
             </v-avatar>
             <div class="person-info">
               <span class="person-name">{{ email }}</span>
@@ -506,10 +561,19 @@
         </div>
 
         <!-- Invitation Summary -->
-        <div v-if="selectedPeople.length > 0 || emailInvitees.length > 0" class="invitation-summary px-3 py-2">
-          <v-divider class="mb-2"></v-divider>
+        <div
+          v-if="selectedPeople.length > 0 || emailInvitees.length > 0"
+          class="invitation-summary px-3 py-2"
+        >
+          <v-divider class="mb-2" />
           <div class="summary-text">
-            <v-icon size="small" class="mr-1" color="success">mdi-check-circle</v-icon>
+            <v-icon
+              size="small"
+              class="mr-1"
+              color="success"
+            >
+              mdi-check-circle
+            </v-icon>
             <span class="text-caption">
               {{ selectedPeople.length + emailInvitees.length }} participant(s) will be invited
             </span>
@@ -523,59 +587,83 @@
         class="input-box meeting-link-box"
       >
         <div class="meeting-link-header">
-          <v-icon class="meeting-link-icon">mdi-link</v-icon>
+          <v-icon class="meeting-link-icon">
+            mdi-link
+          </v-icon>
           <span class="meeting-link-title">Add meeting link</span>
         </div>
 
-          <!-- Enhanced Platform Selection -->
-          <div class="platform-selection-enhanced mb-4">
-            <h4 class="text-subtitle-1 font-weight-medium mb-3 text-green-darken-1">Choose Platform</h4>
-            <v-btn-toggle
-              v-model="selectedPlatform"
-              mandatory
-              class="platform-toggle-enhanced justify-center"
-              style="background: rgba(76, 175, 80, 0.1); border-radius: 15px; padding: 8px; width: 100%;"
+        <!-- Enhanced Platform Selection -->
+        <div class="platform-selection-enhanced mb-4">
+          <h4 class="text-subtitle-1 font-weight-medium mb-3 text-green-darken-1">
+            Choose Platform
+          </h4>
+          <v-btn-toggle
+            v-model="selectedPlatform"
+            mandatory
+            class="platform-toggle-enhanced justify-center"
+            style="background: rgba(76, 175, 80, 0.1); border-radius: 15px; padding: 8px; width: 100%;"
+          >
+            <v-btn
+              value="zoom"
+              class="platform-btn-enhanced mx-1"
+              style="border-radius: 12px; min-width: 110px;"
+              color="blue"
             >
-              <v-btn
-                value="zoom"
-                class="platform-btn-enhanced mx-1"
-                style="border-radius: 12px; min-width: 110px;"
-                color="blue"
+              <v-icon
+                left
+                size="small"
               >
-                <v-icon left size="small">mdi-video</v-icon>
-                Zoom
-              </v-btn>
-              <v-btn
-                value="meet"
-                class="platform-btn-enhanced mx-1"
-                style="border-radius: 12px; min-width: 110px;"
-                color="green"
+                mdi-video
+              </v-icon>
+              Zoom
+            </v-btn>
+            <v-btn
+              value="meet"
+              class="platform-btn-enhanced mx-1"
+              style="border-radius: 12px; min-width: 110px;"
+              color="green"
+            >
+              <v-icon
+                left
+                size="small"
               >
-                <v-icon left size="small">mdi-google</v-icon>
-                Meet
-              </v-btn>
-              <v-btn
-                value="custom"
-                class="platform-btn-enhanced mx-1"
-                style="border-radius: 12px; min-width: 110px;"
-                color="purple"
+                mdi-google
+              </v-icon>
+              Meet
+            </v-btn>
+            <v-btn
+              value="custom"
+              class="platform-btn-enhanced mx-1"
+              style="border-radius: 12px; min-width: 110px;"
+              color="purple"
+            >
+              <v-icon
+                left
+                size="small"
               >
-                <v-icon left size="small">mdi-link</v-icon>
-                Custom
-              </v-btn>
-            </v-btn-toggle>
-          </div>
+                mdi-link
+              </v-icon>
+              Custom
+            </v-btn>
+          </v-btn-toggle>
+        </div>
 
         <!-- Auto-generate or custom link -->
-        <div v-if="selectedPlatform === 'zoom'" class="d-flex align-center px-3 py-2">
+        <div
+          v-if="selectedPlatform === 'zoom'"
+          class="d-flex align-center px-3 py-2"
+        >
           <v-btn
             variant="outlined"
             color="primary"
-            @click="generateZoomLink"
             :disabled="!!newEvent.meetingLink"
             class="generate-btn"
+            @click="generateZoomLink"
           >
-            <v-icon class="mr-1">mdi-plus</v-icon>
+            <v-icon class="mr-1">
+              mdi-plus
+            </v-icon>
             Generate Zoom Link
           </v-btn>
           <v-text-field
@@ -598,15 +686,20 @@
           </v-text-field>
         </div>
 
-        <div v-else-if="selectedPlatform === 'meet'" class="d-flex align-center px-3 py-2">
+        <div
+          v-else-if="selectedPlatform === 'meet'"
+          class="d-flex align-center px-3 py-2"
+        >
           <v-btn
             variant="outlined"
             color="primary"
-            @click="generateMeetLink"
             :disabled="!!newEvent.meetingLink"
             class="generate-btn"
+            @click="generateMeetLink"
           >
-            <v-icon class="mr-1">mdi-plus</v-icon>
+            <v-icon class="mr-1">
+              mdi-plus
+            </v-icon>
             Generate Meet Link
           </v-btn>
           <v-text-field
@@ -629,7 +722,10 @@
           </v-text-field>
         </div>
 
-        <div v-else class="d-flex align-center px-3 py-2">
+        <div
+          v-else
+          class="d-flex align-center px-3 py-2"
+        >
           <v-text-field
             v-model="newEvent.meetingLink"
             placeholder="Enter custom meeting link"
@@ -643,8 +739,8 @@
                 icon="mdi-content-copy"
                 size="small"
                 variant="text"
-                @click="copyToClipboard(newEvent.meetingLink)"
                 :disabled="!newEvent.meetingLink"
+                @click="copyToClipboard(newEvent.meetingLink)"
               />
             </template>
           </v-text-field>
@@ -654,7 +750,9 @@
       <!-- Repeat Section -->
       <div class="input-box repeat-box">
         <div class="repeat-header">
-          <v-icon class="repeat-icon">mdi-repeat</v-icon>
+          <v-icon class="repeat-icon">
+            mdi-repeat
+          </v-icon>
           <span class="repeat-title">Repeat</span>
         </div>
 
@@ -708,7 +806,12 @@
         :disabled="!newEvent.title"
         @click="createEvent"
       >
-        <v-icon left class="mr-2">mdi-plus</v-icon>
+        <v-icon
+          left
+          class="mr-2"
+        >
+          mdi-plus
+        </v-icon>
         {{ eventType === 'task' ? 'Create Task' : eventType === 'meet' ? 'Schedule Meeting' : 'Create Event' }}
       </v-btn>
     </div>
@@ -806,7 +909,10 @@
 
     <!-- Notification Toast -->
     <div class="notification-container">
-      <transition-group name="notification" tag="div">
+      <transition-group
+        name="notification"
+        tag="div"
+      >
         <div
           v-for="notification in notifications"
           :key="notification.id"
@@ -821,8 +927,8 @@
             icon="mdi-close"
             size="x-small"
             variant="text"
-            @click="removeNotification(notification.id)"
             class="notification-close"
+            @click="removeNotification(notification.id)"
           />
         </div>
       </transition-group>
@@ -942,6 +1048,7 @@ function formatDateForDisplay(dateString, options = {}) {
 }
 
 // Helper function for time formatting
+// eslint-disable-next-line no-unused-vars
 function formatTimeForDisplay(timeString) {
   if (!timeString) return '';
   

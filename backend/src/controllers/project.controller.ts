@@ -33,10 +33,16 @@ export class ProjectController {
 
       const createProjectDto: CreateProjectDto = {
         title: req.body.title,
+        name: req.body.name,
         description: req.body.description,
         status: req.body.status,
         priority: req.body.priority,
-        deadline: req.body.deadline ? new Date(req.body.deadline) : undefined
+        deadline: req.body.deadline ? new Date(req.body.deadline) : undefined,
+        privacy: req.body.privacy,
+        category: req.body.category,
+        skills: req.body.skills,
+        teamLead: req.body.teamLead,
+        teamMembers: req.body.teamMembers
       };
 
       const project = await this.projectService.create(createProjectDto);
