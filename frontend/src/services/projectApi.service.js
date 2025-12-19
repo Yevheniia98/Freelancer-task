@@ -37,11 +37,35 @@ export class ProjectApiService {
    */
   static async create(projectData) {
     try {
+      console.log('Creating project with data:', JSON.stringify(projectData, null, 2));
       const response = await api.post('/projects', projectData);
       return response.data.data;
     } catch (error) {
       console.error('Create project error:', error);
-      throw new Error(error.response?.data?.message || 'Failed to create project');
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      console.error('Request data:', projectData);
+      
+      // Extract detailed error information
+      const errorData = error.response?.data;
+      let errorMessage = 'Failed to create project';
+      
+      if (errorData?.message) {
+        errorMessage = errorData.message;
+      }
+      
+      // If there are validation errors, include them
+      if (errorData?.errors && Array.isArray(errorData.errors)) {
+        const errorDetails = errorData.errors.map(e => e.msg || e.message || e).join(', ');
+        errorMessage += ': ' + errorDetails;
+      }
+      
+      // Include status code in error message for debugging
+      if (error.response?.status) {
+        errorMessage += ` (Status: ${error.response.status})`;
+      }
+      
+      throw new Error(errorMessage);
     }
   }
 

@@ -311,6 +311,27 @@
                 cols="12"
                 md="8"
               >
+                <!-- Thumbnail Image -->
+                <div
+                  v-if="projectThumbnail"
+                  class="project-card"
+                >
+                  <div class="card-header">
+                    <h3 class="card-title">
+                      Project Image
+                    </h3>
+                  </div>
+                  <div class="card-content">
+                    <div class="thumbnail-display">
+                      <img 
+                        :src="`http://localhost:3002${projectThumbnail.path}`" 
+                        :alt="project.title"
+                        class="project-thumbnail"
+                      >
+                    </div>
+                  </div>
+                </div>
+
                 <div class="project-card">
                   <div class="card-header">
                     <h3 class="card-title">
@@ -523,6 +544,108 @@
             </v-row>
           </div>
 
+          <!-- Team Members Section -->
+          <div
+            v-if="project.teamMembers && project.teamMembers.length > 0"
+            class="tool-section"
+          >
+            <div class="section-header">
+              <div class="section-title">
+                <v-icon
+                  class="section-icon"
+                  color="success"
+                >
+                  mdi-account-group
+                </v-icon>
+                <h2 class="section-heading">
+                  Team Members
+                </h2>
+              </div>
+              <v-btn
+                v-if="isProjectOwner"
+                color="primary"
+                variant="elevated"
+                size="small"
+                @click="showAddMemberDialog = true"
+              >
+                <v-icon class="mr-2">
+                  mdi-account-plus
+                </v-icon>
+                Add Member
+              </v-btn>
+            </div>
+            
+            <div class="team-members-grid">
+              <div 
+                v-for="member in project.teamMembers" 
+                :key="member.userId" 
+                class="team-member-card"
+              >
+                <div class="member-info">
+                  <div class="member-avatar">
+                    <v-icon size="32" color="primary">
+                      mdi-account-circle
+                    </v-icon>
+                  </div>
+                  <div class="member-details">
+                    <h4 class="member-name">
+                      {{ member.name }}
+                    </h4>
+                    <p class="member-email">
+                      {{ member.email }}
+                    </p>
+                    <v-chip
+                      :color="member.permission === 'view_and_edit' ? 'success' : 'info'"
+                      size="small"
+                      variant="tonal"
+                      class="mt-2"
+                    >
+                      <v-icon size="16" class="mr-1">
+                        {{ member.permission === 'view_and_edit' ? 'mdi-pencil' : 'mdi-eye' }}
+                      </v-icon>
+                      {{ member.permission === 'view_and_edit' ? 'Can Edit' : 'View Only' }}
+                    </v-chip>
+                  </div>
+                </div>
+                
+                <div v-if="isProjectOwner" class="member-actions">
+                  <v-menu>
+                    <template #activator="{ props }">
+                      <v-btn
+                        icon="mdi-dots-vertical"
+                        variant="text"
+                        size="small"
+                        v-bind="props"
+                      />
+                    </template>
+                    <v-list>
+                      <v-list-item
+                        @click="changePermission(member.userId, member.permission === 'view_only' ? 'view_and_edit' : 'view_only')"
+                      >
+                        <v-list-item-title>
+                          <v-icon class="mr-2">
+                            {{ member.permission === 'view_only' ? 'mdi-pencil' : 'mdi-eye' }}
+                          </v-icon>
+                          {{ member.permission === 'view_only' ? 'Allow Edit' : 'View Only' }}
+                        </v-list-item-title>
+                      </v-list-item>
+                      <v-list-item
+                        @click="removeMember(member.userId)"
+                      >
+                        <v-list-item-title class="text-error">
+                          <v-icon class="mr-2">
+                            mdi-delete
+                          </v-icon>
+                          Remove
+                        </v-list-item-title>
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Project Files Section -->
           <div
             v-if="project.files && project.files.length > 0"
@@ -554,7 +677,7 @@
                     class="image-preview"
                   >
                     <img 
-                      :src="`http://localhost:3030${file.path}`" 
+                      :src="`http://localhost:3002${file.path}`" 
                       :alt="file.originalName"
                       class="preview-image"
                     >
@@ -586,7 +709,7 @@
                 
                 <div class="file-actions">
                   <v-btn 
-                    :href="`http://localhost:3030${file.path}`" 
+                    :href="`http://localhost:3002${file.path}`" 
                     target="_blank"
                     color="primary" 
                     variant="outlined" 
@@ -599,7 +722,7 @@
                     Download
                   </v-btn>
                   <v-btn 
-                    :href="`http://localhost:3030${file.path}`" 
+                    :href="`http://localhost:3002${file.path}`" 
                     target="_blank"
                     color="secondary" 
                     variant="text" 
@@ -668,7 +791,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import LeftMenu from '@/dashboard/LeftMenu.vue';
 import SearchBar from '@/dashboard/SearchBar.vue';
@@ -686,6 +809,24 @@ const snackbar = ref(false);
 const snackbarText = ref('');
 const snackbarColor = ref('success');
 const snackbarIcon = ref('mdi-check');
+const showAddMemberDialog = ref(false);
+
+// Computed property for project thumbnail
+const projectThumbnail = computed(() => {
+  if (!project.value?.files || project.value.files.length === 0) {
+    return null;
+  }
+  // Find the first image file as thumbnail
+  return project.value.files.find(file => 
+    file.mimetype && file.mimetype.startsWith('image/')
+  );
+});
+
+// Computed property to check if current user is project owner
+const isProjectOwner = computed(() => {
+  const currentUserId = localStorage.getItem('userId');
+  return project.value?.projectOwner === currentUserId;
+});
 
 // Fetch project details
 const fetchProject = async () => {
@@ -892,6 +1033,74 @@ const showSnackbar = (text, color, icon) => {
   snackbarColor.value = color;
   snackbarIcon.value = icon;
   snackbar.value = true;
+};
+
+// Team member management
+const changePermission = async (memberId, newPermission) => {
+  try {
+    const response = await fetch(
+      `http://localhost:3002/api/projects/${project.value.id}/team-members/${memberId}/permission`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        },
+        body: JSON.stringify({ permission: newPermission })
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to update permission');
+    }
+
+    // Update local state
+    const member = project.value.teamMembers.find(m => m.userId === memberId);
+    if (member) {
+      member.permission = newPermission;
+    }
+
+    showSnackbar(
+      `Permission updated to ${newPermission === 'view_and_edit' ? 'Edit' : 'View Only'}`, 
+      'success', 
+      'mdi-check'
+    );
+  } catch (err) {
+    console.error('Error updating permission:', err);
+    showSnackbar('Failed to update permission', 'error', 'mdi-alert');
+  }
+};
+
+const removeMember = async (memberId) => {
+  if (!confirm('Are you sure you want to remove this team member?')) {
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `http://localhost:3002/api/projects/${project.value.id}/team-members/${memberId}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to remove team member');
+    }
+
+    // Update local state
+    project.value.teamMembers = project.value.teamMembers.filter(
+      m => m.userId !== memberId
+    );
+
+    showSnackbar('Team member removed successfully', 'success', 'mdi-check');
+  } catch (err) {
+    console.error('Error removing team member:', err);
+    showSnackbar('Failed to remove team member', 'error', 'mdi-alert');
+  }
 };
 
 // Load project on component mount
@@ -1261,6 +1470,23 @@ onMounted(() => {
   padding: 1.5rem;
 }
 
+/* Thumbnail Display */
+.thumbnail-display {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.project-thumbnail {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: cover;
+  display: block;
+  border-radius: 12px;
+}
+
 /* Description Content */
 .description-content {
   font-size: 1rem;
@@ -1430,6 +1656,70 @@ onMounted(() => {
     width: 100%;
     min-width: unset;
   }
+}
+
+/* Team Members Section */
+.team-members-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.team-member-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  transition: all 0.2s;
+}
+
+.team-member-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transform: translateY(-2px);
+}
+
+.member-info {
+  display: flex;
+  gap: 1rem;
+  flex: 1;
+}
+
+.member-avatar {
+  flex-shrink: 0;
+}
+
+.member-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.member-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.member-email {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0.25rem 0 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.member-actions {
+  flex-shrink: 0;
 }
 
 /* Files Section */

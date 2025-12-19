@@ -76,19 +76,31 @@ export const authMiddleware = async (req: AuthenticatedRequest, res: Response, n
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('Auth middleware error:', errorMessage);
     
-    // Log failed authentication attempt
-    const ipAddress = (req.ip || req.socket.remoteAddress || 'unknown').replace('::ffff:', '');
-    const securityMonitor = SecurityMonitor.getInstance();
+    // Log failed authentication attempt (wrapped in try-catch to prevent crashes)
+    try {
+      const ipAddress = (req.ip || req.socket.remoteAddress || 'unknown').replace('::ffff:', '');
+      const securityMonitor = SecurityMonitor.getInstance();
+      
+      await securityMonitor.logEvent(SecurityEventType.UNAUTHORIZED_ACCESS, {
+        ipAddress,
+        userAgent: req.get('user-agent') || 'unknown',
+        metadata: {
+          error: errorMessage,
+          path: req.path,
+          method: req.method
+        }
+      });
+    } catch (logError) {
+      console.error('Failed to log security event:', logError);
+    }
     
-    await securityMonitor.logEvent(SecurityEventType.UNAUTHORIZED_ACCESS, {
-      ipAddress,
-      userAgent: req.get('user-agent') || 'unknown',
-      metadata: {
-        error: errorMessage,
-        path: req.path,
-        method: req.method
-      }
-    });
+    // Return appropriate error message
+    if (errorMessage === 'jwt expired') {
+      return res.status(401).json({ 
+        success: false, 
+        message: 'Token expired. Please log in again.' 
+      });
+    }
     
     return res.status(401).json({ 
       success: false, 

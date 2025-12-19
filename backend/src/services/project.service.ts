@@ -74,17 +74,42 @@ export class ProjectService {
         throw new Error('Project description is required');
       }
 
-      // Validate deadline if provided
-      if (createProjectDto.deadline && new Date(createProjectDto.deadline) <= new Date()) {
-        throw new Error('Deadline must be in the future');
+      // Validate deadline if provided - only validate if it's a valid date string
+      if (createProjectDto.deadline) {
+        const deadlineDate = new Date(createProjectDto.deadline);
+        if (isNaN(deadlineDate.getTime())) {
+          // Invalid date, skip the deadline
+          createProjectDto.deadline = undefined;
+        }
+        // Note: We removed the "must be in the future" validation as users may want to set deadlines that passed
       }
+
+      // Filter and validate team members - only include those with valid userId
+      const validTeamMembers = (createProjectDto.teamMembers || []).filter(member => {
+        // Check if userId exists and is a valid ObjectId or can be converted to one
+        if (!member.userId) return false;
+        try {
+          // Try to create ObjectId to validate format
+          new mongoose.Types.ObjectId(member.userId as any);
+          return true;
+        } catch {
+          console.warn(`Invalid userId for team member ${member.name}: ${member.userId}`);
+          return false;
+        }
+      });
 
       const project = new ProjectEntity({
         title: createProjectDto.title.trim(),
+        name: createProjectDto.name?.trim() || createProjectDto.title.trim(),
         description: createProjectDto.description.trim(),
         status: createProjectDto.status || ProjectStatus.PENDING,
         priority: createProjectDto.priority || ProjectPriority.MEDIUM,
-        deadline: createProjectDto.deadline
+        deadline: createProjectDto.deadline,
+        privacy: createProjectDto.privacy,
+        category: createProjectDto.category,
+        skills: createProjectDto.skills || [],
+        teamLead: createProjectDto.teamLead,
+        teamMembers: validTeamMembers
       });
 
       const savedProject = await project.save();

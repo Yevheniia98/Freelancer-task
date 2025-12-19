@@ -15,6 +15,31 @@ export enum ProjectPriority {
   URGENT = 'urgent'
 }
 
+export interface IFile {
+  filename: string;
+  originalName: string;
+  path: string;
+  mimetype: string;
+  size: number;
+  uploadedAt: Date;
+  uploadedBy: mongoose.Types.ObjectId;
+}
+
+export enum TeamMemberPermission {
+  VIEW_ONLY = 'view_only',
+  VIEW_AND_EDIT = 'view_and_edit'
+}
+
+export interface ITeamMember {
+  userId: mongoose.Types.ObjectId;
+  name: string;
+  email: string;
+  role?: string;
+  permission: TeamMemberPermission;
+  addedAt: Date;
+  addedBy: mongoose.Types.ObjectId;
+}
+
 export interface IProjectEntity extends Document {
   id: string;
   title: string;
@@ -27,7 +52,9 @@ export interface IProjectEntity extends Document {
   category?: string;
   skills?: string[];
   teamLead?: string;
-  teamMembers?: any[];
+  teamMembers?: ITeamMember[];
+  projectOwner?: mongoose.Types.ObjectId;
+  files?: IFile[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -83,7 +110,35 @@ const ProjectEntitySchema = new Schema<IProjectEntity>({
     trim: true
   },
   teamMembers: {
-    type: Schema.Types.Mixed,
+    type: [{
+      userId: { type: Schema.Types.ObjectId, ref: 'User', required: false },
+      name: { type: String, required: true },
+      email: { type: String, required: true },
+      role: { type: String },
+      permission: { 
+        type: String, 
+        enum: ['view_only', 'view_and_edit'],
+        default: 'view_only'
+      },
+      addedAt: { type: Date, default: Date.now },
+      addedBy: { type: Schema.Types.ObjectId, ref: 'User' }
+    }],
+    default: []
+  },
+  projectOwner: {
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  files: {
+    type: [{
+      filename: { type: String, required: true },
+      originalName: { type: String, required: true },
+      path: { type: String, required: true },
+      mimetype: { type: String, required: true },
+      size: { type: Number, required: true },
+      uploadedAt: { type: Date, default: Date.now },
+      uploadedBy: { type: Schema.Types.ObjectId, ref: 'User' }
+    }],
     default: []
   }
 }, {

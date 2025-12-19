@@ -51,6 +51,16 @@ export interface IExternalSource {
   syncError?: string;
 }
 
+export interface IFile {
+  filename: string;
+  originalName: string;
+  path: string;
+  mimetype: string;
+  size: number;
+  uploadedAt: Date;
+  uploadedBy: mongoose.Types.ObjectId;
+}
+
 export interface IProject extends Document {
   title: string;
   description: string;
@@ -79,6 +89,9 @@ export interface IProject extends Document {
   
   // External platform integration
   externalSource?: IExternalSource;
+  
+  // Files and attachments
+  files: IFile[];
   
   // User who owns this project
   userId: mongoose.Types.ObjectId;
@@ -119,6 +132,16 @@ const ExternalSourceSchema = new Schema({
     default: 'pending' 
   },
   syncError: { type: String }
+});
+
+const FileSchema = new Schema({
+  filename: { type: String, required: true },
+  originalName: { type: String, required: true },
+  path: { type: String, required: true },
+  mimetype: { type: String, required: true },
+  size: { type: Number, required: true },
+  uploadedAt: { type: Date, default: Date.now },
+  uploadedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true }
 });
 
 const ProjectSchema = new Schema<IProject>({
@@ -192,6 +215,8 @@ const ProjectSchema = new Schema<IProject>({
   }],
   
   externalSource: ExternalSourceSchema,
+  
+  files: [FileSchema],
   
   userId: { 
     type: Schema.Types.ObjectId, 

@@ -301,6 +301,8 @@
                           <v-select
                             v-model="priority"
                             :items="priorityOptions"
+                            item-title="title"
+                            item-value="value"
                             variant="outlined"
                             hide-details
                             class="custom-field"
@@ -318,6 +320,8 @@
                           <v-select
                             v-model="status"
                             :items="statusOptions"
+                            item-title="title"
+                            item-value="value"
                             variant="outlined"
                             hide-details
                             class="custom-field"
@@ -471,6 +475,8 @@
                       <v-select
                         v-model="privacy"
                         :items="privacyOptions"
+                        item-title="title"
+                        item-value="value"
                         variant="outlined"
                         hide-details
                         class="custom-field"
@@ -494,6 +500,8 @@
                       <v-select
                         v-model="category"
                         :items="categoryOptions"
+                        item-title="title"
+                        item-value="value"
                         variant="outlined"
                         hide-details
                         class="custom-field"
@@ -877,16 +885,26 @@ const loadProjectForEditing = async (projectId) => {
     }
   } catch (error) {
     console.error('❌ Error loading project:', error);
-    notificationService.showNotification('Error loading project data', 'error');
+    notificationService.addNotification({
+      type: 'general',
+      title: 'Error',
+      message: 'Failed to load project data',
+      icon: 'mdi-alert-circle',
+      category: 'error'
+    });
   }
 };
 
 // Watch for team lead changes to automatically add them to team members
 watch(teamLead, (newTeamLead) => {
-  if (newTeamLead && newTeamLead.trim()) {
-    setTimeout(() => {
-      ensureTeamLeadInMembers();
-    }, 100); // Small delay to allow for proper selection
+  if (newTeamLead) {
+    // Handle both string and object values
+    const leadValue = typeof newTeamLead === 'string' ? newTeamLead : newTeamLead?.name || newTeamLead?.value;
+    if (leadValue && leadValue.trim && leadValue.trim()) {
+      setTimeout(() => {
+        ensureTeamLeadInMembers();
+      }, 100); // Small delay to allow for proper selection
+    }
   }
 });
 
@@ -1187,19 +1205,38 @@ const submitProject = async () => {
       return;
     }
     
-    // Prepare project data
+    // Extract value from select options (handles both string and {title, value} object formats)
+    const extractValue = (val) => {
+      if (val && typeof val === 'object' && val.value !== undefined) {
+        return val.value;
+      }
+      return val;
+    };
+    
+    // Extract team lead name (handle both string and object) - only if it's a valid string
+    let teamLeadName = '';
+    if (teamLead.value) {
+      if (typeof teamLead.value === 'string') {
+        teamLeadName = teamLead.value;
+      } else if (typeof teamLead.value === 'object') {
+        // Extract the actual name from object
+        teamLeadName = teamLead.value.value || teamLead.value.name || teamLead.value.title || '';
+      }
+    }
+    
+    // Prepare project data (exclude team members for now - they need proper user IDs)
     const projectData = {
       title: projectTitle.value.trim(),
       name: projectTitle.value.trim(),
       description: description.value.trim(),
-      priority: priority.value || 'medium',
-      status: status.value || 'pending',
+      priority: extractValue(priority.value) || 'medium',
+      status: extractValue(status.value) || 'pending',
       deadline: deadline.value ? deadline.value : undefined,
-      privacy: privacy.value,
-      category: category.value,
+      privacy: extractValue(privacy.value),
+      category: extractValue(category.value),
       skills: skills.value,
-      teamLead: teamLead.value,
-      teamMembers: teamMembers.value
+      teamLead: teamLeadName || undefined,
+      teamMembers: [] // Empty for now until we implement proper user lookup
     };
     
     let project;
@@ -1209,7 +1246,7 @@ const submitProject = async () => {
       console.log('Updating project:', editProjectId.value, projectData);
       project = await ProjectApiService.update(editProjectId.value, projectData);
       console.log('✅ Project updated successfully');
-      notificationService.showNotification('Project updated successfully', 'success');
+      notificationService.addProjectNotification(projectTitle.value.trim(), 'updated');
     } else {
       // Create new project
       console.log('Creating new project:', projectData);
@@ -1225,6 +1262,9 @@ const submitProject = async () => {
         filesToUpload.push(thumbnailFile.value);
       }
       
+      // Get authentication token
+      const authToken = localStorage.getItem('auth_token');
+      
       // Upload each file
       for (const file of filesToUpload) {
         try {
@@ -1233,6 +1273,9 @@ const submitProject = async () => {
           
           const response = await fetch(`http://localhost:3002/api/projects/${project.id || editProjectId.value}/files`, {
             method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${authToken}`
+            },
             body: formData
           });
           

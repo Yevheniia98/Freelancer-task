@@ -31,6 +31,8 @@ export class ProjectController {
     try {
       if (this.handleValidationErrors(req, res)) return;
 
+      const currentUserId = (req as any).user.id;
+
       const createProjectDto: CreateProjectDto = {
         title: req.body.title,
         name: req.body.name,
@@ -46,6 +48,10 @@ export class ProjectController {
       };
 
       const project = await this.projectService.create(createProjectDto);
+      
+      // Set project owner
+      project.projectOwner = currentUserId;
+      await project.save();
 
       res.status(201).json({
         success: true,
@@ -266,6 +272,237 @@ export class ProjectController {
       res.status(500).json({
         success: false,
         message: error.message || 'Failed to delete project'
+      });
+    }
+  };
+
+  /**
+   * Upload file to project
+   */
+  uploadFile = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const projectId = req.params.id;
+
+      if (!req.file) {
+        res.status(400).json({
+          success: false,
+          message: 'No file uploaded'
+        });
+        return;
+      }
+
+      // Verify project exists
+      const project = await this.projectService.findById(projectId);
+      if (!project) {
+        res.status(404).json({
+          success: false,
+          message: 'Project not found'
+        });
+        return;
+      }
+
+      // Create file information
+      const fileInfo = {
+        filename: req.file.filename,
+        originalName: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size,
+        path: `/uploads/${req.file.filename}`,
+        uploadedAt: new Date(),
+        uploadedBy: (req as any).user.id
+      };
+
+      // Add file to project's files array
+      if (!project.files) {
+        project.files = [];
+      }
+      project.files.push(fileInfo as any);
+      await project.save();
+
+      res.status(200).json({
+        success: true,
+        message: 'File uploaded successfully',
+        data: fileInfo
+      });
+    } catch (error: any) {
+      console.error('Upload file error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to upload file'
+      });
+    }
+  };
+
+  /**
+   * Add team member to project
+   */
+  addTeamMember = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const projectId = req.params.id;
+      const { userId, name, email, role, permission } = req.body;
+      const currentUserId = (req as any).user.id;
+
+      const project = await this.projectService.findById(projectId);
+      if (!project) {
+        res.status(404).json({
+          success: false,
+          message: 'Project not found'
+        });
+        return;
+      }
+
+      // Check if user is project owner
+      if (project.projectOwner?.toString() !== currentUserId) {
+        res.status(403).json({
+          success: false,
+          message: 'Only project owner can add team members'
+        });
+        return;
+      }
+
+      // Check if member already exists
+      const existingMember = project.teamMembers?.find(
+        (member: any) => member.userId.toString() === userId
+      );
+
+      if (existingMember) {
+        res.status(400).json({
+          success: false,
+          message: 'User is already a team member'
+        });
+        return;
+      }
+
+      // Add team member
+      const newMember = {
+        userId,
+        name,
+        email,
+        role,
+        permission: permission || 'view_only',
+        addedAt: new Date(),
+        addedBy: currentUserId
+      };
+
+      if (!project.teamMembers) {
+        project.teamMembers = [];
+      }
+      project.teamMembers.push(newMember as any);
+      await project.save();
+
+      res.status(200).json({
+        success: true,
+        message: 'Team member added successfully',
+        data: newMember
+      });
+    } catch (error: any) {
+      console.error('Add team member error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to add team member'
+      });
+    }
+  };
+
+  /**
+   * Update team member permission
+   */
+  updateTeamMemberPermission = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { projectId, memberId } = req.params;
+      const { permission } = req.body;
+      const currentUserId = (req as any).user.id;
+
+      const project = await this.projectService.findById(projectId);
+      if (!project) {
+        res.status(404).json({
+          success: false,
+          message: 'Project not found'
+        });
+        return;
+      }
+
+      // Check if user is project owner
+      if (project.projectOwner?.toString() !== currentUserId) {
+        res.status(403).json({
+          success: false,
+          message: 'Only project owner can update permissions'
+        });
+        return;
+      }
+
+      // Find and update team member
+      const member = project.teamMembers?.find(
+        (m: any) => m.userId.toString() === memberId
+      );
+
+      if (!member) {
+        res.status(404).json({
+          success: false,
+          message: 'Team member not found'
+        });
+        return;
+      }
+
+      (member as any).permission = permission;
+      await project.save();
+
+      res.status(200).json({
+        success: true,
+        message: 'Team member permission updated successfully',
+        data: member
+      });
+    } catch (error: any) {
+      console.error('Update team member permission error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to update permission'
+      });
+    }
+  };
+
+  /**
+   * Remove team member from project
+   */
+  removeTeamMember = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { projectId, memberId } = req.params;
+      const currentUserId = (req as any).user.id;
+
+      const project = await this.projectService.findById(projectId);
+      if (!project) {
+        res.status(404).json({
+          success: false,
+          message: 'Project not found'
+        });
+        return;
+      }
+
+      // Check if user is project owner
+      if (project.projectOwner?.toString() !== currentUserId) {
+        res.status(403).json({
+          success: false,
+          message: 'Only project owner can remove team members'
+        });
+        return;
+      }
+
+      // Remove team member
+      project.teamMembers = project.teamMembers?.filter(
+        (m: any) => m.userId.toString() !== memberId
+      ) as any;
+
+      await project.save();
+
+      res.status(200).json({
+        success: true,
+        message: 'Team member removed successfully'
+      });
+    } catch (error: any) {
+      console.error('Remove team member error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to remove team member'
       });
     }
   };

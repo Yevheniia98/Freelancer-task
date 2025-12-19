@@ -3,6 +3,7 @@ import { body, param, query } from 'express-validator';
 import { ProjectController } from '../controllers/project.controller';
 import { ProjectStatus, ProjectPriority } from '../models/project.entity';
 import { authMiddleware } from '../middleware/auth.middleware';
+import { upload } from '../config/multer.config';
 
 const router = express.Router();
 const projectController = new ProjectController();
@@ -124,5 +125,30 @@ router.post('/', createProjectValidation, projectController.create);
 router.put('/:id', updateProjectValidation, projectController.update);
 router.patch('/bulk/status', bulkUpdateValidation, projectController.bulkUpdateStatus);
 router.delete('/:id', idValidation, projectController.delete);
+
+// File upload route
+router.post('/:id/files', 
+  param('id').isMongoId().withMessage('Invalid project ID'),
+  upload.single('file'),
+  projectController.uploadFile
+);
+
+// Team member management routes
+router.post('/:id/team-members',
+  param('id').isMongoId().withMessage('Invalid project ID'),
+  projectController.addTeamMember
+);
+
+router.put('/:projectId/team-members/:memberId/permission',
+  param('projectId').isMongoId().withMessage('Invalid project ID'),
+  param('memberId').isMongoId().withMessage('Invalid member ID'),
+  projectController.updateTeamMemberPermission
+);
+
+router.delete('/:projectId/team-members/:memberId',
+  param('projectId').isMongoId().withMessage('Invalid project ID'),
+  param('memberId').isMongoId().withMessage('Invalid member ID'),
+  projectController.removeTeamMember
+);
 
 export default router;

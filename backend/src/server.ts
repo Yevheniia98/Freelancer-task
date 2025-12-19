@@ -157,7 +157,8 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // Security: Input sanitization middleware - protects against XSS, SQL injection, NoSQL injection, and prompt injection
-app.use('/api/', strictInputSanitization);
+// Apply strict sanitization only to public/auth endpoints
+app.use('/api/auth', strictInputSanitization);
 
 // Security: CSRF token generation
 app.use(csrfTokenGenerator);
