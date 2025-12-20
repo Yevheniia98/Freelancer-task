@@ -136,12 +136,15 @@ router.post('/:id/files',
 // Team member management routes
 router.post('/:id/team-members',
   param('id').isMongoId().withMessage('Invalid project ID'),
+  body('email').isEmail().withMessage('Valid email is required'),
+  body('permission').optional().isIn(['view_only', 'view_and_edit']).withMessage('Invalid permission'),
   projectController.addTeamMember
 );
 
 router.put('/:projectId/team-members/:memberId/permission',
   param('projectId').isMongoId().withMessage('Invalid project ID'),
   param('memberId').isMongoId().withMessage('Invalid member ID'),
+  body('permission').isIn(['view_only', 'view_and_edit']).withMessage('Invalid permission'),
   projectController.updateTeamMemberPermission
 );
 
@@ -149,6 +152,17 @@ router.delete('/:projectId/team-members/:memberId',
   param('projectId').isMongoId().withMessage('Invalid project ID'),
   param('memberId').isMongoId().withMessage('Invalid member ID'),
   projectController.removeTeamMember
+);
+
+// Project invitation routes (no auth required for verification)
+router.post('/accept-invitation',
+  body('token').notEmpty().withMessage('Invitation token is required'),
+  projectController.acceptInvitation
+);
+
+router.get('/verify-invitation/:token',
+  param('token').notEmpty().withMessage('Invitation token is required'),
+  projectController.verifyInvitation
 );
 
 export default router;

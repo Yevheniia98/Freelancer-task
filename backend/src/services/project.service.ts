@@ -194,7 +194,9 @@ export class ProjectService {
         throw new Error('Invalid project ID');
       }
 
-      const project = await ProjectEntity.findById(id).exec();
+      const project = await ProjectEntity.findById(id)
+        .populate('projectOwner', 'firstName lastName email')
+        .exec();
       return project;
     } catch (error: any) {
       console.error('Error finding project by ID:', error);

@@ -35,6 +35,7 @@ import meetingInvitationRoutes from './routes/meeting-invitation.routes';
 import testEmailRoutes from './routes/test-email.routes';
 import teamManagementRoutes from './routes/team-management.routes';
 import notificationRoutes from './routes/notification.routes';
+import inviteRoutes from './routes/invite.routes';
 // import financialRoutes from './routes/financial.routes';
 
 // Import middleware
@@ -190,6 +191,7 @@ app.use('/api/integrations', projectIntegrationRoutes);
 app.use('/api/meeting-invitations', meetingInvitationRoutes);
 app.use('/api/test-email', testEmailRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api', inviteRoutes);
 // app.use('/api/financial', financialRoutes);
 
 // Team Invitation Email Endpoint

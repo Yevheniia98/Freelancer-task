@@ -1,10 +1,12 @@
-[dotenv@17.2.1] injecting env (20) from .env -- tip: 📡 version env with Radar: https://dotenvx.com/radar
+[dotenv@17.2.1] injecting env (20) from .env -- tip: 📡 observe env with Radar: https://dotenvx.com/radar
 📧 Real email service initialized with: freelancetasker0@gmail.com
 📧 Real email service initialized with: freelancetasker0@gmail.com
 📧 Real email service initialized with: freelancetasker0@gmail.com
 ✅ TeamManagementController initialized
-(node:25959) [MONGOOSE] Warning: Duplicate schema index on {"userId":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+📧 Real email service initialized with: freelancetasker0@gmail.com
+(node:65724) [MONGOOSE] Warning: Duplicate schema index on {"userId":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
 (Use `node --trace-warnings ...` to show where the warning was created)
+(node:65724) [MONGOOSE] Warning: Duplicate schema index on {"expiresAt":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
 ✅ MongoDB connected
 ✅ MongoDB connected
 ✅ Redis connected
@@ -12,112 +14,13 @@
 📊 Environment: development
 🌐 Frontend URL: http://localhost:3030
 Auth middleware: Token found, verifying...
-Auth middleware error: jwt expired
-Security Monitor: Redis client not available, skipping event storage
-::ffff:127.0.0.1 - - [19/Dec/2025:18:04:14 +0000] "POST /api/projects HTTP/1.1" 401 65 "http://localhost:3030/project-create" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
-Login attempt for: suprunjen@gmail.com
-Login successful for: suprunjen@gmail.com
-::1 - - [19/Dec/2025:18:04:58 +0000] "POST /api/auth/login HTTP/1.1" 200 375 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
-Error: Not Found - /api/api/finance/summary
-    at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
-    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
-    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
-    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
-    at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
-    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
-    at csrfTokenGenerator (/Users/evgenya/freelancer-task/backend/src/middleware/csrf-protection.middleware.ts:33:3)
-    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
-    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
-    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
-::1 - - [19/Dec/2025:18:04:59 +0000] "GET /api/api/finance/summary HTTP/1.1" 404 1085 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
-Error: Not Found - /api/api/finance/summary
-    at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
-    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
-    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
-    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
-    at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
-    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
-    at csrfTokenGenerator (/Users/evgenya/freelancer-task/backend/src/middleware/csrf-protection.middleware.ts:33:3)
-    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
-    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
-    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
-::1 - - [19/Dec/2025:18:04:59 +0000] "GET /api/api/finance/summary HTTP/1.1" 404 1085 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
-Error: Not Found - /api/api/finance/summary
-    at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
-    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
-    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
-    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
-    at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
-    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
-    at csrfTokenGenerator (/Users/evgenya/freelancer-task/backend/src/middleware/csrf-protection.middleware.ts:33:3)
-    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
-    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
-    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
-::1 - - [19/Dec/2025:18:04:59 +0000] "GET /api/api/finance/summary HTTP/1.1" 404 1085 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
+Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
+::1 - - [19/Dec/2025:22:27:44 +0000] "GET /api/projects/6945c75cc4d46cbb1b7b078a HTTP/1.1" 304 - "http://localhost:3030/project-create?edit=6945c75cc4d46cbb1b7b078a" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
 Auth middleware: Token found, verifying...
 Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
 Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
-::1 - - [19/Dec/2025:18:09:22 +0000] "GET /api/projects?limit=50 HTTP/1.1" 200 2492 "http://localhost:3030/projects" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
-Auth middleware: Token found, verifying...
-Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
-Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
-::1 - - [19/Dec/2025:18:09:22 +0000] "GET /api/integrations/projects HTTP/1.1" 304 - "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
-Auth middleware: Token found, verifying...
-Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
-Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
-::1 - - [19/Dec/2025:18:09:52 +0000] "GET /api/projects/693c2bb7ae0f73f6f3f6fdf3 HTTP/1.1" 200 800 "http://localhost:3030/projects/693c2bb7ae0f73f6f3f6fdf3" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
-::1 - - [19/Dec/2025:18:09:52 +0000] "GET /uploads/file-1765561642910-320567192-0023e96fbda872afd34e9a0636d335a5.jpg HTTP/1.1" 200 105098 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
-Error: Not Found - /api/users/by-email/suprun.jen@gmail.com
-    at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
-    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
-    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
-    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
-    at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
-    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
-    at csrfTokenGenerator (/Users/evgenya/freelancer-task/backend/src/middleware/csrf-protection.middleware.ts:33:3)
-    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
-    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
-    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
-::1 - - [19/Dec/2025:18:14:33 +0000] "GET /api/users/by-email/suprun.jen@gmail.com HTTP/1.1" 404 1117 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
-Auth middleware: Token found, verifying...
-Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
-Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
-::1 - - [19/Dec/2025:18:14:38 +0000] "POST /api/projects HTTP/1.1" 400 172 "http://localhost:3030/project-create" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
-Auth middleware: Token found, verifying...
-Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
-Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
-Error creating project: Error: ProjectEntity validation failed: teamMembers.0.userId: Path `userId` is required.
-    at ValidationError.inspect (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/error/validation.js:52:26)
-    at formatValue (node:internal/util/inspect:814:19)
-    at inspect (node:internal/util/inspect:373:10)
-    at formatWithOptionsInternal (node:internal/util/inspect:2315:40)
-    at formatWithOptions (node:internal/util/inspect:2177:10)
-    at console.value (node:internal/console/constructor:338:14)
-    at console.warn (node:internal/console/constructor:379:61)
-    at ProjectService.create (/Users/evgenya/freelancer-task/backend/src/services/project.service.ts:104:15)
-    at processTicksAndRejections (node:internal/process/task_queues:105:5)
-    at async ProjectController.create (/Users/evgenya/freelancer-task/backend/src/controllers/project.controller.ts:50:23) {
-  errors: {
-    'teamMembers.0.userId': ValidatorError: Path `userId` is required.
-        at validate (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/schemaType.js:1407:13)
-        at SchemaObjectId.SchemaType.doValidate (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/schemaType.js:1391:7)
-        at /Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/document.js:3111:18
-        at processTicksAndRejections (node:internal/process/task_queues:85:11) {
-      properties: [Object],
-      kind: 'required',
-      path: 'userId',
-      value: undefined,
-      reason: undefined,
-      [Symbol(mongoose#validatorError)]: true
-    }
-  },
-  _message: 'ProjectEntity validation failed'
-}
-Create project error: Error: Failed to create project: ProjectEntity validation failed: teamMembers.0.userId: Path `userId` is required.
-    at ProjectService.create (/Users/evgenya/freelancer-task/backend/src/services/project.service.ts:105:13)
-    at processTicksAndRejections (node:internal/process/task_queues:105:5)
-    at async ProjectController.create (/Users/evgenya/freelancer-task/backend/src/controllers/project.controller.ts:50:23)
-::1 - - [19/Dec/2025:18:14:56 +0000] "POST /api/projects HTTP/1.1" 400 137 "http://localhost:3030/project-create" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+::1 - - [19/Dec/2025:22:29:41 +0000] "GET /api/projects/6945c75cc4d46cbb1b7b078a HTTP/1.1" 304 - "http://localhost:3030/project-create?edit=6945c75cc4d46cbb1b7b078a" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
 Error: Not Found - /api/users/by-email/vickyjosh94@gmail.com
     at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
     at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
@@ -125,212 +28,296 @@ Error: Not Found - /api/users/by-email/vickyjosh94@gmail.com
     at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
     at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
     at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
-    at csrfTokenGenerator (/Users/evgenya/freelancer-task/backend/src/middleware/csrf-protection.middleware.ts:33:3)
-    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
-    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
-    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
-::1 - - [19/Dec/2025:18:15:21 +0000] "GET /api/users/by-email/vickyjosh94@gmail.com HTTP/1.1" 404 1119 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:688:15
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:276:14)
+    at Function.handle (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:186:3)
+    at router (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:60:12)
+::1 - - [19/Dec/2025:22:33:14 +0000] "GET /api/users/by-email/vickyjosh94@gmail.com HTTP/1.1" 404 1078 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
 Auth middleware: Token found, verifying...
 Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
 Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
-Error creating project: Error: ProjectEntity validation failed: teamLead: Cast to string failed for value "{ title: 'vickyjosh94 (vickyjosh94@gmail.com)', value: 'vickyjosh94' }" (type Object) at path "teamLead", teamMembers.0.userId: Path `userId` is required., teamMembers.1.userId: Path `userId` is required.
-    at ValidationError.inspect (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/error/validation.js:52:26)
-    at formatValue (node:internal/util/inspect:814:19)
-    at inspect (node:internal/util/inspect:373:10)
-    at formatWithOptionsInternal (node:internal/util/inspect:2315:40)
-    at formatWithOptions (node:internal/util/inspect:2177:10)
-    at console.value (node:internal/console/constructor:338:14)
-    at console.warn (node:internal/console/constructor:379:61)
-    at ProjectService.create (/Users/evgenya/freelancer-task/backend/src/services/project.service.ts:104:15)
-    at processTicksAndRejections (node:internal/process/task_queues:105:5)
-    at async ProjectController.create (/Users/evgenya/freelancer-task/backend/src/controllers/project.controller.ts:50:23) {
-  errors: {
-    teamLead: CastError: Cast to string failed for value "{ title: 'vickyjosh94 (vickyjosh94@gmail.com)', value: 'vickyjosh94' }" (type Object) at path "teamLead"
-        at SchemaString.cast (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/schema/string.js:607:11)
-        at model.<anonymous> (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/schema/string.js:370:16)
-        at SchemaString.SchemaType._applySetters (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/schemaType.js:1228:20)
-        at SchemaString.SchemaType.applySetters (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/schemaType.js:1253:16)
-        at model.$set (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/document.js:1438:22)
-        at model.$set (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/document.js:1132:16)
-        at model.Document (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/document.js:178:12)
-        at model.Model (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/model.js:127:12)
-        at new model (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/model.js:4837:15)
-        at ProjectService.create (/Users/evgenya/freelancer-task/backend/src/services/project.service.ts:87:23) {
-      stringValue: `"{ title: 'vickyjosh94 (vickyjosh94@gmail.com)', value: 'vickyjosh94' }"`,
-      messageFormat: undefined,
-      kind: 'string',
-      value: [Object],
-      path: 'teamLead',
-      reason: null,
-      valueType: 'Object'
-    },
-    'teamMembers.0.userId': ValidatorError: Path `userId` is required.
-        at validate (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/schemaType.js:1407:13)
-        at SchemaObjectId.SchemaType.doValidate (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/schemaType.js:1391:7)
-        at /Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/document.js:3111:18
-        at processTicksAndRejections (node:internal/process/task_queues:85:11) {
-      properties: [Object],
-      kind: 'required',
-      path: 'userId',
-      value: undefined,
-      reason: undefined,
-      [Symbol(mongoose#validatorError)]: true
-    },
-    'teamMembers.1.userId': ValidatorError: Path `userId` is required.
-        at validate (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/schemaType.js:1407:13)
-        at SchemaObjectId.SchemaType.doValidate (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/schemaType.js:1391:7)
-        at /Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/document.js:3111:18
-        at processTicksAndRejections (node:internal/process/task_queues:85:11) {
-      properties: [Object],
-      kind: 'required',
-      path: 'userId',
-      value: undefined,
-      reason: undefined,
-      [Symbol(mongoose#validatorError)]: true
-    }
-  },
-  _message: 'ProjectEntity validation failed'
-}
-Create project error: Error: Failed to create project: ProjectEntity validation failed: teamLead: Cast to string failed for value "{ title: 'vickyjosh94 (vickyjosh94@gmail.com)', value: 'vickyjosh94' }" (type Object) at path "teamLead", teamMembers.0.userId: Path `userId` is required., teamMembers.1.userId: Path `userId` is required.
-    at ProjectService.create (/Users/evgenya/freelancer-task/backend/src/services/project.service.ts:105:13)
-    at processTicksAndRejections (node:internal/process/task_queues:105:5)
-    at async ProjectController.create (/Users/evgenya/freelancer-task/backend/src/controllers/project.controller.ts:50:23)
-::1 - - [19/Dec/2025:18:15:40 +0000] "POST /api/projects HTTP/1.1" 400 340 "http://localhost:3030/project-create" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+::1 - - [19/Dec/2025:22:33:19 +0000] "PUT /api/projects/6945c75cc4d46cbb1b7b078a HTTP/1.1" 200 943 "http://localhost:3030/project-create?edit=6945c75cc4d46cbb1b7b078a" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
 Auth middleware: Token found, verifying...
 Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
 Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
-Error creating project: Error: ProjectEntity validation failed: teamMembers.0.userId: Path `userId` is required., teamMembers.1.userId: Path `userId` is required.
-    at ValidationError.inspect (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/error/validation.js:52:26)
-    at formatValue (node:internal/util/inspect:814:19)
-    at inspect (node:internal/util/inspect:373:10)
-    at formatWithOptionsInternal (node:internal/util/inspect:2315:40)
-    at formatWithOptions (node:internal/util/inspect:2177:10)
-    at console.value (node:internal/console/constructor:338:14)
-    at console.warn (node:internal/console/constructor:379:61)
-    at ProjectService.create (/Users/evgenya/freelancer-task/backend/src/services/project.service.ts:104:15)
-    at processTicksAndRejections (node:internal/process/task_queues:105:5)
-    at async ProjectController.create (/Users/evgenya/freelancer-task/backend/src/controllers/project.controller.ts:50:23) {
-  errors: {
-    'teamMembers.0.userId': ValidatorError: Path `userId` is required.
-        at validate (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/schemaType.js:1407:13)
-        at SchemaObjectId.SchemaType.doValidate (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/schemaType.js:1391:7)
-        at /Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/document.js:3111:18
-        at processTicksAndRejections (node:internal/process/task_queues:85:11) {
-      properties: [Object],
-      kind: 'required',
-      path: 'userId',
-      value: undefined,
-      reason: undefined,
-      [Symbol(mongoose#validatorError)]: true
-    },
-    'teamMembers.1.userId': ValidatorError: Path `userId` is required.
-        at validate (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/schemaType.js:1407:13)
-        at SchemaObjectId.SchemaType.doValidate (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/schemaType.js:1391:7)
-        at /Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/document.js:3111:18
-        at processTicksAndRejections (node:internal/process/task_queues:85:11) {
-      properties: [Object],
-      kind: 'required',
-      path: 'userId',
-      value: undefined,
-      reason: undefined,
-      [Symbol(mongoose#validatorError)]: true
-    }
-  },
-  _message: 'ProjectEntity validation failed'
-}
-Create project error: Error: Failed to create project: ProjectEntity validation failed: teamMembers.0.userId: Path `userId` is required., teamMembers.1.userId: Path `userId` is required.
-    at ProjectService.create (/Users/evgenya/freelancer-task/backend/src/services/project.service.ts:105:13)
-    at processTicksAndRejections (node:internal/process/task_queues:105:5)
-    at async ProjectController.create (/Users/evgenya/freelancer-task/backend/src/controllers/project.controller.ts:50:23)
-::1 - - [19/Dec/2025:18:16:28 +0000] "POST /api/projects HTTP/1.1" 400 187 "http://localhost:3030/project-create" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
-Auth middleware: Token found, verifying...
-Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
-Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
-Error creating project: Error: ProjectEntity validation failed: teamMembers.0.userId: Path `userId` is required., teamMembers.1.userId: Path `userId` is required.
-    at ValidationError.inspect (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/error/validation.js:52:26)
-    at formatValue (node:internal/util/inspect:814:19)
-    at inspect (node:internal/util/inspect:373:10)
-    at formatWithOptionsInternal (node:internal/util/inspect:2315:40)
-    at formatWithOptions (node:internal/util/inspect:2177:10)
-    at console.value (node:internal/console/constructor:338:14)
-    at console.warn (node:internal/console/constructor:379:61)
-    at ProjectService.create (/Users/evgenya/freelancer-task/backend/src/services/project.service.ts:104:15)
-    at processTicksAndRejections (node:internal/process/task_queues:105:5)
-    at async ProjectController.create (/Users/evgenya/freelancer-task/backend/src/controllers/project.controller.ts:50:23) {
-  errors: {
-    'teamMembers.0.userId': ValidatorError: Path `userId` is required.
-        at validate (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/schemaType.js:1407:13)
-        at SchemaObjectId.SchemaType.doValidate (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/schemaType.js:1391:7)
-        at /Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/document.js:3111:18
-        at processTicksAndRejections (node:internal/process/task_queues:85:11) {
-      properties: [Object],
-      kind: 'required',
-      path: 'userId',
-      value: undefined,
-      reason: undefined,
-      [Symbol(mongoose#validatorError)]: true
-    },
-    'teamMembers.1.userId': ValidatorError: Path `userId` is required.
-        at validate (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/schemaType.js:1407:13)
-        at SchemaObjectId.SchemaType.doValidate (/Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/schemaType.js:1391:7)
-        at /Users/evgenya/freelancer-task/backend/node_modules/mongoose/lib/document.js:3111:18
-        at processTicksAndRejections (node:internal/process/task_queues:85:11) {
-      properties: [Object],
-      kind: 'required',
-      path: 'userId',
-      value: undefined,
-      reason: undefined,
-      [Symbol(mongoose#validatorError)]: true
-    }
-  },
-  _message: 'ProjectEntity validation failed'
-}
-Create project error: Error: Failed to create project: ProjectEntity validation failed: teamMembers.0.userId: Path `userId` is required., teamMembers.1.userId: Path `userId` is required.
-    at ProjectService.create (/Users/evgenya/freelancer-task/backend/src/services/project.service.ts:105:13)
-    at processTicksAndRejections (node:internal/process/task_queues:105:5)
-    at async ProjectController.create (/Users/evgenya/freelancer-task/backend/src/controllers/project.controller.ts:50:23)
-::1 - - [19/Dec/2025:18:16:46 +0000] "POST /api/projects HTTP/1.1" 400 187 "http://localhost:3030/project-create" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
-Auth middleware: Token found, verifying...
-Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
-Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
-::1 - - [19/Dec/2025:18:23:27 +0000] "POST /api/projects HTTP/1.1" 201 495 "http://localhost:3030/project-create" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
-Auth middleware: Token found, verifying...
-Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
-Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
-::1 - - [19/Dec/2025:18:23:28 +0000] "POST /api/projects/6945981f96e54bfcc5d02d15/files HTTP/1.1" 200 306 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
-Auth middleware: Token found, verifying...
-Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
-Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
-::1 - - [19/Dec/2025:18:23:28 +0000] "POST /api/projects/6945981f96e54bfcc5d02d15/files HTTP/1.1" 200 306 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
-Auth middleware: Token found, verifying...
-Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
-Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
-::1 - - [19/Dec/2025:18:23:30 +0000] "GET /api/projects?limit=50 HTTP/1.1" 200 3540 "http://localhost:3030/projects" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
-Auth middleware: Token found, verifying...
-Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
-Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
-::1 - - [19/Dec/2025:18:23:30 +0000] "GET /api/integrations/projects HTTP/1.1" 304 - "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
-Auth middleware: Token found, verifying...
-Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
-Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
-::1 - - [19/Dec/2025:18:23:34 +0000] "GET /api/projects/6945981f96e54bfcc5d02d15 HTTP/1.1" 200 1114 "http://localhost:3030/projects/6945981f96e54bfcc5d02d15" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
-::1 - - [19/Dec/2025:18:23:34 +0000] "GET /uploads/file-1766168608072-596265194-0.jpg HTTP/1.1" 200 121842 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
-::1 - - [19/Dec/2025:18:23:34 +0000] "GET /uploads/file-1766168608041-359805547-3.jpg HTTP/1.1" 200 229342 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
-::1 - - [19/Dec/2025:18:23:40 +0000] "GET /uploads/file-1766168608041-359805547-3.jpg HTTP/1.1" 200 229342 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
-Error: Not Found - /favicon.ico
+::1 - - [19/Dec/2025:22:33:21 +0000] "GET /api/projects/6945c75cc4d46cbb1b7b078a HTTP/1.1" 200 1021 "http://localhost:3030/projects/6945c75cc4d46cbb1b7b078a" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+::1 - - [19/Dec/2025:22:33:21 +0000] "GET /uploads/file-1766180700157-711280497-photo_2025-08-13_07-18-49.jpg HTTP/1.1" 200 238404 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Error: Not Found - /api/invites/send
     at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
     at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
     at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
     at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
     at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
     at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
-    at csrfTokenGenerator (/Users/evgenya/freelancer-task/backend/src/middleware/csrf-protection.middleware.ts:33:3)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:688:15
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:276:14)
+    at Function.handle (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:186:3)
+    at router (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:60:12)
+::1 - - [19/Dec/2025:22:33:48 +0000] "POST /api/invites/send HTTP/1.1" 404 1030 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Error: Not Found - /api/invites/send
+    at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
     at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
     at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
     at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
-::1 - - [19/Dec/2025:18:23:41 +0000] "GET /favicon.ico HTTP/1.1" 404 1061 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
-::1 - - [19/Dec/2025:18:23:47 +0000] "GET /uploads/file-1766168608072-596265194-0.jpg HTTP/1.1" 200 121842 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+    at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:688:15
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:276:14)
+    at Function.handle (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:186:3)
+    at router (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:60:12)
+::1 - - [19/Dec/2025:22:34:00 +0000] "POST /api/invites/send HTTP/1.1" 404 1030 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
 Auth middleware: Token found, verifying...
 Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
 Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
-::1 - - [19/Dec/2025:18:23:56 +0000] "GET /api/projects/6945981f96e54bfcc5d02d15 HTTP/1.1" 304 - "http://localhost:3030/project-create?edit=6945981f96e54bfcc5d02d15" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+::1 - - [19/Dec/2025:22:35:36 +0000] "GET /api/projects/6945c75cc4d46cbb1b7b078a HTTP/1.1" 304 - "http://localhost:3030/project-create?edit=6945c75cc4d46cbb1b7b078a" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Auth middleware: Token found, verifying...
+Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
+Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
+::1 - - [19/Dec/2025:22:35:58 +0000] "GET /api/projects/6945c75cc4d46cbb1b7b078a HTTP/1.1" 304 - "http://localhost:3030/project-create?edit=6945c75cc4d46cbb1b7b078a" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Auth middleware: Token found, verifying...
+Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
+Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
+::1 - - [19/Dec/2025:22:36:29 +0000] "GET /api/projects/6945c75cc4d46cbb1b7b078a HTTP/1.1" 304 - "http://localhost:3030/project-create?edit=6945c75cc4d46cbb1b7b078a" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Auth middleware: Token found, verifying...
+Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
+Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
+::1 - - [19/Dec/2025:22:37:23 +0000] "GET /api/projects/6945c75cc4d46cbb1b7b078a HTTP/1.1" 304 - "http://localhost:3030/project-create?edit=6945c75cc4d46cbb1b7b078a" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Error: Not Found - /api/auth/me
+    at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
+    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
+    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
+    at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:688:15
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:276:14)
+    at Function.handle (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:186:3)
+    at router (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:60:12)
+::1 - - [19/Dec/2025:22:37:33 +0000] "GET /api/auth/me HTTP/1.1" 404 1020 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Auth middleware: Token found, verifying...
+Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
+Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
+::1 - - [19/Dec/2025:22:37:33 +0000] "GET /api/projects/6945c75cc4d46cbb1b7b078a HTTP/1.1" 304 - "http://localhost:3030/project-create?edit=6945c75cc4d46cbb1b7b078a" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Error: Not Found - /api/invites/send
+    at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
+    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
+    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
+    at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:688:15
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:276:14)
+    at Function.handle (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:186:3)
+    at router (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:60:12)
+::1 - - [19/Dec/2025:22:40:37 +0000] "POST /api/invites/send HTTP/1.1" 404 1030 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Error: Not Found - /api/api/finance/summary
+    at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
+    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
+    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
+    at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:688:15
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:276:14)
+    at Function.handle (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:186:3)
+    at router (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:60:12)
+::1 - - [19/Dec/2025:22:41:32 +0000] "GET /api/api/finance/summary HTTP/1.1" 404 1044 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Error: Not Found - /api/api/finance/summary
+    at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
+    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
+    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
+    at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:688:15
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:276:14)
+    at Function.handle (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:186:3)
+    at router (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:60:12)
+::1 - - [19/Dec/2025:22:41:32 +0000] "GET /api/api/finance/summary HTTP/1.1" 404 1044 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Error: Not Found - /api/api/finance/summary
+    at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
+    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
+    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
+    at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:688:15
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:276:14)
+    at Function.handle (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:186:3)
+    at router (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:60:12)
+::1 - - [19/Dec/2025:22:41:32 +0000] "GET /api/api/finance/summary HTTP/1.1" 404 1044 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Error: Not Found - /api/auth/me
+    at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
+    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
+    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
+    at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:688:15
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:276:14)
+    at Function.handle (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:186:3)
+    at router (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:60:12)
+::1 - - [19/Dec/2025:22:41:43 +0000] "GET /api/auth/me HTTP/1.1" 404 1020 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Auth middleware: Token found, verifying...
+Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
+Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
+::1 - - [19/Dec/2025:22:41:47 +0000] "GET /api/projects?limit=50 HTTP/1.1" 200 7855 "http://localhost:3030/projects" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Auth middleware: Token found, verifying...
+Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
+Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
+::1 - - [19/Dec/2025:22:41:47 +0000] "GET /api/integrations/projects HTTP/1.1" 304 - "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Auth middleware: Token found, verifying...
+Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
+Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
+::1 - - [19/Dec/2025:22:41:50 +0000] "GET /api/projects/6945c75cc4d46cbb1b7b078a HTTP/1.1" 304 - "http://localhost:3030/projects/6945c75cc4d46cbb1b7b078a" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+::1 - - [19/Dec/2025:22:41:50 +0000] "GET /uploads/file-1766180700157-711280497-photo_2025-08-13_07-18-49.jpg HTTP/1.1" 200 238404 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Auth middleware: Token found, verifying...
+Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
+Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
+::1 - - [19/Dec/2025:22:42:54 +0000] "GET /api/projects/6945c75cc4d46cbb1b7b078a HTTP/1.1" 304 - "http://localhost:3030/projects/6945c75cc4d46cbb1b7b078a" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+::1 - - [19/Dec/2025:22:42:54 +0000] "GET /uploads/file-1766180700157-711280497-photo_2025-08-13_07-18-49.jpg HTTP/1.1" 200 238404 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Error: Not Found - /api/auth/me
+    at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
+    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
+    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
+    at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:688:15
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:276:14)
+    at Function.handle (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:186:3)
+    at router (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:60:12)
+::1 - - [20/Dec/2025:09:32:19 +0000] "GET /api/auth/me HTTP/1.1" 404 1020 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Error: Not Found - /api/auth/me
+    at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
+    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
+    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
+    at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:688:15
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:276:14)
+    at Function.handle (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:186:3)
+    at router (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:60:12)
+::1 - - [20/Dec/2025:09:32:36 +0000] "GET /api/auth/me HTTP/1.1" 404 1020 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Auth middleware: Token found, verifying...
+Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
+Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
+::1 - - [20/Dec/2025:09:32:53 +0000] "GET /api/projects?limit=50 HTTP/1.1" 200 7854 "http://localhost:3030/projects" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Auth middleware: Token found, verifying...
+Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
+Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
+::1 - - [20/Dec/2025:09:32:53 +0000] "GET /api/integrations/projects HTTP/1.1" 304 - "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Auth middleware: Token found, verifying...
+Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
+Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
+::1 - - [20/Dec/2025:09:32:56 +0000] "GET /api/projects/6945c75cc4d46cbb1b7b078a HTTP/1.1" 304 - "http://localhost:3030/projects/6945c75cc4d46cbb1b7b078a" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+::1 - - [20/Dec/2025:09:32:56 +0000] "GET /uploads/file-1766180700157-711280497-photo_2025-08-13_07-18-49.jpg HTTP/1.1" 200 238404 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Error: Not Found - /api/invites/send
+    at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
+    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
+    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
+    at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:688:15
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:276:14)
+    at Function.handle (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:186:3)
+    at router (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:60:12)
+::1 - - [20/Dec/2025:09:33:09 +0000] "POST /api/invites/send HTTP/1.1" 404 1030 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Error: Not Found - /api/auth/me
+    at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
+    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
+    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
+    at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:688:15
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:276:14)
+    at Function.handle (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:186:3)
+    at router (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:60:12)
+::1 - - [20/Dec/2025:09:34:34 +0000] "GET /api/auth/me HTTP/1.1" 404 1020 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Error: Not Found - /api/auth/me
+    at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
+    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
+    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
+    at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:688:15
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:276:14)
+    at Function.handle (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:186:3)
+    at router (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:60:12)
+::1 - - [20/Dec/2025:09:39:14 +0000] "GET /api/auth/me HTTP/1.1" 404 1020 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Error: Not Found - /api/auth/me
+    at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
+    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
+    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
+    at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:688:15
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:276:14)
+    at Function.handle (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:186:3)
+    at router (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:60:12)
+::1 - - [20/Dec/2025:09:39:59 +0000] "GET /api/auth/me HTTP/1.1" 404 1020 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Error: Not Found - /api/auth/me
+    at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
+    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
+    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
+    at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:688:15
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:276:14)
+    at Function.handle (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:186:3)
+    at router (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:60:12)
+::1 - - [20/Dec/2025:09:54:37 +0000] "GET /api/auth/me HTTP/1.1" 404 1020 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Error: Not Found - /api/auth/me
+    at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
+    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
+    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
+    at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:688:15
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:276:14)
+    at Function.handle (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:186:3)
+    at router (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:60:12)
+::1 - - [20/Dec/2025:10:03:49 +0000] "GET /api/auth/me HTTP/1.1" 404 1020 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Error: Not Found - /api/auth/me
+    at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
+    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
+    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
+    at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:688:15
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:276:14)
+    at Function.handle (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:186:3)
+    at router (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:60:12)
+::1 - - [20/Dec/2025:10:04:28 +0000] "GET /api/auth/me HTTP/1.1" 404 1020 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Error: Not Found - /api/auth/me
+    at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
+    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
+    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
+    at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:688:15
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:276:14)
+    at Function.handle (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:186:3)
+    at router (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:60:12)
+::1 - - [20/Dec/2025:10:04:28 +0000] "GET /api/auth/me HTTP/1.1" 404 1020 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Error: Not Found - /api/auth/me
+    at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
+    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
+    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
+    at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:688:15
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:276:14)
+    at Function.handle (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:186:3)
+    at router (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:60:12)
+::1 - - [20/Dec/2025:10:05:09 +0000] "GET /api/auth/me HTTP/1.1" 404 1020 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"

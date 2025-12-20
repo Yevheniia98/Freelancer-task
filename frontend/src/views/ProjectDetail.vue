@@ -135,12 +135,23 @@
                 </div>
               </div>
               <div class="hero-actions">
+                <ShareProjectDialog
+                  v-if="project"
+                  :project-id="project.id"
+                  :project-name="project.title"
+                  :team-members="project.teamMembers || []"
+                  :owner-name="currentUserName"
+                  :owner-email="currentUserEmail"
+                  @member-added="handleMemberAdded"
+                  @member-removed="handleMemberRemoved"
+                  @permission-updated="handlePermissionUpdated"
+                />
                 <v-btn 
                   color="white"
                   variant="elevated"
                   size="large"
                   rounded="lg"
-                  class="hero-btn"
+                  class="hero-btn ml-3"
                   @click="editProject"
                 >
                   <v-icon class="mr-2">
@@ -284,6 +295,64 @@
                       {{ project.deadline && project.isOverdue ? 'Overdue!' : 'Target completion' }}
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Project Lead & Owner Section -->
+          <div class="tool-section">
+            <div class="section-header">
+              <div class="section-title">
+                <v-icon
+                  class="section-icon"
+                  color="purple"
+                >
+                  mdi-account-star
+                </v-icon>
+                <h2 class="section-heading">
+                  Project Leadership
+                </h2>
+              </div>
+            </div>
+            
+            <div class="leadership-grid">
+              <!-- Project Owner -->
+              <div class="leader-card owner-card">
+                <div class="leader-badge">
+                  <v-icon size="20" color="white">mdi-crown</v-icon>
+                </div>
+                <div class="leader-avatar">
+                  <v-icon size="48" color="purple">
+                    mdi-account-circle
+                  </v-icon>
+                </div>
+                <div class="leader-info">
+                  <div class="leader-role">Project Owner</div>
+                  <h3 class="leader-name">
+                    {{ getOwnerName() }}
+                  </h3>
+                  <p class="leader-email">
+                    {{ getOwnerEmail() }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Team Lead -->
+              <div v-if="project.teamLead" class="leader-card lead-card">
+                <div class="leader-badge">
+                  <v-icon size="20" color="white">mdi-star</v-icon>
+                </div>
+                <div class="leader-avatar">
+                  <v-icon size="48" color="blue">
+                    mdi-account-circle
+                  </v-icon>
+                </div>
+                <div class="leader-info">
+                  <div class="leader-role">Team Lead</div>
+                  <h3 class="leader-name">
+                    {{ project.teamLead }}
+                  </h3>
                 </div>
               </div>
             </div>
@@ -545,10 +614,7 @@
           </div>
 
           <!-- Team Members Section -->
-          <div
-            v-if="project.teamMembers && project.teamMembers.length > 0"
-            class="tool-section"
-          >
+          <div class="tool-section">
             <div class="section-header">
               <div class="section-title">
                 <v-icon
@@ -560,22 +626,18 @@
                 <h2 class="section-heading">
                   Team Members
                 </h2>
+                <v-chip
+                  size="small"
+                  color="primary"
+                  variant="flat"
+                  class="ml-2"
+                >
+                  {{ project.teamMembers?.length || 0 }}
+                </v-chip>
               </div>
-              <v-btn
-                v-if="isProjectOwner"
-                color="primary"
-                variant="elevated"
-                size="small"
-                @click="showAddMemberDialog = true"
-              >
-                <v-icon class="mr-2">
-                  mdi-account-plus
-                </v-icon>
-                Add Member
-              </v-btn>
             </div>
             
-            <div class="team-members-grid">
+            <div v-if="project.teamMembers && project.teamMembers.length > 0" class="team-members-grid">
               <div 
                 v-for="member in project.teamMembers" 
                 :key="member.userId" 
@@ -590,6 +652,15 @@
                   <div class="member-details">
                     <h4 class="member-name">
                       {{ member.name }}
+                      <v-chip
+                        v-if="member.status === 'pending'"
+                        size="x-small"
+                        color="warning"
+                        variant="flat"
+                        class="ml-2"
+                      >
+                        Invite sent
+                      </v-chip>
                     </h4>
                     <p class="member-email">
                       {{ member.email }}
@@ -643,6 +714,17 @@
                   </v-menu>
                 </div>
               </div>
+            </div>
+            
+            <!-- Empty state for no team members -->
+            <div v-else class="empty-state">
+              <v-icon size="64" color="grey-lighten-1">
+                mdi-account-multiple-outline
+              </v-icon>
+              <h3 class="empty-state-title">No team members yet</h3>
+              <p class="empty-state-text">
+                Click the <strong>Share</strong> button at the top to invite team members to this project.
+              </p>
             </div>
           </div>
 
@@ -795,6 +877,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import LeftMenu from '@/dashboard/LeftMenu.vue';
 import SearchBar from '@/dashboard/SearchBar.vue';
+import ShareProjectDialog from '@/components/ShareProjectDialog.vue';
 import { ProjectApiService } from '@/services/projectApi.service.js';
 
 const route = useRoute();
@@ -994,6 +1077,25 @@ const formatFileDate = (dateString) => {
   });
 };
 
+// Project Owner helpers
+const getOwnerName = () => {
+  if (!project.value?.projectOwner) return 'Unknown';
+  const owner = project.value.projectOwner;
+  if (typeof owner === 'object' && owner.firstName) {
+    return `${owner.firstName} ${owner.lastName || ''}`.trim();
+  }
+  return 'Unknown';
+};
+
+const getOwnerEmail = () => {
+  if (!project.value?.projectOwner) return '';
+  const owner = project.value.projectOwner;
+  if (typeof owner === 'object' && owner.email) {
+    return owner.email;
+  }
+  return '';
+};
+
 // Actions
 const editProject = () => {
   router.push(`/project-create?edit=${project.value.id}`);
@@ -1033,6 +1135,36 @@ const showSnackbar = (text, color, icon) => {
   snackbarColor.value = color;
   snackbarIcon.value = icon;
   snackbar.value = true;
+};
+
+// Current user data for ShareProjectDialog
+const currentUserName = computed(() => {
+  const firstName = localStorage.getItem('firstName') || '';
+  const lastName = localStorage.getItem('lastName') || '';
+  return `${firstName} ${lastName}`.trim() || 'Unknown User';
+});
+
+const currentUserEmail = computed(() => {
+  return localStorage.getItem('email') || '';
+});
+
+// Share dialog event handlers
+const handleMemberAdded = async () => {
+  // Refresh project data to get updated team members
+  await fetchProject();
+  showSnackbar('Team member invitation sent successfully', 'success', 'mdi-check');
+};
+
+const handleMemberRemoved = async () => {
+  // Refresh project data to get updated team members
+  await fetchProject();
+  showSnackbar('Team member removed successfully', 'success', 'mdi-check');
+};
+
+const handlePermissionUpdated = async () => {
+  // Refresh project data to get updated permissions
+  await fetchProject();
+  showSnackbar('Permission updated successfully', 'success', 'mdi-check');
 };
 
 // Team member management
@@ -1658,12 +1790,117 @@ onMounted(() => {
   }
 }
 
+/* Project Leadership Section */
+.leadership-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+
+.leader-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.4);
+  transition: all 0.3s;
+}
+
+.leader-card.owner-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.leader-card.lead-card {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+}
+
+.leader-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px -5px rgba(102, 126, 234, 0.5);
+}
+
+.leader-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+}
+
+.leader-avatar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+}
+
+.leader-info {
+  text-align: center;
+  color: white;
+}
+
+.leader-role {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.9;
+  margin-bottom: 0.5rem;
+}
+
+.leader-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  color: white;
+}
+
+.leader-email {
+  font-size: 0.875rem;
+  opacity: 0.8;
+  margin: 0;
+  word-break: break-word;
+}
+
 /* Team Members Section */
 .team-members-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
   margin-top: 1rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 16px;
+  border: 2px dashed #cbd5e1;
+  margin-top: 1rem;
+}
+
+.empty-state-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #475569;
+  margin: 1rem 0 0.5rem 0;
+}
+
+.empty-state-text {
+  font-size: 1rem;
+  color: #64748b;
+  margin: 0;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .team-member-card {

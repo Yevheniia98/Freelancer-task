@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import { ProjectService, CreateProjectDto, UpdateProjectDto, ProjectQuery } from '../services/project.service';
 import { ProjectStatus } from '../models/project.entity';
+import { ProjectInvitationService } from '../services/project-invitation.service';
+import { User } from '../models/user.model';
 
 export class ProjectController {
   private projectService: ProjectService;
@@ -334,13 +336,22 @@ export class ProjectController {
   };
 
   /**
-   * Add team member to project
+   * Add team member to project by email (sends invitation)
    */
   addTeamMember = async (req: Request, res: Response): Promise<void> => {
     try {
       const projectId = req.params.id;
-      const { userId, name, email, role, permission } = req.body;
+      const { email, permission } = req.body;
       const currentUserId = (req as any).user.id;
+      const currentUser = (req as any).user;
+
+      if (!email) {
+        res.status(400).json({
+          success: false,
+          message: 'Email is required'
+        });
+        return;
+      }
 
       const project = await this.projectService.findById(projectId);
       if (!project) {
@@ -360,9 +371,63 @@ export class ProjectController {
         return;
       }
 
+      // Check if user exists
+      const invitedUser = await User.findOne({ email: email.toLowerCase() });
+      
+      if (!invitedUser) {
+        // User doesn't exist - add as pending member and send invitation email
+        const inviterName = currentUser.firstName && currentUser.lastName 
+          ? `${currentUser.firstName} ${currentUser.lastName}` 
+          : currentUser.email;
+        
+        // Add as pending team member immediately (like Figma)
+        const pendingMember = {
+          userId: null, // No userId yet since user doesn't exist
+          name: email.split('@')[0], // Use email prefix as temporary name
+          email: email.toLowerCase(),
+          role: 'Pending',
+          permission: permission || 'view_only',
+          addedAt: new Date(),
+          addedBy: currentUserId,
+          status: 'pending' // Mark as pending invitation
+        };
+
+        if (!project.teamMembers) {
+          project.teamMembers = [];
+        }
+        project.teamMembers.push(pendingMember as any);
+        await project.save();
+
+        // Send invitation email
+        const invitationService = ProjectInvitationService.getInstance();
+        const invitationSent = await invitationService.sendInvitation({
+          projectId: project.id,
+          projectName: project.title,
+          inviterName: inviterName,
+          inviterEmail: currentUser.email,
+          inviteeEmail: email,
+          permission: permission || 'view_only'
+        });
+
+        if (invitationSent) {
+          res.status(200).json({
+            success: true,
+            message: 'Invitation sent successfully. User will be added once they sign up and accept.',
+            pending: true,
+            data: pendingMember
+          });
+        } else {
+          res.status(500).json({
+            success: false,
+            message: 'Failed to send invitation email'
+          });
+        }
+        return;
+      }
+
       // Check if member already exists
       const existingMember = project.teamMembers?.find(
-        (member: any) => member.userId.toString() === userId
+        (member: any) => member.userId?.toString() === (invitedUser._id as any).toString()
       );
 
       if (existingMember) {
@@ -373,13 +438,17 @@ export class ProjectController {
         return;
       }
 
-      // Add team member
+      // Add team member directly (user exists)
+      const memberName = invitedUser.firstName && invitedUser.lastName 
+        ? `${invitedUser.firstName} ${invitedUser.lastName}` 
+        : invitedUser.email.split('@')[0];
       const newMember = {
-        userId,
-        name,
-        email,
-        role,
+        userId: invitedUser._id,
+        name: memberName,
+        email: invitedUser.email,
+        role: 'Member',
         permission: permission || 'view_only',
+        status: 'active',
         addedAt: new Date(),
         addedBy: currentUserId
       };
@@ -389,6 +458,20 @@ export class ProjectController {
       }
       project.teamMembers.push(newMember as any);
       await project.save();
+
+      // Send notification email
+      const inviterName = currentUser.firstName && currentUser.lastName 
+        ? `${currentUser.firstName} ${currentUser.lastName}` 
+        : currentUser.email;
+      const invitationService = ProjectInvitationService.getInstance();
+      await invitationService.sendInvitation({
+        projectId: project.id,
+        projectName: project.title,
+        inviterName: inviterName,
+        inviterEmail: currentUser.email,
+        inviteeEmail: email,
+        permission: permission || 'view_only'
+      });
 
       res.status(200).json({
         success: true,
@@ -503,6 +586,116 @@ export class ProjectController {
       res.status(500).json({
         success: false,
         message: error.message || 'Failed to remove team member'
+      });
+    }
+  };
+
+  /**
+   * Accept project invitation
+   */
+  acceptInvitation = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { token } = req.body;
+      const currentUserId = (req as any).user.id;
+
+      const invitationService = ProjectInvitationService.getInstance();
+      const memberData = await invitationService.acceptInvitation(token, currentUserId);
+
+      const project = await this.projectService.findById(memberData.projectId);
+      if (!project) {
+        res.status(404).json({
+          success: false,
+          message: 'Project not found'
+        });
+        return;
+      }
+
+      // Check if member already exists
+      const existingMember = project.teamMembers?.find(
+        (member: any) => member.userId?.toString() === currentUserId
+      );
+
+      if (existingMember) {
+        res.status(400).json({
+          success: false,
+          message: 'You are already a team member of this project'
+        });
+        return;
+      }
+
+      // Add team member
+      const newMember = {
+        userId: memberData.userId,
+        name: memberData.name,
+        email: memberData.email,
+        role: 'Member',
+        permission: memberData.permission,
+        addedAt: new Date(),
+        addedBy: project.projectOwner
+      };
+
+      if (!project.teamMembers) {
+        project.teamMembers = [];
+      }
+      project.teamMembers.push(newMember as any);
+      await project.save();
+
+      res.status(200).json({
+        success: true,
+        message: 'Invitation accepted successfully',
+        data: {
+          project: {
+            id: project.id,
+            title: project.title,
+            description: project.description
+          },
+          member: newMember
+        }
+      });
+    } catch (error: any) {
+      console.error('Accept invitation error:', error);
+      res.status(400).json({
+        success: false,
+        message: error.message || 'Failed to accept invitation'
+      });
+    }
+  };
+
+  /**
+   * Verify project invitation token
+   */
+  verifyInvitation = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { token } = req.params;
+
+      const invitationService = ProjectInvitationService.getInstance();
+      const invitation = await invitationService.verifyInvitation(token);
+
+      const project = await this.projectService.findById(invitation.projectId);
+      if (!project) {
+        res.status(404).json({
+          success: false,
+          message: 'Project not found'
+        });
+        return;
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'Invitation verified successfully',
+        data: {
+          projectId: project.id,
+          projectName: project.title,
+          projectDescription: project.description,
+          email: invitation.email,
+          permission: invitation.permission
+        }
+      });
+    } catch (error: any) {
+      console.error('Verify invitation error:', error);
+      res.status(400).json({
+        success: false,
+        message: error.message || 'Invalid or expired invitation'
       });
     }
   };

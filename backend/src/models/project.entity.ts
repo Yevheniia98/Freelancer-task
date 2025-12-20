@@ -26,16 +26,17 @@ export interface IFile {
 }
 
 export enum TeamMemberPermission {
-  VIEW_ONLY = 'view_only',
-  VIEW_AND_EDIT = 'view_and_edit'
+  VIEW_ONLY = 'view',
+  VIEW_AND_EDIT = 'edit',
+  OWNER = 'owner'
 }
 
 export interface ITeamMember {
   userId: mongoose.Types.ObjectId;
   name: string;
   email: string;
-  role?: string;
-  permission: TeamMemberPermission;
+  role: 'view' | 'edit' | 'owner';
+  status?: 'active' | 'pending';
   addedAt: Date;
   addedBy: mongoose.Types.ObjectId;
 }
@@ -114,11 +115,16 @@ const ProjectEntitySchema = new Schema<IProjectEntity>({
       userId: { type: Schema.Types.ObjectId, ref: 'User', required: false },
       name: { type: String, required: true },
       email: { type: String, required: true },
-      role: { type: String },
-      permission: { 
+      role: { 
         type: String, 
-        enum: ['view_only', 'view_and_edit'],
-        default: 'view_only'
+        enum: ['view', 'edit', 'owner'],
+        default: 'view',
+        required: true
+      },
+      status: { 
+        type: String, 
+        enum: ['active', 'pending'],
+        default: 'active'
       },
       addedAt: { type: Date, default: Date.now },
       addedBy: { type: Schema.Types.ObjectId, ref: 'User' }

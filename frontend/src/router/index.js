@@ -115,6 +115,12 @@ const routes = [
   },
 
   {
+    path: '/invite/accept',
+    name: 'InviteAccept',
+    component: () => import('@/views/InviteAccept.vue')
+  },
+
+  {
     path: '/client-main',
     name: 'ClientMain',
     component: ClientMain,

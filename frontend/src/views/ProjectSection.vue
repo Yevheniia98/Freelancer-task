@@ -358,12 +358,15 @@
                         <div class="team-section">
                           <div class="team-avatars">
                             <v-avatar
-                              v-for="memberId in task.teamMembers.slice(0, 3)"
-                              :key="memberId"
+                              v-for="(member, idx) in task.teamMembers.slice(0, 3)"
+                              :key="idx"
                               size="32"
+                              :color="getAvatarColor(idx)"
                               class="team-avatar"
                             >
-                              <v-img :src="getTeamMemberAvatar(memberId)" />
+                              <span class="text-white text-caption font-weight-bold">
+                                {{ getInitials(member.name || member.email) }}
+                              </span>
                             </v-avatar>
                             <v-avatar
                               v-if="task.teamMembers.length > 3"
@@ -527,12 +530,15 @@
                         <div class="team-section">
                           <div class="team-avatars">
                             <v-avatar
-                              v-for="memberId in task.teamMembers.slice(0, 3)"
-                              :key="memberId"
+                              v-for="(member, idx) in task.teamMembers.slice(0, 3)"
+                              :key="idx"
                               size="32"
+                              :color="getAvatarColor(idx)"
                               class="team-avatar"
                             >
-                              <v-img :src="getTeamMemberAvatar(memberId)" />
+                              <span class="text-white text-caption font-weight-bold">
+                                {{ getInitials(member.name || member.email) }}
+                              </span>
                             </v-avatar>
                             <v-avatar
                               v-if="task.teamMembers.length > 3"
@@ -699,12 +705,15 @@
                         <div class="team-section">
                           <div class="team-avatars">
                             <v-avatar
-                              v-for="memberId in task.teamMembers.slice(0, 3)"
-                              :key="memberId"
+                              v-for="(member, idx) in task.teamMembers.slice(0, 3)"
+                              :key="idx"
                               size="32"
+                              :color="getAvatarColor(idx)"
                               class="team-avatar"
                             >
-                              <v-img :src="getTeamMemberAvatar(memberId)" />
+                              <span class="text-white text-caption font-weight-bold">
+                                {{ getInitials(member.name || member.email) }}
+                              </span>
                             </v-avatar>
                             <v-avatar
                               v-if="task.teamMembers.length > 3"
@@ -998,6 +1007,22 @@ export default defineComponent({
       const member = teamMembers.value.find(m => m.id === memberId);
       return member ? member.avatar : '';
     };
+    
+    // Get initials from name or email
+    const getInitials = (nameOrEmail) => {
+      if (!nameOrEmail) return '?';
+      const parts = nameOrEmail.split('@')[0].split(/[\s.]+/);
+      if (parts.length >= 2) {
+        return (parts[0][0] + parts[1][0]).toUpperCase();
+      }
+      return nameOrEmail.substring(0, 2).toUpperCase();
+    };
+    
+    // Get avatar color based on index
+    const getAvatarColor = (index) => {
+      const colors = ['primary', 'success', 'info', 'warning', 'error', 'purple', 'teal', 'indigo'];
+      return colors[index % colors.length];
+    };
 
     // Map backend status to frontend kanban column status
     const mapBackendStatusToFrontend = (backendStatus) => {
@@ -1149,7 +1174,9 @@ export default defineComponent({
         
         if (response.ok) {
           const data = await response.json();
-          const upworkProjects = data.data.filter(project => 
+          // Ensure data.data is an array before filtering
+          const projectsArray = Array.isArray(data.data) ? data.data : (Array.isArray(data) ? data : []);
+          const upworkProjects = projectsArray.filter(project => 
             project.externalSource && project.externalSource.platform === 'upwork'
           );
           
@@ -1342,7 +1369,8 @@ export default defineComponent({
           iconColor: 'pink-darken-1',
           progress: project.status === 'completed' ? 1 : 0,
           total: 1,
-          teamMembers: [],
+          teamMembers: project.teamMembers || [],
+          teamLead: project.teamLead || null,
           date: project.deadline ? new Date(project.deadline).toLocaleDateString('en-US', { 
             day: '2-digit', 
             month: 'short', 
@@ -1376,6 +1404,8 @@ export default defineComponent({
       snackbarIcon,
       getTasksByStatus,
       getTeamMemberAvatar,
+      getInitials,
+      getAvatarColor,
       navigateToProjectCreate,
       navigateToProjectDetail,
       onDragStart,

@@ -562,119 +562,168 @@
                   
                   <div class="card-content">
                     <div class="form-group">
-                      <h4 class="field-label">
-                        Team Lead
-                      </h4>
-                      <v-combobox
-                        v-model="teamLead"
-                        :items="teamLeadOptions"
-                        variant="outlined"
-                        hide-details
-                        class="custom-field"
-                        placeholder="Type name or select from team members"
-                        clearable
-                        :hint="teamMembers.length > 0 ? 'You can select from existing team members or type a name' : 'Add team members below to select from them'"
-                        persistent-hint
-                      />
-                    </div>
+                      <div class="d-flex align-items-center justify-space-between mb-4">
+                        <h4 class="field-label mb-0">
+                          Team Members
+                        </h4>
+                        
+                        <!-- Share Button - Works in both create and edit mode -->
+                        <v-dialog v-model="shareDialog" max-width="600">
+                          <template #activator="{ props }">
+                            <v-btn
+                              color="primary"
+                              variant="elevated"
+                              v-bind="props"
+                            >
+                              <v-icon left>mdi-share-variant</v-icon>
+                              Share
+                            </v-btn>
+                          </template>
+                          
+                          <v-card class="share-dialog">
+                            <v-card-title class="d-flex justify-space-between align-center pa-6">
+                              <span class="text-h5">Share "{{ projectTitle || 'Project' }}"</span>
+                              <v-btn icon variant="text" @click="shareDialog = false">
+                                <v-icon>mdi-close</v-icon>
+                              </v-btn>
+                            </v-card-title>
 
-                    <div class="form-group">
-                      <h4 class="field-label">
-                        Team Members
-                      </h4>
-                      <div class="team-members-section">
-                        <div class="members-avatars">
+                            <v-divider />
+
+                            <v-card-text class="pa-6">
+                              <!-- Add people section -->
+                              <div class="mb-6">
+                                <div class="d-flex gap-2 align-center">
+                                  <v-text-field
+                                    v-model="inviteEmail"
+                                    placeholder="Add people by email"
+                                    variant="outlined"
+                                    density="comfortable"
+                                    hide-details="auto"
+                                    :error-messages="emailError"
+                                    @keyup.enter="addPendingInvite"
+                                    class="flex-grow-1"
+                                  />
+                                  <v-select
+                                    v-model="invitePermission"
+                                    :items="permissionOptions"
+                                    variant="outlined"
+                                    density="comfortable"
+                                    hide-details
+                                    class="flex-shrink-0"
+                                    style="min-width: 140px; max-width: 160px;"
+                                  />
+                                  <v-btn
+                                    color="primary"
+                                    variant="flat"
+                                    size="large"
+                                    :disabled="!inviteEmail"
+                                    @click="addPendingInvite"
+                                  >
+                                    Invite
+                                  </v-btn>
+                                </div>
+                              </div>
+
+                              <!-- Who has access -->
+                              <div>
+                                <h4 class="text-subtitle-1 mb-3">Who has access</h4>
+
+                                <!-- Project owner -->
+                                <div class="member-item d-flex align-center pa-3 mb-2" style="border-radius: 8px;">
+                                  <v-avatar size="40" color="primary" class="mr-3">
+                                    <span class="text-white">{{ getInitials(currentUserName) }}</span>
+                                  </v-avatar>
+                                  <div class="flex-grow-1">
+                                    <div class="text-body-1 font-weight-medium">{{ currentUserName }} (you)</div>
+                                    <div class="text-caption text-medium-emphasis">{{ currentUserEmail }}</div>
+                                  </div>
+                                  <v-chip size="small" color="primary" variant="flat">Owner</v-chip>
+                                </div>
+
+                                <!-- Pending invites -->
+                                <div
+                                  v-for="(invite, index) in pendingInvites"
+                                  :key="index"
+                                  class="member-item d-flex align-center pa-3 mb-2"
+                                  style="border-radius: 8px;"
+                                >
+                                  <v-avatar size="40" color="grey-lighten-1" class="mr-3">
+                                    <v-icon color="white">mdi-account-outline</v-icon>
+                                  </v-avatar>
+                                  <div class="flex-grow-1">
+                                    <div class="text-body-1 font-weight-medium">
+                                      {{ invite.email }}
+                                      <v-chip size="x-small" color="info" variant="flat" class="ml-2">
+                                        {{ isEditMode ? 'Invite sent' : 'Will be sent' }}
+                                      </v-chip>
+                                    </div>
+                                    <div class="text-caption text-medium-emphasis">{{ invite.email }}</div>
+                                  </div>
+                                  <v-chip size="small" variant="text">
+                                    {{ invite.role === 'edit' ? 'Can edit' : 'Can view' }}
+                                  </v-chip>
+                                  <v-btn
+                                    icon
+                                    size="small"
+                                    variant="text"
+                                    @click="removePendingInvite(index)"
+                                  >
+                                    <v-icon>mdi-close</v-icon>
+                                  </v-btn>
+                                </div>
+
+                                <!-- Empty state -->
+                                <div
+                                  v-if="pendingInvites.length === 0"
+                                  class="text-center py-6 text-medium-emphasis"
+                                >
+                                  <v-icon size="48" class="mb-2">mdi-account-multiple-outline</v-icon>
+                                  <div>No team members yet</div>
+                                  <div class="text-caption">Invite people to collaborate on this project</div>
+                                </div>
+                              </div>
+                            </v-card-text>
+                          </v-card>
+                        </v-dialog>
+                      </div>
+                      
+                      <!-- Display team members -->
+                      <div v-if="isEditMode" class="team-members-section">
+                        <div class="members-avatars" v-if="realTeamMembers.length > 0">
                           <div
-                            v-for="(member, index) in teamMembers"
-                            :key="index"
+                            v-for="(member, index) in realTeamMembers"
+                            :key="member.userId || index"
                             class="member-wrapper"
-                            :class="{ 'team-lead-member': member.name === teamLead }"
                           >
                             <v-avatar
                               size="40"
                               class="member-avatar"
-                              :style="getDefaultAvatarStyle(member)"
+                              :color="member.status === 'pending' ? 'grey-lighten-1' : '#1976D2'"
                             >
-                              <v-img 
-                                v-if="member.profilePicture" 
-                                :src="member.profilePicture" 
-                                :alt="member.name"
-                              />
-                              <span
-                                v-else
-                                class="avatar-initials"
-                              >
-                                {{ getAvatarContent(member) }}
-                              </span>
+                              <v-icon v-if="member.status === 'pending'" color="white">mdi-account-outline</v-icon>
+                              <span v-else class="text-white">{{ getInitials(member.name) }}</span>
                             </v-avatar>
-                            
-                            <!-- Team Lead Crown Icon -->
-                            <v-icon
-                              v-if="member.name === teamLead"
-                              size="16"
-                              color="#FFD700"
-                              class="team-lead-crown"
-                            >
-                              mdi-crown
-                            </v-icon>
-                            
-                            <v-btn
-                              icon
-                              size="16"
-                              color="error"
-                              variant="elevated"
-                              class="delete-member-btn"
-                              @click="removeTeamMember(index)"
-                            >
-                              <v-icon size="12">
-                                mdi-close
-                              </v-icon>
-                            </v-btn>
                           </div>
-                          <v-btn
-                            icon
-                            size="40"
-                            color="primary"
-                            variant="outlined"
-                            class="add-member-btn"
-                            @click="showAddMemberForm = true"
-                          >
-                            <v-icon>mdi-plus</v-icon>
-                          </v-btn>
                         </div>
-
-                        <v-expand-transition>
-                          <div
-                            v-if="showAddMemberForm"
-                            class="add-member-form"
-                          >
-                            <v-text-field
-                              v-model="newMemberEmail"
-                              label="Enter email to invite"
-                              variant="outlined"
-                              density="compact"
-                              hide-details
-                              class="member-email-field"
-                            />
-                            <div class="member-form-actions">
-                              <v-btn 
-                                size="small" 
-                                color="grey" 
-                                variant="text" 
-                                @click="showAddMemberForm = false"
-                              >
-                                Cancel
-                              </v-btn>
-                              <v-btn 
-                                size="small" 
-                                color="primary" 
-                                @click="addTeamMember"
-                              >
-                                Invite
-                              </v-btn>
-                            </div>
-                          </div>
-                        </v-expand-transition>
+                        <div v-else class="text-center py-6 text-medium-emphasis">
+                          <v-icon size="48" class="mb-2">mdi-account-multiple-outline</v-icon>
+                          <div>No team members yet</div>
+                          <div class="text-caption">Click the Share button above to invite people</div>
+                        </div>
+                      </div>
+                      
+                      <!-- Create Mode: Show empty state -->
+                      <div v-else class="team-members-section">
+                        <div class="text-center py-8">
+                          <v-icon size="64" color="primary" class="mb-3 opacity-50">
+                            mdi-account-multiple-plus
+                          </v-icon>
+                          <h4 class="text-h6 mb-2">Invite Your Team</h4>
+                          <p class="text-body-2 text-medium-emphasis mb-0">
+                            Create your project first, then use the Share button<br>to invite team members with email notifications
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -730,6 +779,7 @@ import { ref, onMounted, computed, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import LeftMenu from '@/dashboard/LeftMenu.vue';
 import SearchBar from '@/dashboard/SearchBar.vue';
+import ShareProjectDialog from '@/components/ShareProjectDialog.vue';
 import { ProjectApiService } from '@/services/projectApi.service.js';
 import notificationService from '@/services/notificationService.js';
 
@@ -757,6 +807,23 @@ const newMemberEmail = ref('');
 const showAddMemberForm = ref(false);
 const showSuccessPopup = ref(false);
 const uploadedFiles = ref([]);
+
+// For ShareProjectDialog in edit mode
+const currentUserName = ref('Current User');
+const currentUserEmail = ref('user@example.com');
+const realTeamMembers = ref([]);
+
+// For Share Dialog
+const shareDialog = ref(false);
+const inviteEmail = ref('');
+const invitePermission = ref('view');
+const emailError = ref('');
+const pendingInvites = ref([]);
+
+const permissionOptions = [
+  { title: 'Can view', value: 'view' },
+  { title: 'Can edit', value: 'edit' }
+];
 
 // Options
 const priorityOptions = [
@@ -842,6 +909,9 @@ const triggerFileInput = () => {
 onMounted(async () => {
   console.log('ProjectCreate component loaded and upload functionality ready');
   
+  // Fetch current user info
+  await fetchCurrentUser();
+  
   // Check if we're editing an existing project
   const editProjectId = route.query.edit;
   if (editProjectId) {
@@ -856,6 +926,11 @@ onMounted(async () => {
 });
 
 // Load project data for editing
+const loadProjectData = async () => {
+  if (!editProjectId.value) return;
+  await loadProjectForEditing(editProjectId.value);
+};
+
 const loadProjectForEditing = async (projectId) => {
   try {
     console.log('Fetching project data for ID:', projectId);
@@ -876,6 +951,17 @@ const loadProjectForEditing = async (projectId) => {
       teamLead.value = project.teamLead || '';
       teamMembers.value = project.teamMembers || [];
       
+      // Fetch real team members from database
+      if (project.teamMemberDetails && Array.isArray(project.teamMemberDetails)) {
+        realTeamMembers.value = project.teamMemberDetails.map(member => ({
+          userId: member.userId || member._id,
+          name: member.name || member.username || 'Unknown',
+          email: member.email || '',
+          role: member.role || 'view',
+          status: member.status || 'active'
+        }));
+      }
+      
       // Update rich text editor if available
       if (descriptionTextarea.value && description.value) {
         descriptionTextarea.value.innerHTML = description.value;
@@ -895,18 +981,75 @@ const loadProjectForEditing = async (projectId) => {
   }
 };
 
+// Fetch current user info
+const fetchCurrentUser = async () => {
+  try {
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+    
+    const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3002/api';
+    const response = await fetch(`${apiBaseUrl}/auth/me`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      currentUserName.value = data.user?.name || data.user?.username || 'Current User';
+      currentUserEmail.value = data.user?.email || 'user@example.com';
+    }
+  } catch (error) {
+    console.error('Error fetching current user:', error);
+  }
+};
+
+// Handle team lead selection - only add to members when explicitly selected or confirmed
+const onTeamLeadSelect = (value) => {
+  // Only proceed if we have a valid value
+  if (!value || (typeof value === 'string' && !value.trim())) {
+    return;
+  }
+  
+  // Get the actual string value
+  const leadValue = typeof value === 'string' ? value : value?.name || value?.value;
+  
+  // Only add to team members if this was selected from dropdown (object) or if it matches existing member
+  const isExistingMember = teamMembers.value.some(member => 
+    member.name.toLowerCase() === leadValue.toLowerCase()
+  );
+  
+  if (isExistingMember || typeof value === 'object') {
+    // This is a selection from dropdown, safe to add
+    setTimeout(() => {
+      ensureTeamLeadInMembers();
+    }, 100);
+  }
+  // If it's just typed text, don't automatically add - wait for user to finish and move on
+};
+
 // Watch for team lead changes to automatically add them to team members
+// Disabled automatic adding - now using onTeamLeadSelect handler instead
+/*
+let teamLeadDebounce = null;
 watch(teamLead, (newTeamLead) => {
+  // Clear previous timeout
+  if (teamLeadDebounce) {
+    clearTimeout(teamLeadDebounce);
+  }
+  
   if (newTeamLead) {
     // Handle both string and object values
     const leadValue = typeof newTeamLead === 'string' ? newTeamLead : newTeamLead?.name || newTeamLead?.value;
     if (leadValue && leadValue.trim && leadValue.trim()) {
-      setTimeout(() => {
+      // Wait 1 second after user stops typing before adding to team members
+      teamLeadDebounce = setTimeout(() => {
         ensureTeamLeadInMembers();
-      }, 100); // Small delay to allow for proper selection
+      }, 1000);
     }
   }
 });
+*/
 
 // Methods
 const formatText = (format) => {
@@ -1105,6 +1248,128 @@ const formatFileSize = (bytes) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 };
 
+const getInitials = (name) => {
+  if (!name) return '?';
+  return name
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase()
+    .substring(0, 2);
+};
+
+// Share Dialog Functions
+const validateEmail = (email) => {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
+};
+
+const addPendingInvite = async () => {
+  emailError.value = '';
+  
+  if (!inviteEmail.value) {
+    emailError.value = 'Email is required';
+    return;
+  }
+
+  if (!validateEmail(inviteEmail.value)) {
+    emailError.value = 'Please enter a valid email';
+    return;
+  }
+
+  // Check if already invited
+  if (pendingInvites.value.some(inv => inv.email === inviteEmail.value)) {
+    emailError.value = 'This email has already been invited';
+    return;
+  }
+
+  // Add to pending invites
+  pendingInvites.value.push({
+    email: inviteEmail.value,
+    role: invitePermission.value
+  });
+
+  // If in edit mode, send invitation immediately
+  if (isEditMode.value && editProjectId.value) {
+    await sendInvitationNow(inviteEmail.value, invitePermission.value);
+  }
+
+  inviteEmail.value = '';
+  invitePermission.value = 'view';
+};
+
+const removePendingInvite = (index) => {
+  pendingInvites.value.splice(index, 1);
+};
+
+const sendInvitationNow = async (email, role) => {
+  try {
+    const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3002/api';
+    const authToken = localStorage.getItem('auth_token');
+    
+    const response = await fetch(`${apiBaseUrl}/invites/send`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      },
+      body: JSON.stringify({
+        projectId: editProjectId.value,
+        email: email,
+        role: role
+      })
+    });
+
+    const data = await response.json();
+    
+    if (data.success) {
+      console.log('✅ Invitation sent to:', email);
+      await loadProjectData();
+    } else {
+      console.error('❌ Failed to send invitation:', data.message);
+    }
+  } catch (error) {
+    console.error('❌ Error sending invitation:', error);
+  }
+};
+
+const sendAllPendingInvites = async (projectId) => {
+  console.log('📧 Sending pending invites for project:', projectId);
+  
+  for (const invite of pendingInvites.value) {
+    try {
+      const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3002/api';
+      const authToken = localStorage.getItem('auth_token');
+      
+      const response = await fetch(`${apiBaseUrl}/invites/send`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
+        },
+        body: JSON.stringify({
+          projectId: projectId,
+          email: invite.email,
+          role: invite.role
+        })
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        console.log('✅ Invitation sent to:', invite.email);
+      } else {
+        console.error('❌ Failed to send invitation to:', invite.email, data.message);
+      }
+    } catch (error) {
+      console.error('❌ Error sending invitation to:', invite.email, error);
+    }
+  }
+  
+  // Clear pending invites after sending
+  pendingInvites.value = [];
+};
+
 const addSkill = () => {
   if (newSkill.value && !skills.value.includes(newSkill.value)) {
     skills.value.push(newSkill.value);
@@ -1179,22 +1444,34 @@ const removeTeamMember = (index) => {
 
 // Add team lead to team members if not already present
 const ensureTeamLeadInMembers = () => {
-  if (teamLead.value && teamLead.value.trim()) {
-    const isAlreadyMember = teamMembers.value.some(member => 
-      member.name.toLowerCase() === teamLead.value.toLowerCase()
-    );
-    
-    if (!isAlreadyMember) {
-      const leadAsMember = {
-        id: teamMembers.value.length + 1,
-        name: teamLead.value,
-        email: `${teamLead.value.toLowerCase().replace(/\s+/g, '.')}@company.com`, // Placeholder email
-        profilePicture: null,
-        gender: 'unknown',
-        isTeamLead: true
-      };
-      teamMembers.value.unshift(leadAsMember); // Add at the beginning
-    }
+  if (!teamLead.value) return;
+  
+  // Handle both string and object values from combobox
+  const leadValue = typeof teamLead.value === 'string' 
+    ? teamLead.value 
+    : teamLead.value?.name || teamLead.value?.value || '';
+  
+  // Check if it's a valid string
+  if (!leadValue || typeof leadValue !== 'string' || !leadValue.trim()) {
+    return;
+  }
+  
+  const leadName = leadValue.trim();
+  
+  const isAlreadyMember = teamMembers.value.some(member => 
+    member.name.toLowerCase() === leadName.toLowerCase()
+  );
+  
+  if (!isAlreadyMember) {
+    const leadAsMember = {
+      id: teamMembers.value.length + 1,
+      name: leadName,
+      email: `${leadName.toLowerCase().replace(/\s+/g, '.')}@company.com`, // Placeholder email
+      profilePicture: null,
+      gender: 'unknown',
+      isTeamLead: true
+    };
+    teamMembers.value.unshift(leadAsMember); // Add at the beginning
   }
 };
 
@@ -1294,9 +1571,16 @@ const submitProject = async () => {
       }
     }
     
+    // Send pending invites if any (for new projects)
+    if (!isEditMode.value && pendingInvites.value.length > 0 && project && project.id) {
+      console.log('📧 Sending pending invites after project creation...');
+      await sendAllPendingInvites(project.id);
+    }
+    
     showSuccessPopup.value = true;
     setTimeout(() => {
-      router.push('/projects');
+      // Redirect to project detail page to allow sharing
+      router.push(`/projects/${project.id || editProjectId.value}`);
     }, 2000);
   } catch (error) {
     console.error('Error submitting project:', error);
@@ -2112,5 +2396,19 @@ const submitProject = async () => {
   .members-avatars {
     justify-content: center;
   }
+}
+
+/* Share Dialog Styles */
+.share-dialog {
+  border-radius: 12px;
+}
+
+.member-item {
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.member-item:hover {
+  background-color: rgba(0, 0, 0, 0.04);
 }
 </style>
