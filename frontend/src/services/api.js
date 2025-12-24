@@ -37,13 +37,32 @@ api.interceptors.response.use(
       
       if (hasToken && currentPath !== '/login') {
         // Token expired or invalid for authenticated user
+        // Preserve user profile data before clearing
+        const userData = localStorage.getItem('user_data');
+        if (userData) {
+          try {
+            const parsedData = JSON.parse(userData);
+            const preservedData = {
+              fullName: parsedData.fullName,
+              email: parsedData.email,
+              phoneNumber: parsedData.phoneNumber,
+              country: parsedData.country,
+              profileImage: parsedData.profileImage,
+              firstName: parsedData.firstName,
+              lastName: parsedData.lastName
+            };
+            localStorage.setItem('user_data_preserved', JSON.stringify(preservedData));
+          } catch (e) {
+            console.error('Error preserving user data:', e);
+          }
+        }
+        
         localStorage.removeItem('auth_token');
         localStorage.removeItem('user_data');
         window.location.href = '/login';
       } else if (currentPath !== '/login') {
         // Clear any existing tokens but don't redirect if we're already on login
         localStorage.removeItem('auth_token');
-        localStorage.removeItem('user_data');
       }
     }
     return Promise.reject(error);

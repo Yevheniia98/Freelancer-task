@@ -372,16 +372,6 @@ export default {
     const error = ref(null);
     const syncing = ref(false);
 
-    // Colors for tax breakdown
-    const colors = {
-      incomeTax: "#e74c3c",
-      pension: "#f1c40f",
-      unemployment: "#3498db",
-      health: "#9b59b6",
-      care: "#795548",
-      netSalary: "#009688",
-    };
-
     // Load financial data
     const loadFinancialData = async () => {
       try {

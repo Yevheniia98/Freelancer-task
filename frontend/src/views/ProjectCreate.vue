@@ -575,7 +575,7 @@
                               variant="elevated"
                               v-bind="props"
                             >
-                              <v-icon left>mdi-share-variant</v-icon>
+                              <v-icon class="mr-2">mdi-share-variant</v-icon>
                               Share
                             </v-btn>
                           </template>
@@ -690,7 +690,7 @@
                       
                       <!-- Display team members -->
                       <div v-if="isEditMode" class="team-members-section">
-                        <div class="members-avatars" v-if="realTeamMembers.length > 0">
+                        <div v-if="realTeamMembers.length > 0" class="members-avatars">
                           <div
                             v-for="(member, index) in realTeamMembers"
                             :key="member.userId || index"
@@ -775,11 +775,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue';
+/* eslint-disable no-unused-vars */
+import { ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import LeftMenu from '@/dashboard/LeftMenu.vue';
 import SearchBar from '@/dashboard/SearchBar.vue';
-import ShareProjectDialog from '@/components/ShareProjectDialog.vue';
 import { ProjectApiService } from '@/services/projectApi.service.js';
 import notificationService from '@/services/notificationService.js';
 
@@ -854,28 +854,8 @@ const categoryOptions = [
   { title: 'Content Creation', value: 'Content' }
 ];
 
-// Team Lead options - dynamically generated from existing team members
-const teamLeadOptions = computed(() => {
-  const options = [];
-  
-  // Add existing team members as options
-  teamMembers.value.forEach(member => {
-    options.push({
-      title: `${member.name} (${member.email})`,
-      value: member.name
-    });
-  });
-  
-  // If there's a custom teamLead value that's not in team members, keep it
-  if (teamLead.value && !options.find(opt => opt.value === teamLead.value)) {
-    options.push({
-      title: `${teamLead.value} (Custom)`,
-      value: teamLead.value
-    });
-  }
-  
-  return options;
-});
+// Team Lead options would be dynamically generated from existing team members if needed
+// Removed unused computed property
 
 // File input refs
 const thumbnailInput = ref(null);
@@ -998,35 +978,39 @@ const fetchCurrentUser = async () => {
       const data = await response.json();
       currentUserName.value = data.user?.name || data.user?.username || 'Current User';
       currentUserEmail.value = data.user?.email || 'user@example.com';
+    } else if (response.status === 401) {
+      // Token expired, preserve user data before clearing
+      const userData = localStorage.getItem('user_data');
+      if (userData) {
+        try {
+          const parsedData = JSON.parse(userData);
+          const preservedData = {
+            fullName: parsedData.fullName,
+            email: parsedData.email,
+            phoneNumber: parsedData.phoneNumber,
+            country: parsedData.country,
+            profileImage: parsedData.profileImage,
+            firstName: parsedData.firstName,
+            lastName: parsedData.lastName
+          };
+          localStorage.setItem('user_data_preserved', JSON.stringify(preservedData));
+        } catch (e) {
+          console.error('Error preserving user data:', e);
+        }
+      }
+      
+      // Clear auth data and redirect
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user');
+      alert('Token expired. Please log in again.');
+      window.location.href = '/login';
     }
   } catch (error) {
     console.error('Error fetching current user:', error);
   }
 };
 
-// Handle team lead selection - only add to members when explicitly selected or confirmed
-const onTeamLeadSelect = (value) => {
-  // Only proceed if we have a valid value
-  if (!value || (typeof value === 'string' && !value.trim())) {
-    return;
-  }
-  
-  // Get the actual string value
-  const leadValue = typeof value === 'string' ? value : value?.name || value?.value;
-  
-  // Only add to team members if this was selected from dropdown (object) or if it matches existing member
-  const isExistingMember = teamMembers.value.some(member => 
-    member.name.toLowerCase() === leadValue.toLowerCase()
-  );
-  
-  if (isExistingMember || typeof value === 'object') {
-    // This is a selection from dropdown, safe to add
-    setTimeout(() => {
-      ensureTeamLeadInMembers();
-    }, 100);
-  }
-  // If it's just typed text, don't automatically add - wait for user to finish and move on
-};
+// Removed unused onTeamLeadSelect function
 
 // Watch for team lead changes to automatically add them to team members
 // Disabled automatic adding - now using onTeamLeadSelect handler instead
@@ -1097,35 +1081,7 @@ const onEditorBlur = () => {
   editorFocused.value = false;
 };
 
-// Generate default avatar colors based on gender
-const getDefaultAvatarStyle = (member) => {
-  if (member.profilePicture) {
-    return {}; // Use the real profile picture
-  }
-  
-  // Determine gender and assign colors
-  const isWoman = member.gender === 'female' || member.gender === 'woman';
-  const colors = isWoman ? ['#FF69B4', '#FF8C69'] : ['#4169E1', '#32CD32']; // Pink/Orange for women, Blue/Green for men
-  
-  // Use member ID or name to consistently pick a color
-  const colorIndex = (member.id || member.name.length) % colors.length;
-  
-  return {
-    backgroundColor: colors[colorIndex],
-    color: 'white',
-    fontWeight: 'bold'
-  };
-};
-
-// Get avatar display content
-const getAvatarContent = (member) => {
-  if (member.profilePicture) {
-    return member.profilePicture;
-  }
-  
-  // Show first letter of name for default avatar
-  return member.name ? member.name.charAt(0).toUpperCase() : '?';
-};
+// Removed unused avatar helper functions
 
 
 
@@ -1283,15 +1239,21 @@ const addPendingInvite = async () => {
     return;
   }
 
+  const emailToInvite = inviteEmail.value;
+  const roleToAssign = invitePermission.value;
+
   // Add to pending invites
   pendingInvites.value.push({
-    email: inviteEmail.value,
-    role: invitePermission.value
+    email: emailToInvite,
+    role: roleToAssign
   });
 
   // If in edit mode, send invitation immediately
   if (isEditMode.value && editProjectId.value) {
-    await sendInvitationNow(inviteEmail.value, invitePermission.value);
+    await sendInvitationNow(emailToInvite, roleToAssign);
+  } else {
+    // Show confirmation for new projects
+    alert(`✅ ${emailToInvite} will be invited when you create the project`);
   }
 
   inviteEmail.value = '';
@@ -1324,17 +1286,23 @@ const sendInvitationNow = async (email, role) => {
     
     if (data.success) {
       console.log('✅ Invitation sent to:', email);
+      alert(`✅ Invitation email sent successfully to ${email}!\n\nThey will receive an email with a link to join the project.`);
       await loadProjectData();
     } else {
       console.error('❌ Failed to send invitation:', data.message);
+      alert(`❌ Failed to send invitation: ${data.message}`);
     }
   } catch (error) {
     console.error('❌ Error sending invitation:', error);
+    alert(`❌ Error sending invitation. Please try again.`);
   }
 };
 
 const sendAllPendingInvites = async (projectId) => {
   console.log('📧 Sending pending invites for project:', projectId);
+  
+  let successCount = 0;
+  let failCount = 0;
   
   for (const invite of pendingInvites.value) {
     try {
@@ -1358,14 +1326,30 @@ const sendAllPendingInvites = async (projectId) => {
       
       if (data.success) {
         console.log('✅ Invitation sent to:', invite.email);
+        successCount++;
       } else {
         console.error('❌ Failed to send invitation to:', invite.email, data.message);
+        failCount++;
       }
     } catch (error) {
       console.error('❌ Error sending invitation to:', invite.email, error);
+      failCount++;
     }
   }
   
+  // Show summary message
+  if (successCount > 0) {
+    const message = successCount === 1 
+      ? `✅ Invitation email sent successfully to 1 person!` 
+      : `✅ Invitation emails sent successfully to ${successCount} people!`;
+    alert(message + '\n\nThey will receive an email with a link to join the project.');
+  }
+  
+  if (failCount > 0) {
+    alert(`⚠️ Failed to send ${failCount} invitation(s). Please check the console for details.`);
+  }
+  
+  // Clear pending invites after sending
   // Clear pending invites after sending
   pendingInvites.value = [];
 };
@@ -1381,66 +1365,7 @@ const removeSkill = (skillToRemove) => {
   skills.value = skills.value.filter(skill => skill !== skillToRemove);
 };
 
-const addTeamMember = async () => {
-  if (newMemberEmail.value) {
-    try {
-      // Try to fetch real user data from backend
-      const response = await fetch(`http://localhost:3002/api/users/by-email/${newMemberEmail.value}`);
-      
-      let newMember;
-      if (response.ok) {
-        const userData = await response.json();
-        newMember = {
-          id: teamMembers.value.length + 1,
-          name: userData.name || userData.fullName || newMemberEmail.value.split('@')[0],
-          email: newMemberEmail.value,
-          profilePicture: userData.profilePicture || userData.avatar || null,
-          gender: userData.gender || 'unknown'
-        };
-      } else {
-        // If user not found, create with basic info
-        newMember = {
-          id: teamMembers.value.length + 1,
-          name: newMemberEmail.value.split('@')[0],
-          email: newMemberEmail.value,
-          profilePicture: null,
-          gender: 'unknown' // Will get random color
-        };
-      }
-      
-      teamMembers.value.push(newMember);
-      newMemberEmail.value = '';
-      showAddMemberForm.value = false;
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-      // Fallback to basic member info
-      const newMember = {
-        id: teamMembers.value.length + 1,
-        name: newMemberEmail.value.split('@')[0],
-        email: newMemberEmail.value,
-        profilePicture: null,
-        gender: 'unknown'
-      };
-      teamMembers.value.push(newMember);
-      newMemberEmail.value = '';
-      showAddMemberForm.value = false;
-    }
-  }
-};
-
-const removeTeamMember = (index) => {
-  if (confirm(`Are you sure you want to remove ${teamMembers.value[index].name} from the team?`)) {
-    const removedMember = teamMembers.value[index];
-    teamMembers.value.splice(index, 1);
-    
-    // If the removed member was the team lead, clear the team lead
-    if (teamLead.value === removedMember.name) {
-      teamLead.value = '';
-    }
-    
-    console.log(`Team member at index ${index} removed`);
-  }
-};
+// Removed unused addTeamMember and removeTeamMember functions
 
 // Add team lead to team members if not already present
 const ensureTeamLeadInMembers = () => {

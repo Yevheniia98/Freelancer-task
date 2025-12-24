@@ -434,7 +434,6 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { clientService } from '../../services/crmService.js'
 
 // Data

@@ -46,11 +46,21 @@ export class ProjectApiService {
       console.error('Error status:', error.response?.status);
       console.error('Request data:', projectData);
       
+      // Check if this is a network error
+      if (!error.response) {
+        throw new Error('Cannot connect to server. Please ensure the backend server is running on port 3002.');
+      }
+      
       // Extract detailed error information
       const errorData = error.response?.data;
       let errorMessage = 'Failed to create project';
       
-      if (errorData?.message) {
+      // Handle authentication errors
+      if (error.response?.status === 401) {
+        errorMessage = 'Authentication required. Please log in again.';
+      } else if (error.response?.status === 403) {
+        errorMessage = 'Permission denied. You do not have access to create projects.';
+      } else if (errorData?.message) {
         errorMessage = errorData.message;
       }
       

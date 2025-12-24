@@ -2,6 +2,7 @@ import express from 'express';
 import { body } from 'express-validator';
 import { AuthController } from '../controllers/auth.controller';
 import { validateRequest } from '../middleware/validator.middleware';
+import { authMiddleware } from '../middleware/auth.middleware';
 
 const router = express.Router();
 const authController = new AuthController();
@@ -86,5 +87,6 @@ router.post('/login', loginValidation, validateRequest, authController.login);
 router.post('/validate-password', passwordValidation, validateRequest, authController.validatePassword);
 router.post('/forgot-password', forgotPasswordValidation, validateRequest, authController.forgotPassword);
 router.post('/reset-password', resetPasswordValidation, validateRequest, authController.resetPassword);
+router.get('/me', authMiddleware, authController.getCurrentUser);
 
 export default router;

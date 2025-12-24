@@ -251,11 +251,12 @@ export class ProjectInviteController {
       res.json({
         success: true,
         message: 'Successfully joined project',
-        data: {
-          projectId: project.id,
-          projectName: project.title,
-          role: invite.role
-        }
+        project: {
+          id: project.id,
+          name: project.title,
+          title: project.title
+        },
+        role: invite.role
       });
     } catch (error: any) {
       console.error('Accept invite error:', error);
@@ -267,7 +268,7 @@ export class ProjectInviteController {
   };
 
   /**
-   * Send invite email
+   * Send invite email - Concise and professional
    */
   private async sendInviteEmail(
     email: string,
@@ -276,56 +277,110 @@ export class ProjectInviteController {
     role: string,
     inviteLink: string
   ): Promise<void> {
-    const roleText = role === 'edit' ? 'edit' : 'view';
+    const roleText = role === 'edit' ? 'Can edit' : 'Can view';
     
     const html = `
 <!DOCTYPE html>
 <html>
 <head>
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0; text-align: center; }
-    .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
-    .button { display: inline-block; background: #667eea; color: white; padding: 14px 30px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 20px 0; }
-    .role-badge { display: inline-block; background: #10b981; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; text-transform: uppercase; }
-    .footer { text-align: center; color: #6b7280; font-size: 14px; margin-top: 30px; }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${inviterName} invited you to ${projectName}</title>
 </head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1 style="margin: 0;">🎉 You're Invited!</h1>
-    </div>
-    <div class="content">
-      <p><strong>${inviterName}</strong> has invited you to collaborate on:</p>
-      <h2 style="color: #667eea; margin: 10px 0;">${projectName}</h2>
-      <p>You'll have <span class="role-badge">${roleText}</span> access to this project.</p>
-      
-      <p><strong>What you can do:</strong></p>
-      <ul>
-        ${role === 'edit' ? '<li>✅ View and edit project</li><li>✅ Add comments and files</li><li>✅ Collaborate with team</li>' : '<li>✅ View project</li><li>✅ Add comments</li><li>❌ Cannot edit</li>'}
-      </ul>
-      
-      <div style="text-align: center;">
-        <a href="${inviteLink}" class="button">Accept Invitation</a>
-      </div>
-      
-      <p style="font-size: 14px; color: #6b7280; margin-top: 20px;">
-        This invitation expires in 7 days. If you don't have an account, you'll be asked to create one.
-      </p>
-    </div>
-    <div class="footer">
-      <p>Freelancer Task Manager • Professional Project Collaboration</p>
-    </div>
-  </div>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif; background-color: #f5f5f5;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+          
+          <!-- Logo/Header -->
+          <tr>
+            <td style="padding: 40px 40px 32px 40px;">
+              <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #064E47 0%, #0D7C66 100%); border-radius: 8px; display: inline-block; text-align: center; line-height: 48px; margin-bottom: 24px;">
+                <span style="color: #ffffff; font-size: 24px; font-weight: bold;">F</span>
+              </div>
+              <h1 style="color: #1a1a1a; margin: 0; font-size: 28px; font-weight: 600; line-height: 1.3;">
+                You're invited to collaborate
+              </h1>
+            </td>
+          </tr>
+
+          <!-- Main Content -->
+          <tr>
+            <td style="padding: 0 40px 32px 40px;">
+              <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0;">
+                <strong>${inviterName}</strong> has invited you to join <strong>"${projectName}"</strong> with <span style="color: #0D7C66; font-weight: 600;">${roleText}</span> access.
+              </p>
+
+              <!-- Project Card -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 24px;">
+                <tr>
+                  <td style="padding: 20px;">
+                    <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                      <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #064E47 0%, #0D7C66 100%); border-radius: 50%; display: inline-block; text-align: center; line-height: 40px; margin-right: 12px; vertical-align: middle;">
+                        <span style="color: #ffffff; font-size: 18px; font-weight: 600;">${inviterName.charAt(0).toUpperCase()}</span>
+                      </div>
+                      <div style="display: inline-block; vertical-align: middle;">
+                        <div style="color: #1a1a1a; font-size: 16px; font-weight: 600; margin-bottom: 2px;">${projectName}</div>
+                        <div style="color: #6b7280; font-size: 14px;">From ${inviterName}</div>
+                      </div>
+                    </div>
+                    <div style="background-color: #dbeafe; color: #1e40af; padding: 8px 14px; border-radius: 6px; display: inline-block; font-size: 13px; font-weight: 500;">
+                      🔑 ${roleText}
+                    </div>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="color: #6b7280; font-size: 15px; line-height: 1.6; margin: 0 0 28px 0;">
+                Click below to accept the invitation and start collaborating. This link expires in 7 days.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Accept Button -->
+          <tr>
+            <td style="padding: 0 40px 40px 40px;">
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center">
+                    <a href="${inviteLink}" style="display: inline-block; background-color: #0D7C66; color: #ffffff; text-decoration: none; padding: 16px 56px; border-radius: 8px; font-size: 16px; font-weight: 600; text-align: center;">
+                      Accept Invitation
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              
+              <p style="color: #9ca3af; font-size: 13px; line-height: 1.5; margin: 20px 0 0 0; text-align: center;">
+                Or copy this link: <br>
+                <span style="color: #0D7C66; word-break: break-all;">${inviteLink}</span>
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 24px 40px; background-color: #f9fafb; border-top: 1px solid #e5e7eb;">
+              <p style="color: #9ca3af; font-size: 13px; line-height: 1.6; margin: 0; text-align: center;">
+                If you didn't expect this invitation, you can safely ignore this email.
+              </p>
+              <p style="color: #d1d5db; font-size: 12px; margin: 12px 0 0 0; text-align: center;">
+                © ${new Date().getFullYear()} Freelancer Task Manager
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>
     `;
 
     await this.emailService.sendEmail({
       to: email,
-      subject: `${inviterName} invited you to "${projectName}"`,
+      subject: `${inviterName} invited you to join ${projectName}`,
       html
     });
 

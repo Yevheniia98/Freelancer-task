@@ -33,7 +33,15 @@ export class ProjectController {
     try {
       if (this.handleValidationErrors(req, res)) return;
 
-      const currentUserId = (req as any).user.id;
+      const currentUserId = (req as any).user?._id?.toString() || (req as any).user?.id;
+      
+      if (!currentUserId) {
+        res.status(401).json({
+          success: false,
+          message: 'User not authenticated'
+        });
+        return;
+      }
 
       const createProjectDto: CreateProjectDto = {
         title: req.body.title,
@@ -51,8 +59,8 @@ export class ProjectController {
 
       const project = await this.projectService.create(createProjectDto);
       
-      // Set project owner
-      project.projectOwner = currentUserId;
+      // Set project owner - convert string back to ObjectId
+      project.projectOwner = currentUserId as any;
       await project.save();
 
       res.status(201).json({
@@ -62,7 +70,7 @@ export class ProjectController {
       });
     } catch (error: any) {
       console.error('Create project error:', error);
-      res.status(400).json({
+      res.status(500).json({
         success: false,
         message: error.message || 'Failed to create project'
       });

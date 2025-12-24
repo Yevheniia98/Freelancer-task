@@ -36,7 +36,11 @@ import testEmailRoutes from './routes/test-email.routes';
 import teamManagementRoutes from './routes/team-management.routes';
 import notificationRoutes from './routes/notification.routes';
 import inviteRoutes from './routes/invite.routes';
+import chatRoutes from './routes/project-chat.routes';
 // import financialRoutes from './routes/financial.routes';
+
+// Import services
+import { SocketService } from './services/socket.service';
 
 // Import middleware
 import { errorHandler } from './middleware/error.middleware';
@@ -47,12 +51,9 @@ import { csrfTokenGenerator, getCsrfToken } from './middleware/csrf-protection.m
 // Create Express app
 const app = express();
 const server = createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
-    methods: ["GET", "POST"]
-  }
-});
+
+// Initialize Socket.IO service for real-time chat (creates its own Socket.IO server)
+const socketService = new SocketService(server);
 
 const PORT = process.env.PORT || 5000;
 
@@ -192,6 +193,7 @@ app.use('/api/meeting-invitations', meetingInvitationRoutes);
 app.use('/api/test-email', testEmailRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api', inviteRoutes);
+app.use('/api', chatRoutes);
 // app.use('/api/financial', financialRoutes);
 
 // Team Invitation Email Endpoint
@@ -311,29 +313,8 @@ app.post('/upload', (req, res) => {
   });
 });
 
-// Socket.io for real-time features
-io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
-
-  // Join project rooms for real-time updates
-  socket.on('join-project', (projectId) => {
-    socket.join(`project-${projectId}`);
-  });
-
-  // Handle team chat
-  socket.on('send-message', (data) => {
-    socket.to(`project-${data.projectId}`).emit('new-message', data);
-  });
-
-  // Handle task updates
-  socket.on('task-update', (data) => {
-    socket.to(`project-${data.projectId}`).emit('task-updated', data);
-  });
-
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
-  });
-});
+// Socket.IO is initialized via SocketService (see line ~58)
+// All real-time features are handled there
 
 // Error handling middleware (must be last)
 app.use(notFound);

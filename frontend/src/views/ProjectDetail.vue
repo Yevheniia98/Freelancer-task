@@ -728,6 +728,11 @@
             </div>
           </div>
 
+          <!-- Project Chat Section -->
+          <div class="tool-section">
+            <ProjectChat :project-id="project._id" />
+          </div>
+
           <!-- Project Files Section -->
           <div
             v-if="project.files && project.files.length > 0"
@@ -878,6 +883,7 @@ import { useRoute, useRouter } from 'vue-router';
 import LeftMenu from '@/dashboard/LeftMenu.vue';
 import SearchBar from '@/dashboard/SearchBar.vue';
 import ShareProjectDialog from '@/components/ShareProjectDialog.vue';
+import ProjectChat from '@/components/ProjectChat.vue';
 import { ProjectApiService } from '@/services/projectApi.service.js';
 
 const route = useRoute();
@@ -892,6 +898,7 @@ const snackbar = ref(false);
 const snackbarText = ref('');
 const snackbarColor = ref('success');
 const snackbarIcon = ref('mdi-check');
+// eslint-disable-next-line no-unused-vars
 const showAddMemberDialog = ref(false);
 
 // Computed property for project thumbnail

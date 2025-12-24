@@ -449,4 +449,39 @@ export class AuthController {
       });
     }
   };
+
+  /**
+   * Get current authenticated user
+   */
+  public getCurrentUser = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const user = (req as any).user;
+      
+      if (!user) {
+        res.status(401).json({
+          success: false,
+          message: 'Not authenticated'
+        });
+        return;
+      }
+
+      res.status(200).json({
+        success: true,
+        user: {
+          id: user._id,
+          email: user.email,
+          name: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.email.split('@')[0],
+          firstName: user.firstName,
+          lastName: user.lastName,
+          username: user.username || user.email.split('@')[0]
+        }
+      });
+    } catch (error: any) {
+      console.error('Get current user error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'An error occurred while fetching user data'
+      });
+    }
+  };
 }

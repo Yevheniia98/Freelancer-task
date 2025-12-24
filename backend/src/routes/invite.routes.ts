@@ -6,7 +6,14 @@ import { requireOwner } from '../middleware/permissions.middleware';
 const router = Router();
 const inviteController = new ProjectInviteController();
 
-// Create invite (owner only)
+// Send invitation (simpler endpoint for frontend)
+router.post(
+  '/invites/send',
+  authMiddleware,
+  inviteController.createInvite
+);
+
+// Create invite (owner only) - original endpoint
 router.post(
   '/projects/:id/invite',
   authMiddleware,
@@ -16,7 +23,7 @@ router.post(
 
 // Accept invite (authenticated user)
 router.get(
-  '/invite/accept',
+  '/invites/accept',
   authMiddleware,
   inviteController.acceptInvite
 );
