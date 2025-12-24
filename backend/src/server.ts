@@ -90,8 +90,12 @@ if (!fs.existsSync(uploadsDir)) {
   console.log('📁 Created uploads directory at:', uploadsDir);
 }
 
-// Static file serving for uploads
-app.use('/uploads', express.static(uploadsDir));
+// Static file serving for uploads with CORS headers
+app.use('/uploads', (req, res, next) => {
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  next();
+}, express.static(uploadsDir));
 
 // Multer configuration for file uploads
 const storage = multer.diskStorage({

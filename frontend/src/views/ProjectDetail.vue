@@ -729,7 +729,7 @@
           </div>
 
           <!-- Project Chat Section -->
-          <div class="tool-section">
+          <div v-if="project._id" class="tool-section">
             <ProjectChat :project-id="project._id" />
           </div>
 
