@@ -416,6 +416,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { authAPI } from '@/services/api.js'
+import axios from 'axios'
 import LeftMenu from '@/dashboard/LeftMenu.vue'
 import SearchBar from '@/dashboard/SearchBar.vue'
 
@@ -535,55 +536,57 @@ const deleteAccount = async () => {
 
   deletingAccount.value = true
   try {
-    // Simulate account deletion process
-    await new Promise(resolve => setTimeout(resolve, 3000))
-    
-    // Implement account deletion logic here
-    console.log('Deleting account...')
-    
-    // Example deletion implementation:
-    // 1. Verify password with backend
-    // const passwordValid = await api.verifyPassword(confirmPassword.value)
-    // if (!passwordValid) {
-    //   throw new Error('Invalid password')
-    // }
-    
-    // 2. Send deletion request to backend
-    // await api.deleteAccount({
-    //   password: confirmPassword.value,
-    //   confirmation: deleteConfirmation.value
-    // })
-    
-    // 3. Clear all local data
-    localStorage.clear()
-    sessionStorage.clear()
-    
-    // 4. Clear any cached data (if using service workers, etc.)
-    if ('caches' in window) {
-      caches.keys().then(names => {
-        names.forEach(name => {
-          caches.delete(name)
-        })
-      })
+    // Get auth token
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      showSnackbar('Not authenticated. Please login again.', 'error');
+      router.push('/login');
+      return;
     }
-    
-    // 5. Show success message
-    showSnackbar('Your account has been successfully deleted. You will be redirected shortly.', 'success')
-    
-    // 6. Navigate to a goodbye page or login after a delay
-    setTimeout(() => {
-      router.push({ name: 'AccountDeleted' }) // or Login
-    }, 2000)
-    
+
+    // Call API to delete account
+    const response = await axios.delete('http://localhost:3002/api/auth/account', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      data: {
+        password: confirmPassword.value
+      }
+    });
+
+    if (response.data.success) {
+      // Clear all local data
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Clear any cached data (if using service workers, etc.)
+      if ('caches' in window) {
+        caches.keys().then(names => {
+          names.forEach(name => {
+            caches.delete(name);
+          });
+        });
+      }
+      
+      // Show success message
+      showSnackbar('Your account has been successfully deleted. You will be redirected shortly.', 'success');
+      
+      // Navigate to login after a delay
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 2000);
+    }
   } catch (error) {
-    console.error('Account deletion error:', error)
-    if (error.message === 'Invalid password') {
-      showSnackbar('Invalid password. Please try again.', 'error')
+    console.error('Account deletion error:', error);
+    if (error.response?.data?.message) {
+      showSnackbar(error.response.data.message, 'error');
+    } else if (error.response?.status === 401) {
+      showSnackbar('Invalid password. Please try again.', 'error');
     } else {
-      showSnackbar('Error deleting account. Please try again or contact support.', 'error')
+      showSnackbar('Error deleting account. Please try again or contact support.', 'error');
     }
   } finally {
-    deletingAccount.value = false
+    deletingAccount.value = false;
   }
 }
 

@@ -90,6 +90,9 @@ export class AuthService {
     password: string;
     firstName: string;
     lastName: string;
+    fullName?: string;
+    phoneNumber?: string;
+    country?: string;
   }) {
     try {
       // Check if user already exists in database
@@ -108,6 +111,9 @@ export class AuthService {
         password: hashedPassword,
         firstName: userData.firstName,
         lastName: userData.lastName,
+        fullName: userData.fullName,
+        phoneNumber: userData.phoneNumber,
+        country: userData.country,
         twoFactorEnabled: false
       });
 
@@ -134,6 +140,9 @@ export class AuthService {
           email: savedUser.email,
           firstName: savedUser.firstName,
           lastName: savedUser.lastName,
+          fullName: savedUser.fullName,
+          phoneNumber: savedUser.phoneNumber,
+          country: savedUser.country,
           twoFactorEnabled: savedUser.twoFactorEnabled
         }
       };

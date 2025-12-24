@@ -257,8 +257,12 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import axios from 'axios'
 import LeftMenu from '@/dashboard/LeftMenu.vue'
 import SearchBar from '@/dashboard/SearchBar.vue'
+
+// API base URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002/api'
 
 // Get router and route
 const router = useRouter()
@@ -378,20 +382,42 @@ const removeProfilePicture = () => {
 const saveProfile = async () => {
   saving.value = true
   try {
-    // Update localStorage with new user data
-    const existingUserData = localStorage.getItem('user_data');
-    if (existingUserData) {
-      const userData = JSON.parse(existingUserData);
-      // Update user data with form data and profile image
-      const updatedUserData = {
-        ...userData,
-        fullName: formData.value.fullName,
-        email: formData.value.email,
-        phoneNumber: formData.value.phoneNumber,
-        country: formData.value.country,
-        profileImage: profileImage.value
-      };
-      localStorage.setItem('user_data', JSON.stringify(updatedUserData));
+    // Call API to update profile
+    const token = localStorage.getItem('token');
+    const response = await axios.put('http://localhost:3002/api/auth/profile', {
+      fullName: formData.value.fullName,
+      phoneNumber: formData.value.phoneNumber,
+      country: formData.value.country,
+      profileImage: profileImage.value
+    }, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (response.data.success) {
+      // Update localStorage with new user data
+      const existingUserData = localStorage.getItem('user_data');
+      if (existingUserData) {
+        const userData = JSON.parse(existingUserData);
+        // Update user data with form data and profile image
+        const updatedUserData = {
+          ...userData,
+          fullName: formData.value.fullName,
+          email: formData.value.email,
+          phoneNumber: formData.value.phoneNumber,
+          country: formData.value.country,
+          profileImage: profileImage.value
+        };
+        localStorage.setItem('user_data', JSON.stringify(updatedUserData));
+      } else {
+        // Create new user data if none exists
+        const newUserData = {
+          ...formData.value,
+          profileImage: profileImage.value
+        };
+        localStorage.setItem('user_data', JSON.stringify(newUserData));
+      }
       
       // Dispatch events for real-time updates across the app
       window.dispatchEvent(new CustomEvent('userNameUpdated', {
@@ -405,38 +431,17 @@ const saveProfile = async () => {
         detail: { profileImage: profileImage.value }
       }));
       
-    } else {
-      // Create new user data if none exists
-      const newUserData = {
-        ...formData.value,
-        profileImage: profileImage.value
-      };
-      localStorage.setItem('user_data', JSON.stringify(newUserData));
-      
-      // Dispatch events for new user data
-      window.dispatchEvent(new CustomEvent('userNameUpdated', {
-        detail: { 
-          fullName: formData.value.fullName,
-          name: formData.value.fullName
-        }
-      }));
-      
-      window.dispatchEvent(new CustomEvent('profileImageUpdated', {
-        detail: { profileImage: profileImage.value }
-      }));
+      console.log('Profile saved successfully:', formData.value);
+      snackbar.value = true;
+      setTimeout(() => {
+        snackbar.value = false;
+      }, 3000);
     }
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    console.log('Profile saved successfully:', formData.value)
-    snackbar.value = true
-    setTimeout(() => {
-      snackbar.value = false
-    }, 3000)
   } catch (error) {
-    console.error('Error saving profile:', error)
+    console.error('Error saving profile:', error);
+    alert('Failed to save profile. Please try again.');
   } finally {
-    saving.value = false
+    saving.value = false;
   }
 }
 
@@ -453,40 +458,73 @@ watch(
 )
 
 // Initialize from current route
-onMounted(() => {
+onMounted(async () => {
   const pathSegment = route.path.split('/').pop()
   if (pathSegment && ['profile', 'password1', 'notifications', 'data-export', 'log-out'].includes(pathSegment)) {
     tab.value = pathSegment
   }
   
-  // Load user data from localStorage
-  let userData = localStorage.getItem('user_data');
-  
-  // If no user_data but preserved data exists (user logged out and back in)
-  if (!userData) {
-    const preservedData = localStorage.getItem('user_data_preserved');
-    if (preservedData) {
-      userData = preservedData;
-      // Restore it to user_data for consistency
-      localStorage.setItem('user_data', preservedData);
-      localStorage.removeItem('user_data_preserved');
+  // Fetch user data from API
+  try {
+    const authToken = localStorage.getItem('auth_token');
+    if (authToken) {
+      const response = await axios.get(`${API_BASE_URL}/auth/me`, {
+        headers: {
+          'Authorization': `Bearer ${authToken}`
+        }
+      });
+      
+      if (response.data.success && response.data.user) {
+        const user = response.data.user;
+        
+        // Update form data with API response
+        formData.value = {
+          fullName: user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim() || '',
+          email: user.email || '',
+          phoneNumber: user.phoneNumber || '',
+          country: user.country || ''
+        };
+        
+        // Set profile image if exists
+        if (user.profileImage) {
+          profileImage.value = user.profileImage;
+        }
+        
+        // Update localStorage with fresh data
+        localStorage.setItem('user_data', JSON.stringify({
+          ...user,
+          fullName: formData.value.fullName
+        }));
+      }
     }
-  }
-  
-  if (userData) {
-    const parsedData = JSON.parse(userData);
+  } catch (error) {
+    console.error('Error fetching user data:', error);
     
-    // Set form data
-    formData.value = {
-      fullName: parsedData.fullName || '',
-      email: parsedData.email || '',
-      phoneNumber: parsedData.phoneNumber || '',
-      country: parsedData.country || ''
-    };
+    // Fallback to localStorage if API fails
+    let userData = localStorage.getItem('user_data');
     
-    // Set profile image - preserved across logout/login
-    if (parsedData.profileImage) {
-      profileImage.value = parsedData.profileImage;
+    if (!userData) {
+      const preservedData = localStorage.getItem('user_data_preserved');
+      if (preservedData) {
+        userData = preservedData;
+        localStorage.setItem('user_data', preservedData);
+        localStorage.removeItem('user_data_preserved');
+      }
+    }
+    
+    if (userData) {
+      const parsedData = JSON.parse(userData);
+      
+      formData.value = {
+        fullName: parsedData.fullName || '',
+        email: parsedData.email || '',
+        phoneNumber: parsedData.phoneNumber || '',
+        country: parsedData.country || ''
+      };
+      
+      if (parsedData.profileImage) {
+        profileImage.value = parsedData.profileImage;
+      }
     }
   }
 })

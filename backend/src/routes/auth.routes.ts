@@ -81,6 +81,33 @@ const resetPasswordValidation = [
     .withMessage('New password must be at least 8 characters long')
 ];
 
+const updateProfileValidation = [
+  body('fullName')
+    .optional()
+    .isString()
+    .withMessage('Full name must be a string'),
+  body('phoneNumber')
+    .optional()
+    .isString()
+    .withMessage('Phone number must be a string'),
+  body('country')
+    .optional()
+    .isString()
+    .withMessage('Country must be a string'),
+  body('profileImage')
+    .optional()
+    .isString()
+    .withMessage('Profile image must be a string')
+];
+
+const deleteAccountValidation = [
+  body('password')
+    .notEmpty()
+    .withMessage('Password is required')
+    .isString()
+    .withMessage('Password must be a string')
+];
+
 // Routes
 router.post('/register', registerValidation, validateRequest, authController.register);
 router.post('/login', loginValidation, validateRequest, authController.login);
@@ -88,5 +115,7 @@ router.post('/validate-password', passwordValidation, validateRequest, authContr
 router.post('/forgot-password', forgotPasswordValidation, validateRequest, authController.forgotPassword);
 router.post('/reset-password', resetPasswordValidation, validateRequest, authController.resetPassword);
 router.get('/me', authMiddleware, authController.getCurrentUser);
+router.put('/profile', authMiddleware, updateProfileValidation, validateRequest, authController.updateProfile);
+router.delete('/account', authMiddleware, deleteAccountValidation, validateRequest, authController.deleteAccount);
 
 export default router;

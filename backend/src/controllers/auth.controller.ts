@@ -18,7 +18,7 @@ export class AuthController {
 
   public register = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { fullName, email, password, confirmPassword } = req.body;
+      const { fullName, email, password, confirmPassword, phoneNumber, country } = req.body;
 
       // Input validation
       if (!fullName || !email || !password || !confirmPassword) {
@@ -102,7 +102,10 @@ export class AuthController {
         email: email.toLowerCase(),
         password,
         firstName,
-        lastName
+        lastName,
+        fullName,
+        phoneNumber,
+        country
       });
 
       // Log successful registration
@@ -473,7 +476,11 @@ export class AuthController {
           name: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.email.split('@')[0],
           firstName: user.firstName,
           lastName: user.lastName,
-          username: user.username || user.email.split('@')[0]
+          fullName: user.fullName,
+          username: user.username || user.email.split('@')[0],
+          phoneNumber: user.phoneNumber,
+          country: user.country,
+          profileImage: user.profileImage
         }
       });
     } catch (error: any) {
@@ -481,6 +488,126 @@ export class AuthController {
       res.status(500).json({
         success: false,
         message: 'An error occurred while fetching user data'
+      });
+    }
+  };
+
+  /**
+   * Update user profile
+   */
+  public updateProfile = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const userId = (req as any).user?._id;
+      const { fullName, phoneNumber, country, profileImage } = req.body;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          message: 'Not authenticated'
+        });
+        return;
+      }
+
+      // Update user in database
+      const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        {
+          fullName,
+          phoneNumber,
+          country,
+          profileImage
+        },
+        { new: true, runValidators: true }
+      );
+
+      if (!updatedUser) {
+        res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
+        return;
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'Profile updated successfully',
+        user: {
+          id: updatedUser._id,
+          email: updatedUser.email,
+          fullName: updatedUser.fullName,
+          phoneNumber: updatedUser.phoneNumber,
+          country: updatedUser.country,
+          profileImage: updatedUser.profileImage
+        }
+      });
+    } catch (error: any) {
+      console.error('Update profile error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'An error occurred while updating profile'
+      });
+    }
+  };
+
+  /**
+   * Delete user account
+   */
+  public deleteAccount = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const userId = (req as any).user?._id;
+      const { password } = req.body;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          message: 'Not authenticated'
+        });
+        return;
+      }
+
+      if (!password) {
+        res.status(400).json({
+          success: false,
+          message: 'Password is required to delete account'
+        });
+        return;
+      }
+
+      // Find user with password field
+      const user = await User.findById(userId).select('+password');
+      if (!user) {
+        res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
+        return;
+      }
+
+      // Verify password
+      const bcrypt = require('bcrypt');
+      const isValidPassword = await bcrypt.compare(password, user.password);
+      if (!isValidPassword) {
+        res.status(401).json({
+          success: false,
+          message: 'Invalid password'
+        });
+        return;
+      }
+
+      // Delete user account
+      await User.findByIdAndDelete(userId);
+
+      console.log('Account deleted successfully:', user.email);
+
+      res.status(200).json({
+        success: true,
+        message: 'Account deleted successfully'
+      });
+    } catch (error: any) {
+      console.error('Delete account error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'An error occurred while deleting account'
       });
     }
   };
