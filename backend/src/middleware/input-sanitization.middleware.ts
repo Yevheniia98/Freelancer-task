@@ -55,6 +55,18 @@ const SUSPICIOUS_KEYWORDS = [
   'Function', 'setTimeout', 'setInterval'
 ];
 
+// Fields that are allowed to contain base64 data or other special characters
+const WHITELISTED_FIELDS = [
+  'profileImage',
+  'image',
+  'avatar',
+  'photo',
+  'file',
+  'fileUrl',
+  'imageUrl',
+  'thumbnail'
+];
+
 interface SanitizationResult {
   isSafe: boolean;
   threats: string[];
@@ -133,6 +145,12 @@ function sanitizeObject(obj: any, maxDepth = 10, currentDepth = 0): Sanitization
           allThreats.push(...keyThreats.map(t => `In key "${key}": ${t}`));
           continue; // Skip this key-value pair
         }
+      }
+      
+      // Skip whitelisted fields (e.g., profileImage with base64 data)
+      if (WHITELISTED_FIELDS.includes(key)) {
+        sanitized[key] = value;
+        continue;
       }
       
       // Sanitize value based on type

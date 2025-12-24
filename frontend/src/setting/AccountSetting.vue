@@ -383,7 +383,7 @@ const saveProfile = async () => {
   saving.value = true
   try {
     // Call API to update profile
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('auth_token');
     const response = await axios.put('http://localhost:3002/api/auth/profile', {
       fullName: formData.value.fullName,
       phoneNumber: formData.value.phoneNumber,

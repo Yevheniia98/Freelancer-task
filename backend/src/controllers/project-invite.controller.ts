@@ -148,7 +148,7 @@ export class ProjectInviteController {
   acceptInvite = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const { token } = req.query;
-      const userId = req.user?.id;
+      const userId = (req.user as any)?._id || req.user?.id;
 
       if (!token) {
         res.status(400).json({
