@@ -90,6 +90,9 @@ class AuthService {
                 password: hashedPassword,
                 firstName: userData.firstName,
                 lastName: userData.lastName,
+                fullName: userData.fullName,
+                phoneNumber: userData.phoneNumber,
+                country: userData.country,
                 twoFactorEnabled: false
             });
             const savedUser = await newUser.save();
@@ -113,6 +116,9 @@ class AuthService {
                     email: savedUser.email,
                     firstName: savedUser.firstName,
                     lastName: savedUser.lastName,
+                    fullName: savedUser.fullName,
+                    phoneNumber: savedUser.phoneNumber,
+                    country: savedUser.country,
                     twoFactorEnabled: savedUser.twoFactorEnabled
                 }
             };

@@ -6,10 +6,10 @@ class FinancialService {
    */
   async getFinancialSummary() {
     try {
-      const response = await api.get('/api/finance/summary');
+      const response = await api.get('/finance/summary');
       return response.data;
     } catch (error) {
-      console.error('Failed to fetch financial summary:', error);
+      // Silently throw - component layer handles error logging via logControl
       throw error;
     }
   }
@@ -19,10 +19,10 @@ class FinancialService {
    */
   async syncAllPlatforms() {
     try {
-      const response = await api.post('/api/finance/sync');
+      const response = await api.post('/finance/sync');
       return response.data;
     } catch (error) {
-      console.error('Failed to sync platforms:', error);
+      // Silently throw - component layer handles error logging
       throw error;
     }
   }
@@ -32,10 +32,10 @@ class FinancialService {
    */
   async syncPlatform(platform) {
     try {
-      const response = await api.post(`/api/finance/sync/${platform}`);
+      const response = await api.post(`/finance/sync/${platform}`);
       return response.data;
     } catch (error) {
-      console.error(`Failed to sync ${platform}:`, error);
+      // Silently throw - component layer handles error logging
       throw error;
     }
   }
@@ -45,10 +45,10 @@ class FinancialService {
    */
   async getConnectedPlatforms() {
     try {
-      const response = await api.get('/api/finance/platforms');
+      const response = await api.get('/finance/platforms');
       return response.data;
     } catch (error) {
-      console.error('Failed to fetch connected platforms:', error);
+      // Silently throw - component layer handles error logging
       throw error;
     }
   }
@@ -58,10 +58,10 @@ class FinancialService {
    */
   async connectPlatform(platform) {
     try {
-      const response = await api.get(`/api/finance/oauth/${platform}/authorize`);
+      const response = await api.get(`/finance/oauth/${platform}/authorize`);
       return response.data.authUrl;
     } catch (error) {
-      console.error(`Error connecting to ${platform}:`, error);
+      // Silently throw - component layer handles error logging
       throw error;
     }
   }
@@ -71,10 +71,10 @@ class FinancialService {
    */
   async disconnectPlatform(platform) {
     try {
-      const response = await api.delete(`/api/finance/platforms/${platform}`);
+      const response = await api.delete(`/finance/platforms/${platform}`);
       return response.data;
     } catch (error) {
-      console.error(`Error disconnecting ${platform}:`, error);
+      // Silently throw - component layer handles error logging
       throw error;
     }
   }

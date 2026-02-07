@@ -19,7 +19,17 @@ export class ProjectInviteController {
   createInvite = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const { projectId, email, role } = req.body;
-      const userId = req.user?.id;
+      const userId = req.user?.id || (req.user as any)?._id?.toString();
+
+      console.log('🔍 Create invite request:', { projectId, email, role, userId });
+
+      if (!projectId) {
+        res.status(400).json({
+          success: false,
+          message: 'Project ID is required'
+        });
+        return;
+      }
 
       if (!email || !role) {
         res.status(400).json({
@@ -39,9 +49,27 @@ export class ProjectInviteController {
 
       const project = await ProjectEntity.findById(projectId);
       if (!project) {
+        console.error('❌ Project not found:', projectId);
         res.status(404).json({
           success: false,
           message: 'Project not found'
+        });
+        return;
+      }
+
+      console.log('📋 Project found:', { title: project.title, owner: project.projectOwner });
+
+      // Check if user has permission to invite (OWNER only)
+      const { getUserRoleInProject, canShareProject } = await import('../utils/rbac.util');
+      const userRole = getUserRoleInProject(project, userId);
+
+      console.log('👤 User role check:', { userId, userRole, canShare: canShareProject(userRole) });
+
+      if (!canShareProject(userRole)) {
+        console.error('❌ Permission denied for user:', userId);
+        res.status(403).json({
+          success: false,
+          message: 'Access denied. Only the project owner can invite team members.'
         });
         return;
       }

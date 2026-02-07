@@ -176,10 +176,16 @@ export class ProjectController {
         return;
       }
 
+      // Get user's role in this project
+      const currentUserId = (req as any).user?._id?.toString() || (req as any).user?.id;
+      const { getUserRoleInProject } = await import('../utils/rbac.util');
+      const userRole = getUserRoleInProject(project, currentUserId);
+
       res.json({
         success: true,
         message: 'Project retrieved successfully',
-        data: project
+        data: project,
+        userRole: userRole // Include user's role
       });
     } catch (error: any) {
       console.error('Get project error:', error);
@@ -196,6 +202,29 @@ export class ProjectController {
   update = async (req: Request, res: Response): Promise<void> => {
     try {
       if (this.handleValidationErrors(req, res)) return;
+
+      // Check user permissions
+      const currentUserId = (req as any).user?._id?.toString() || (req as any).user?.id;
+      const project = await this.projectService.findById(req.params.id);
+
+      if (!project) {
+        res.status(404).json({
+          success: false,
+          message: 'Project not found'
+        });
+        return;
+      }
+
+      const { getUserRoleInProject, canEditProject } = await import('../utils/rbac.util');
+      const userRole = getUserRoleInProject(project, currentUserId);
+
+      if (!canEditProject(userRole)) {
+        res.status(403).json({
+          success: false,
+          message: 'Access denied. You do not have permission to edit this project.'
+        });
+        return;
+      }
 
       const updateProjectDto: UpdateProjectDto = {};
       
@@ -262,6 +291,29 @@ export class ProjectController {
   delete = async (req: Request, res: Response): Promise<void> => {
     try {
       if (this.handleValidationErrors(req, res)) return;
+
+      // Check user permissions - only OWNER can delete
+      const currentUserId = (req as any).user?._id?.toString() || (req as any).user?.id;
+      const project = await this.projectService.findById(req.params.id);
+
+      if (!project) {
+        res.status(404).json({
+          success: false,
+          message: 'Project not found'
+        });
+        return;
+      }
+
+      const { getUserRoleInProject, canDeleteProject } = await import('../utils/rbac.util');
+      const userRole = getUserRoleInProject(project, currentUserId);
+
+      if (!canDeleteProject(userRole)) {
+        res.status(403).json({
+          success: false,
+          message: 'Access denied. Only the project owner can delete this project.'
+        });
+        return;
+      }
 
       const deleted = await this.projectService.delete(req.params.id);
 

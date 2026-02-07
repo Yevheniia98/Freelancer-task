@@ -136,7 +136,7 @@
               </div>
               <div class="hero-actions">
                 <ShareProjectDialog
-                  v-if="project"
+                  v-if="project && isProjectOwner"
                   :project-id="project.id"
                   :project-name="project.title"
                   :team-members="project.teamMembers || []"
@@ -147,6 +147,7 @@
                   @permission-updated="handlePermissionUpdated"
                 />
                 <v-btn 
+                  v-if="canEdit"
                   color="white"
                   variant="elevated"
                   size="large"
@@ -160,6 +161,7 @@
                   Edit Project
                 </v-btn>
                 <v-btn 
+                  v-if="isProjectOwner"
                   color="white"
                   variant="outlined"
                   size="large"
@@ -560,7 +562,7 @@
                 </div>
 
                 <!-- Actions Card -->
-                <div class="project-card">
+                <div v-if="project && !canOnlyView" class="project-card">
                   <div class="card-header">
                     <h3 class="card-title">
                       Actions
@@ -581,6 +583,20 @@
                         Edit Project
                       </v-btn>
                       
+                      <ShareProjectDialog
+                        v-if="project && isProjectOwner"
+                        :project-id="project.id"
+                        :project-name="project.title"
+                        :team-members="project.teamMembers || []"
+                        :owner-name="currentUserName"
+                        :owner-email="currentUserEmail"
+                        @member-added="handleMemberAdded"
+                        @member-removed="handleMemberRemoved"
+                        @permission-updated="handlePermissionUpdated"
+                        block
+                        class="mb-3"
+                      />
+                      
                       <v-btn 
                         color="success" 
                         variant="outlined" 
@@ -596,6 +612,7 @@
                       </v-btn>
                       
                       <v-btn 
+                        v-if="isProjectOwner"
                         color="error" 
                         variant="outlined" 
                         block
@@ -912,10 +929,27 @@ const projectThumbnail = computed(() => {
   );
 });
 
+// User role from backend (set when project is fetched)
+const backendUserRole = ref('VIEW'); // Default to VIEW
+
 // Computed property to check if current user is project owner
 const isProjectOwner = computed(() => {
-  const currentUserId = localStorage.getItem('userId');
-  return project.value?.projectOwner === currentUserId;
+  return backendUserRole.value === 'OWNER';
+});
+
+// Computed property to get current user's role in the project (lowercase for compatibility)
+const userRole = computed(() => {
+  return backendUserRole.value.toLowerCase();
+});
+
+// Computed property to check if user can edit (owner or edit permission)
+const canEdit = computed(() => {
+  return backendUserRole.value === 'OWNER' || backendUserRole.value === 'EDIT';
+});
+
+// Computed property to check if user can only view
+const canOnlyView = computed(() => {
+  return backendUserRole.value === 'VIEW';
 });
 
 // Fetch project details
@@ -931,6 +965,12 @@ const fetchProject = async () => {
     
     const response = await ProjectApiService.getById(projectId);
     project.value = response;
+    
+    // Get user role from backend response
+    if (response.userRole) {
+      backendUserRole.value = response.userRole;
+      console.log('User role from backend:', backendUserRole.value);
+    }
     
   } catch (err) {
     console.error('Error fetching project:', err);

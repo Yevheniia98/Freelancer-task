@@ -384,6 +384,13 @@ const saveProfile = async () => {
   try {
     // Call API to update profile
     const token = localStorage.getItem('auth_token');
+    
+    if (!token) {
+      alert('You are not logged in. Please log in first.');
+      saving.value = false;
+      return;
+    }
+    
     const response = await axios.put('http://localhost:3002/api/auth/profile', {
       fullName: formData.value.fullName,
       phoneNumber: formData.value.phoneNumber,
@@ -391,8 +398,10 @@ const saveProfile = async () => {
       profileImage: profileImage.value
     }, {
       headers: {
-        'Authorization': `Bearer ${token}`
-      }
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      withCredentials: true
     });
 
     if (response.data.success) {

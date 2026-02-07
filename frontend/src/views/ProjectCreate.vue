@@ -1538,6 +1538,7 @@ const submitProject = async () => {
 .main-content {
   background: linear-gradient(135deg, #064E47 0%, #0D7C66 50%, #41B3A2 100%);
   min-height: 100vh;
+  margin-top: 72px;
 }
 
 /* Hero Section - Same as Design Tools */

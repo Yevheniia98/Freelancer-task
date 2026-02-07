@@ -601,6 +601,7 @@ export default {
 .main-content {
   background: linear-gradient(135deg, #064E47 0%, #0D7C66 50%, #41B3A2 100%);
   min-height: 100vh;
+  margin-top: 72px;
 }
 
 /* Hero Section - Same as Design Tools */
@@ -619,6 +620,11 @@ export default {
   bottom: 0;
   background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.05"><circle cx="30" cy="30" r="2"/></g></svg>');
   pointer-events: none;
+}
+
+/* Hero Container with Search Bar */
+.hero-container {
+  padding: 2rem 1.5rem !important;
 }
 
 .hero-content {

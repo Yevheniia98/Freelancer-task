@@ -325,20 +325,31 @@ class SecurityMonitor extends events_1.EventEmitter {
         await this.redisClient.setex(`blocked_ip:${ipAddress}`, 60 * 60, 'brute_force'); // 1 hour block
     }
     async storeEvent(event) {
-        const eventKey = `security_event:${event.id}`;
-        // Store event data
-        await this.redisClient.hset(eventKey, this.serializeEvent(event));
-        // Add to timeline (sorted by timestamp)
-        await this.redisClient.zadd('security_events_timeline', event.timestamp.getTime(), event.id);
-        // Add to type-specific index
-        await this.redisClient.sadd(`security_events:${event.type}`, event.id);
-        // Add to user-specific index if userId exists
-        if (event.userId) {
-            await this.redisClient.sadd(`user_security_events:${event.userId}`, event.id);
+        // Skip if Redis is not available
+        if (!this.redisClient) {
+            console.warn('Security Monitor: Redis client not available, skipping event storage');
+            return;
         }
-        // Set expiration
-        const expireTime = this.EVENT_RETENTION_DAYS * 24 * 60 * 60;
-        await this.redisClient.expire(eventKey, expireTime);
+        try {
+            const eventKey = `security_event:${event.id}`;
+            // Store event data
+            await this.redisClient.hset(eventKey, this.serializeEvent(event));
+            // Add to timeline (sorted by timestamp)
+            await this.redisClient.zadd('security_events_timeline', event.timestamp.getTime(), event.id);
+            // Add to type-specific index
+            await this.redisClient.sadd(`security_events:${event.type}`, event.id);
+            // Add to user-specific index if userId exists
+            if (event.userId) {
+                await this.redisClient.sadd(`user_security_events:${event.userId}`, event.id);
+            }
+            // Set expiration
+            const expireTime = this.EVENT_RETENTION_DAYS * 24 * 60 * 60;
+            await this.redisClient.expire(eventKey, expireTime);
+        }
+        catch (error) {
+            console.error('Security Monitor: Failed to store event:', error);
+            // Don't throw - just log the error so the main flow continues
+        }
     }
     async getLocationFromIP(ipAddress) {
         // Mock location service - in production, use a real IP geolocation service

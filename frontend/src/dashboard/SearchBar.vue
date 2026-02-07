@@ -634,18 +634,23 @@ onUnmounted(() => {
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(6, 78, 71, 0.08);
   box-shadow: 0 1px 3px rgba(6, 78, 71, 0.05);
-  position: relative;
+  position: fixed;
+  top: 0;
+  right: 0;
   z-index: 1000;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 72px;
+  display: flex;
+  align-items: center;
 }
 
 /* Topbar positioning based on Vuetify navigation drawer state */
 .modern-topbar.sidebar-expanded {
-  margin-left: 240px; /* Width when drawer is expanded */
+  left: 240px; /* Width when drawer is expanded */
 }
 
 .modern-topbar.sidebar-rail {
-  margin-left: 72px; /* Width when drawer is in rail mode */
+  left: 72px; /* Width when drawer is in rail mode */
 }
 
 .topbar-content {
@@ -658,6 +663,7 @@ onUnmounted(() => {
   justify-content: space-between;
   gap: 24px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
 }
 
 /* Menu Toggle Button - Removed since Vuetify handles this */
@@ -1216,13 +1222,16 @@ onUnmounted(() => {
   
   .topbar-content {
     padding: 0 16px;
-    height: 64px;
-    gap: 16px;
+    height: auto;
+    gap: 12px;
+    grid-template-columns: 1fr auto;
   }
 
   .search-section {
     max-width: none;
     flex: 1;
+    min-width: 150px;
+    grid-column: 1;
   }
 
   .search-section.search-shifted-expanded,
@@ -1242,6 +1251,7 @@ onUnmounted(() => {
 
   .actions-section {
     gap: 4px;
+    grid-column: 2;
   }
 
   .action-button {
@@ -1276,7 +1286,13 @@ onUnmounted(() => {
 @media (max-width: 480px) {
   .topbar-content {
     padding: 0 12px;
-    gap: 12px;
+    gap: 8px;
+    grid-template-columns: 1fr auto;
+  }
+
+  .search-section {
+    min-width: 120px;
+    grid-column: 1;
   }
 
   .search-container {
@@ -1290,6 +1306,11 @@ onUnmounted(() => {
 
   .action-button {
     padding: 8px;
+  }
+
+  .actions-section {
+    grid-column: 2;
+    gap: 4px;
   }
 
   .user-avatar {

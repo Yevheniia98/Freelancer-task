@@ -49,7 +49,6 @@ const multer_1 = __importDefault(require("multer"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const http_1 = require("http");
-const socket_io_1 = require("socket.io");
 // Import configurations
 const database_1 = require("./config/database");
 const redis_1 = require("./config/redis");
@@ -69,19 +68,21 @@ const meeting_invitation_routes_1 = __importDefault(require("./routes/meeting-in
 const test_email_routes_1 = __importDefault(require("./routes/test-email.routes"));
 const team_management_routes_1 = __importDefault(require("./routes/team-management.routes"));
 const notification_routes_1 = __importDefault(require("./routes/notification.routes"));
+const invite_routes_1 = __importDefault(require("./routes/invite.routes"));
+const project_chat_routes_1 = __importDefault(require("./routes/project-chat.routes"));
 // import financialRoutes from './routes/financial.routes';
+// Import services
+const socket_service_1 = require("./services/socket.service");
 // Import middleware
 const error_middleware_1 = require("./middleware/error.middleware");
 const notFound_middleware_1 = require("./middleware/notFound.middleware");
+const input_sanitization_middleware_1 = require("./middleware/input-sanitization.middleware");
+const csrf_protection_middleware_1 = require("./middleware/csrf-protection.middleware");
 // Create Express app
 const app = (0, express_1.default)();
 const server = (0, http_1.createServer)(app);
-const io = new socket_io_1.Server(server, {
-    cors: {
-        origin: process.env.FRONTEND_URL || "http://localhost:3000",
-        methods: ["GET", "POST"]
-    }
-});
+// Initialize Socket.IO service for real-time chat (creates its own Socket.IO server)
+const socketService = new socket_service_1.SocketService(server);
 const PORT = process.env.PORT || 5000;
 // Security middleware - completely disable CSP in development
 app.use((0, helmet_1.default)({
@@ -91,7 +92,8 @@ app.use((0, helmet_1.default)({
 // CORS configuration
 app.use((0, cors_1.default)({
     origin: [
-        process.env.FRONTEND_URL || 'http://localhost:3000',
+        process.env.FRONTEND_URL || 'http://localhost:3030',
+        'http://localhost:3000',
         'http://localhost:3001',
         'http://localhost:5173',
         'http://localhost:8080'
@@ -111,8 +113,12 @@ if (!fs_1.default.existsSync(uploadsDir)) {
     fs_1.default.mkdirSync(uploadsDir, { recursive: true });
     console.log('📁 Created uploads directory at:', uploadsDir);
 }
-// Static file serving for uploads
-app.use('/uploads', express_1.default.static(uploadsDir));
+// Static file serving for uploads with CORS headers
+app.use('/uploads', (req, res, next) => {
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    next();
+}, express_1.default.static(uploadsDir));
 // Multer configuration for file uploads
 const storage = multer_1.default.diskStorage({
     destination: (req, file, cb) => {
@@ -172,6 +178,13 @@ const limiter = (0, express_rate_limit_1.default)({
     legacyHeaders: false
 });
 app.use('/api/', limiter);
+// Security: Input sanitization middleware - protects against XSS, SQL injection, NoSQL injection, and prompt injection
+// Apply strict sanitization only to public/auth endpoints
+app.use('/api/auth', input_sanitization_middleware_1.strictInputSanitization);
+// Security: CSRF token generation
+app.use(csrf_protection_middleware_1.csrfTokenGenerator);
+// CSRF token endpoint
+app.get('/api/csrf-token', csrf_protection_middleware_1.getCsrfToken);
 // Health check endpoint
 app.get('/api/health', (req, res) => {
     res.json({
@@ -195,6 +208,8 @@ app.use('/api/integrations', project_integration_routes_1.default);
 app.use('/api/meeting-invitations', meeting_invitation_routes_1.default);
 app.use('/api/test-email', test_email_routes_1.default);
 app.use('/api/notifications', notification_routes_1.default);
+app.use('/api', invite_routes_1.default);
+app.use('/api', project_chat_routes_1.default);
 // app.use('/api/financial', financialRoutes);
 // Team Invitation Email Endpoint
 app.post('/api/send-email', async (req, res) => {
@@ -303,25 +318,8 @@ app.post('/upload', (req, res) => {
         });
     });
 });
-// Socket.io for real-time features
-io.on('connection', (socket) => {
-    console.log('User connected:', socket.id);
-    // Join project rooms for real-time updates
-    socket.on('join-project', (projectId) => {
-        socket.join(`project-${projectId}`);
-    });
-    // Handle team chat
-    socket.on('send-message', (data) => {
-        socket.to(`project-${data.projectId}`).emit('new-message', data);
-    });
-    // Handle task updates
-    socket.on('task-update', (data) => {
-        socket.to(`project-${data.projectId}`).emit('task-updated', data);
-    });
-    socket.on('disconnect', () => {
-        console.log('User disconnected:', socket.id);
-    });
-});
+// Socket.IO is initialized via SocketService (see line ~58)
+// All real-time features are handled there
 // Error handling middleware (must be last)
 app.use(notFound_middleware_1.notFound);
 app.use(error_middleware_1.errorHandler);

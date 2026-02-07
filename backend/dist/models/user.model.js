@@ -57,6 +57,25 @@ const userSchema = new mongoose_1.Schema({
         required: true,
         trim: true,
     },
+    fullName: {
+        type: String,
+        trim: true,
+    },
+    username: {
+        type: String,
+        trim: true,
+    },
+    phoneNumber: {
+        type: String,
+        trim: true,
+    },
+    country: {
+        type: String,
+        trim: true,
+    },
+    profileImage: {
+        type: String,
+    },
     twoFactorEnabled: {
         type: Boolean,
         default: false,

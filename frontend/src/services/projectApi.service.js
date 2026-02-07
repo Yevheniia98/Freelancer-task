@@ -108,7 +108,11 @@ export class ProjectApiService {
   static async getById(id) {
     try {
       const response = await api.get(`/projects/${id}`);
-      return response.data.data;
+      // Return both project data and userRole from backend
+      return {
+        ...response.data.data,
+        userRole: response.data.userRole
+      };
     } catch (error) {
       console.error('Get project error:', error);
       throw new Error(error.response?.data?.message || 'Failed to fetch project');

@@ -941,6 +941,7 @@ import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 // Remove this import since you're defining your own implementation
 // import { isSameDay } from 'vuetify/lib/util/dateTimeUtils'
 import notificationService from '@/services/notificationService.js'; 
+import { storageService } from '@/services/storageService.js';
 
 
 // State
@@ -1139,9 +1140,42 @@ function loadEvents() {
   return [];
 }
 
-// Save events to localStorage
-function saveEvents() {
-  localStorage.setItem('userEvents', JSON.stringify(events.value));
+// Save events to localStorage with quota management
+async function saveEvents() {
+  try {
+    // Clean up old and past events to save space
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Keep only events from the last 90 days and future events
+    const cutoffDate = new Date(today);
+    cutoffDate.setDate(cutoffDate.getDate() - 90);
+    const cutoffISO = dateToISO(cutoffDate);
+    
+    const eventsToKeep = events.value.filter(event => {
+      return event.date >= cutoffISO;
+    });
+    
+    // Limit to 500 events maximum (most recent)
+    const limitedEvents = eventsToKeep.slice(-500);
+    
+    // Use storage service for better handling
+    const result = await storageService.saveEvents(limitedEvents);
+    console.log('Events saved successfully:', result);
+    
+  } catch (error) {
+    console.error('Error saving events:', error);
+    
+    // Fallback to localStorage with simpler approach
+    try {
+      const minimalEvents = events.value.slice(-100);
+      localStorage.setItem('userEvents', JSON.stringify(minimalEvents));
+      showNotification('Events saved with limited history due to storage constraints.', 'warning');
+    } catch (fallbackError) {
+      console.error('Failed to save events:', fallbackError);
+      showNotification('Failed to save event. Please clear your browser cache and try again.', 'error');
+    }
+  }
 }
 
 const events = ref(loadEvents());
@@ -1662,8 +1696,10 @@ function createEvent() {
     return a.timeFrom < b.timeFrom ? -1 : 1;
   });
   
-  // Save to localStorage
-  saveEvents();
+  // Save to localStorage (async, but don't block execution)
+  saveEvents().catch(error => {
+    console.error('Error in saveEvents:', error);
+  });
   
   // Add notification for reminder/meeting creation
   if (eventType.value === 'task') {
