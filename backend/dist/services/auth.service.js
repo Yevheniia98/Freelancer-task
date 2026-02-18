@@ -12,63 +12,6 @@ const twoFactor_service_1 = require("./twoFactor.service");
 const subscription_service_1 = require("./subscription.service");
 class AuthService {
     constructor() {
-        // Mock users for demo mode (email-only mode without MongoDB)
-        this.mockUsers = [
-            {
-                id: 'demo-user-1',
-                email: 'demo@example.com',
-                password: 'password123', // In real app this would be hashed
-                firstName: 'Demo',
-                lastName: 'User',
-                twoFactorEnabled: false,
-                twoFactorSecret: null
-            },
-            {
-                id: 'demo-user-2',
-                email: 'test@example.com',
-                password: 'test123',
-                firstName: 'Test',
-                lastName: 'User',
-                twoFactorEnabled: false,
-                twoFactorSecret: null
-            },
-            {
-                id: 'demo-user-3',
-                email: 'suprunjen@gmail.com',
-                password: '03101998Polo',
-                firstName: 'Evgeniia',
-                lastName: 'Suprun',
-                twoFactorEnabled: false,
-                twoFactorSecret: null
-            },
-            {
-                id: 'demo-user-4',
-                email: 'suprun.jen@gmail.com',
-                password: 'test123',
-                firstName: 'Evgeniia',
-                lastName: 'Suprun',
-                twoFactorEnabled: false,
-                twoFactorSecret: null
-            },
-            {
-                id: 'demo-user-5',
-                email: 'suprun.jen@gmail.com',
-                password: 'test123',
-                firstName: 'Evgeniia',
-                lastName: 'Suprun',
-                twoFactorEnabled: false,
-                twoFactorSecret: null
-            },
-            {
-                id: 'demo-user-4',
-                email: 'freelancer@example.com',
-                password: 'freelancer123',
-                firstName: 'John',
-                lastName: 'Freelancer',
-                twoFactorEnabled: false,
-                twoFactorSecret: null
-            }
-        ];
         this.JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
         this.JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
         this.twoFactorService = new twoFactor_service_1.TwoFactorService();
@@ -166,7 +109,7 @@ class AuthService {
     }
     async verifyTwoFactor(userId, code) {
         try {
-            const user = this.mockUsers.find(u => u.id === userId);
+            const user = await user_model_1.User.findById(userId);
             if (!user) {
                 throw new Error('User not found');
             }
@@ -177,11 +120,11 @@ class AuthService {
             if (!isCodeValid) {
                 throw new Error('Invalid 2FA code');
             }
-            const token = this.generateToken(user.id);
+            const token = this.generateToken(String(user._id));
             return {
                 token,
                 user: {
-                    id: user.id,
+                    id: String(user._id),
                     email: user.email,
                     firstName: user.firstName,
                     lastName: user.lastName,
@@ -195,13 +138,13 @@ class AuthService {
     }
     async setupTwoFactor(userId) {
         try {
-            const user = this.mockUsers.find(u => u.id === userId);
+            const user = await user_model_1.User.findById(userId);
             if (!user) {
                 throw new Error('User not found');
             }
             const { secret, qrCodeUrl } = await this.twoFactorService.generateSecret(user.email);
-            // In demo mode, we would update mock user data
             user.twoFactorSecret = secret;
+            await user.save();
             return {
                 secret,
                 qrCodeUrl
@@ -213,7 +156,7 @@ class AuthService {
     }
     async enableTwoFactor(userId, code) {
         try {
-            const user = this.mockUsers.find(u => u.id === userId);
+            const user = await user_model_1.User.findById(userId);
             if (!user) {
                 throw new Error('User not found');
             }
@@ -225,7 +168,7 @@ class AuthService {
                 throw new Error('Invalid 2FA code');
             }
             user.twoFactorEnabled = true;
-            // In demo mode, changes are only in memory
+            await user.save();
             return {
                 message: '2FA enabled successfully'
             };
@@ -236,14 +179,15 @@ class AuthService {
     }
     async initiatePasswordReset(email) {
         try {
-            const user = this.mockUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
+            const user = await user_model_1.User.findOne({ email: email.toLowerCase() });
             if (!user) {
                 throw new Error('User not found');
             }
             const resetToken = crypto_1.default.randomBytes(32).toString('hex');
-            // In demo mode, we simulate password reset but don't actually store tokens
-            console.log(`Password reset token for ${email}: ${resetToken}`);
-            // Return success for demo purposes
+            const resetTokenHash = crypto_1.default.createHash('sha256').update(resetToken).digest('hex');
+            user.resetPasswordToken = resetTokenHash;
+            user.resetPasswordExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+            await user.save();
             return {
                 resetToken,
                 message: 'Password reset initiated'
@@ -255,15 +199,20 @@ class AuthService {
     }
     async resetPassword(token, newPassword) {
         try {
-            // In demo mode, we simulate password reset
-            // Find user by email (simplified for demo)
-            const user = this.mockUsers.find(u => u.email === 'suprunjen@gmail.com'); // Demo user
+            const resetTokenHash = crypto_1.default.createHash('sha256').update(token).digest('hex');
+            const user = await user_model_1.User.findOne({
+                resetPasswordToken: resetTokenHash,
+                resetPasswordExpires: { $gt: new Date() }
+            });
             if (!user) {
                 throw new Error('Invalid or expired reset token');
             }
-            // Update password in demo mode
-            user.password = newPassword; // In demo mode, storing plain password
-            console.log(`Password updated for user: ${user.email}`);
+            // Hash the new password
+            const saltRounds = 12;
+            user.password = await bcrypt_1.default.hash(newPassword, saltRounds);
+            user.resetPasswordToken = undefined;
+            user.resetPasswordExpires = undefined;
+            await user.save();
             return {
                 message: 'Password reset successful'
             };
@@ -274,7 +223,6 @@ class AuthService {
     }
     async logout(token) {
         try {
-            // In demo mode, we simulate logout without Redis
             console.log(`User logged out with token: ${token.substring(0, 10)}...`);
             return { message: 'Logged out successfully' };
         }
@@ -294,7 +242,6 @@ class AuthService {
     }
     async validateToken(token) {
         try {
-            // In demo mode, we skip Redis blacklist check
             const decoded = jsonwebtoken_1.default.verify(token, this.JWT_SECRET);
             if (decoded.temp) {
                 throw new Error('Cannot use temporary token for this operation');

@@ -292,9 +292,8 @@ export class ProjectController {
     try {
       if (this.handleValidationErrors(req, res)) return;
 
-      // Check user permissions - only OWNER can delete
-      const currentUserId = (req as any).user?._id?.toString() || (req as any).user?.id;
-      const project = await this.projectService.findById(req.params.id);
+      const projectId = req.params.id;
+      const project = await this.projectService.findById(projectId);
 
       if (!project) {
         res.status(404).json({
@@ -304,18 +303,8 @@ export class ProjectController {
         return;
       }
 
-      const { getUserRoleInProject, canDeleteProject } = await import('../utils/rbac.util');
-      const userRole = getUserRoleInProject(project, currentUserId);
-
-      if (!canDeleteProject(userRole)) {
-        res.status(403).json({
-          success: false,
-          message: 'Access denied. Only the project owner can delete this project.'
-        });
-        return;
-      }
-
-      const deleted = await this.projectService.delete(req.params.id);
+      // Delete the project
+      const deleted = await this.projectService.delete(projectId);
 
       if (!deleted) {
         res.status(404).json({

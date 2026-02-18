@@ -56,7 +56,7 @@ export function canEditProject(role: ProjectRole): boolean {
  * Check if user can delete project
  */
 export function canDeleteProject(role: ProjectRole): boolean {
-  return role === ProjectRole.OWNER;
+  return role === ProjectRole.OWNER || role === ProjectRole.EDIT;
 }
 
 /**

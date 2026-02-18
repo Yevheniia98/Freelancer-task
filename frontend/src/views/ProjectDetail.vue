@@ -562,7 +562,7 @@
                 </div>
 
                 <!-- Actions Card -->
-                <div v-if="project && !canOnlyView" class="project-card">
+                <div v-if="project && !canOnlyView" class="project-card actions-card">
                   <div class="card-header">
                     <h3 class="card-title">
                       Actions
@@ -570,11 +570,13 @@
                   </div>
                   <div class="card-content">
                     <div class="action-buttons">
+                      <!-- Primary Action: Edit -->
                       <v-btn 
                         color="primary" 
                         variant="elevated" 
                         block 
-                        class="mb-3"
+                        size="large"
+                        class="action-btn primary-btn mb-3"
                         @click="editProject"
                       >
                         <v-icon class="mr-2">
@@ -583,6 +585,7 @@
                         Edit Project
                       </v-btn>
                       
+                      <!-- Share Project Dialog -->
                       <ShareProjectDialog
                         v-if="project && isProjectOwner"
                         :project-id="project.id"
@@ -597,29 +600,33 @@
                         class="mb-3"
                       />
                       
+                      <!-- Complete Project -->
                       <v-btn 
                         color="success" 
                         variant="outlined" 
                         block 
-                        class="mb-3"
+                        size="large"
+                        class="action-btn success-btn mb-3"
                         :disabled="project.status === 'completed'"
                         @click="changeStatus('completed')"
                       >
                         <v-icon class="mr-2">
-                          mdi-check
+                          mdi-check-circle
                         </v-icon>
                         Mark Complete
                       </v-btn>
                       
+                      <!-- Delete Project -->
                       <v-btn 
-                        v-if="isProjectOwner"
                         color="error" 
                         variant="outlined" 
                         block
+                        size="large"
+                        class="action-btn danger-btn"
                         @click="deleteProject"
                       >
                         <v-icon class="mr-2">
-                          mdi-delete
+                          mdi-trash-can
                         </v-icon>
                         Delete Project
                       </v-btn>
@@ -1756,6 +1763,51 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+}
+
+.action-btn {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+}
+
+.primary-btn:hover {
+  background: linear-gradient(135deg, #1565c0 0%, #1565c0 100%);
+}
+
+.success-btn {
+  border: 2px solid #4caf50;
+  color: #4caf50;
+}
+
+.success-btn:hover {
+  background-color: rgba(76, 175, 80, 0.08);
+}
+
+.danger-btn {
+  border: 2px solid #f44336;
+  color: #f44336;
+}
+
+.danger-btn:hover {
+  background-color: rgba(244, 67, 54, 0.08);
+}
+
+.actions-card {
+  border-top: 4px solid #1976d2;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 /* Responsive Design */

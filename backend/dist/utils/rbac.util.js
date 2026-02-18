@@ -59,7 +59,7 @@ function canEditProject(role) {
  * Check if user can delete project
  */
 function canDeleteProject(role) {
-    return role === ProjectRole.OWNER;
+    return role === ProjectRole.OWNER || role === ProjectRole.EDIT;
 }
 /**
  * Check if user can share/invite to project
