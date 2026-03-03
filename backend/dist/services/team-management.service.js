@@ -210,7 +210,7 @@ class TeamManagementService {
      */
     async getTeamMembers(userId) {
         const members = await team_member_entity_1.TeamMember.find({ ownerId: userId })
-            .populate('memberId', 'email firstName lastName createdAt isInvitedUser phone gender payment currentProject skills')
+            .populate('memberId', 'email firstName lastName createdAt isInvitedUser')
             .sort({ createdAt: -1 });
         return members.map(member => {
             const user = member.memberId;
@@ -222,12 +222,13 @@ class TeamManagementService {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 email: user.email,
-                phone: user.phone || '',
-                gender: user.gender || 'male',
-                payment: user.payment || 0,
-                currentProject: user.currentProject || '',
-                skills: user.skills || [],
-                role: member.role,
+                // Get these fields from TeamMember, not User
+                phone: member.phone || '',
+                gender: member.gender || 'male',
+                payment: member.payment || 0,
+                currentProject: member.currentProject || '',
+                skills: member.skills || [],
+                role: member.customRole || member.role || 'member',
                 hasProjectAccess: member.hasProjectAccess,
                 hasChatAccess: member.hasChatAccess,
                 joinedAt: member.createdAt,
@@ -420,11 +421,17 @@ class TeamManagementService {
                 });
                 await user.save();
             }
-            // Create team member relationship
+            // Create team member relationship with all custom fields
             const teamMember = new team_member_entity_1.TeamMember({
                 ownerId,
                 memberId: user._id,
                 role: team_member_entity_1.MemberRole.MEMBER,
+                customRole: memberData.role || '',
+                phone: memberData.phone || '',
+                gender: memberData.gender || 'male',
+                payment: memberData.payment || 0,
+                currentProject: memberData.currentProject || '',
+                skills: memberData.skills || [],
                 hasProjectAccess: true,
                 hasChatAccess: true
             });
@@ -440,12 +447,12 @@ class TeamManagementService {
                     firstName,
                     lastName,
                     email: user.email,
-                    phone: memberData.phone,
-                    role: memberData.role,
-                    gender: memberData.gender,
-                    payment: memberData.payment,
-                    currentProject: memberData.currentProject,
-                    skills: memberData.skills,
+                    phone: teamMember.phone,
+                    role: teamMember.customRole,
+                    gender: teamMember.gender,
+                    payment: teamMember.payment,
+                    currentProject: teamMember.currentProject,
+                    skills: teamMember.skills,
                     joinedAt: teamMember.createdAt
                 }
             };

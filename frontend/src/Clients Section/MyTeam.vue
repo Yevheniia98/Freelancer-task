@@ -2337,7 +2337,7 @@ export default defineComponent({
         
         if (data.success && data.members) {
           // Map API response to component format
-          teamMembers.value = data.members.map((member, index) => ({
+          teamMembers.value = data.members.map((member) => ({
             id: member._id || member.id,
             name: `${member.firstName || ''} ${member.lastName || ''}`.trim() || member.name || 'Team Member',
             role: member.role || 'Member',
@@ -2347,7 +2347,7 @@ export default defineComponent({
             currentProject: member.currentProject || '',
             skills: member.skills || [],
             gender: member.gender || 'male',
-            avatar: member.avatar || `https://i.pravatar.cc/150?img=${index + 1}`
+            avatar: null // Use gender icons instead of random images
           }));
         }
       } catch (error) {
