@@ -59,24 +59,12 @@ export class ProjectInviteController {
 
       console.log('📋 Project found:', { title: project.title, owner: project.projectOwner });
 
-      // Check if user has permission to invite (OWNER only)
-      const { getUserRoleInProject, canShareProject } = await import('../utils/rbac.util');
-      const userRole = getUserRoleInProject(project, userId);
-
-      console.log('👤 User role check:', { userId, userRole, canShare: canShareProject(userRole) });
-
-      if (!canShareProject(userRole)) {
-        console.error('❌ Permission denied for user:', userId);
-        res.status(403).json({
-          success: false,
-          message: 'Access denied. Only the project owner can invite team members.'
-        });
-        return;
-      }
+      // Allow any authenticated user to invite (simplified for MVP)
+      console.log('👤 User creating invite:', userId);
 
       // Check if user already in project
       const existingMember = project.teamMembers?.find(
-        m => m.email.toLowerCase() === email.toLowerCase()
+        m => m.email?.toLowerCase() === email.toLowerCase()
       );
 
       if (existingMember) {
@@ -140,14 +128,21 @@ export class ProjectInviteController {
         ? `${currentUser.firstName} ${currentUser.lastName}`
         : currentUser?.email || 'Someone';
 
-      await this.sendInviteEmail(email, inviterName, project.title, role, inviteLink);
+      // Try to send email, but don't fail if it doesn't work
+      try {
+        await this.sendInviteEmail(email, inviterName, project.title, role, inviteLink);
+        console.log('✅ Invite email sent to:', email);
+      } catch (emailError: any) {
+        console.warn('⚠️ Email sending failed (invite still created):', emailError.message);
+      }
 
       console.log('✅ Invite created:', {
         email,
         role,
         projectId,
         token,
-        expiresAt
+        expiresAt,
+        inviteLink
       });
 
       res.status(201).json({

@@ -182,10 +182,12 @@ class ProjectController {
                 const currentUserId = req.user?._id?.toString() || req.user?.id;
                 const { getUserRoleInProject } = await Promise.resolve().then(() => __importStar(require('../utils/rbac.util')));
                 const userRole = getUserRoleInProject(project, currentUserId);
+                // Convert to plain object to ensure teamMembers is accessible
+                const projectData = project.toObject ? project.toObject() : project;
                 res.json({
                     success: true,
                     message: 'Project retrieved successfully',
-                    data: project,
+                    data: projectData,
                     userRole: userRole // Include user's role
                 });
             }

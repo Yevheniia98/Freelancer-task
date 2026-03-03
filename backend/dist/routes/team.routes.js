@@ -12,7 +12,7 @@ const teamService = new team_management_service_1.TeamManagementService();
 // Send team invitation
 router.post('/invite', auth_middleware_1.authMiddleware, async (req, res) => {
     try {
-        const userId = req.user.userId;
+        const userId = req.user._id;
         const { email, name } = req.body;
         if (!email || !name) {
             return res.status(400).json({
@@ -118,7 +118,7 @@ router.post('/invite/accept', async (req, res) => {
 // Get team members
 router.get('/members', auth_middleware_1.authMiddleware, async (req, res) => {
     try {
-        const userId = req.user.userId;
+        const userId = req.user._id;
         const members = await teamService.getTeamMembers(userId);
         res.json({
             success: true,
@@ -135,10 +135,58 @@ router.get('/members', auth_middleware_1.authMiddleware, async (req, res) => {
         });
     }
 });
+// Create team member directly (manual add)
+router.post('/members', auth_middleware_1.authMiddleware, async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { name, email, phone, role, gender, payment, currentProject, skills } = req.body;
+        console.log('📝 Create team member request:', {
+            userId,
+            body: req.body,
+            name,
+            email
+        });
+        if (!name || !email) {
+            console.log('❌ Validation failed: name or email missing');
+            return res.status(400).json({
+                success: false,
+                message: 'Name and email are required'
+            });
+        }
+        const result = await teamService.createTeamMember(userId, {
+            name,
+            email,
+            phone,
+            role,
+            gender,
+            payment,
+            currentProject,
+            skills
+        });
+        console.log('📝 Create team member result:', result);
+        if (!result.success) {
+            console.log('❌ Create team member failed:', result.error);
+            return res.status(400).json(result);
+        }
+        res.json({
+            success: true,
+            message: 'Team member added successfully',
+            member: result.member
+        });
+    }
+    catch (error) {
+        console.error('Error creating team member:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to create team member',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+});
 // Search team members
 router.get('/members/search', auth_middleware_1.authMiddleware, async (req, res) => {
     try {
-        const userId = req.user.userId;
+        const userId = req.user._id;
         const { q } = req.query;
         if (!q || typeof q !== 'string') {
             return res.status(400).json({
@@ -165,16 +213,25 @@ router.get('/members/search', auth_middleware_1.authMiddleware, async (req, res)
 // Remove team member
 router.delete('/members/:memberId', auth_middleware_1.authMiddleware, async (req, res) => {
     try {
-        const ownerId = req.user.userId;
+        const ownerId = req.user._id;
         const { memberId } = req.params;
+        console.log('🗑️  Remove team member request:', {
+            ownerId,
+            memberId
+        });
         if (!memberId) {
+            console.log('❌ Member ID is missing');
             return res.status(400).json({
                 success: false,
                 message: 'Member ID is required'
             });
         }
-        const result = await teamService.removeMember(ownerId, new mongoose_1.default.Types.ObjectId(memberId));
+        // The memberId from frontend is the TeamMember document's _id
+        // We need to use removeByTeamMemberId instead
+        const result = await teamService.removeByTeamMemberId(ownerId, new mongoose_1.default.Types.ObjectId(memberId));
+        console.log('🗑️  Remove team member result:', result);
         if (!result.success) {
+            console.log('❌ Remove failed:', result.error);
             return res.status(400).json(result);
         }
         res.json({
@@ -194,7 +251,7 @@ router.delete('/members/:memberId', auth_middleware_1.authMiddleware, async (req
 // Get pending invitations
 router.get('/invitations/pending', auth_middleware_1.authMiddleware, async (req, res) => {
     try {
-        const userId = req.user.userId;
+        const userId = req.user._id;
         const invitations = await teamService.getPendingInvitations(userId);
         res.json({
             success: true,

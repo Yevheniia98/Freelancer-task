@@ -69,12 +69,33 @@ const userSchema = new mongoose_1.Schema({
         type: String,
         trim: true,
     },
+    phone: {
+        type: String,
+        trim: true,
+    },
     country: {
         type: String,
         trim: true,
     },
     profileImage: {
         type: String,
+    },
+    gender: {
+        type: String,
+        enum: ['male', 'female', 'other'],
+        default: 'male',
+    },
+    payment: {
+        type: Number,
+        default: 0,
+    },
+    currentProject: {
+        type: String,
+        trim: true,
+    },
+    skills: {
+        type: [String],
+        default: [],
     },
     twoFactorEnabled: {
         type: Boolean,

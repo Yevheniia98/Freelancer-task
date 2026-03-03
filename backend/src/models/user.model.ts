@@ -8,8 +8,13 @@ export interface IUser extends Document {
   fullName?: string;
   username?: string;
   phoneNumber?: string;
+  phone?: string;
   country?: string;
   profileImage?: string;
+  gender?: string;
+  payment?: number;
+  currentProject?: string;
+  skills?: string[];
   twoFactorEnabled: boolean;
   twoFactorSecret?: string;
   resetPasswordToken?: string;
@@ -56,12 +61,33 @@ const userSchema = new Schema<IUser>(
       type: String,
       trim: true,
     },
+    phone: {
+      type: String,
+      trim: true,
+    },
     country: {
       type: String,
       trim: true,
     },
     profileImage: {
       type: String,
+    },
+    gender: {
+      type: String,
+      enum: ['male', 'female', 'other'],
+      default: 'male',
+    },
+    payment: {
+      type: Number,
+      default: 0,
+    },
+    currentProject: {
+      type: String,
+      trim: true,
+    },
+    skills: {
+      type: [String],
+      default: [],
     },
     twoFactorEnabled: {
       type: Boolean,

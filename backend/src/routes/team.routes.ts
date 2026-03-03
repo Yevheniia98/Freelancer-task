@@ -9,7 +9,7 @@ const teamService = new TeamManagementService();
 // Send team invitation
 router.post('/invite', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.userId;
+    const userId = (req as any).user._id;
     const { email, name } = req.body;
 
     if (!email || !name) {
@@ -130,7 +130,7 @@ router.post('/invite/accept', async (req: Request, res: Response) => {
 // Get team members
 router.get('/members', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.userId;
+    const userId = (req as any).user._id;
     const members = await teamService.getTeamMembers(userId);
 
     res.json({
@@ -149,10 +149,65 @@ router.get('/members', authMiddleware, async (req: Request, res: Response) => {
   }
 });
 
+// Create team member directly (manual add)
+router.post('/members', authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user._id;
+    const { name, email, phone, role, gender, payment, currentProject, skills } = req.body;
+
+    console.log('📝 Create team member request:', {
+      userId,
+      body: req.body,
+      name,
+      email
+    });
+
+    if (!name || !email) {
+      console.log('❌ Validation failed: name or email missing');
+      return res.status(400).json({
+        success: false,
+        message: 'Name and email are required'
+      });
+    }
+
+    const result = await teamService.createTeamMember(userId, {
+      name,
+      email,
+      phone,
+      role,
+      gender,
+      payment,
+      currentProject,
+      skills
+    });
+
+    console.log('📝 Create team member result:', result);
+
+    if (!result.success) {
+      console.log('❌ Create team member failed:', result.error);
+      return res.status(400).json(result);
+    }
+
+    res.json({
+      success: true,
+      message: 'Team member added successfully',
+      member: result.member
+    });
+
+  } catch (error: any) {
+    console.error('Error creating team member:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create team member',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
 // Search team members
 router.get('/members/search', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.userId;
+    const userId = (req as any).user._id;
     const { q } = req.query;
 
     if (!q || typeof q !== 'string') {
@@ -183,19 +238,30 @@ router.get('/members/search', authMiddleware, async (req: Request, res: Response
 // Remove team member
 router.delete('/members/:memberId', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const ownerId = (req as any).user.userId;
+    const ownerId = (req as any).user._id;
     const { memberId } = req.params;
 
+    console.log('🗑️  Remove team member request:', {
+      ownerId,
+      memberId
+    });
+
     if (!memberId) {
+      console.log('❌ Member ID is missing');
       return res.status(400).json({
         success: false,
         message: 'Member ID is required'
       });
     }
 
-    const result = await teamService.removeMember(ownerId, new mongoose.Types.ObjectId(memberId));
+    // The memberId from frontend is the TeamMember document's _id
+    // We need to use removeByTeamMemberId instead
+    const result = await teamService.removeByTeamMemberId(ownerId, new mongoose.Types.ObjectId(memberId));
+
+    console.log('🗑️  Remove team member result:', result);
 
     if (!result.success) {
+      console.log('❌ Remove failed:', result.error);
       return res.status(400).json(result);
     }
 
@@ -217,7 +283,7 @@ router.delete('/members/:memberId', authMiddleware, async (req: Request, res: Re
 // Get pending invitations
 router.get('/invitations/pending', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.userId;
+    const userId = (req as any).user._id;
     const invitations = await teamService.getPendingInvitations(userId);
 
     res.json({

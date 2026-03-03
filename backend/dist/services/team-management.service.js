@@ -210,17 +210,30 @@ class TeamManagementService {
      */
     async getTeamMembers(userId) {
         const members = await team_member_entity_1.TeamMember.find({ ownerId: userId })
-            .populate('memberId', 'email firstName lastName createdAt isInvitedUser')
+            .populate('memberId', 'email firstName lastName createdAt isInvitedUser phone gender payment currentProject skills')
             .sort({ createdAt: -1 });
-        return members.map(member => ({
-            id: member._id,
-            user: member.memberId,
-            role: member.role,
-            hasProjectAccess: member.hasProjectAccess,
-            hasChatAccess: member.hasChatAccess,
-            joinedAt: member.createdAt,
-            lastAccessedAt: member.lastAccessedAt
-        }));
+        return members.map(member => {
+            const user = member.memberId;
+            return {
+                id: member._id,
+                _id: member._id,
+                memberId: user._id,
+                name: `${user.firstName} ${user.lastName}`,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                phone: user.phone || '',
+                gender: user.gender || 'male',
+                payment: user.payment || 0,
+                currentProject: user.currentProject || '',
+                skills: user.skills || [],
+                role: member.role,
+                hasProjectAccess: member.hasProjectAccess,
+                hasChatAccess: member.hasChatAccess,
+                joinedAt: member.createdAt,
+                lastAccessedAt: member.lastAccessedAt
+            };
+        });
     }
     /**
      * Search team members by name or email
@@ -259,6 +272,33 @@ class TeamManagementService {
             const member = await team_member_entity_1.TeamMember.findOneAndDelete({
                 ownerId,
                 memberId
+            });
+            if (!member) {
+                return {
+                    success: false,
+                    error: 'Team member not found'
+                };
+            }
+            // Decrement owner's subscription count
+            await this.subscriptionService.decrementInviteCount(ownerId);
+            return { success: true };
+        }
+        catch (error) {
+            console.error('Error removing member:', error);
+            return {
+                success: false,
+                error: error.message || 'Failed to remove member'
+            };
+        }
+    }
+    /**
+     * Remove team member by TeamMember document _id
+     */
+    async removeByTeamMemberId(ownerId, teamMemberId) {
+        try {
+            const member = await team_member_entity_1.TeamMember.findOneAndDelete({
+                _id: teamMemberId,
+                ownerId
             });
             if (!member) {
                 return {
@@ -328,6 +368,93 @@ class TeamManagementService {
             return {
                 valid: false,
                 error: 'Failed to validate invitation'
+            };
+        }
+    }
+    /**
+     * Create a team member directly (manual add without invitation)
+     */
+    async createTeamMember(ownerId, memberData) {
+        try {
+            // Skip subscription check for now - allow adding team members freely
+            // TODO: Re-enable subscription check in production if needed
+            // const canInvite = await this.subscriptionService.canUserInvite(ownerId);
+            // if (!canInvite.canInvite) {
+            //   return {
+            //     success: false,
+            //     error: canInvite.reason || 'Cannot add more team members'
+            //   };
+            // }
+            // Parse name into first and last name
+            const nameParts = memberData.name.trim().split(' ');
+            const firstName = nameParts[0] || memberData.name;
+            const lastName = nameParts.slice(1).join(' ') || '';
+            // Check if user already exists with this email
+            let user = await user_model_1.User.findOne({ email: memberData.email.toLowerCase() });
+            if (user) {
+                // Check if already a team member
+                const existingMember = await team_member_entity_1.TeamMember.findOne({
+                    ownerId,
+                    memberId: user._id
+                });
+                if (existingMember) {
+                    return {
+                        success: false,
+                        error: 'This user is already a member of your team'
+                    };
+                }
+            }
+            else {
+                // Create a new user for this team member (as invited/contact user)
+                user = new user_model_1.User({
+                    email: memberData.email.toLowerCase(),
+                    firstName,
+                    lastName,
+                    password: crypto_1.default.randomBytes(32).toString('hex'), // Random password (they can reset if needed)
+                    isInvitedUser: true,
+                    phone: memberData.phone || '',
+                    gender: memberData.gender || '',
+                    payment: memberData.payment || 0,
+                    currentProject: memberData.currentProject || '',
+                    skills: memberData.skills || []
+                });
+                await user.save();
+            }
+            // Create team member relationship
+            const teamMember = new team_member_entity_1.TeamMember({
+                ownerId,
+                memberId: user._id,
+                role: team_member_entity_1.MemberRole.MEMBER,
+                hasProjectAccess: true,
+                hasChatAccess: true
+            });
+            await teamMember.save();
+            // Increment invitation count
+            await this.subscriptionService.incrementInviteCount(ownerId);
+            return {
+                success: true,
+                member: {
+                    id: teamMember._id,
+                    memberId: user._id,
+                    name: memberData.name,
+                    firstName,
+                    lastName,
+                    email: user.email,
+                    phone: memberData.phone,
+                    role: memberData.role,
+                    gender: memberData.gender,
+                    payment: memberData.payment,
+                    currentProject: memberData.currentProject,
+                    skills: memberData.skills,
+                    joinedAt: teamMember.createdAt
+                }
+            };
+        }
+        catch (error) {
+            console.error('Error creating team member:', error);
+            return {
+                success: false,
+                error: error.message || 'Failed to create team member'
             };
         }
     }

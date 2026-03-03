@@ -664,14 +664,23 @@
             <div v-if="project.teamMembers && project.teamMembers.length > 0" class="team-members-grid">
               <div 
                 v-for="member in project.teamMembers" 
-                :key="member.userId" 
+                :key="member.userId || member.email" 
                 class="team-member-card"
+                :class="{ 'pending-member': member.status === 'pending' }"
               >
                 <div class="member-info">
                   <div class="member-avatar">
-                    <v-icon size="32" color="primary">
-                      mdi-account-circle
-                    </v-icon>
+                    <v-avatar 
+                      :color="member.status === 'pending' ? 'grey-lighten-1' : 'primary'"
+                      size="40"
+                    >
+                      <v-icon v-if="member.status === 'pending'" color="grey-darken-1">
+                        mdi-account-outline
+                      </v-icon>
+                      <span v-else class="text-white font-weight-bold">
+                        {{ member.name.charAt(0).toUpperCase() }}
+                      </span>
+                    </v-avatar>
                   </div>
                   <div class="member-details">
                     <h4 class="member-name">
@@ -680,31 +689,32 @@
                         v-if="member.status === 'pending'"
                         size="x-small"
                         color="warning"
-                        variant="flat"
+                        variant="elevated"
                         class="ml-2"
+                        prepend-icon="mdi-clock-outline"
                       >
-                        Invite sent
+                        Pending
                       </v-chip>
                     </h4>
                     <p class="member-email">
                       {{ member.email }}
                     </p>
                     <v-chip
-                      :color="member.permission === 'view_and_edit' ? 'success' : 'info'"
+                      :color="member.permission === 'view_and_edit' || member.role === 'edit' ? 'success' : 'info'"
                       size="small"
                       variant="tonal"
                       class="mt-2"
                     >
                       <v-icon size="16" class="mr-1">
-                        {{ member.permission === 'view_and_edit' ? 'mdi-pencil' : 'mdi-eye' }}
+                        {{ (member.permission === 'view_and_edit' || member.role === 'edit') ? 'mdi-pencil' : 'mdi-eye' }}
                       </v-icon>
-                      {{ member.permission === 'view_and_edit' ? 'Can Edit' : 'View Only' }}
+                      {{ (member.permission === 'view_and_edit' || member.role === 'edit') ? 'Can Edit' : 'Can View' }}
                     </v-chip>
                   </div>
                 </div>
                 
                 <div v-if="isProjectOwner" class="member-actions">
-                  <v-menu>
+                  <v-menu v-if="member.status !== 'pending'">
                     <template #activator="{ props }">
                       <v-btn
                         icon="mdi-dots-vertical"
@@ -736,6 +746,15 @@
                       </v-list-item>
                     </v-list>
                   </v-menu>
+                  <v-btn
+                    v-else
+                    icon="mdi-delete"
+                    variant="text"
+                    size="small"
+                    color="error"
+                    @click="removeMember(member.userId || member.email)"
+                    title="Cancel invitation"
+                  />
                 </div>
               </div>
             </div>
@@ -2018,6 +2037,17 @@ onMounted(() => {
   border-color: #3b82f6;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   transform: translateY(-2px);
+}
+
+.team-member-card.pending-member {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border-color: #fbbf24;
+  opacity: 0.95;
+}
+
+.team-member-card.pending-member:hover {
+  border-color: #f59e0b;
+  box-shadow: 0 4px 12px -1px rgba(245, 158, 11, 0.2);
 }
 
 .member-info {
