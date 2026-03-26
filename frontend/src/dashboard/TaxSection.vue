@@ -200,81 +200,149 @@
       <h2 class="card-title">
         My balance
       </h2>
-      <div class="balance-amount">
-        <span class="currency-symbol">$</span>
-        <span class="amount">11,650</span>
+      
+      <!-- Loading state -->
+      <div
+        v-if="loading"
+        class="loading-state"
+      >
+        <div class="loading-spinner" />
+        <p>Loading financial data...</p>
       </div>
-      <div class="balance-period">
-        Income in this month
+
+      <!-- Error state -->
+      <div
+        v-else-if="error"
+        class="error-state"
+      >
+        <p>{{ error }}</p>
+        <button
+          class="retry-button"
+          @click="loadFinancialData"
+        >
+          Retry
+        </button>
       </div>
+
+      <!-- Balance display -->
+      <div v-else>
+        <div class="balance-amount">
+          <span class="currency-symbol">$</span>
+          <span class="amount">{{ totalBalance.toLocaleString() }}</span>
+        </div>
+        <div class="balance-period">
+          Income in this month: ${{ monthlyEarnings.toLocaleString() }}
+        </div>
         
-      <div class="income-sources">
-        <div class="income-source">
-          <div
-            class="source-logo"
-            style="background-color: #3cb371;"
+        <!-- Real platform earnings -->
+        <div class="income-sources">
+          <div 
+            v-for="platform in platformEarnings" 
+            :key="platform.name"
+            class="income-source"
           >
-            <span>Up</span>
-          </div>
-          <div class="source-details">
-            <div class="source-name">
-              UpWork
+            <div
+              class="source-logo"
+              :style="{ backgroundColor: platform.color }"
+            >
+              <span>{{ platform.logo }}</span>
             </div>
-            <div class="source-progress-container">
-              <div
-                class="source-progress"
-                style="width: 75%;"
-              />
+            <div class="source-details">
+              <div class="source-name">
+                {{ platform.name }}
+              </div>
+              <div class="source-progress-container">
+                <div
+                  class="source-progress"
+                  :style="{ width: platform.percentage + '%' }"
+                />
+              </div>
+            </div>
+            <div class="source-amount">
+              ${{ platform.amount.toLocaleString() }}
             </div>
           </div>
-          <div class="source-amount">
-            4800$
+
+          <!-- Show message if no platforms connected -->
+          <div
+            v-if="platformEarnings.length === 0"
+            class="no-platforms"
+          >
+            <p>No platforms connected</p>
+            <small>Connect your freelance platforms to see real earnings data</small>
+            
+            <!-- Platform connection buttons -->
+            <div class="platform-connect-buttons">
+              <button 
+                class="connect-button upwork"
+                :disabled="syncing"
+                @click="connectPlatform('upwork')"
+              >
+                <span class="button-icon">💼</span>
+                Connect Upwork
+              </button>
+              <button 
+                class="connect-button freelancer"
+                :disabled="syncing"
+                @click="connectPlatform('freelancer')"
+              >
+                <span class="button-icon">👔</span>
+                Connect Freelancer
+              </button>
+              <button 
+                class="connect-button fiverr"
+                :disabled="syncing"
+                @click="connectPlatform('fiverr')"
+              >
+                <span class="button-icon">🛍️</span>
+                Connect Fiverr
+              </button>
+            </div>
+          </div>
+
+          <!-- Sync button if platforms connected -->
+          <div
+            v-if="platformEarnings.length > 0"
+            class="sync-section"
+          >
+            <button 
+              class="sync-button" 
+              :disabled="syncing"
+              @click="syncAllPlatforms"
+            >
+              <span v-if="!syncing">🔄 Sync Earnings</span>
+              <span v-else>⏳ Syncing...</span>
+            </button>
+            <small
+              v-if="financialSummary?.platforms?.[0]?.lastSynced"
+              class="last-synced"
+            >
+              Last synced: {{ formatDate(financialSummary.platforms[0].lastSynced) }}
+            </small>
           </div>
         </div>
-          
-        <div class="income-source">
-          <div
-            class="source-logo"
-            style="background-color: #0e76a8;"
-          >
-            <span>F</span>
+
+        <!-- Financial statistics -->
+        <div
+          v-if="financialSummary"
+          class="financial-stats"
+        >
+          <div class="stat-item">
+            <span class="stat-label">Total Projects:</span>
+            <span class="stat-value">{{ financialSummary.statistics?.totalProjects || 0 }}</span>
           </div>
-          <div class="source-details">
-            <div class="source-name">
-              Freelancer.com
-            </div>
-            <div class="source-progress-container">
-              <div
-                class="source-progress"
-                style="width: 25%;"
-              />
-            </div>
+          <div class="stat-item">
+            <span class="stat-label">Active Projects:</span>
+            <span class="stat-value">{{ financialSummary.statistics?.activeProjects || 0 }}</span>
           </div>
-          <div class="source-amount">
-            1250$
-          </div>
-        </div>
-          
-        <div class="income-source">
-          <div
-            class="source-logo"
-            style="background-color: #1dbf73;"
-          >
-            <span>F</span>
-          </div>
-          <div class="source-details">
-            <div class="source-name">
-              Fiverr
-            </div>
-            <div class="source-progress-container">
-              <div
-                class="source-progress"
-                style="width: 95%;"
-              />
-            </div>
-          </div>
-          <div class="source-amount">
-            5600$
+          <div class="stat-item">
+            <span class="stat-label">Monthly Growth:</span>
+            <span
+              class="stat-value"
+              :class="{ positive: (financialSummary.statistics?.monthlyGrowth || 0) > 0, negative: (financialSummary.statistics?.monthlyGrowth || 0) < 0 }"
+            >
+              {{ (financialSummary.statistics?.monthlyGrowth || 0).toFixed(1) }}%
+            </span>
           </div>
         </div>
       </div>
@@ -284,16 +352,184 @@
     
 
 
-    <script>
-   export default {
+<script>
+import { ref, onMounted, computed } from 'vue';
+import financialService from '@/services/financialService';
+import { logControl } from '@/utils/logControl';
+
+export default {
   name: "TaxCalculator",
+  setup() {
+    // Tax calculator data
+    const country = ref("Germany");
+    const state = ref("");
+    const taxCategory = ref(1);
+    const salary = ref(0);
+    const salaryPeriod = ref("month");
+
+    // Financial data
+    const financialSummary = ref(null);
+    const loading = ref(false);
+    const error = ref(null);
+    const syncing = ref(false);
+    const apiUnavailable = ref(false);
+
+    // Mock financial data for when API is unavailable
+    const getMockFinancialData = () => ({
+      balance: 15250.50,
+      earnings: [
+        { platform: 'Upwork', amount: 8500, percentage: 45 },
+        { platform: 'Freelancer', amount: 4200, percentage: 22 },
+        { platform: 'Fiverr', amount: 3500, percentage: 18 },
+        { platform: 'Other', amount: 2050, percentage: 10 }
+      ],
+      thisMonth: 3200,
+      lastMonth: 2800,
+      growth: 14.3,
+      totalEarnings: 18250.50
+    });
+
+    // Load financial data
+    const loadFinancialData = async () => {
+      try {
+        loading.value = true;
+        error.value = null;
+        apiUnavailable.value = false;
+        
+        try {
+          financialSummary.value = await financialService.getFinancialSummary();
+        } catch (apiError) {
+          // If API fails, check if it's a network error
+          if (apiError.code === 'ERR_NETWORK' || apiError.code === 'ECONNABORTED') {
+            logControl.logWarnOnce('api-unavailable', 'Backend API unavailable, using mock data');
+            apiUnavailable.value = true;
+            financialSummary.value = getMockFinancialData();
+            error.value = null; // Don't show error since we have mock data
+          } else {
+            throw apiError;
+          }
+        }
+      } catch (err) {
+        logControl.logErrorOnce('load-financial-data', 'Failed to load financial data:', err);
+        // Use mock data as fallback
+        financialSummary.value = getMockFinancialData();
+        apiUnavailable.value = true;
+        error.value = null; // Don't show error message since we have fallback data
+      } finally {
+        loading.value = false;
+      }
+    };
+
+    // Connect platform via OAuth
+    const connectPlatform = async (platform) => {
+      try {
+        const authUrl = await financialService.connectPlatform(platform);
+        // Open OAuth flow in popup or redirect
+        window.location.href = authUrl;
+      } catch (err) {
+        console.error(`Failed to connect ${platform}:`, err);
+        alert(`Failed to connect ${platform}. Please try again.`);
+      }
+    };
+
+    // Sync all platforms
+    const syncAllPlatforms = async () => {
+      try {
+        syncing.value = true;
+        await financialService.syncAllPlatforms();
+        // Reload financial data
+        await loadFinancialData();
+      } catch (err) {
+        console.error('Failed to sync platforms:', err);
+        alert('Failed to sync earnings. Please try again.');
+      } finally {
+        syncing.value = false;
+      }
+    };
+
+    // Format date helper
+    const formatDate = (date) => {
+      if (!date) return '';
+      return new Date(date).toLocaleString();
+    };
+
+    // Check for OAuth callback success
+    onMounted(() => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const connected = urlParams.get('connected');
+      const error = urlParams.get('error');
+      
+      if (connected) {
+        alert(`Successfully connected to ${connected}!`);
+        // Clear URL params
+        window.history.replaceState({}, document.title, window.location.pathname);
+        // Trigger sync
+        syncAllPlatforms();
+      } else if (error) {
+        alert(`Connection failed: ${error}`);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+      
+      loadFinancialData();
+    });
+
+    // Computed properties for financial display
+    const totalBalance = computed(() => {
+      return financialSummary.value?.totalBalance || 0;
+    });
+
+    const monthlyEarnings = computed(() => {
+      return financialSummary.value?.totalEarnings?.thisMonth || 0;
+    });
+
+    const platformEarnings = computed(() => {
+      if (!financialSummary.value?.platforms) return [];
+      
+      return financialSummary.value.platforms.map(platform => {
+        const platformInfo = financialService.getPlatformInfo(platform.platform);
+        const maxEarnings = Math.max(...financialSummary.value.platforms.map(p => p.earnings.thisMonth));
+        const percentage = maxEarnings > 0 ? (platform.earnings.thisMonth / maxEarnings) * 100 : 0;
+        
+        return {
+          name: platformInfo.name,
+          amount: platform.earnings.thisMonth,
+          percentage: Math.round(percentage),
+          color: platformInfo.color,
+          logo: platform.platform.charAt(0).toUpperCase()
+        };
+      }).filter(p => p.amount > 0);
+    });
+
+    // Load data on mount
+    onMounted(() => {
+      loadFinancialData();
+    });
+
+    return {
+      // Tax calculator
+      country,
+      state,
+      taxCategory,
+      salary,
+      salaryPeriod,
+      
+      // Financial data
+      financialSummary,
+      loading,
+      error,
+      syncing,
+      apiUnavailable,
+      totalBalance,
+      monthlyEarnings,
+      platformEarnings,
+      loadFinancialData,
+      connectPlatform,
+      syncAllPlatforms,
+      formatDate
+    };
+  },
   data() {
     return {
-      country: "Germany",
-      state: "",
-      taxCategory: 1,
-      salary: 0,
-      salaryPeriod: "month",
       colors: {
         incomeTax: "#e74c3c",
         pension: "#f1c40f",
@@ -412,7 +648,9 @@
   },
   mounted() {
     this.calculateTaxes();
+    this.loadFinancialData();
   },
+
 
   methods: {
     calculateIncomeTax(annualSalary, country) {
@@ -618,6 +856,86 @@
       font-size: 14px;
       margin-bottom: 8px;
       text-align: left  !important;
+    }
+
+    /* Loading and error states */
+    .loading-state, .error-state {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .loading-spinner {
+      width: 30px;
+      height: 30px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #0D7C66;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .retry-button {
+      background: #0D7C66;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .retry-button:hover {
+      background: #0a6b57;
+    }
+
+    .no-platforms {
+      text-align: center;
+      color: #666;
+      padding: 20px;
+    }
+
+    .no-platforms small {
+      display: block;
+      margin-top: 5px;
+      color: #999;
+    }
+
+    /* Financial statistics */
+    .financial-stats {
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .stat-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .stat-value {
+      font-size: 12px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .stat-value.positive {
+      color: #10B981;
+    }
+
+    .stat-value.negative {
+      color: #EF4444;
     }
     
     .select-container {
@@ -826,6 +1144,177 @@
       font-size: 14px;
       font-weight: 600;
       margin-left: 12px;
+    }
+
+    /* Platform connection styles */
+    .no-platforms {
+      text-align: center;
+      padding: 32px 16px;
+      color: #777;
+    }
+
+    .no-platforms p {
+      margin: 0 0 8px 0;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .no-platforms small {
+      display: block;
+      margin-bottom: 24px;
+      color: #999;
+    }
+
+    .platform-connect-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+
+    .connect-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .connect-button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .connect-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .connect-button.upwork {
+      background: linear-gradient(135deg, #6fda44 0%, #5fb836 100%);
+    }
+
+    .connect-button.freelancer {
+      background: linear-gradient(135deg, #29b2fe 0%, #1a8fd9 100%);
+    }
+
+    .connect-button.fiverr {
+      background: linear-gradient(135deg, #1dbf73 0%, #19a463 100%);
+    }
+
+    .button-icon {
+      font-size: 20px;
+    }
+
+    .sync-section {
+      text-align: center;
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid #eee;
+    }
+
+    .sync-button {
+      padding: 10px 24px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .sync-button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .sync-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .last-synced {
+      display: block;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #999;
+    }
+
+    .loading-state, .error-state {
+      text-align: center;
+      padding: 32px;
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .retry-button {
+      margin-top: 16px;
+      padding: 8px 16px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .retry-button:hover {
+      background: #5568d3;
+    }
+
+    .financial-stats {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid #eee;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-label {
+      display: block;
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      display: block;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .stat-value.positive {
+      color: #2ecc71;
+    }
+
+    .stat-value.negative {
+      color: #e74c3c;
     }
     </style>
     

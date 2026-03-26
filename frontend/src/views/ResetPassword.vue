@@ -9,7 +9,10 @@
           
         <form @submit.prevent="submitForm">
           <!-- Error Messages -->
-          <div v-if="errors.length > 0" class="error-messages">
+          <div
+            v-if="errors.length > 0"
+            class="error-messages"
+          >
             <div 
               v-for="error in errors" 
               :key="error" 
@@ -20,7 +23,10 @@
           </div>
 
           <!-- Success Message -->
-          <div v-if="successMessage" class="success-message">
+          <div
+            v-if="successMessage"
+            class="success-message"
+          >
             {{ successMessage }}
           </div>
 
@@ -32,20 +38,23 @@
             :disabled="isLoading"
             maxlength="6"
             required
-          />
+          >
 
           <!-- Password Options -->
           <div class="password-options">
             <h3>Choose an option:</h3>
             
-            <div class="option-card" :class="{ 'selected': selectedOption === 'keep' }">
+            <div
+              class="option-card"
+              :class="{ 'selected': selectedOption === 'keep' }"
+            >
               <label class="option-label">
                 <input 
-                  type="radio" 
                   v-model="selectedOption" 
+                  type="radio" 
                   value="keep"
                   :disabled="isLoading"
-                />
+                >
                 <div class="option-content">
                   <strong>Keep Current Password</strong>
                   <p>Continue using your existing password</p>
@@ -53,14 +62,17 @@
               </label>
             </div>
 
-            <div class="option-card" :class="{ 'selected': selectedOption === 'change' }">
+            <div
+              class="option-card"
+              :class="{ 'selected': selectedOption === 'change' }"
+            >
               <label class="option-label">
                 <input 
-                  type="radio" 
                   v-model="selectedOption" 
+                  type="radio" 
                   value="change"
                   :disabled="isLoading"
-                />
+                >
                 <div class="option-content">
                   <strong>Create New Password</strong>
                   <p>Set a new password for your account</p>
@@ -70,7 +82,10 @@
           </div>
 
           <!-- New Password Fields (shown only if changing password) -->
-          <div v-if="selectedOption === 'change'" class="new-password-section">
+          <div
+            v-if="selectedOption === 'change'"
+            class="new-password-section"
+          >
             <label>New Password</label>
             <div class="password-field">
               <input
@@ -80,13 +95,13 @@
                 :disabled="isLoading"
                 autocomplete="new-password"
                 required
-              />
+              >
               <img 
                 :src="showNewPassword ? '/eye-open.svg' : '/eye-close.svg'" 
                 class="eye-icon" 
                 alt="Toggle password visibility" 
                 @click="toggleNewPassword"
-              />
+              >
             </div>
 
             <label>Confirm New Password</label>
@@ -98,13 +113,13 @@
                 :disabled="isLoading"
                 autocomplete="new-password"
                 required
-              />
+              >
               <img 
                 :src="showConfirmPassword ? '/eye-open.svg' : '/eye-close.svg'" 
                 class="eye-icon" 
                 alt="Toggle password visibility" 
                 @click="toggleConfirmPassword"
-              />
+              >
             </div>
           </div>
   
@@ -123,8 +138,8 @@
           <button 
             type="button" 
             class="resend-btn"
-            @click="resendCode"
             :disabled="isLoading || resendCooldown > 0"
+            @click="resendCode"
           >
             <span v-if="resendCooldown > 0">Resend in {{ resendCooldown }}s</span>
             <span v-else>Resend Code</span>
@@ -142,7 +157,7 @@
         <img
           src="/sign.png"
           alt="Reset password illustration"
-        />
+        >
       </div>
     </div>
   
@@ -248,16 +263,24 @@ export default {
 
         // Handle successful request
         if (response.success) {
+          // Save authentication data if token is provided
+          if (response.data && response.data.token) {
+            localStorage.setItem('auth_token', response.data.token);
+            if (response.data.user) {
+              localStorage.setItem('user', JSON.stringify(response.data.user));
+            }
+          }
+
           if (selectedOption.value === 'keep') {
-            successMessage.value = "Password verification successful! Your existing password remains unchanged.";
+            successMessage.value = "Password verification successful! Redirecting to dashboard...";
           } else {
-            successMessage.value = "Password successfully updated! You can now login with your new password.";
+            successMessage.value = "Password successfully updated! Redirecting to dashboard...";
           }
           
-          // Redirect to login after success
+          // Redirect to dashboard after success
           setTimeout(() => {
-            router.push('/login');
-          }, 3000);
+            router.push({ name: 'DashboardPage' });
+          }, 1500);
         }
 
       } catch (error) {
@@ -335,36 +358,49 @@ export default {
 </script>
   
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
 .container {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  gap: 50px;
-  margin-left: 100px;
-  margin-right: 100px;
-  padding: 20px 0;
+  padding: 40px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
 }
 
 .form-container {
-  width: 500px;
-  height: auto;
-  padding: 0px;
+  width: 520px;
+  background: white;
+  padding: 48px;
+  border-radius: 16px;
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.1), 
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(229, 231, 235, 0.8);
 }
 
 h1 {
-  margin-top: 50px;
-  font-size: 24px;
-  color: #000;
-  text-align: left;
-  font-weight: 600;
+  margin: 0 0 16px 0;
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
+  color: #111827;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
 p {
   font-size: 16px;
-  color: #555;
-  text-align: left;
-  margin-bottom: 30px;
+  color: #6b7280;
+  text-align: center;
+  margin-bottom: 40px;
+  line-height: 1.6;
+  font-weight: 400;
 }
 
 form {
@@ -373,20 +409,40 @@ form {
 }
 
 label {
-  font-size: 16px;
-  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 20px 0 8px 0;
   text-align: left;
-  font-weight: 500;
+  color: #374151;
 }
 
 input[type="text"], input[type="password"] {
-  padding: 10px;
-  margin-top: 5px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  padding: 12px 16px;
+  margin-bottom: 4px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
   width: 100%;
   font-size: 16px;
+  font-weight: 400;
+  transition: all 0.2s ease;
+  background: white;
+  color: #111827;
+  box-sizing: border-box;
+}
+
+input::placeholder {
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+input:focus {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+input:hover:not(:focus) {
+  border-color: #9ca3af;
 }
 
 .password-field {
@@ -395,41 +451,54 @@ input[type="text"], input[type="password"] {
   position: relative;
 }
 
+.password-field input {
+  padding-right: 54px;
+}
+
 .eye-icon {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   cursor: pointer;
   position: absolute;
-  right: 10px;
+  right: 18px;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.eye-icon:hover {
+  opacity: 1;
 }
 
 .password-options {
-  margin: 20px 0;
+  margin: 24px 0 0 0;
 }
 
 .password-options h3 {
-  font-size: 18px;
-  margin-bottom: 15px;
-  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #374151;
 }
 
 .option-card {
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  padding: 15px;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  padding: 16px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  background: white;
 }
 
 .option-card:hover {
-  border-color: #007b5e;
-  background-color: #f8fffe;
+  border-color: #10b981;
+  background-color: #f0fdf4;
 }
 
 .option-card.selected {
-  border-color: #007b5e;
-  background-color: #f0fff4;
+  border-color: #10b981;
+  background-color: #f0fdf4;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
 .option-label {
@@ -442,7 +511,10 @@ input[type="text"], input[type="password"] {
 .option-label input[type="radio"] {
   margin-right: 12px;
   margin-top: 2px;
-  width: auto;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #10b981;
 }
 
 .option-content {
@@ -451,96 +523,114 @@ input[type="text"], input[type="password"] {
 
 .option-content strong {
   display: block;
-  font-size: 16px;
-  color: #333;
+  font-size: 15px;
+  color: #111827;
   margin-bottom: 4px;
+  font-weight: 600;
 }
 
 .option-content p {
   font-size: 14px;
-  color: #666;
+  color: #6b7280;
   margin: 0;
+  text-align: left;
 }
 
 .new-password-section {
-  margin-top: 20px;
-  padding: 20px;
-  background-color: #f8fffe;
-  border-radius: 8px;
+  margin-top: 24px;
+  padding: 24px;
+  background-color: #f0fdf4;
+  border-radius: 10px;
   border: 1px solid #d1fae5;
 }
 
 button[type="submit"] {
-  margin-top: 30px;
-  padding: 12px;
+  margin-top: 32px;
+  padding: 14px 24px;
   border: none;
-  background-color: #007b5e;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
   font-size: 16px;
-  border-radius: 5px;
+  font-weight: 600;
+  border-radius: 8px;
   cursor: pointer;
   width: 100%;
-  transition: background-color 0.3s ease;
-  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 button[type="submit"]:hover:not(:disabled) {
-  background-color: #005f47;
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+
+button[type="submit"]:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 button[type="submit"]:disabled {
-  background-color: #cccccc;
+  background: #d1d5db;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  color: #9ca3af;
 }
 
 .resend-section {
-  margin-top: 20px;
+  margin-top: 28px;
   text-align: center;
-  padding: 15px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
+  padding: 20px;
+  background-color: #f9fafb;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
 }
 
 .resend-section p {
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   font-size: 14px;
-  color: #666;
+  color: #6b7280;
+  text-align: center;
 }
 
 .resend-btn {
-  background: none;
-  border: 1px solid #007b5e;
-  color: #007b5e;
-  padding: 8px 16px;
-  border-radius: 4px;
+  background: white;
+  border: 1px solid #10b981;
+  color: #10b981;
+  padding: 10px 20px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
-  transition: all 0.3s ease;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .resend-btn:hover:not(:disabled) {
-  background-color: #007b5e;
+  background-color: #10b981;
   color: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
 }
 
 .resend-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
 }
 
 /* Error and Success Messages */
 .error-messages {
-  margin-bottom: 15px;
-  animation: slideIn 0.3s ease-out;
+  margin-bottom: 20px;
 }
 
 .error-message {
-  background-color: #fef2f2;
-  color: #dc2626;
-  padding: 12px 16px;
-  border-radius: 8px;
+  background: #fef2f2;
   border: 1px solid #fecaca;
-  border-left: 4px solid #dc2626;
+  border-radius: 8px;
+  color: #dc2626;
+  padding: 16px;
   margin-bottom: 8px;
   font-size: 14px;
   font-weight: 500;
@@ -551,49 +641,79 @@ button[type="submit"]:disabled {
 .error-message::before {
   content: "⚠️";
   margin-right: 8px;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  font-size: 16px;
 }
 
 .success-message {
-  background-color: #f0fff4;
-  color: #38a169;
-  padding: 12px 16px;
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  padding: 16px;
   border-radius: 8px;
-  border-left: 4px solid #48bb78;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   font-size: 14px;
   font-weight: 500;
 }
 
 .back-to-login {
-  margin-top: 20px;
-  font-size: 16px;
+  margin-top: 24px;
+  font-size: 14px;
   text-align: center;
+  color: #6b7280;
+  line-height: 1.5;
 }
 
 .back-to-login a {
-  color: #007b5e;
+  color: #10b981;
   text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
 }
 
 .back-to-login a:hover {
+  color: #059669;
   text-decoration: underline;
 }
 
-.image-container img {
-  border-radius: 10px;
-  height: 600px;
-  width: auto;
-  margin-top: 80px;
+/* Hide image container to match login page */
+.image-container {
+  display: none;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .container {
+    padding: 20px;
+  }
+  
+  .form-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 40px 32px;
+  }
+  
+  h1 {
+    font-size: 28px;
+  }
+  
+  input {
+    padding: 10px 14px;
+  }
+  
+  button {
+    padding: 12px 20px;
+  }
+  
+  .password-options h3 {
+    font-size: 15px;
+  }
+  
+  .option-card {
+    padding: 14px;
+  }
+  
+  .new-password-section {
+    padding: 20px;
+  }
 }
 </style>

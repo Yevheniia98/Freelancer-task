@@ -28,27 +28,32 @@ import clientRoutes from './routes/client.routes';
 import taskRoutes from './routes/task.routes';
 import teamRoutes from './routes/team.routes';
 import financeRoutes from './routes/finance.routes';
+import subscriptionRoutes from './routes/subscription.routes';
 import settingsRoutes from './routes/settings.routes';
 import projectIntegrationRoutes from './routes/project.integration.routes';
 import meetingInvitationRoutes from './routes/meeting-invitation.routes';
 import testEmailRoutes from './routes/test-email.routes';
 import teamManagementRoutes from './routes/team-management.routes';
 import notificationRoutes from './routes/notification.routes';
+import inviteRoutes from './routes/invite.routes';
+import chatRoutes from './routes/project-chat.routes';
 // import financialRoutes from './routes/financial.routes';
+
+// Import services
+import { SocketService } from './services/socket.service';
 
 // Import middleware
 import { errorHandler } from './middleware/error.middleware';
 import { notFound } from './middleware/notFound.middleware';
+import { strictInputSanitization } from './middleware/input-sanitization.middleware';
+import { csrfTokenGenerator, getCsrfToken } from './middleware/csrf-protection.middleware';
 
 // Create Express app
 const app = express();
 const server = createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
-    methods: ["GET", "POST"]
-  }
-});
+
+// Initialize Socket.IO service for real-time chat (creates its own Socket.IO server)
+const socketService = new SocketService(server);
 
 const PORT = process.env.PORT || 5000;
 
@@ -61,7 +66,8 @@ app.use(helmet({
 // CORS configuration
 app.use(cors({
   origin: [
-    process.env.FRONTEND_URL || 'http://localhost:3000',
+    process.env.FRONTEND_URL || 'http://localhost:3030',
+    'http://localhost:3000',
     'http://localhost:3001',
     'http://localhost:5173',
     'http://localhost:8080'
@@ -85,8 +91,12 @@ if (!fs.existsSync(uploadsDir)) {
   console.log('📁 Created uploads directory at:', uploadsDir);
 }
 
-// Static file serving for uploads
-app.use('/uploads', express.static(uploadsDir));
+// Static file serving for uploads with CORS headers
+app.use('/uploads', (req, res, next) => {
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  next();
+}, express.static(uploadsDir));
 
 // Multer configuration for file uploads
 const storage = multer.diskStorage({
@@ -153,6 +163,16 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
+// Security: Input sanitization middleware - protects against XSS, SQL injection, NoSQL injection, and prompt injection
+// Apply strict sanitization only to public/auth endpoints
+app.use('/api/auth', strictInputSanitization);
+
+// Security: CSRF token generation
+app.use(csrfTokenGenerator);
+
+// CSRF token endpoint
+app.get('/api/csrf-token', getCsrfToken);
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ 
@@ -171,12 +191,63 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/team', teamRoutes);
 app.use('/api/team-management', teamManagementRoutes);
 app.use('/api/finance', financeRoutes);
+app.use('/api/subscription', subscriptionRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/integrations', projectIntegrationRoutes);
 app.use('/api/meeting-invitations', meetingInvitationRoutes);
 app.use('/api/test-email', testEmailRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api', inviteRoutes);
+app.use('/api', chatRoutes);
 // app.use('/api/financial', financialRoutes);
+
+// Team Invitation Email Endpoint
+app.post('/api/send-email', async (req, res) => {
+  try {
+    const { to, subject, html } = req.body;
+
+    if (!to || !subject || !html) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required fields: to, subject, html'
+      });
+    }
+
+    // Import EmailService dynamically
+    const { EmailService } = await import('./services/email.service');
+    const emailService = new EmailService();
+
+    // Send the email
+    const emailSent = await emailService.sendEmail({
+      to,
+      subject,
+      html,
+      text: subject // Fallback text version
+    });
+
+    if (emailSent) {
+      console.log(`✅ Team invitation email sent to: ${to}`);
+      res.status(200).json({
+        success: true,
+        message: 'Email sent successfully'
+      });
+    } else {
+      console.error(`❌ Failed to send email to: ${to}`);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to send email'
+      });
+    }
+
+  } catch (error: any) {
+    console.error('❌ Email sending error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
 
 // Image Upload Endpoint - Clean & Simple
 app.post('/upload', (req, res) => {
@@ -247,29 +318,8 @@ app.post('/upload', (req, res) => {
   });
 });
 
-// Socket.io for real-time features
-io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
-
-  // Join project rooms for real-time updates
-  socket.on('join-project', (projectId) => {
-    socket.join(`project-${projectId}`);
-  });
-
-  // Handle team chat
-  socket.on('send-message', (data) => {
-    socket.to(`project-${data.projectId}`).emit('new-message', data);
-  });
-
-  // Handle task updates
-  socket.on('task-update', (data) => {
-    socket.to(`project-${data.projectId}`).emit('task-updated', data);
-  });
-
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
-  });
-});
+// Socket.IO is initialized via SocketService (see line ~58)
+// All real-time features are handled there
 
 // Error handling middleware (must be last)
 app.use(notFound);

@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProjectEntity = exports.ProjectPriority = exports.ProjectStatus = void 0;
+exports.ProjectEntity = exports.TeamMemberPermission = exports.ProjectPriority = exports.ProjectStatus = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 // Simple Project entity similar to TypeORM style
 var ProjectStatus;
@@ -50,12 +50,23 @@ var ProjectPriority;
     ProjectPriority["HIGH"] = "high";
     ProjectPriority["URGENT"] = "urgent";
 })(ProjectPriority || (exports.ProjectPriority = ProjectPriority = {}));
+var TeamMemberPermission;
+(function (TeamMemberPermission) {
+    TeamMemberPermission["VIEW_ONLY"] = "view";
+    TeamMemberPermission["VIEW_AND_EDIT"] = "edit";
+    TeamMemberPermission["OWNER"] = "owner";
+})(TeamMemberPermission || (exports.TeamMemberPermission = TeamMemberPermission = {}));
 const ProjectEntitySchema = new mongoose_1.Schema({
     title: {
         type: String,
         required: [true, 'Project title is required'],
         trim: true,
         maxlength: [200, 'Title cannot exceed 200 characters']
+    },
+    name: {
+        type: String,
+        trim: true,
+        maxlength: [200, 'Name cannot exceed 200 characters']
     },
     description: {
         type: String,
@@ -78,6 +89,59 @@ const ProjectEntitySchema = new mongoose_1.Schema({
     deadline: {
         type: Date,
         required: false
+    },
+    privacy: {
+        type: String,
+        trim: true
+    },
+    category: {
+        type: String,
+        trim: true
+    },
+    skills: {
+        type: [String],
+        default: []
+    },
+    teamLead: {
+        type: String,
+        trim: true
+    },
+    teamMembers: {
+        type: [{
+                userId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User', required: false },
+                name: { type: String, required: true },
+                email: { type: String, required: true },
+                role: {
+                    type: String,
+                    enum: ['view', 'edit', 'owner'],
+                    default: 'view',
+                    required: true
+                },
+                status: {
+                    type: String,
+                    enum: ['active', 'pending'],
+                    default: 'active'
+                },
+                addedAt: { type: Date, default: Date.now },
+                addedBy: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User' }
+            }],
+        default: []
+    },
+    projectOwner: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    files: {
+        type: [{
+                filename: { type: String, required: true },
+                originalName: { type: String, required: true },
+                path: { type: String, required: true },
+                mimetype: { type: String, required: true },
+                size: { type: Number, required: true },
+                uploadedAt: { type: Date, default: Date.now },
+                uploadedBy: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User' }
+            }],
+        default: []
     }
 }, {
     timestamps: true, // This automatically adds createdAt and updatedAt

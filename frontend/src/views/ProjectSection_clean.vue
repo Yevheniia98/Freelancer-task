@@ -74,7 +74,9 @@
           <div class="projects-section">
             <!-- Section Header -->
             <div class="section-header">
-              <h2 class="section-title">Project Overview</h2>
+              <h2 class="section-title">
+                Project Overview
+              </h2>
               <div class="section-actions">
                 <v-btn 
                   color="white"
@@ -82,7 +84,9 @@
                   class="action-btn"
                   @click="navigateToProjectCreate"
                 >
-                  <v-icon left>mdi-plus</v-icon>
+                  <v-icon left>
+                    mdi-plus
+                  </v-icon>
                   Create Project
                 </v-btn>
               </div>
@@ -102,7 +106,9 @@
                 <div class="column-header">
                   <div class="column-title">
                     <div class="title-icon new-icon">
-                      <v-icon size="20">mdi-plus-circle</v-icon>
+                      <v-icon size="20">
+                        mdi-plus-circle
+                      </v-icon>
                     </div>
                     <h3>New</h3>
                     <div class="task-count">
@@ -128,7 +134,9 @@
                           color: `var(--v-theme-${task.iconColor})`
                         }"
                       >
-                        <v-icon size="16">{{ task.icon }}</v-icon>
+                        <v-icon size="16">
+                          {{ task.icon }}
+                        </v-icon>
                       </div>
                       <div class="task-menu">
                         <v-menu>
@@ -156,8 +164,12 @@
                     </div>
 
                     <div class="task-content">
-                      <h4 class="task-title">{{ task.title }}</h4>
-                      <p class="task-description">{{ task.description }}</p>
+                      <h4 class="task-title">
+                        {{ task.title }}
+                      </h4>
+                      <p class="task-description">
+                        {{ task.description }}
+                      </p>
                     </div>
 
                     <div class="task-progress">
@@ -233,7 +245,9 @@
                 <div class="column-header">
                   <div class="column-title">
                     <div class="title-icon progress-icon">
-                      <v-icon size="20">mdi-progress-clock</v-icon>
+                      <v-icon size="20">
+                        mdi-progress-clock
+                      </v-icon>
                     </div>
                     <h3>In Progress</h3>
                     <div class="task-count">
@@ -259,7 +273,9 @@
                           color: `var(--v-theme-${task.iconColor})`
                         }"
                       >
-                        <v-icon size="16">{{ task.icon }}</v-icon>
+                        <v-icon size="16">
+                          {{ task.icon }}
+                        </v-icon>
                       </div>
                       <div class="task-menu">
                         <v-menu>
@@ -287,8 +303,12 @@
                     </div>
 
                     <div class="task-content">
-                      <h4 class="task-title">{{ task.title }}</h4>
-                      <p class="task-description">{{ task.description }}</p>
+                      <h4 class="task-title">
+                        {{ task.title }}
+                      </h4>
+                      <p class="task-description">
+                        {{ task.description }}
+                      </p>
                     </div>
 
                     <div class="task-progress">
@@ -357,7 +377,9 @@
                 <div class="column-header">
                   <div class="column-title">
                     <div class="title-icon completed-icon">
-                      <v-icon size="20">mdi-check-circle</v-icon>
+                      <v-icon size="20">
+                        mdi-check-circle
+                      </v-icon>
                     </div>
                     <h3>Completed</h3>
                     <div class="task-count">
@@ -383,7 +405,9 @@
                           color: `var(--v-theme-${task.iconColor})`
                         }"
                       >
-                        <v-icon size="16">{{ task.icon }}</v-icon>
+                        <v-icon size="16">
+                          {{ task.icon }}
+                        </v-icon>
                       </div>
                       <div class="completed-badge">
                         <v-icon
@@ -396,8 +420,12 @@
                     </div>
 
                     <div class="task-content">
-                      <h4 class="task-title">{{ task.title }}</h4>
-                      <p class="task-description">{{ task.description }}</p>
+                      <h4 class="task-title">
+                        {{ task.title }}
+                      </h4>
+                      <p class="task-description">
+                        {{ task.description }}
+                      </p>
                     </div>
 
                     <div class="task-progress">

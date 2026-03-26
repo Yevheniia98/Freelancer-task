@@ -250,8 +250,46 @@
               </v-chip>
             </div>
           </div>
+
+          <!-- Empty State when no projects exist -->
+          <div 
+            v-if="tasks.length === 0" 
+            class="empty-state-container"
+          >
+            <div class="empty-state-content">
+              <v-icon 
+                size="120" 
+                color="grey-lighten-1"
+                class="empty-icon"
+              >
+                mdi-folder-open-outline
+              </v-icon>
+              <h3 class="empty-state-title">
+                Create your first project
+              </h3>
+              <p class="empty-state-subtitle">
+                Get started by creating a new project to manage your work and collaborate with your team.
+              </p>
+              <v-btn 
+                color="primary"
+                variant="elevated"
+                size="large"
+                rounded="lg"
+                class="mt-6"
+                @click="navigateToProjectCreate"
+              >
+                <v-icon class="mr-2">
+                  mdi-plus
+                </v-icon>
+                Create New Project
+              </v-btn>
+            </div>
+          </div>
           
-          <div class="project-board">
+          <div 
+            v-else 
+            class="project-board"
+          >
             <v-row>
               <!-- New Tasks Column -->
               <v-col
@@ -358,12 +396,15 @@
                         <div class="team-section">
                           <div class="team-avatars">
                             <v-avatar
-                              v-for="memberId in task.teamMembers.slice(0, 3)"
-                              :key="memberId"
+                              v-for="(member, idx) in task.teamMembers.slice(0, 3)"
+                              :key="idx"
                               size="32"
+                              :color="getAvatarColor(idx)"
                               class="team-avatar"
                             >
-                              <v-img :src="getTeamMemberAvatar(memberId)" />
+                              <span class="text-white text-caption font-weight-bold">
+                                {{ getInitials(member.name || member.email) }}
+                              </span>
                             </v-avatar>
                             <v-avatar
                               v-if="task.teamMembers.length > 3"
@@ -527,12 +568,15 @@
                         <div class="team-section">
                           <div class="team-avatars">
                             <v-avatar
-                              v-for="memberId in task.teamMembers.slice(0, 3)"
-                              :key="memberId"
+                              v-for="(member, idx) in task.teamMembers.slice(0, 3)"
+                              :key="idx"
                               size="32"
+                              :color="getAvatarColor(idx)"
                               class="team-avatar"
                             >
-                              <v-img :src="getTeamMemberAvatar(memberId)" />
+                              <span class="text-white text-caption font-weight-bold">
+                                {{ getInitials(member.name || member.email) }}
+                              </span>
                             </v-avatar>
                             <v-avatar
                               v-if="task.teamMembers.length > 3"
@@ -699,12 +743,15 @@
                         <div class="team-section">
                           <div class="team-avatars">
                             <v-avatar
-                              v-for="memberId in task.teamMembers.slice(0, 3)"
-                              :key="memberId"
+                              v-for="(member, idx) in task.teamMembers.slice(0, 3)"
+                              :key="idx"
                               size="32"
+                              :color="getAvatarColor(idx)"
                               class="team-avatar"
                             >
-                              <v-img :src="getTeamMemberAvatar(memberId)" />
+                              <span class="text-white text-caption font-weight-bold">
+                                {{ getInitials(member.name || member.email) }}
+                              </span>
                             </v-avatar>
                             <v-avatar
                               v-if="task.teamMembers.length > 3"
@@ -820,173 +867,8 @@ export default defineComponent({
       { id: 4, name: 'Lisa', avatar: 'https://i.pravatar.cc/150?img=4' },
     ]);
     
-    // Tasks data with status
-    const tasks = ref([
-      {
-        id: 1,
-        route: "/project-task",
-        title: 'Slack brand logo design',
-        description: 'Create a brand logo design for admin',
-        icon: 'mdi-pound',
-        iconBg: 'rgba(233, 30, 99, 0.1)',
-        iconColor: 'pink-darken-1',
-        progress: 22,
-        total: 56,
-        teamMembers: [1, 2, 3],
-        date: '10 Jul, 2024',
-        lastUpdate: '3hrs ago',
-        status: 'new',
-        platform: null // Local project
-      },
-      {
-        id: 2,
-        title: 'Redesign - Landing page',
-        description: 'Make new design system. Improve user experience',
-        icon: 'mdi-penguin',
-        iconBg: 'rgba(255, 193, 7, 0.1)',
-        iconColor: 'amber-darken-1',
-        progress: 10,
-        total: 20,
-        teamMembers: [2, 3, 4],
-        date: '19 Jul, 2024',
-        lastUpdate: '8 May',
-        status: 'new',
-        platform: null // Local project
-      },
-      {
-        id: 3,
-        title: 'Chat Application',
-        description: 'Create a Chat application for business communication',
-        icon: 'mdi-paypal',
-        iconBg: 'rgba(33, 150, 243, 0.1)',
-        iconColor: 'blue-darken-1',
-        progress: 5,
-        total: 36,
-        teamMembers: [1, 2, 4],
-        date: '2 Aug, 2024',
-        lastUpdate: '5hrs ago',
-        status: 'new',
-        platform: null // Local project
-      },
-      {
-        id: 100,
-        title: 'React E-commerce Website',
-        description: 'Build a modern e-commerce platform with React and Node.js',
-        icon: 'mdi-briefcase-account',
-        iconBg: 'rgba(20, 168, 0, 0.1)',
-        iconColor: 'green-darken-1',
-        progress: 0,
-        total: 1,
-        teamMembers: [1],
-        date: '20 Aug, 2025',
-        lastUpdate: 'Mock Upwork Project',
-        status: 'new',
-        platform: 'upwork',
-        externalId: 'upwork_mock_001'
-      },
-      {
-        id: 101,
-        title: 'Vue.js Dashboard Development',
-        description: 'Create a modern admin dashboard using Vue.js and Vuetify',
-        icon: 'mdi-account-tie',
-        iconBg: 'rgba(0, 123, 255, 0.1)',
-        iconColor: 'blue-darken-1',
-        progress: 0,
-        total: 1,
-        teamMembers: [1],
-        date: '21 Aug, 2025',
-        lastUpdate: 'Mock Freelancer Project',
-        status: 'new',
-        platform: 'freelancer',
-        externalId: 'freelancer_mock_001'
-      },
-      {
-        id: 4,
-        title: 'Project App',
-        description: 'Create a responsive design for 2 devices',
-        icon: 'mdi-diamond-stone',
-        iconBg: 'rgba(76, 175, 80, 0.1)',
-        iconColor: 'green-darken-1',
-        progress: 35,
-        total: 42,
-        teamMembers: [1, 3, 4],
-        date: '9 Jun, 2024',
-        lastUpdate: '1 June',
-        status: 'new'
-      },
-      {
-        id: 5,
-        title: 'Mobile App Redesign',
-        description: 'Update mobile interface with modern design',
-        icon: 'mdi-cellphone',
-        iconBg: 'rgba(156, 39, 176, 0.1)',
-        iconColor: 'purple-darken-1',
-        progress: 45,
-        total: 60,
-        teamMembers: [1, 2, 3],
-        date: '15 Aug, 2024',
-        lastUpdate: '2hrs ago',
-        status: 'in-progress'
-      },
-      {
-        id: 6,
-        title: 'E-commerce Platform',
-        description: 'Build complete online shopping platform',
-        icon: 'mdi-shopping',
-        iconBg: 'rgba(255, 87, 34, 0.1)',
-        iconColor: 'deep-orange-darken-1',
-        progress: 75,
-        total: 100,
-        teamMembers: [2, 3, 4],
-        date: '25 Aug, 2024',
-        lastUpdate: '1 day ago',
-        status: 'in-progress'
-      },
-      {
-        id: 7,
-        title: 'Analytics Dashboard',
-        description: 'Create comprehensive data visualization dashboard',
-        icon: 'mdi-chart-line',
-        iconBg: 'rgba(0, 188, 212, 0.1)',
-        iconColor: 'cyan-darken-1',
-        progress: 30,
-        total: 50,
-        teamMembers: [1, 2, 4],
-        date: '5 Sep, 2024',
-        lastUpdate: '4hrs ago',
-        status: 'in-progress'
-      },
-      {
-        id: 8,
-        title: 'Multipurpose landing template',
-        description: 'Create multipurpose landing page template',
-        icon: 'mdi-web',
-        iconBg: 'rgba(76, 175, 80, 0.1)',
-        iconColor: 'green-darken-1',
-        progress: 100,
-        total: 100,
-        teamMembers: [1, 2, 3, 4],
-        date: '18 Oct, 2024',
-        lastUpdate: 'Completed',
-        status: 'completed',
-        deadline: '18 Oct, 2024'
-      },
-      {
-        id: 9,
-        title: 'Dashboard UI Kit',
-        description: 'Complete dashboard UI components',
-        icon: 'mdi-view-dashboard',
-        iconBg: 'rgba(33, 150, 243, 0.1)',
-        iconColor: 'blue-darken-1',
-        progress: 100,
-        total: 100,
-        teamMembers: [1, 2, 3],
-        date: '1 Sep, 2024',
-        lastUpdate: 'Completed',
-        status: 'completed',
-        deadline: '1 Sep, 2024'
-      }
-    ]);
+    // Tasks data with status - initially empty for new users
+    const tasks = ref([]);
 
     // Computed properties
     const getTasksByStatus = (status) => {
@@ -997,6 +879,22 @@ export default defineComponent({
     const getTeamMemberAvatar = (memberId) => {
       const member = teamMembers.value.find(m => m.id === memberId);
       return member ? member.avatar : '';
+    };
+    
+    // Get initials from name or email
+    const getInitials = (nameOrEmail) => {
+      if (!nameOrEmail) return '?';
+      const parts = nameOrEmail.split('@')[0].split(/[\s.]+/);
+      if (parts.length >= 2) {
+        return (parts[0][0] + parts[1][0]).toUpperCase();
+      }
+      return nameOrEmail.substring(0, 2).toUpperCase();
+    };
+    
+    // Get avatar color based on index
+    const getAvatarColor = (index) => {
+      const colors = ['primary', 'success', 'info', 'warning', 'error', 'purple', 'teal', 'indigo'];
+      return colors[index % colors.length];
     };
 
     // Map backend status to frontend kanban column status
@@ -1149,7 +1047,9 @@ export default defineComponent({
         
         if (response.ok) {
           const data = await response.json();
-          const upworkProjects = data.data.filter(project => 
+          // Ensure data.data is an array before filtering
+          const projectsArray = Array.isArray(data.data) ? data.data : (Array.isArray(data) ? data : []);
+          const upworkProjects = projectsArray.filter(project => 
             project.externalSource && project.externalSource.platform === 'upwork'
           );
           
@@ -1342,7 +1242,8 @@ export default defineComponent({
           iconColor: 'pink-darken-1',
           progress: project.status === 'completed' ? 1 : 0,
           total: 1,
-          teamMembers: [],
+          teamMembers: project.teamMembers || [],
+          teamLead: project.teamLead || null,
           date: project.deadline ? new Date(project.deadline).toLocaleDateString('en-US', { 
             day: '2-digit', 
             month: 'short', 
@@ -1376,6 +1277,8 @@ export default defineComponent({
       snackbarIcon,
       getTasksByStatus,
       getTeamMemberAvatar,
+      getInitials,
+      getAvatarColor,
       navigateToProjectCreate,
       navigateToProjectDetail,
       onDragStart,
@@ -1420,6 +1323,7 @@ export default defineComponent({
 .main-content {
   background: linear-gradient(135deg, #064E47 0%, #0D7C66 50%, #41B3A2 100%);
   min-height: 100vh;
+  margin-top: 72px;
 }
 
 /* Hero Section */
@@ -2224,6 +2128,63 @@ export default defineComponent({
   
   .board-column {
     min-height: 700px;
+  }
+}
+
+/* Empty State Styles */
+.empty-state-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.empty-state-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.empty-icon {
+  opacity: 0.3;
+  margin-bottom: 1rem;
+}
+
+.empty-state-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #9e9e9e;
+  margin: 0;
+  letter-spacing: 0.3px;
+}
+
+.empty-state-subtitle {
+  font-size: 0.95rem;
+  color: #bdbdbd;
+  margin: 0.5rem 0 0 0;
+  max-width: 400px;
+  line-height: 1.6;
+}
+
+/* Responsive empty state */
+@media (max-width: 768px) {
+  .empty-state-container {
+    min-height: 400px;
+    padding: 2rem 1rem;
+  }
+  
+  .empty-state-title {
+    font-size: 1.25rem;
+  }
+  
+  .empty-state-subtitle {
+    font-size: 0.85rem;
   }
 }
 </style>

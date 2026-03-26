@@ -37,11 +37,45 @@ export class ProjectApiService {
    */
   static async create(projectData) {
     try {
+      console.log('Creating project with data:', JSON.stringify(projectData, null, 2));
       const response = await api.post('/projects', projectData);
       return response.data.data;
     } catch (error) {
       console.error('Create project error:', error);
-      throw new Error(error.response?.data?.message || 'Failed to create project');
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      console.error('Request data:', projectData);
+      
+      // Check if this is a network error
+      if (!error.response) {
+        throw new Error('Cannot connect to server. Please ensure the backend server is running on port 3002.');
+      }
+      
+      // Extract detailed error information
+      const errorData = error.response?.data;
+      let errorMessage = 'Failed to create project';
+      
+      // Handle authentication errors
+      if (error.response?.status === 401) {
+        errorMessage = 'Authentication required. Please log in again.';
+      } else if (error.response?.status === 403) {
+        errorMessage = 'Permission denied. You do not have access to create projects.';
+      } else if (errorData?.message) {
+        errorMessage = errorData.message;
+      }
+      
+      // If there are validation errors, include them
+      if (errorData?.errors && Array.isArray(errorData.errors)) {
+        const errorDetails = errorData.errors.map(e => e.msg || e.message || e).join(', ');
+        errorMessage += ': ' + errorDetails;
+      }
+      
+      // Include status code in error message for debugging
+      if (error.response?.status) {
+        errorMessage += ` (Status: ${error.response.status})`;
+      }
+      
+      throw new Error(errorMessage);
     }
   }
 
@@ -74,7 +108,11 @@ export class ProjectApiService {
   static async getById(id) {
     try {
       const response = await api.get(`/projects/${id}`);
-      return response.data.data;
+      // Return both project data and userRole from backend
+      return {
+        ...response.data.data,
+        userRole: response.data.userRole
+      };
     } catch (error) {
       console.error('Get project error:', error);
       throw new Error(error.response?.data?.message || 'Failed to fetch project');

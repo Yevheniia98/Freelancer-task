@@ -7,6 +7,7 @@ const express_1 = __importDefault(require("express"));
 const express_validator_1 = require("express-validator");
 const auth_controller_1 = require("../controllers/auth.controller");
 const validator_middleware_1 = require("../middleware/validator.middleware");
+const auth_middleware_1 = require("../middleware/auth.middleware");
 const router = express_1.default.Router();
 const authController = new auth_controller_1.AuthController();
 // Registration validation rules
@@ -71,10 +72,38 @@ const resetPasswordValidation = [
         .isLength({ min: 8 })
         .withMessage('New password must be at least 8 characters long')
 ];
+const updateProfileValidation = [
+    (0, express_validator_1.body)('fullName')
+        .optional()
+        .isString()
+        .withMessage('Full name must be a string'),
+    (0, express_validator_1.body)('phoneNumber')
+        .optional()
+        .isString()
+        .withMessage('Phone number must be a string'),
+    (0, express_validator_1.body)('country')
+        .optional()
+        .isString()
+        .withMessage('Country must be a string'),
+    (0, express_validator_1.body)('profileImage')
+        .optional()
+        .isString()
+        .withMessage('Profile image must be a string')
+];
+const deleteAccountValidation = [
+    (0, express_validator_1.body)('password')
+        .notEmpty()
+        .withMessage('Password is required')
+        .isString()
+        .withMessage('Password must be a string')
+];
 // Routes
 router.post('/register', registerValidation, validator_middleware_1.validateRequest, authController.register);
 router.post('/login', loginValidation, validator_middleware_1.validateRequest, authController.login);
 router.post('/validate-password', passwordValidation, validator_middleware_1.validateRequest, authController.validatePassword);
 router.post('/forgot-password', forgotPasswordValidation, validator_middleware_1.validateRequest, authController.forgotPassword);
 router.post('/reset-password', resetPasswordValidation, validator_middleware_1.validateRequest, authController.resetPassword);
+router.get('/me', auth_middleware_1.authMiddleware, authController.getCurrentUser);
+router.put('/profile', auth_middleware_1.authMiddleware, updateProfileValidation, validator_middleware_1.validateRequest, authController.updateProfile);
+router.delete('/account', auth_middleware_1.authMiddleware, deleteAccountValidation, validator_middleware_1.validateRequest, authController.deleteAccount);
 exports.default = router;

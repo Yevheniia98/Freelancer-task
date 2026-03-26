@@ -9,6 +9,12 @@ export interface ITeamMember extends Document {
   ownerId: mongoose.Types.ObjectId;
   memberId: mongoose.Types.ObjectId;
   role: MemberRole;
+  customRole?: string; // Custom role like "UI designer", "Developer", etc.
+  phone?: string;
+  gender?: string;
+  payment?: number;
+  currentProject?: string;
+  skills?: string[];
   hasProjectAccess: boolean;
   hasChatAccess: boolean;
   lastAccessedAt?: Date;
@@ -32,6 +38,34 @@ const teamMemberSchema = new Schema<ITeamMember>(
       type: String,
       enum: Object.values(MemberRole),
       default: MemberRole.MEMBER
+    },
+    customRole: {
+      type: String,
+      trim: true,
+      default: ''
+    },
+    phone: {
+      type: String,
+      trim: true,
+      default: ''
+    },
+    gender: {
+      type: String,
+      enum: ['male', 'female', 'other', ''],
+      default: 'male'
+    },
+    payment: {
+      type: Number,
+      default: 0
+    },
+    currentProject: {
+      type: String,
+      trim: true,
+      default: ''
+    },
+    skills: {
+      type: [String],
+      default: []
     },
     hasProjectAccess: {
       type: Boolean,

@@ -159,8 +159,8 @@
                   </button>
                   <button
                     class="notification-delete-btn"
-                    @click="deleteNotification(notification, $event)"
                     title="Delete notification"
+                    @click="deleteNotification(notification, $event)"
                   >
                     <X :size="14" />
                   </button>
@@ -189,7 +189,10 @@
             :class="{ 'active': showUserMenu }"
             @click="toggleUserMenu"
           >
-            <div class="user-avatar" :class="{ 'default-avatar': !user.avatar }">
+            <div
+              class="user-avatar"
+              :class="{ 'default-avatar': !user.avatar }"
+            >
               <img 
                 v-if="user.avatar"
                 :src="user.avatar" 
@@ -200,7 +203,12 @@
                 v-else 
                 class="default-avatar-icon"
               >
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="20"
+                  height="20"
+                  fill="currentColor"
+                >
                   <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
                 </svg>
               </div>
@@ -214,7 +222,10 @@
               v-if="showUserMenu"
               class="dropdown-menu user-dropdown"
             >
-              <div class="dropdown-header user-header" @click="navigateTo('/account')">
+              <div
+                class="dropdown-header user-header"
+                @click="navigateTo('/account')"
+              >
                 <div class="user-info">
                   <img
                     v-if="user.avatar"
@@ -226,7 +237,12 @@
                     v-else 
                     class="user-profile-image default-profile-icon"
                   >
-                    <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor">
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="30"
+                      height="30"
+                      fill="currentColor"
+                    >
                       <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
                     </svg>
                   </div>
@@ -509,12 +525,38 @@ const logout = async () => {
     showUserMenu.value = false
     console.log('Logging out...')
     
+    // Preserve user profile data including photos before logout
+    const userData = localStorage.getItem('user_data');
+    let preservedData = null;
+    
+    if (userData) {
+      try {
+        const parsedData = JSON.parse(userData);
+        preservedData = {
+          fullName: parsedData.fullName,
+          email: parsedData.email,
+          phoneNumber: parsedData.phoneNumber,
+          country: parsedData.country,
+          profileImage: parsedData.profileImage,
+          firstName: parsedData.firstName,
+          lastName: parsedData.lastName
+        };
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+      }
+    }
+    
     // Call logout API to clear server-side session
     authAPI.logout()
     
-    // Clear any remaining data from localStorage
+    // Clear authentication tokens
     localStorage.removeItem('auth_token')
     localStorage.removeItem('user_data')
+    
+    // Restore preserved user data
+    if (preservedData) {
+      localStorage.setItem('user_data_preserved', JSON.stringify(preservedData));
+    }
     
     // Clear browser history to prevent back button issues
     router.replace('/')
@@ -592,18 +634,23 @@ onUnmounted(() => {
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(6, 78, 71, 0.08);
   box-shadow: 0 1px 3px rgba(6, 78, 71, 0.05);
-  position: relative;
+  position: fixed;
+  top: 0;
+  right: 0;
   z-index: 1000;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 72px;
+  display: flex;
+  align-items: center;
 }
 
 /* Topbar positioning based on Vuetify navigation drawer state */
 .modern-topbar.sidebar-expanded {
-  margin-left: 240px; /* Width when drawer is expanded */
+  left: 240px; /* Width when drawer is expanded */
 }
 
 .modern-topbar.sidebar-rail {
-  margin-left: 72px; /* Width when drawer is in rail mode */
+  left: 72px; /* Width when drawer is in rail mode */
 }
 
 .topbar-content {
@@ -616,6 +663,7 @@ onUnmounted(() => {
   justify-content: space-between;
   gap: 24px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
 }
 
 /* Menu Toggle Button - Removed since Vuetify handles this */
@@ -1174,13 +1222,16 @@ onUnmounted(() => {
   
   .topbar-content {
     padding: 0 16px;
-    height: 64px;
-    gap: 16px;
+    height: auto;
+    gap: 12px;
+    grid-template-columns: 1fr auto;
   }
 
   .search-section {
     max-width: none;
     flex: 1;
+    min-width: 150px;
+    grid-column: 1;
   }
 
   .search-section.search-shifted-expanded,
@@ -1200,6 +1251,7 @@ onUnmounted(() => {
 
   .actions-section {
     gap: 4px;
+    grid-column: 2;
   }
 
   .action-button {
@@ -1234,7 +1286,13 @@ onUnmounted(() => {
 @media (max-width: 480px) {
   .topbar-content {
     padding: 0 12px;
-    gap: 12px;
+    gap: 8px;
+    grid-template-columns: 1fr auto;
+  }
+
+  .search-section {
+    min-width: 120px;
+    grid-column: 1;
   }
 
   .search-container {
@@ -1248,6 +1306,11 @@ onUnmounted(() => {
 
   .action-button {
     padding: 8px;
+  }
+
+  .actions-section {
+    grid-column: 2;
+    gap: 4px;
   }
 
   .user-avatar {

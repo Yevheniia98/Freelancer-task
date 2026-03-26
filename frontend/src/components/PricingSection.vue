@@ -95,17 +95,22 @@
             <div class="price-container">
               <div class="price">
                 <span class="currency">€</span>
-                <span class="amount">{{ getPrice(20) }}</span>
+                <span class="amount">{{ getPrice(10) }}</span>
                 <span class="period">/month</span>
               </div>
               <div class="tax-note">
-                + {{ getTax(20) }} German tax
+                + {{ getTax(10) }} German tax
+              </div>
+              <div class="team-note">
+                1 user only
               </div>
             </div>
             <p class="plan-description">
               Perfect for individual freelancers starting out
             </p>
           </div>
+
+          <div class="features-divider" />
 
           <div class="features-list">
             <div class="feature-item">
@@ -288,7 +293,7 @@
 
           <button
             class="price-btn"
-            @click="goToPayment(20)"
+            @click="goToPayment(10)"
           >
             <span>Start Basic Plan</span>
             <svg
@@ -321,20 +326,22 @@
             <div class="price-container">
               <div class="price">
                 <span class="currency">€</span>
-                <span class="amount">{{ getPrice(85) }}</span>
+                <span class="amount">{{ getPrice(30) }}</span>
                 <span class="period">/month</span>
               </div>
               <div class="tax-note">
-                + {{ getTax(85) }} German tax
+                + {{ getTax(30) }} German tax
               </div>
               <div class="team-note">
-                Up to 5 team members
+                1 user + 2 invited members
               </div>
             </div>
             <p class="plan-description">
               Perfect for growing teams and agencies
             </p>
           </div>
+
+          <div class="features-divider" />
 
           <div class="features-list">
             <div class="feature-item">
@@ -399,7 +406,7 @@
               >
                 <polyline points="20,6 9,17 4,12" />
               </svg>
-              <span>Team Collaboration (5 members)</span>
+              <span>Team Collaboration (2 invited members)</span>
             </div>
             <div class="feature-item">
               <svg
@@ -501,7 +508,7 @@
 
           <button
             class="price-btn featured-btn"
-            @click="goToPayment(85)"
+            @click="goToPayment(30)"
           >
             <span>Start Team Plan</span>
             <svg
@@ -531,20 +538,22 @@
             <div class="price-container">
               <div class="price">
                 <span class="currency">€</span>
-                <span class="amount">{{ getPrice(149) }}</span>
+                <span class="amount">{{ getPrice(150) }}</span>
                 <span class="period">/month</span>
               </div>
               <div class="tax-note">
-                + {{ getTax(149) }} German tax
+                + {{ getTax(150) }} German tax
               </div>
               <div class="team-note">
-                For startups & small businesses
+                1 user + 5 invited members
               </div>
             </div>
             <p class="plan-description">
               Enterprise features for growing businesses
             </p>
           </div>
+
+          <div class="features-divider" />
 
           <div class="features-list">
             <div class="feature-item">
@@ -577,7 +586,7 @@
               >
                 <polyline points="20,6 9,17 4,12" />
               </svg>
-              <span>Unlimited Team Members</span>
+              <span>Up to 5 Invited Team Members</span>
             </div>
             <div class="feature-item">
               <svg
@@ -711,7 +720,7 @@
 
           <button
             class="price-btn"
-            @click="goToPayment(149)"
+            @click="goToPayment(150)"
           >
             <span>Contact Sales</span>
             <svg
@@ -1015,6 +1024,8 @@ export default {
   border: 2px solid transparent;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .pricing-card:hover {
@@ -1048,13 +1059,16 @@ export default {
 .card-header {
   text-align: center;
   margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(12, 156, 141, 0.1);
 }
 
 .card-header h4 {
-  font-size: 1.75rem;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.02em;
 }
 
 .price-container {
@@ -1065,42 +1079,63 @@ export default {
   display: flex;
   align-items: baseline;
   justify-content: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .currency {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   color: #0C9C8D;
-  font-weight: 600;
+  font-weight: 700;
+  margin-right: 0.25rem;
 }
 
 .amount {
-  font-size: 3rem;
+  font-size: 4rem;
   font-weight: 800;
-  color: #333;
-  margin: 0 0.25rem;
+  color: #1a202c;
+  line-height: 1;
+  letter-spacing: -0.03em;
 }
 
 .period {
   font-size: 1.125rem;
-  color: #666;
+  color: #718096;
+  font-weight: 500;
+  margin-left: 0.25rem;
 }
 
 .tax-note, .team-note {
   font-size: 0.875rem;
-  color: #666;
-  margin-bottom: 0.25rem;
+  color: #718096;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.team-note {
+  color: #0C9C8D;
+  font-weight: 600;
 }
 
 .plan-description {
-  color: #666;
-  font-size: 1rem;
-  margin: 0;
+  color: #718096;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin: 1rem 0 0 0;
+  line-height: 1.5;
+}
+
+/* Features Divider */
+.features-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(12, 156, 141, 0.15) 20%, rgba(12, 156, 141, 0.15) 80%, transparent);
+  margin: 0 0 2rem 0;
 }
 
 /* Features List */
 .features-list {
   margin-bottom: 2rem;
+  flex-grow: 1;
 }
 
 .feature-item {

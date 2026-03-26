@@ -2,9 +2,16 @@
   <div class="oauth-success">
     <v-container>
       <v-row justify="center">
-        <v-col cols="12" md="6">
+        <v-col
+          cols="12"
+          md="6"
+        >
           <v-card class="text-center pa-8">
-            <v-icon color="success" size="64" class="mb-4">
+            <v-icon
+              color="success"
+              size="64"
+              class="mb-4"
+            >
               mdi-check-circle
             </v-icon>
             

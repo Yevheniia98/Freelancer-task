@@ -5,10 +5,23 @@ export interface IUser extends Document {
   password: string;
   firstName: string;
   lastName: string;
+  fullName?: string;
+  username?: string;
+  phoneNumber?: string;
+  phone?: string;
+  country?: string;
+  profileImage?: string;
+  gender?: string;
+  payment?: number;
+  currentProject?: string;
+  skills?: string[];
   twoFactorEnabled: boolean;
   twoFactorSecret?: string;
   resetPasswordToken?: string;
   resetPasswordExpires?: Date;
+  invitedBy?: mongoose.Types.ObjectId; // User who invited this user
+  inviteToken?: string; // Token from the invitation
+  isInvitedUser: boolean; // Whether this user joined via invitation (gets free access)
   createdAt: Date;
   updatedAt: Date;
 }
@@ -36,6 +49,46 @@ const userSchema = new Schema<IUser>(
       required: true,
       trim: true,
     },
+    fullName: {
+      type: String,
+      trim: true,
+    },
+    username: {
+      type: String,
+      trim: true,
+    },
+    phoneNumber: {
+      type: String,
+      trim: true,
+    },
+    phone: {
+      type: String,
+      trim: true,
+    },
+    country: {
+      type: String,
+      trim: true,
+    },
+    profileImage: {
+      type: String,
+    },
+    gender: {
+      type: String,
+      enum: ['male', 'female', 'other'],
+      default: 'male',
+    },
+    payment: {
+      type: Number,
+      default: 0,
+    },
+    currentProject: {
+      type: String,
+      trim: true,
+    },
+    skills: {
+      type: [String],
+      default: [],
+    },
     twoFactorEnabled: {
       type: Boolean,
       default: false,
@@ -46,6 +99,19 @@ const userSchema = new Schema<IUser>(
     },
     resetPasswordToken: String,
     resetPasswordExpires: Date,
+    invitedBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
+    },
+    inviteToken: {
+      type: String,
+      default: null
+    },
+    isInvitedUser: {
+      type: Boolean,
+      default: false
+    }
   },
   {
     timestamps: true,

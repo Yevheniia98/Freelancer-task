@@ -26,7 +26,9 @@
           variant="flat"
           class="mb-4"
         >
-          <v-icon left>mdi-check-circle</v-icon>
+          <v-icon left>
+            mdi-check-circle
+          </v-icon>
           Connected
         </v-chip>
         <v-chip
@@ -35,7 +37,9 @@
           variant="flat"
           class="mb-4"
         >
-          <v-icon left>mdi-alert-circle</v-icon>
+          <v-icon left>
+            mdi-alert-circle
+          </v-icon>
           Not Connected
         </v-chip>
 
@@ -51,13 +55,15 @@
           </v-alert>
           
           <v-btn
-            @click="initiateConnection"
             :loading="isConnecting"
             color="primary"
             size="large"
             variant="elevated"
+            @click="initiateConnection"
           >
-            <v-icon left>mdi-link</v-icon>
+            <v-icon left>
+              mdi-link
+            </v-icon>
             Connect to Upwork
           </v-btn>
         </div>
@@ -65,39 +71,51 @@
         <!-- Connected Section -->
         <div v-else>
           <v-row>
-            <v-col cols="12" md="6">
+            <v-col
+              cols="12"
+              md="6"
+            >
               <v-card variant="tonal">
                 <v-card-title>
-                  <v-icon left>mdi-sync</v-icon>
+                  <v-icon left>
+                    mdi-sync
+                  </v-icon>
                   Project Sync
                 </v-card-title>
                 <v-card-text>
                   <p>Sync your projects to see them in your task manager.</p>
                   <v-btn
-                    @click="syncProjects"
                     :loading="isSyncing"
                     color="primary"
                     variant="outlined"
                     class="mb-2"
+                    @click="syncProjects"
                   >
-                    <v-icon left>mdi-sync</v-icon>
+                    <v-icon left>
+                      mdi-sync
+                    </v-icon>
                     {{ isSyncing ? 'Syncing...' : 'Sync Now' }}
                   </v-btn>
                   
                   <v-switch
                     v-model="autoSync"
-                    @change="toggleAutoSync"
                     label="Auto-sync every hour"
                     color="primary"
+                    @change="toggleAutoSync"
                   />
                 </v-card-text>
               </v-card>
             </v-col>
             
-            <v-col cols="12" md="6">
+            <v-col
+              cols="12"
+              md="6"
+            >
               <v-card variant="tonal">
                 <v-card-title>
-                  <v-icon left>mdi-chart-line</v-icon>
+                  <v-icon left>
+                    mdi-chart-line
+                  </v-icon>
                   Sync Stats
                 </v-card-title>
                 <v-card-text>
@@ -119,12 +137,14 @@
           <v-row class="mt-4">
             <v-col cols="12">
               <v-btn
-                @click="disconnect"
                 color="error"
                 variant="outlined"
                 size="small"
+                @click="disconnect"
               >
-                <v-icon left>mdi-link-off</v-icon>
+                <v-icon left>
+                  mdi-link-off
+                </v-icon>
                 Disconnect
               </v-btn>
             </v-col>
@@ -137,8 +157,8 @@
           type="error"
           variant="tonal"
           dismissible
-          @input="error = null"
           class="mt-4"
+          @input="error = null"
         >
           {{ error }}
         </v-alert>
@@ -149,8 +169,8 @@
           type="success"
           variant="tonal"
           dismissible
-          @input="successMessage = null"
           class="mt-4"
+          @input="successMessage = null"
         >
           {{ successMessage }}
         </v-alert>

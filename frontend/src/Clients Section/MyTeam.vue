@@ -274,7 +274,29 @@
                       v-if="activeTab === 'chats'"
                       class="chats-list"
                     >
+                      <!-- Empty State for Chats -->
+                      <div v-if="chats.length === 0" class="empty-chats-state pa-6 text-center">
+                        <v-icon size="48" color="grey-lighten-1" class="mb-3">
+                          mdi-chat-outline
+                        </v-icon>
+                        <h4 class="text-body-1 font-weight-medium mb-2">No chats yet</h4>
+                        <p class="text-caption text-grey mb-4">
+                          Start a conversation with your team
+                        </p>
+                        <v-btn
+                          color="primary"
+                          size="small"
+                          rounded="lg"
+                          @click="openNewChatDialog"
+                        >
+                          <v-icon size="small" class="mr-1">mdi-chat-plus</v-icon>
+                          Create Chat
+                        </v-btn>
+                      </div>
+                      
+                      <!-- Chats Items -->
                       <div
+                        v-else
                         v-for="chat in chats"
                         :key="chat.id"
                         class="chat-item"
@@ -303,14 +325,46 @@
                       v-if="activeTab === 'contacts'"
                       class="contacts-list"
                     >
+                      <!-- Loading State -->
+                      <div v-if="isLoading" class="loading-state pa-4 text-center">
+                        <v-progress-circular
+                          indeterminate
+                          color="primary"
+                          size="32"
+                        />
+                        <p class="text-caption mt-2">Loading team members...</p>
+                      </div>
+                      
+                      <!-- Empty State -->
+                      <div v-else-if="teamMembers.length === 0" class="empty-contacts-state pa-6 text-center">
+                        <v-icon size="48" color="grey-lighten-1" class="mb-3">
+                          mdi-account-group-outline
+                        </v-icon>
+                        <h4 class="text-body-1 font-weight-medium mb-2">No team members yet</h4>
+                        <p class="text-caption text-grey mb-4">
+                          Invite team members to collaborate on your projects
+                        </p>
+                        <v-btn
+                          color="primary"
+                          size="small"
+                          rounded="lg"
+                          @click="openInviteDialog"
+                        >
+                          <v-icon size="small" class="mr-1">mdi-email-plus</v-icon>
+                          Invite Members
+                        </v-btn>
+                      </div>
+                      
+                      <!-- Team Members List -->
                       <div
+                        v-else
                         v-for="contact in teamMembers"
                         :key="contact.id"
                         class="contact-item"
                         :class="{ active: selectedMember && contact.id === selectedMember.id }"
                         @click="selectTeamMember(contact)"
                       >
-                        <div class="contact-avatar">
+                        <div class="contact-avatar" :style="{ backgroundColor: getAvatarColor(contact) }">
                           <img
                             v-if="contact.avatar"
                             :src="contact.avatar"
@@ -319,8 +373,9 @@
                           <v-icon
                             v-else
                             color="white"
+                            size="24"
                           >
-                            mdi-account
+                            {{ getGenderIcon(contact) }}
                           </v-icon>
                         </div>
                         <div class="contact-info">
@@ -448,7 +503,7 @@
                     class="member-details"
                   >
                     <div class="member-header">
-                      <div class="member-avatar-large">
+                      <div class="member-avatar-large" :style="{ backgroundColor: getAvatarColor(selectedMember) }">
                         <img
                           v-if="selectedMember.avatar"
                           :src="selectedMember.avatar"
@@ -459,7 +514,7 @@
                           size="40"
                           color="white"
                         >
-                          mdi-account
+                          {{ getGenderIcon(selectedMember) }}
                         </v-icon>
                       </div>
                       <div class="member-info">
@@ -1450,6 +1505,20 @@
                 cols="12"
                 sm="6"
               >
+                <v-select
+                  v-model="newMember.gender"
+                  label="Gender"
+                  variant="outlined"
+                  :items="genderOptions"
+                  required
+                  :rules="[v => !!v || 'Gender is required']"
+                />
+              </v-col>
+                
+              <v-col
+                cols="12"
+                sm="6"
+              >
                 <v-text-field
                   v-model="newMember.email"
                   label="Email"
@@ -1527,6 +1596,7 @@
             color="grey-darken-1" 
             variant="text"
             @click="addMemberDialog = false"
+            :disabled="addingMember"
           >
             Cancel
           </v-btn>
@@ -1534,7 +1604,8 @@
             color="primary"
             variant="elevated"
             rounded="lg"
-            :disabled="!isMemberFormValid"
+            :disabled="!isMemberFormValid || addingMember"
+            :loading="addingMember"
             @click="addTeamMember"
           >
             <v-icon class="mr-2">
@@ -1553,6 +1624,7 @@ import { defineComponent, ref, computed, nextTick, onMounted } from 'vue';
 import LeftMenu from '@/dashboard/LeftMenu.vue';
 import SearchBar from '@/dashboard/SearchBar.vue';
 import notificationService from '@/services/notificationService.js';
+import api from '@/services/api.js';
   
 export default defineComponent({
   name: 'MyTeamPage',
@@ -1574,186 +1646,19 @@ export default defineComponent({
     // Current user
     const currentUserId = 0; // Assuming 0 is the current user's ID
     
+    // Loading state
+    const isLoading = ref(false);
+    
     // Tabs
-    const activeTab = ref('chats');
+    const activeTab = ref('contacts');
     
-    // Chats
-    const chats = ref([
-      {
-        id: 1,
-        name: 'Design Team',
-        members: [0, 1, 3, 5],
-        lastMessage: 'Let\'s discuss the new homepage layout',
-        lastMessageTime: new Date(2025, 3, 15, 14, 30)
-      },
-      {
-        id: 2,
-        name: 'Development Team',
-        members: [0, 2, 4, 6],
-        lastMessage: 'The API integration is complete',
-        lastMessageTime: new Date(2025, 3, 15, 11, 45)
-      },
-      {
-        id: 3,
-        name: 'Project Alpha',
-        members: [0, 1, 2, 3, 4],
-        lastMessage: 'Client meeting scheduled for tomorrow',
-        lastMessageTime: new Date(2025, 3, 14, 16, 20)
-      },
-      {
-        id: 4,
-        name: 'Marketing Campaign',
-        members: [0, 5, 6],
-        lastMessage: 'Social media assets are ready for review',
-        lastMessageTime: new Date(2025, 3, 13, 9, 15)
-      }
-    ]);
+    // Chats - start empty, will be loaded from API
+    const chats = ref([]);
     
-    const messages = ref([
-      // Chat 1 messages
-      {
-        chatId: 1,
-        senderId: 1,
-        text: 'Hey team, I\'ve updated the mockups for the hero section',
-        timestamp: new Date(2025, 3, 15, 10, 15)
-      },
-      {
-        chatId: 1,
-        senderId: 3,
-        text: 'Looks great! I especially like the new color scheme',
-        timestamp: new Date(2025, 3, 15, 10, 22)
-      },
-      {
-        chatId: 1,
-        senderId: 0,
-        text: 'Thanks everyone. Let\'s discuss the new homepage layout',
-        timestamp: new Date(2025, 3, 15, 14, 30)
-      },
-      
-      // Chat 2 messages
-      {
-        chatId: 2,
-        senderId: 2,
-        text: 'Hey, I\'ve pushed the latest changes to the repo',
-        timestamp: new Date(2025, 3, 15, 9, 10)
-      },
-      {
-        chatId: 2,
-        senderId: 4,
-        text: 'Great! I\'ll pull and test it',
-        timestamp: new Date(2025, 3, 15, 9, 45)
-      },
-      {
-        chatId: 2,
-        senderId: 0,
-        text: 'The API integration is complete',
-        timestamp: new Date(2025, 3, 15, 11, 45)
-      },
-      
-      // Chat 3 messages
-      {
-        chatId: 3,
-        senderId: 3,
-        text: 'Has the client approved the final designs?',
-        timestamp: new Date(2025, 3, 14, 14, 5)
-      },
-      {
-        chatId: 3,
-        senderId: 1,
-        text: 'Yes, they loved it!',
-        timestamp: new Date(2025, 3, 14, 15, 30)
-      },
-      {
-        chatId: 3,
-        senderId: 0,
-        text: 'Client meeting scheduled for tomorrow',
-        timestamp: new Date(2025, 3, 14, 16, 20)
-      },
-      
-      // Chat 4 messages
-      {
-        chatId: 4,
-        senderId: 5,
-        text: 'I\'ve prepared all the assets for Facebook and Instagram',
-        timestamp: new Date(2025, 3, 13, 8, 40)
-      },
-      {
-        chatId: 4,
-        senderId: 0,
-        text: 'Social media assets are ready for review',
-        timestamp: new Date(2025, 3, 13, 9, 15)
-      }
-    ]);
+    const messages = ref([]);
     
-    // Team members
-    const teamMembers = ref([
-      {
-        id: 1,
-        name: 'Emily Johnson',
-        role: 'UI/UX Designer',
-        email: 'emily.j@example.com',
-        phone: '+1 234 567 8901',
-        payment: 3500,
-        currentProject: 'Website Redesign',
-        skills: ['UI Design', 'Wireframing', 'Figma', 'User Research'],
-        avatar: 'https://i.pravatar.cc/150?img=1'
-      },
-      {
-        id: 2,
-        name: 'Michael Chen',
-        role: 'Frontend Developer',
-        email: 'michael.c@example.com',
-        phone: '+1 234 567 8902',
-        payment: 4200,
-        currentProject: 'E-commerce Platform',
-        skills: ['Vue.js', 'React', 'CSS', 'JavaScript'],
-        avatar: 'https://i.pravatar.cc/150?img=2'
-      },
-      {
-        id: 3,
-        name: 'Sophia Martinez',
-        role: 'Product Manager',
-        email: 'sophia.m@example.com',
-        phone: '+1 234 567 8903',
-        payment: 5000,
-        currentProject: 'Website Redesign',
-        skills: ['Product Strategy', 'Agile', 'User Stories', 'Roadmapping'],
-        avatar: 'https://i.pravatar.cc/150?img=3'
-      },
-      {
-        id: 4,
-        name: 'James Wilson',
-        role: 'Backend Developer',
-        email: 'james.w@example.com',
-        phone: '+1 234 567 8904',
-        payment: 4800,
-        currentProject: 'API Development',
-        skills: ['Node.js', 'Express', 'MongoDB', 'REST API'],
-        avatar: 'https://i.pravatar.cc/150?img=4'
-      },
-      {
-        id: 5,
-        name: 'Olivia Lee',
-        role: 'Marketing Specialist',
-        email: 'olivia.l@example.com',
-        phone: '+1 234 567 8905',
-        payment: 3800,
-        currentProject: 'Product Launch',
-        skills: ['Social Media', 'Content Creation', 'SEO', 'Analytics'],
-        avatar: 'https://i.pravatar.cc/150?img=5'
-      },
-      {
-        id: 6,
-        name: 'William Brown',
-        role: 'QA Engineer',
-        email: 'william.b@example.com',
-        phone: '+1 234 567 8906',
-        payment: 3900,
-        currentProject: 'E-commerce Platform',
-        skills: ['Testing', 'Automation', 'Selenium', 'JIRA'],
-        avatar: 'https://i.pravatar.cc/150?img=6'
-      }
-    ]);
+    // Team members - start empty, will be loaded from API
+    const teamMembers = ref([]);
     
     // Available projects
     const availableProjects = [
@@ -1805,12 +1710,19 @@ export default defineComponent({
     const newMember = ref({
       name: '',
       role: '',
+      gender: '',
       email: '',
       phone: '',
       payment: 0,
       currentProject: '',
       skills: []
     });
+    
+    // Gender options
+    const genderOptions = [
+      { title: 'Male', value: 'male' },
+      { title: 'Female', value: 'female' }
+    ];
 
     // Role dialog
     const editRoleDialog = ref(false);
@@ -2120,7 +2032,7 @@ export default defineComponent({
         const emails = emailAddresses.value.split(',').map(email => email.trim());
         
         // Call the backend API
-        const response = await fetch('http://localhost:3030/api/team/invitations/send', {
+        const response = await fetch('http://localhost:3002/api/team/invitations/send', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -2235,7 +2147,7 @@ export default defineComponent({
       
       try {
         // Call API to update member role
-        const response = await fetch(`http://localhost:3030/api/team/members/${memberToEditRole.value.id}/role`, {
+        const response = await fetch(`http://localhost:3002/api/team/members/${memberToEditRole.value.id}/role`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -2293,17 +2205,10 @@ export default defineComponent({
       removingMember.value = true;
       
       try {
-        // Call API to remove member
-        const response = await fetch(`http://localhost:3030/api/team/members/${memberToRemove.value.id}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            // Add auth token if you have one
-            // 'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
+        // Call API to remove member using axios with auth
+        const response = await api.delete(`/team/members/${memberToRemove.value.id}`);
 
-        const data = await response.json();
+        const data = response.data;
         
         if (data.success) {
           // Remove from local data
@@ -2329,25 +2234,93 @@ export default defineComponent({
       }
     };
     
-    const addTeamMember = () => {
+    // Adding member loading state
+    const addingMember = ref(false);
+    
+    const addTeamMember = async () => {
       if (!isMemberFormValid.value) return;
       
-      // Create new member with ID
-      const newMemberId = Math.max(0, ...teamMembers.value.map(m => m.id)) + 1;
-      const memberToAdd = {
-        ...newMember.value,
-        id: newMemberId,
-        avatar: `https://i.pravatar.cc/150?img=${newMemberId + 10}` // Random avatar
-      };
+      addingMember.value = true;
       
-      // Add to team members
-      teamMembers.value.push(memberToAdd);
-      
-      // Select the new member
-      selectTeamMember(memberToAdd);
-      
-      // Close dialog
-      addMemberDialog.value = false;
+      try {
+        // Call API to create team member
+        const response = await api.post('/team/members', {
+          name: newMember.value.name,
+          email: newMember.value.email,
+          phone: newMember.value.phone,
+          role: newMember.value.role,
+          gender: newMember.value.gender,
+          payment: newMember.value.payment,
+          currentProject: newMember.value.currentProject,
+          skills: newMember.value.skills
+        });
+        
+        const data = response.data;
+        
+        if (data.success && data.member) {
+          // Add member to local list
+          const memberToAdd = {
+            id: data.member.id || data.member.memberId,
+            name: data.member.name || `${data.member.firstName} ${data.member.lastName}`.trim(),
+            email: data.member.email,
+            phone: data.member.phone || newMember.value.phone,
+            role: data.member.role || newMember.value.role,
+            gender: data.member.gender || newMember.value.gender,
+            payment: data.member.payment || newMember.value.payment,
+            currentProject: data.member.currentProject || newMember.value.currentProject,
+            skills: data.member.skills || newMember.value.skills,
+            avatar: null // Use gender icon
+          };
+          
+          teamMembers.value.push(memberToAdd);
+          
+          // Select the new member
+          selectTeamMember(memberToAdd);
+          
+          // Show success message
+          snackbarMessage.value = 'Team member added successfully!';
+          showSnackbar.value = true;
+          
+          // Close dialog
+          addMemberDialog.value = false;
+          
+          // Reset form
+          newMember.value = {
+            name: '',
+            role: '',
+            gender: '',
+            email: '',
+            phone: '',
+            payment: 0,
+            currentProject: '',
+            skills: []
+          };
+        } else {
+          throw new Error(data.message || 'Failed to add team member');
+        }
+      } catch (error) {
+        console.error('Error adding team member:', error);
+        snackbarMessage.value = error.message || 'Failed to add team member. Please try again.';
+        showSnackbar.value = true;
+      } finally {
+        addingMember.value = false;
+      }
+    };
+    
+    // Get gender icon for member
+    const getGenderIcon = (member) => {
+      if (member.gender === 'female') {
+        return 'mdi-face-woman';
+      }
+      return 'mdi-face-man';
+    };
+    
+    // Get avatar color based on gender
+    const getAvatarColor = (member) => {
+      if (member.gender === 'female') {
+        return '#E91E63'; // Pink
+      }
+      return '#2196F3'; // Blue
     };
     
     // Window resize handler for responsive layout
@@ -2355,11 +2328,45 @@ export default defineComponent({
       updateResponsiveState();
     };
     
+    // Fetch team members from API
+    const fetchTeamMembers = async () => {
+      isLoading.value = true;
+      try {
+        const response = await api.get('/team/members');
+        const data = response.data;
+        
+        if (data.success && data.members) {
+          // Map API response to component format
+          teamMembers.value = data.members.map((member) => ({
+            id: member._id || member.id,
+            name: `${member.firstName || ''} ${member.lastName || ''}`.trim() || member.name || 'Team Member',
+            role: member.role || 'Member',
+            email: member.email || '',
+            phone: member.phone || '',
+            payment: member.payment || 0,
+            currentProject: member.currentProject || '',
+            skills: member.skills || [],
+            gender: member.gender || 'male',
+            avatar: null // Use gender icons instead of random images
+          }));
+        }
+      } catch (error) {
+        console.error('Error fetching team members:', error);
+        // Keep empty array if fetch fails
+        teamMembers.value = [];
+      } finally {
+        isLoading.value = false;
+      }
+    };
+    
     // Lifecycle hooks
     onMounted(() => {
       // Initialize window resize listener
       window.addEventListener('resize', handleResize);
       updateResponsiveState();
+      
+      // Fetch team members from API
+      fetchTeamMembers();
       
       // Initialize with first chat selected
       if (chats.value.length > 0 && !selectedChat.value) {
@@ -2380,6 +2387,7 @@ export default defineComponent({
       selectedMember,
       messagesContainer,
       currentUserId,
+      isLoading,
       
       // Computed
       totalPayroll,
@@ -2425,6 +2433,9 @@ export default defineComponent({
       removeConfirmDialog,
       memberToRemove,
       removingMember,
+      
+      // Adding member
+      addingMember,
       
       // New chat dialog
       newChatDialog,
@@ -2484,7 +2495,11 @@ export default defineComponent({
       updateRole,
       confirmRemoveMember,
       removeMember,
-      availableRoles
+      availableRoles,
+      fetchTeamMembers,
+      genderOptions,
+      getGenderIcon,
+      getAvatarColor
     };
   }
 });
@@ -2514,6 +2529,7 @@ export default defineComponent({
 .main-content {
   background: linear-gradient(135deg, #064E47 0%, #0D7C66 50%, #41B3A2 100%);
   min-height: 100vh;
+  margin-top: 72px;
 }
 
 /* Hero Section - Same as Design Tools */
@@ -2885,6 +2901,28 @@ export default defineComponent({
   font-size: 0.75rem;
   color: #94a3b8;
   flex-shrink: 0;
+}
+
+/* Empty States */
+.empty-contacts-state,
+.empty-chats-state,
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: 2rem;
+}
+
+.empty-contacts-state h4,
+.empty-chats-state h4 {
+  color: #475569;
+}
+
+.empty-contacts-state p,
+.empty-chats-state p {
+  color: #94a3b8;
 }
 
 /* Contacts List */

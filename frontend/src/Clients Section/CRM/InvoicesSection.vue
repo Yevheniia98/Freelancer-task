@@ -1,12 +1,17 @@
 <template>
   <v-container fluid>
     <v-row class="mb-4">
-      <v-col cols="12" class="d-flex justify-space-between align-center">
-        <h2 class="text-h4">Invoices & Payments</h2>
+      <v-col
+        cols="12"
+        class="d-flex justify-space-between align-center"
+      >
+        <h2 class="text-h4">
+          Invoices & Payments
+        </h2>
         <v-btn
           color="primary"
-          @click="openInvoiceDialog()"
           prepend-icon="mdi-plus"
+          @click="openInvoiceDialog()"
         >
           Create Invoice
         </v-btn>
@@ -15,35 +20,75 @@
 
     <!-- Invoice Stats -->
     <v-row class="mb-4">
-      <v-col cols="12" md="3">
-        <v-card color="primary" variant="flat">
+      <v-col
+        cols="12"
+        md="3"
+      >
+        <v-card
+          color="primary"
+          variant="flat"
+        >
           <v-card-text class="text-center">
-            <div class="text-h4 font-weight-bold text-white">{{ invoiceStats.total }}</div>
-            <div class="text-white">Total Invoices</div>
+            <div class="text-h4 font-weight-bold text-white">
+              {{ invoiceStats.total }}
+            </div>
+            <div class="text-white">
+              Total Invoices
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
-      <v-col cols="12" md="3">
-        <v-card color="success" variant="flat">
+      <v-col
+        cols="12"
+        md="3"
+      >
+        <v-card
+          color="success"
+          variant="flat"
+        >
           <v-card-text class="text-center">
-            <div class="text-h4 font-weight-bold text-white">${{ formatCurrency(invoiceStats.paidAmount) }}</div>
-            <div class="text-white">Paid Amount</div>
+            <div class="text-h4 font-weight-bold text-white">
+              ${{ formatCurrency(invoiceStats.paidAmount) }}
+            </div>
+            <div class="text-white">
+              Paid Amount
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
-      <v-col cols="12" md="3">
-        <v-card color="warning" variant="flat">
+      <v-col
+        cols="12"
+        md="3"
+      >
+        <v-card
+          color="warning"
+          variant="flat"
+        >
           <v-card-text class="text-center">
-            <div class="text-h4 font-weight-bold text-white">${{ formatCurrency(invoiceStats.pendingAmount) }}</div>
-            <div class="text-white">Pending Amount</div>
+            <div class="text-h4 font-weight-bold text-white">
+              ${{ formatCurrency(invoiceStats.pendingAmount) }}
+            </div>
+            <div class="text-white">
+              Pending Amount
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
-      <v-col cols="12" md="3">
-        <v-card color="error" variant="flat">
+      <v-col
+        cols="12"
+        md="3"
+      >
+        <v-card
+          color="error"
+          variant="flat"
+        >
           <v-card-text class="text-center">
-            <div class="text-h4 font-weight-bold text-white">{{ invoiceStats.overdue }}</div>
-            <div class="text-white">Overdue Invoices</div>
+            <div class="text-h4 font-weight-bold text-white">
+              {{ invoiceStats.overdue }}
+            </div>
+            <div class="text-white">
+              Overdue Invoices
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
@@ -51,7 +96,10 @@
 
     <!-- Filters and Search -->
     <v-row class="mb-4">
-      <v-col cols="12" md="4">
+      <v-col
+        cols="12"
+        md="4"
+      >
         <v-text-field
           v-model="searchQuery"
           label="Search invoices..."
@@ -61,7 +109,10 @@
           clearable
         />
       </v-col>
-      <v-col cols="12" md="2">
+      <v-col
+        cols="12"
+        md="2"
+      >
         <v-select
           v-model="statusFilter"
           :items="statusOptions"
@@ -71,7 +122,10 @@
           clearable
         />
       </v-col>
-      <v-col cols="12" md="2">
+      <v-col
+        cols="12"
+        md="2"
+      >
         <v-select
           v-model="clientFilter"
           :items="clientOptions"
@@ -81,7 +135,10 @@
           clearable
         />
       </v-col>
-      <v-col cols="12" md="2">
+      <v-col
+        cols="12"
+        md="2"
+      >
         <v-text-field
           v-model="dateFrom"
           label="From Date"
@@ -90,7 +147,10 @@
           density="compact"
         />
       </v-col>
-      <v-col cols="12" md="2">
+      <v-col
+        cols="12"
+        md="2"
+      >
         <v-text-field
           v-model="dateTo"
           label="To Date"
@@ -112,10 +172,19 @@
       <!-- Invoice Number Column -->
       <template #item.invoiceNumber="{ item }">
         <div class="d-flex align-center">
-          <v-icon class="mr-2" color="primary">mdi-file-document</v-icon>
+          <v-icon
+            class="mr-2"
+            color="primary"
+          >
+            mdi-file-document
+          </v-icon>
           <div>
-            <div class="font-weight-medium">{{ item.invoiceNumber }}</div>
-            <div class="text-caption text-grey">{{ formatDate(item.issueDate) }}</div>
+            <div class="font-weight-medium">
+              {{ item.invoiceNumber }}
+            </div>
+            <div class="text-caption text-grey">
+              {{ formatDate(item.issueDate) }}
+            </div>
           </div>
         </div>
       </template>
@@ -128,7 +197,9 @@
       <!-- Amount Column -->
       <template #item.amount="{ item }">
         <div>
-          <div class="font-weight-bold">${{ formatCurrency(item.totalAmount) }}</div>
+          <div class="font-weight-bold">
+            ${{ formatCurrency(item.totalAmount) }}
+          </div>
           <div class="text-caption text-grey">
             Tax: ${{ formatCurrency(item.taxAmount || 0) }}
           </div>
@@ -142,7 +213,12 @@
           size="small"
           variant="flat"
         >
-          <v-icon start size="small">{{ getStatusIcon(item.status) }}</v-icon>
+          <v-icon
+            start
+            size="small"
+          >
+            {{ getStatusIcon(item.status) }}
+          </v-icon>
           {{ item.status }}
         </v-chip>
       </template>
@@ -150,11 +226,19 @@
       <!-- Due Date Column -->
       <template #item.dueDate="{ item }">
         <div>
-          <div class="text-body-2">{{ formatDate(item.dueDate) }}</div>
-          <div v-if="isOverdue(item)" class="text-caption text-error">
+          <div class="text-body-2">
+            {{ formatDate(item.dueDate) }}
+          </div>
+          <div
+            v-if="isOverdue(item)"
+            class="text-caption text-error"
+          >
             {{ getDaysOverdue(item) }} days overdue
           </div>
-          <div v-else-if="isDueSoon(item)" class="text-caption text-warning">
+          <div
+            v-else-if="isDueSoon(item)"
+            class="text-caption text-warning"
+          >
             Due in {{ getDaysUntilDue(item) }} days
           </div>
         </div>
@@ -189,38 +273,53 @@
           <v-list density="compact">
             <v-list-item @click="openInvoiceDialog(item)">
               <v-list-item-title>
-                <v-icon class="mr-2">mdi-pencil</v-icon>
+                <v-icon class="mr-2">
+                  mdi-pencil
+                </v-icon>
                 Edit
               </v-list-item-title>
             </v-list-item>
             <v-list-item @click="viewInvoice(item)">
               <v-list-item-title>
-                <v-icon class="mr-2">mdi-eye</v-icon>
+                <v-icon class="mr-2">
+                  mdi-eye
+                </v-icon>
                 View
               </v-list-item-title>
             </v-list-item>
             <v-list-item @click="downloadInvoice(item)">
               <v-list-item-title>
-                <v-icon class="mr-2">mdi-download</v-icon>
+                <v-icon class="mr-2">
+                  mdi-download
+                </v-icon>
                 Download PDF
               </v-list-item-title>
             </v-list-item>
             <v-list-item @click="recordPayment(item)">
               <v-list-item-title>
-                <v-icon class="mr-2">mdi-cash</v-icon>
+                <v-icon class="mr-2">
+                  mdi-cash
+                </v-icon>
                 Record Payment
               </v-list-item-title>
             </v-list-item>
             <v-list-item @click="sendReminder(item)">
               <v-list-item-title>
-                <v-icon class="mr-2">mdi-email-send</v-icon>
+                <v-icon class="mr-2">
+                  mdi-email-send
+                </v-icon>
                 Send Reminder
               </v-list-item-title>
             </v-list-item>
             <v-divider />
-            <v-list-item @click="deleteInvoice(item)" class="text-error">
+            <v-list-item
+              class="text-error"
+              @click="deleteInvoice(item)"
+            >
               <v-list-item-title>
-                <v-icon class="mr-2">mdi-delete</v-icon>
+                <v-icon class="mr-2">
+                  mdi-delete
+                </v-icon>
                 Delete
               </v-list-item-title>
             </v-list-item>
@@ -230,7 +329,11 @@
     </v-data-table>
 
     <!-- Invoice Dialog -->
-    <v-dialog v-model="invoiceDialog" max-width="1000px" persistent>
+    <v-dialog
+      v-model="invoiceDialog"
+      max-width="1000px"
+      persistent
+    >
       <v-card>
         <v-card-title>
           <span class="text-h5">{{ editingInvoice ? 'Edit Invoice' : 'Create New Invoice' }}</span>
@@ -239,7 +342,10 @@
           <v-container>
             <v-row>
               <!-- Basic Information -->
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-select
                   v-model="invoiceForm.clientId"
                   :items="clientOptions"
@@ -248,7 +354,10 @@
                   :rules="[v => !!v || 'Client is required']"
                 />
               </v-col>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-text-field
                   v-model="invoiceForm.invoiceNumber"
                   label="Invoice Number*"
@@ -256,7 +365,10 @@
                   :rules="[v => !!v || 'Invoice number is required']"
                 />
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col
+                cols="12"
+                md="4"
+              >
                 <v-text-field
                   v-model="invoiceForm.issueDate"
                   label="Issue Date*"
@@ -265,7 +377,10 @@
                   :rules="[v => !!v || 'Issue date is required']"
                 />
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col
+                cols="12"
+                md="4"
+              >
                 <v-text-field
                   v-model="invoiceForm.dueDate"
                   label="Due Date*"
@@ -274,7 +389,10 @@
                   :rules="[v => !!v || 'Due date is required']"
                 />
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col
+                cols="12"
+                md="4"
+              >
                 <v-select
                   v-model="invoiceForm.status"
                   :items="statusOptions"
@@ -287,22 +405,39 @@
               <v-col cols="12">
                 <v-divider class="my-4" />
                 <div class="d-flex justify-space-between align-center mb-4">
-                  <h3 class="text-h6">Invoice Items</h3>
+                  <h3 class="text-h6">
+                    Invoice Items
+                  </h3>
                   <v-btn
                     color="primary"
                     variant="outlined"
                     size="small"
                     @click="addInvoiceItem"
                   >
-                    <v-icon start>mdi-plus</v-icon>
+                    <v-icon start>
+                      mdi-plus
+                    </v-icon>
                     Add Item
                   </v-btn>
                 </div>
                 
-                <v-card v-if="invoiceForm.items.length === 0" variant="outlined" class="text-center pa-8">
-                  <v-icon size="48" color="grey">mdi-clipboard-list-outline</v-icon>
-                  <div class="text-h6 mt-2 text-grey">No items added yet</div>
-                  <div class="text-body-2 text-grey">Click "Add Item" to start building your invoice</div>
+                <v-card
+                  v-if="invoiceForm.items.length === 0"
+                  variant="outlined"
+                  class="text-center pa-8"
+                >
+                  <v-icon
+                    size="48"
+                    color="grey"
+                  >
+                    mdi-clipboard-list-outline
+                  </v-icon>
+                  <div class="text-h6 mt-2 text-grey">
+                    No items added yet
+                  </div>
+                  <div class="text-body-2 text-grey">
+                    Click "Add Item" to start building your invoice
+                  </div>
                 </v-card>
 
                 <div v-else>
@@ -314,7 +449,10 @@
                   >
                     <v-card-text>
                       <v-row>
-                        <v-col cols="12" md="4">
+                        <v-col
+                          cols="12"
+                          md="4"
+                        >
                           <v-text-field
                             v-model="item.description"
                             label="Description*"
@@ -322,7 +460,10 @@
                             density="compact"
                           />
                         </v-col>
-                        <v-col cols="12" md="2">
+                        <v-col
+                          cols="12"
+                          md="2"
+                        >
                           <v-text-field
                             v-model="item.quantity"
                             label="Quantity*"
@@ -332,7 +473,10 @@
                             @input="calculateItemTotal(index)"
                           />
                         </v-col>
-                        <v-col cols="12" md="2">
+                        <v-col
+                          cols="12"
+                          md="2"
+                        >
                           <v-text-field
                             v-model="item.rate"
                             label="Rate*"
@@ -344,7 +488,10 @@
                             @input="calculateItemTotal(index)"
                           />
                         </v-col>
-                        <v-col cols="12" md="2">
+                        <v-col
+                          cols="12"
+                          md="2"
+                        >
                           <v-text-field
                             :model-value="formatCurrency(item.total || 0)"
                             label="Total"
@@ -354,7 +501,11 @@
                             prefix="$"
                           />
                         </v-col>
-                        <v-col cols="12" md="2" class="d-flex align-center">
+                        <v-col
+                          cols="12"
+                          md="2"
+                          class="d-flex align-center"
+                        >
                           <v-btn
                             icon="mdi-delete"
                             variant="text"
@@ -370,8 +521,14 @@
               </v-col>
 
               <!-- Totals -->
-              <v-col cols="12" md="8"></v-col>
-              <v-col cols="12" md="4">
+              <v-col
+                cols="12"
+                md="8"
+              />
+              <v-col
+                cols="12"
+                md="4"
+              >
                 <v-card variant="outlined">
                   <v-card-text>
                     <div class="d-flex justify-space-between mb-2">
@@ -392,7 +549,10 @@
               </v-col>
 
               <!-- Tax Rate -->
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-text-field
                   v-model="invoiceForm.taxRate"
                   label="Tax Rate (%)"
@@ -417,10 +577,18 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="grey" variant="text" @click="closeInvoiceDialog">
+          <v-btn
+            color="grey"
+            variant="text"
+            @click="closeInvoiceDialog"
+          >
             Cancel
           </v-btn>
-          <v-btn color="primary" variant="flat" @click="saveInvoice">
+          <v-btn
+            color="primary"
+            variant="flat"
+            @click="saveInvoice"
+          >
             {{ editingInvoice ? 'Update' : 'Create' }}
           </v-btn>
         </v-card-actions>
@@ -428,7 +596,10 @@
     </v-dialog>
 
     <!-- Payment Dialog -->
-    <v-dialog v-model="paymentDialog" max-width="600px">
+    <v-dialog
+      v-model="paymentDialog"
+      max-width="600px"
+    >
       <v-card>
         <v-card-title>Record Payment</v-card-title>
         <v-card-text>
@@ -453,7 +624,10 @@
                   </span>
                 </div>
               </v-col>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-text-field
                   v-model="paymentForm.amount"
                   label="Payment Amount*"
@@ -464,7 +638,10 @@
                   :rules="[v => !!v || 'Amount is required', v => v > 0 || 'Amount must be positive']"
                 />
               </v-col>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-text-field
                   v-model="paymentForm.date"
                   label="Payment Date*"
@@ -502,10 +679,18 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="grey" variant="text" @click="paymentDialog = false">
+          <v-btn
+            color="grey"
+            variant="text"
+            @click="paymentDialog = false"
+          >
             Cancel
           </v-btn>
-          <v-btn color="primary" variant="flat" @click="savePayment">
+          <v-btn
+            color="primary"
+            variant="flat"
+            @click="savePayment"
+          >
             Record Payment
           </v-btn>
         </v-card-actions>
@@ -513,18 +698,31 @@
     </v-dialog>
 
     <!-- Delete Confirmation Dialog -->
-    <v-dialog v-model="deleteDialog" max-width="400px">
+    <v-dialog
+      v-model="deleteDialog"
+      max-width="400px"
+    >
       <v-card>
-        <v-card-title class="text-h5">Confirm Delete</v-card-title>
+        <v-card-title class="text-h5">
+          Confirm Delete
+        </v-card-title>
         <v-card-text>
           Are you sure you want to delete invoice "{{ invoiceToDelete?.invoiceNumber }}"? This action cannot be undone.
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="grey" variant="text" @click="deleteDialog = false">
+          <v-btn
+            color="grey"
+            variant="text"
+            @click="deleteDialog = false"
+          >
             Cancel
           </v-btn>
-          <v-btn color="error" variant="flat" @click="confirmDelete">
+          <v-btn
+            color="error"
+            variant="flat"
+            @click="confirmDelete"
+          >
             Delete
           </v-btn>
         </v-card-actions>

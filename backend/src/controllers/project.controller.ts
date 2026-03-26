@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import { ProjectService, CreateProjectDto, UpdateProjectDto, ProjectQuery } from '../services/project.service';
 import { ProjectStatus } from '../models/project.entity';
+import { ProjectInvitationService } from '../services/project-invitation.service';
+import { User } from '../models/user.model';
 
 export class ProjectController {
   private projectService: ProjectService;
@@ -31,15 +33,35 @@ export class ProjectController {
     try {
       if (this.handleValidationErrors(req, res)) return;
 
+      const currentUserId = (req as any).user?._id?.toString() || (req as any).user?.id;
+      
+      if (!currentUserId) {
+        res.status(401).json({
+          success: false,
+          message: 'User not authenticated'
+        });
+        return;
+      }
+
       const createProjectDto: CreateProjectDto = {
         title: req.body.title,
+        name: req.body.name,
         description: req.body.description,
         status: req.body.status,
         priority: req.body.priority,
-        deadline: req.body.deadline ? new Date(req.body.deadline) : undefined
+        deadline: req.body.deadline ? new Date(req.body.deadline) : undefined,
+        privacy: req.body.privacy,
+        category: req.body.category,
+        skills: req.body.skills,
+        teamLead: req.body.teamLead,
+        teamMembers: req.body.teamMembers
       };
 
       const project = await this.projectService.create(createProjectDto);
+      
+      // Set project owner - convert string back to ObjectId
+      project.projectOwner = currentUserId as any;
+      await project.save();
 
       res.status(201).json({
         success: true,
@@ -48,7 +70,7 @@ export class ProjectController {
       });
     } catch (error: any) {
       console.error('Create project error:', error);
-      res.status(400).json({
+      res.status(500).json({
         success: false,
         message: error.message || 'Failed to create project'
       });
@@ -154,10 +176,19 @@ export class ProjectController {
         return;
       }
 
+      // Get user's role in this project
+      const currentUserId = (req as any).user?._id?.toString() || (req as any).user?.id;
+      const { getUserRoleInProject } = await import('../utils/rbac.util');
+      const userRole = getUserRoleInProject(project, currentUserId);
+
+      // Convert to plain object to ensure teamMembers is accessible
+      const projectData = project.toObject ? project.toObject() : project;
+      
       res.json({
         success: true,
         message: 'Project retrieved successfully',
-        data: project
+        data: projectData,
+        userRole: userRole // Include user's role
       });
     } catch (error: any) {
       console.error('Get project error:', error);
@@ -174,6 +205,29 @@ export class ProjectController {
   update = async (req: Request, res: Response): Promise<void> => {
     try {
       if (this.handleValidationErrors(req, res)) return;
+
+      // Check user permissions
+      const currentUserId = (req as any).user?._id?.toString() || (req as any).user?.id;
+      const project = await this.projectService.findById(req.params.id);
+
+      if (!project) {
+        res.status(404).json({
+          success: false,
+          message: 'Project not found'
+        });
+        return;
+      }
+
+      const { getUserRoleInProject, canEditProject } = await import('../utils/rbac.util');
+      const userRole = getUserRoleInProject(project, currentUserId);
+
+      if (!canEditProject(userRole)) {
+        res.status(403).json({
+          success: false,
+          message: 'Access denied. You do not have permission to edit this project.'
+        });
+        return;
+      }
 
       const updateProjectDto: UpdateProjectDto = {};
       
@@ -241,7 +295,19 @@ export class ProjectController {
     try {
       if (this.handleValidationErrors(req, res)) return;
 
-      const deleted = await this.projectService.delete(req.params.id);
+      const projectId = req.params.id;
+      const project = await this.projectService.findById(projectId);
+
+      if (!project) {
+        res.status(404).json({
+          success: false,
+          message: 'Project not found'
+        });
+        return;
+      }
+
+      // Delete the project
+      const deleted = await this.projectService.delete(projectId);
 
       if (!deleted) {
         res.status(404).json({
@@ -260,6 +326,428 @@ export class ProjectController {
       res.status(500).json({
         success: false,
         message: error.message || 'Failed to delete project'
+      });
+    }
+  };
+
+  /**
+   * Upload file to project
+   */
+  uploadFile = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const projectId = req.params.id;
+
+      if (!req.file) {
+        res.status(400).json({
+          success: false,
+          message: 'No file uploaded'
+        });
+        return;
+      }
+
+      // Verify project exists
+      const project = await this.projectService.findById(projectId);
+      if (!project) {
+        res.status(404).json({
+          success: false,
+          message: 'Project not found'
+        });
+        return;
+      }
+
+      // Create file information
+      const fileInfo = {
+        filename: req.file.filename,
+        originalName: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size,
+        path: `/uploads/${req.file.filename}`,
+        uploadedAt: new Date(),
+        uploadedBy: (req as any).user.id
+      };
+
+      // Add file to project's files array
+      if (!project.files) {
+        project.files = [];
+      }
+      project.files.push(fileInfo as any);
+      await project.save();
+
+      res.status(200).json({
+        success: true,
+        message: 'File uploaded successfully',
+        data: fileInfo
+      });
+    } catch (error: any) {
+      console.error('Upload file error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to upload file'
+      });
+    }
+  };
+
+  /**
+   * Add team member to project by email (sends invitation)
+   */
+  addTeamMember = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const projectId = req.params.id;
+      const { email, permission } = req.body;
+      const currentUserId = (req as any).user.id;
+      const currentUser = (req as any).user;
+
+      if (!email) {
+        res.status(400).json({
+          success: false,
+          message: 'Email is required'
+        });
+        return;
+      }
+
+      const project = await this.projectService.findById(projectId);
+      if (!project) {
+        res.status(404).json({
+          success: false,
+          message: 'Project not found'
+        });
+        return;
+      }
+
+      // Check if user is project owner
+      if (project.projectOwner?.toString() !== currentUserId) {
+        res.status(403).json({
+          success: false,
+          message: 'Only project owner can add team members'
+        });
+        return;
+      }
+
+      // Check if user exists
+      const invitedUser = await User.findOne({ email: email.toLowerCase() });
+      
+      if (!invitedUser) {
+        // User doesn't exist - add as pending member and send invitation email
+        const inviterName = currentUser.firstName && currentUser.lastName 
+          ? `${currentUser.firstName} ${currentUser.lastName}` 
+          : currentUser.email;
+        
+        // Add as pending team member immediately (like Figma)
+        const pendingMember = {
+          userId: null, // No userId yet since user doesn't exist
+          name: email.split('@')[0], // Use email prefix as temporary name
+          email: email.toLowerCase(),
+          role: 'Pending',
+          permission: permission || 'view_only',
+          addedAt: new Date(),
+          addedBy: currentUserId,
+          status: 'pending' // Mark as pending invitation
+        };
+
+        if (!project.teamMembers) {
+          project.teamMembers = [];
+        }
+        project.teamMembers.push(pendingMember as any);
+        await project.save();
+
+        // Send invitation email
+        const invitationService = ProjectInvitationService.getInstance();
+        const invitationSent = await invitationService.sendInvitation({
+          projectId: project.id,
+          projectName: project.title,
+          inviterName: inviterName,
+          inviterEmail: currentUser.email,
+          inviteeEmail: email,
+          permission: permission || 'view_only'
+        });
+
+        if (invitationSent) {
+          res.status(200).json({
+            success: true,
+            message: 'Invitation sent successfully. User will be added once they sign up and accept.',
+            pending: true,
+            data: pendingMember
+          });
+        } else {
+          res.status(500).json({
+            success: false,
+            message: 'Failed to send invitation email'
+          });
+        }
+        return;
+      }
+
+      // Check if member already exists
+      const existingMember = project.teamMembers?.find(
+        (member: any) => member.userId?.toString() === (invitedUser._id as any).toString()
+      );
+
+      if (existingMember) {
+        res.status(400).json({
+          success: false,
+          message: 'User is already a team member'
+        });
+        return;
+      }
+
+      // Add team member directly (user exists)
+      const memberName = invitedUser.firstName && invitedUser.lastName 
+        ? `${invitedUser.firstName} ${invitedUser.lastName}` 
+        : invitedUser.email.split('@')[0];
+      const newMember = {
+        userId: invitedUser._id,
+        name: memberName,
+        email: invitedUser.email,
+        role: 'Member',
+        permission: permission || 'view_only',
+        status: 'active',
+        addedAt: new Date(),
+        addedBy: currentUserId
+      };
+
+      if (!project.teamMembers) {
+        project.teamMembers = [];
+      }
+      project.teamMembers.push(newMember as any);
+      await project.save();
+
+      // Send notification email
+      const inviterName = currentUser.firstName && currentUser.lastName 
+        ? `${currentUser.firstName} ${currentUser.lastName}` 
+        : currentUser.email;
+      const invitationService = ProjectInvitationService.getInstance();
+      await invitationService.sendInvitation({
+        projectId: project.id,
+        projectName: project.title,
+        inviterName: inviterName,
+        inviterEmail: currentUser.email,
+        inviteeEmail: email,
+        permission: permission || 'view_only'
+      });
+
+      res.status(200).json({
+        success: true,
+        message: 'Team member added successfully',
+        data: newMember
+      });
+    } catch (error: any) {
+      console.error('Add team member error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to add team member'
+      });
+    }
+  };
+
+  /**
+   * Update team member permission
+   */
+  updateTeamMemberPermission = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { projectId, memberId } = req.params;
+      const { permission } = req.body;
+      const currentUserId = (req as any).user.id;
+
+      const project = await this.projectService.findById(projectId);
+      if (!project) {
+        res.status(404).json({
+          success: false,
+          message: 'Project not found'
+        });
+        return;
+      }
+
+      // Check if user is project owner
+      if (project.projectOwner?.toString() !== currentUserId) {
+        res.status(403).json({
+          success: false,
+          message: 'Only project owner can update permissions'
+        });
+        return;
+      }
+
+      // Find and update team member
+      const member = project.teamMembers?.find(
+        (m: any) => m.userId.toString() === memberId
+      );
+
+      if (!member) {
+        res.status(404).json({
+          success: false,
+          message: 'Team member not found'
+        });
+        return;
+      }
+
+      (member as any).permission = permission;
+      await project.save();
+
+      res.status(200).json({
+        success: true,
+        message: 'Team member permission updated successfully',
+        data: member
+      });
+    } catch (error: any) {
+      console.error('Update team member permission error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to update permission'
+      });
+    }
+  };
+
+  /**
+   * Remove team member from project
+   */
+  removeTeamMember = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { projectId, memberId } = req.params;
+      const currentUserId = (req as any).user.id;
+
+      const project = await this.projectService.findById(projectId);
+      if (!project) {
+        res.status(404).json({
+          success: false,
+          message: 'Project not found'
+        });
+        return;
+      }
+
+      // Check if user is project owner
+      if (project.projectOwner?.toString() !== currentUserId) {
+        res.status(403).json({
+          success: false,
+          message: 'Only project owner can remove team members'
+        });
+        return;
+      }
+
+      // Remove team member
+      project.teamMembers = project.teamMembers?.filter(
+        (m: any) => m.userId.toString() !== memberId
+      ) as any;
+
+      await project.save();
+
+      res.status(200).json({
+        success: true,
+        message: 'Team member removed successfully'
+      });
+    } catch (error: any) {
+      console.error('Remove team member error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to remove team member'
+      });
+    }
+  };
+
+  /**
+   * Accept project invitation
+   */
+  acceptInvitation = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { token } = req.body;
+      const currentUserId = (req as any).user.id;
+
+      const invitationService = ProjectInvitationService.getInstance();
+      const memberData = await invitationService.acceptInvitation(token, currentUserId);
+
+      const project = await this.projectService.findById(memberData.projectId);
+      if (!project) {
+        res.status(404).json({
+          success: false,
+          message: 'Project not found'
+        });
+        return;
+      }
+
+      // Check if member already exists
+      const existingMember = project.teamMembers?.find(
+        (member: any) => member.userId?.toString() === currentUserId
+      );
+
+      if (existingMember) {
+        res.status(400).json({
+          success: false,
+          message: 'You are already a team member of this project'
+        });
+        return;
+      }
+
+      // Add team member
+      const newMember = {
+        userId: memberData.userId,
+        name: memberData.name,
+        email: memberData.email,
+        role: 'Member',
+        permission: memberData.permission,
+        addedAt: new Date(),
+        addedBy: project.projectOwner
+      };
+
+      if (!project.teamMembers) {
+        project.teamMembers = [];
+      }
+      project.teamMembers.push(newMember as any);
+      await project.save();
+
+      res.status(200).json({
+        success: true,
+        message: 'Invitation accepted successfully',
+        data: {
+          project: {
+            id: project.id,
+            title: project.title,
+            description: project.description
+          },
+          member: newMember
+        }
+      });
+    } catch (error: any) {
+      console.error('Accept invitation error:', error);
+      res.status(400).json({
+        success: false,
+        message: error.message || 'Failed to accept invitation'
+      });
+    }
+  };
+
+  /**
+   * Verify project invitation token
+   */
+  verifyInvitation = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { token } = req.params;
+
+      const invitationService = ProjectInvitationService.getInstance();
+      const invitation = await invitationService.verifyInvitation(token);
+
+      const project = await this.projectService.findById(invitation.projectId);
+      if (!project) {
+        res.status(404).json({
+          success: false,
+          message: 'Project not found'
+        });
+        return;
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'Invitation verified successfully',
+        data: {
+          projectId: project.id,
+          projectName: project.title,
+          projectDescription: project.description,
+          email: invitation.email,
+          permission: invitation.permission
+        }
+      });
+    } catch (error: any) {
+      console.error('Verify invitation error:', error);
+      res.status(400).json({
+        success: false,
+        message: error.message || 'Invalid or expired invitation'
       });
     }
   };

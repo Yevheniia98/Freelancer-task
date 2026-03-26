@@ -37,13 +37,32 @@ api.interceptors.response.use(
       
       if (hasToken && currentPath !== '/login') {
         // Token expired or invalid for authenticated user
+        // Preserve user profile data before clearing
+        const userData = localStorage.getItem('user_data');
+        if (userData) {
+          try {
+            const parsedData = JSON.parse(userData);
+            const preservedData = {
+              fullName: parsedData.fullName,
+              email: parsedData.email,
+              phoneNumber: parsedData.phoneNumber,
+              country: parsedData.country,
+              profileImage: parsedData.profileImage,
+              firstName: parsedData.firstName,
+              lastName: parsedData.lastName
+            };
+            localStorage.setItem('user_data_preserved', JSON.stringify(preservedData));
+          } catch (e) {
+            console.error('Error preserving user data:', e);
+          }
+        }
+        
         localStorage.removeItem('auth_token');
         localStorage.removeItem('user_data');
         window.location.href = '/login';
       } else if (currentPath !== '/login') {
         // Clear any existing tokens but don't redirect if we're already on login
         localStorage.removeItem('auth_token');
-        localStorage.removeItem('user_data');
       }
     }
     return Promise.reject(error);
@@ -105,10 +124,54 @@ export const authAPI = {
     }
   },
 
-  // Logout user
+  /**
+   * Logout user while preserving profile data
+   * 
+   * This logout implementation preserves user profile information and photos
+   * across sessions. When a user logs out, their profile data (name, email, 
+   * phone, country, and profile image) is saved to 'user_data_preserved'.
+   * 
+   * Upon next login, this preserved data is automatically restored, ensuring
+   * no data loss. Only authentication tokens are cleared during logout.
+   * 
+   * Preserved data includes:
+   * - Full name
+   * - Email address
+   * - Phone number
+   * - Country
+   * - Profile image/photo
+   * - First and last name
+   */
   logout: () => {
+    // Preserve user profile data including photos
+    const userData = localStorage.getItem('user_data');
+    let preservedData = null;
+    
+    if (userData) {
+      try {
+        const parsedData = JSON.parse(userData);
+        // Preserve specific fields
+        preservedData = {
+          fullName: parsedData.fullName,
+          email: parsedData.email,
+          phoneNumber: parsedData.phoneNumber,
+          country: parsedData.country,
+          profileImage: parsedData.profileImage,
+          firstName: parsedData.firstName,
+          lastName: parsedData.lastName
+        };
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+      }
+    }
+    
+    // Remove authentication tokens only
     localStorage.removeItem('auth_token');
-    localStorage.removeItem('user_data');
+    
+    // Restore preserved user data
+    if (preservedData) {
+      localStorage.setItem('user_data_preserved', JSON.stringify(preservedData));
+    }
   }
 };
 
@@ -140,7 +203,37 @@ export const apiUtils = {
   // Save authentication data
   saveAuthData: (token, user) => {
     localStorage.setItem('auth_token', token);
-    localStorage.setItem('user_data', JSON.stringify(user));
+    
+    // Check if there's preserved user data from previous session
+    const preservedData = localStorage.getItem('user_data_preserved');
+    let userData = user;
+    
+    if (preservedData) {
+      try {
+        const preserved = JSON.parse(preservedData);
+        // Merge preserved data (profile info, photos) with new user data
+        userData = {
+          ...user,
+          fullName: preserved.fullName || user.fullName,
+          phoneNumber: preserved.phoneNumber || user.phoneNumber,
+          country: preserved.country || user.country,
+          profileImage: preserved.profileImage || user.profileImage,
+          // Keep auth-related fields from server
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName
+        };
+        
+        // Remove the preserved data after restoring
+        localStorage.removeItem('user_data_preserved');
+        console.log('Restored preserved user data including profile photo');
+      } catch (e) {
+        console.error('Error restoring preserved data:', e);
+      }
+    }
+    
+    localStorage.setItem('user_data', JSON.stringify(userData));
   },
 
   // Get saved user data

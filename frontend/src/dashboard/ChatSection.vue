@@ -15,49 +15,54 @@
           <!-- Sidebar Header -->
           <div class="sidebar-header">
             <div class="d-flex align-center justify-space-between">
-          <div class="d-flex align-center">
-            <v-avatar
-              size="40"
-              class="mr-3"
-              :class="{ 'default-user-avatar': !currentUser.avatar }"
-            >
-              <v-img
-                v-if="currentUser.avatar"
-                :src="currentUser.avatar"
-              />
-              <div 
-                v-else 
-                class="default-user-icon"
-              >
-                <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
-                  <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
-                </svg>
-              </div>
-            </v-avatar>
-            <div>
+              <div class="d-flex align-center">
+                <v-avatar
+                  size="40"
+                  class="mr-3"
+                  :class="{ 'default-user-avatar': !currentUser.avatar }"
+                >
+                  <v-img
+                    v-if="currentUser.avatar"
+                    :src="currentUser.avatar"
+                  />
+                  <div 
+                    v-else 
+                    class="default-user-icon"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="32"
+                      height="32"
+                      fill="currentColor"
+                    >
+                      <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
+                    </svg>
+                  </div>
+                </v-avatar>
+                <div>
                   <div class="text-h6 font-weight-medium">
                     {{ currentUser.name }}
-              </div>
-              <div class="text-caption text-medium-emphasis">
+                  </div>
+                  <div class="text-caption text-medium-emphasis">
                     {{ currentUser.status }}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
               <div class="d-flex">
                 <v-btn
                   icon="mdi-message-plus"
                   variant="tonal"
                   size="small"
                   color="green"
-                  @click="openNewChatDialog"
                   title="Invite team member"
+                  @click="openNewChatDialog"
                 />
-          <v-btn
-            icon="mdi-dots-vertical"
-            variant="text"
+                <v-btn
+                  icon="mdi-dots-vertical"
+                  variant="text"
                   size="small"
-          />
-        </div>
+                />
+              </div>
             </div>
           </div>
 
@@ -100,7 +105,12 @@
                       v-else 
                       class="default-user-icon"
                     >
-                      <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+                      <svg
+                        viewBox="0 0 24 24"
+                        width="32"
+                        height="32"
+                        fill="currentColor"
+                      >
                         <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
                       </svg>
                     </div>
@@ -108,7 +118,7 @@
                   <div
                     v-if="chat.contact.isOnline"
                     class="online-indicator"
-                  ></div>
+                  />
                 </div>
                 
                 <div class="flex-grow-1 min-width-0">
@@ -118,8 +128,8 @@
                     </div>
                     <div class="text-caption text-medium-emphasis">
                       {{ formatChatTime(chat.lastMessage?.timestamp) }}
-        </div>
-      </div>
+                    </div>
+                  </div>
       
                   <div class="d-flex align-center justify-space-between">
                     <div class="text-body-2 text-medium-emphasis text-truncate mr-2">
@@ -132,7 +142,7 @@
                       />
                       {{ getLastMessagePreview(chat.lastMessage) }}
                     </div>
-              <v-badge
+                    <v-badge
                       v-if="chat.unreadCount > 0"
                       :content="chat.unreadCount"
                       color="green"
@@ -144,7 +154,10 @@
             </div>
             
             <!-- Empty state when no chats -->
-            <div v-if="!chats || chats.length === 0" class="empty-chat-state text-center pa-4">
+            <div
+              v-if="!chats || chats.length === 0"
+              class="empty-chat-state text-center pa-4"
+            >
               <v-icon
                 size="48"
                 color="grey-lighten-2"
@@ -152,51 +165,53 @@
               >
                 mdi-account-group-outline
               </v-icon>
-              <h4 class="text-subtitle-1 mb-2 text-medium-emphasis">No team chats yet</h4>
+              <h4 class="text-subtitle-1 mb-2 text-medium-emphasis">
+                No team chats yet
+              </h4>
               <p class="text-body-2 text-medium-emphasis mb-3">
                 Start by inviting team members to collaborate
               </p>
               <v-btn
                 color="green"
                 variant="outlined"
-                @click="openNewChatDialog"
                 prepend-icon="mdi-account-plus"
+                @click="openNewChatDialog"
               >
                 Invite Team Member
               </v-btn>
             </div>
           </div>
             
-            <!-- Floating Action Button for Invite -->
-            <div style="position: relative;">
-              <v-btn
-                fab
-                color="green"
-                style="position: absolute; bottom: 16px; right: 16px; z-index: 10;"
-                @click="openNewChatDialog"
-                title="Invite new team member"
-                size="small"
-              >
-                <v-icon>mdi-account-plus</v-icon>
-              </v-btn>
-            </div>
+          <!-- Floating Action Button for Invite -->
+          <div style="position: relative;">
+            <v-btn
+              fab
+              color="green"
+              style="position: absolute; bottom: 16px; right: 16px; z-index: 10;"
+              title="Invite new team member"
+              size="small"
+              @click="openNewChatDialog"
+            >
+              <v-icon>mdi-account-plus</v-icon>
+            </v-btn>
           </div>
+        </div>
             
         <!-- Right Side - Chat Window -->
         <div class="chat-window">
           <!-- Chat not selected state -->
-            <div
+          <div
             v-if="!selectedChatId"
             class="no-chat-selected"
-            >
+          >
             <div class="text-center">
-                <v-icon
+              <v-icon
                 size="80"
                 color="grey-lighten-2"
                 class="mb-4"
-                >
+              >
                 mdi-chat-outline
-                </v-icon>
+              </v-icon>
               <h3 class="text-h6 text-medium-emphasis mb-2">
                 Team Chat
               </h3>
@@ -229,7 +244,12 @@
                       v-else 
                       class="default-user-icon"
                     >
-                      <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+                      <svg
+                        viewBox="0 0 24 24"
+                        width="32"
+                        height="32"
+                        fill="currentColor"
+                      >
                         <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
                       </svg>
                     </div>
@@ -238,15 +258,18 @@
                     <div class="text-subtitle-1 font-weight-medium">
                       {{ selectedChat?.contact.name }}
                     </div>
-                    <div class="text-caption text-medium-emphasis">
+                    <div
+                      class="text-caption"
+                      :style="{ color: selectedChat?.contact.isOnline ? '#DCDCDC' : '#666' }"
+                    >
                       {{ selectedChat?.contact.isOnline ? 'online' : `last seen ${formatLastSeen(selectedChat?.contact.lastSeen)}` }}
                     </div>
                   </div>
                 </div>
                 <div class="d-flex">
-                <v-btn
+                  <v-btn
                     icon="mdi-dots-vertical"
-                  variant="text"
+                    variant="text"
                     size="small"
                   />
                 </div>
@@ -273,14 +296,14 @@
                 
                 <!-- Messages for this date -->
                 <div
-                  v-for="(message, index) in group"
+                  v-for="message in group"
                   :key="message.id"
-                :class="['message-wrapper', message.senderId === currentUserId ? 'message-sent' : 'message-received']"
-              >
-                <div
-                  class="message-bubble"
-                  :class="{'message-editing': editingMessageId === message.id}"
+                  :class="['message-wrapper', message.senderId === currentUserId ? 'message-sent' : 'message-received']"
                 >
+                  <div
+                    class="message-bubble"
+                    :class="{'message-editing': editingMessageId === message.id}"
+                  >
                     <!-- Message Content -->
                     <div
                       v-if="editingMessageId !== message.id"
@@ -304,11 +327,11 @@
                               :key="n"
                               class="waveform-bar"
                               :style="{ height: Math.random() * 20 + 5 + 'px' }"
-                            ></div>
+                            />
                           </div>
                         </div>
                         <span class="voice-duration">0:{{ Math.floor(Math.random() * 60).toString().padStart(2, '0') }}</span>
-                  </div>
+                      </div>
                   
                       <!-- Image message -->
                       <div
@@ -326,7 +349,7 @@
                         <div class="image-info mt-1">
                           <div class="text-caption text-medium-emphasis">
                             {{ message.fileName }}
-                  </div>
+                          </div>
                           <div
                             v-if="message.fileSize"
                             class="text-caption text-medium-emphasis"
@@ -337,10 +360,10 @@
                         <div
                           v-if="message.text"
                           class="image-caption mt-2"
-                  >
-                    {{ message.text }}
+                        >
+                          {{ message.text }}
                         </div>
-                  </div>
+                      </div>
                   
                       <!-- File message -->
                       <div
@@ -364,15 +387,15 @@
                               {{ message.fileSize }}
                             </div>
                           </div>
-                      <v-btn
+                          <v-btn
                             icon="mdi-download"
-                        variant="text"
+                            variant="text"
                             size="small"
                             color="primary"
                             @click.stop="downloadFile(message)"
                           />
-                    </div>
-                  </div>
+                        </div>
+                      </div>
                   
                       <!-- Regular text message -->
                       <div
@@ -380,7 +403,7 @@
                         class="text-message"
                       >
                         {{ message.text }}
-                    </div>
+                      </div>
                     </div>
                     
                     <!-- Message footer -->
@@ -406,19 +429,19 @@
               </div>
             </div>
             
-              <!-- Typing Indicator -->
-              <div
+            <!-- Typing Indicator -->
+            <div
               v-if="selectedChat?.contact.isTyping"
               class="typing-indicator-container"
             >
               <div class="typing-bubble">
                 <div class="typing-dots">
-                  <span></span>
-                  <span></span>
-                  <span></span>
+                  <span />
+                  <span />
+                  <span />
                 </div>
               </div>
-              </div>
+            </div>
               
             <!-- WhatsApp Input Area -->
             <div class="whatsapp-input">
@@ -430,8 +453,11 @@
                   accept="image/*"
                   style="display: none"
                   @change="handleFileUpload"
-                />
-                <label for="uploadBtn" style="background: #25d366; color: white; padding: 8px 16px; border-radius: 20px; cursor: pointer; margin-right: 8px;">
+                >
+                <label
+                  for="uploadBtn"
+                  style="background: #25d366; color: white; padding: 8px 16px; border-radius: 20px; cursor: pointer; margin-right: 8px;"
+                >
                   📎 Upload
                 </label>
                 
@@ -468,13 +494,13 @@
                   size="small"
                   @click="recordVoice"
                 />
-            </div>
-                </div>
               </div>
             </div>
           </div>
+        </div>
+      </div>
           
-        <!-- New Chat Dialog -->
+      <!-- New Chat Dialog -->
       <v-dialog
         v-model="showNewChatDialog"
         max-width="500"
@@ -484,7 +510,9 @@
           <v-card-text>
             <!-- Invite by Email or Phone -->
             <div class="mb-4">
-              <h4 class="text-subtitle-1 mb-2">Invite New Team Member</h4>
+              <h4 class="text-subtitle-1 mb-2">
+                Invite New Team Member
+              </h4>
               <p class="text-body-2 text-medium-emphasis mb-3">
                 Send an invitation via email or phone to add someone to your team chat
               </p>
@@ -521,13 +549,15 @@
               />
               <v-btn
                 color="green"
-                @click="inviteNewMember"
                 :disabled="!newMemberEmail.trim() || !newMemberName.trim() || sendingInvitation"
                 :loading="sendingInvitation"
                 block
                 size="large"
+                @click="inviteNewMember"
               >
-                <v-icon left>mdi-account-plus</v-icon>
+                <v-icon left>
+                  mdi-account-plus
+                </v-icon>
                 {{ sendingInvitation ? 'Sending...' : 'Send Invitation' }}
               </v-btn>
             </div>
@@ -536,7 +566,9 @@
             
             <!-- Existing Team Members -->
             <div>
-              <h4 class="text-subtitle-1 mb-2">Existing Team Members</h4>
+              <h4 class="text-subtitle-1 mb-2">
+                Existing Team Members
+              </h4>
               <v-text-field
                 v-model="newChatSearch"
                 label="Search team members"
@@ -566,7 +598,12 @@
                         v-else 
                         class="default-user-icon"
                       >
-                        <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+                        <svg
+                          viewBox="0 0 24 24"
+                          width="32"
+                          height="32"
+                          fill="currentColor"
+                        >
                           <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
                         </svg>
                       </div>
@@ -576,8 +613,17 @@
                   <v-list-item-subtitle>{{ contact.email }}</v-list-item-subtitle>
                 </v-list-item>
               </v-list>
-              <div v-else class="text-center text-medium-emphasis py-4">
-                <v-icon size="48" color="grey-lighten-2" class="mb-2">mdi-account-group-outline</v-icon>
+              <div
+                v-else
+                class="text-center text-medium-emphasis py-4"
+              >
+                <v-icon
+                  size="48"
+                  color="grey-lighten-2"
+                  class="mb-2"
+                >
+                  mdi-account-group-outline
+                </v-icon>
                 <p>No team members yet. Invite someone to start chatting!</p>
               </div>
             </div>
@@ -603,9 +649,9 @@
         <v-card>
           <v-card-title class="d-flex justify-space-between align-center">
             <span>{{ previewImage.fileName || 'Image Preview' }}</span>
-                <v-btn 
+            <v-btn 
               icon="mdi-close"
-                  variant="text" 
+              variant="text" 
               @click="showImagePreview = false"
             />
           </v-card-title>
@@ -666,6 +712,7 @@
 
 <script>
 import notificationService from '@/services/notificationService.js';
+import { teamService, subscriptionService } from '@/services/teamService.js';
 
 export default {
   name: 'WhatsAppChat',
@@ -1626,11 +1673,13 @@ export default {
       // Validate input
       if (!this.newMemberName.trim()) {
         alert('Please enter a name for the team member');
+        this.sendingInvitation = false;
         return;
       }
 
       if (!this.newMemberEmail.trim() && !this.newMemberPhone.trim()) {
         alert('Please provide either an email or phone number');
+        this.sendingInvitation = false;
         return;
       }
 
@@ -1639,8 +1688,90 @@ export default {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(this.newMemberEmail.trim())) {
           alert('Please enter a valid email address');
+          this.sendingInvitation = false;
           return;
         }
+      }
+
+      try {
+        // Check if user can invite more members (subscription check)
+        const canInviteResponse = await subscriptionService.canInvite();
+        
+        if (!canInviteResponse.canInvite) {
+          alert(canInviteResponse.reason || 'You cannot invite more members. Please upgrade your subscription.');
+          this.sendingInvitation = false;
+          return;
+        }
+
+        // Send invitation via backend
+        const response = await teamService.sendInvitation(
+          this.newMemberEmail.trim(),
+          this.newMemberName.trim()
+        );
+
+        if (response.success) {
+          const invitationLink = response.inviteUrl;
+
+          // Create new member chat locally
+          const newMember = {
+            id: response.invitation.id,
+            name: this.newMemberName.trim(),
+            email: this.newMemberEmail.trim(),
+            phone: this.newMemberPhone.trim(),
+            avatar: null,
+            isOnline: false,
+            lastSeen: new Date(),
+            pendingInvite: true
+          };
+
+          const welcomeChat = {
+            id: newMember.id,
+            contact: newMember,
+            messages: [
+              {
+                id: Date.now(),
+                senderId: 0,
+                text: `Invitation sent to ${newMember.name}! 👋 Waiting for them to accept...`,
+                timestamp: new Date(),
+                type: 'text',
+                status: 'sent'
+              }
+            ],
+            unreadCount: 0,
+            lastMessage: null
+          };
+
+          this.chats.push(welcomeChat);
+
+          // Send email notification
+          await this.sendInvitationEmail(newMember, invitationLink);
+
+          // Copy link to clipboard
+          this.copyInvitationLink(invitationLink, newMember);
+
+          // Clear form
+          this.newMemberName = '';
+          this.newMemberEmail = '';
+          this.newMemberPhone = '';
+          this.sendingInvitation = false;
+          this.showNewChatDialog = false;
+
+          // Show success message
+          this.showSuccessDialog(
+            `Invitation Sent! ✅`,
+            `${newMember.name} has been invited to join your team!\n\n📧 Email sent to: ${newMember.email}\n🔗 Invitation link copied to clipboard\n\nRemaining invites: ${canInviteResponse.remaining}`,
+            invitationLink
+          );
+
+          console.log('✅ Invitation sent successfully');
+        } else {
+          alert(response.error || 'Failed to send invitation');
+          this.sendingInvitation = false;
+        }
+      } catch (error) {
+        console.error('Error sending invitation:', error);
+        alert(error.response?.data?.error || 'Failed to send invitation. Please try again.');
+        this.sendingInvitation = false;
       }
 
       // Phone validation if provided (basic check)
@@ -1697,7 +1828,7 @@ export default {
       this.chats.push(welcomeChat);
 
       // Generate invitation link
-      const invitationLink = `${window.location.origin}/dashboard?invite=${encodeURIComponent(newMember.name)}&team=freelancer-task`;
+      const invitationLink = `${window.location.origin}/team-invite?invite=${encodeURIComponent(newMember.name)}&team=freelancer-task`;
 
       // Send invitation email if email provided
       if (newMember.email) {
@@ -1782,11 +1913,17 @@ export default {
 
                 <div style="text-align: center; margin: 30px 0;">
                   <a href="${invitationLink}" 
-                     style="background: #25d366; color: white; padding: 15px 30px; 
-                            text-decoration: none; border-radius: 25px; font-weight: bold; 
-                            display: inline-block; font-size: 16px;">
-                    🚀 Join Team Chat
+                     style="background: #0C9C8D; color: white; padding: 15px 30px; 
+                            text-decoration: none; border-radius: 8px; font-weight: bold; 
+                            display: inline-block; font-size: 16px; box-shadow: 0 4px 12px rgba(12, 156, 141, 0.3);">
+                    🚀 Accept Invitation & Join Team
                   </a>
+                </div>
+                
+                <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 15px; margin: 20px 0;">
+                  <p style="margin: 0; font-size: 14px; color: #856404;">
+                    <strong>📝 Note:</strong> If you don't have an account yet, clicking the button above will guide you through creating one. Once registered, you'll automatically get access to our team workspace!
+                  </p>
                 </div>
 
                 <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0;">
@@ -1831,7 +1968,7 @@ export default {
     },
 
     // Copy invitation link to clipboard
-    async copyInvitationLink(link, member) {
+    async copyInvitationLink(link) {
       try {
         await navigator.clipboard.writeText(link);
         console.log('📋 Invitation link copied to clipboard');

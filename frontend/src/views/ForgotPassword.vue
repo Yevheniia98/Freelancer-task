@@ -5,11 +5,16 @@
     <div class="main-container">
       <div class="form-card">
         <h1>Forgot Your Password?</h1>
-        <p class="subtitle">Enter your email address and we'll send you a verification code to reset your password.</p>
+        <p class="subtitle">
+          Enter your email address and we'll send you a verification code to reset your password.
+        </p>
           
         <form @submit.prevent="submitForm">
           <!-- Error Messages -->
-          <div v-if="errors.length > 0" class="error-messages">
+          <div
+            v-if="errors.length > 0"
+            class="error-messages"
+          >
             <div 
               v-for="error in errors" 
               :key="error" 
@@ -20,7 +25,10 @@
           </div>
 
           <!-- Success Message -->
-          <div v-if="successMessage" class="success-message">
+          <div
+            v-if="successMessage"
+            class="success-message"
+          >
             {{ successMessage }}
           </div>
 
@@ -34,7 +42,7 @@
               :disabled="isLoading"
               autocomplete="email"
               required
-            />
+            >
           </div>
   
           <button 

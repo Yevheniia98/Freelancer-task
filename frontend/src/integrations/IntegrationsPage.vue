@@ -1,7 +1,10 @@
 <template>
   <div class="integrations-page">
     <v-row justify="center">
-      <v-col cols="12" md="10">
+      <v-col
+        cols="12"
+        md="10"
+      >
         <v-card class="pa-6">
           <v-card-title class="text-h4 text-center mb-6">
             Platform Integrations
@@ -13,8 +16,15 @@
             </p>
             
             <v-row justify="center">
-              <v-col cols="12" sm="6" md="4">
-                <v-card variant="outlined" class="integration-card">
+              <v-col
+                cols="12"
+                sm="6"
+                md="4"
+              >
+                <v-card
+                  variant="outlined"
+                  class="integration-card"
+                >
                   <v-card-text class="text-center pa-6">
                     <v-img
                       src="/upwork-logo.svg"
@@ -24,15 +34,26 @@
                       class="mx-auto mb-4"
                       contain
                     />
-                    <h3 class="mb-3">Upwork</h3>
-                    <p class="mb-4">Connect your Upwork account to sync all your projects</p>
+                    <h3 class="mb-3">
+                      Upwork
+                    </h3>
+                    <p class="mb-4">
+                      Connect your Upwork account to sync all your projects
+                    </p>
                     <UpworkIntegration />
                   </v-card-text>
                 </v-card>
               </v-col>
               
-              <v-col cols="12" sm="6" md="4">
-                <v-card variant="outlined" class="integration-card">
+              <v-col
+                cols="12"
+                sm="6"
+                md="4"
+              >
+                <v-card
+                  variant="outlined"
+                  class="integration-card"
+                >
                   <v-card-text class="text-center pa-6">
                     <v-img
                       src="/freelancer-logo.svg"
@@ -42,17 +63,31 @@
                       class="mx-auto mb-4"
                       contain
                     />
-                    <h3 class="mb-3">Freelancer</h3>
-                    <p class="mb-4">Connect your Freelancer account (Coming Soon)</p>
-                    <v-btn variant="outlined" disabled>
+                    <h3 class="mb-3">
+                      Freelancer
+                    </h3>
+                    <p class="mb-4">
+                      Connect your Freelancer account (Coming Soon)
+                    </p>
+                    <v-btn
+                      variant="outlined"
+                      disabled
+                    >
                       Coming Soon
                     </v-btn>
                   </v-card-text>
                 </v-card>
               </v-col>
               
-              <v-col cols="12" sm="6" md="4">
-                <v-card variant="outlined" class="integration-card">
+              <v-col
+                cols="12"
+                sm="6"
+                md="4"
+              >
+                <v-card
+                  variant="outlined"
+                  class="integration-card"
+                >
                   <v-card-text class="text-center pa-6">
                     <v-img
                       src="/fiverr-logo.svg"
@@ -62,9 +97,16 @@
                       class="mx-auto mb-4"
                       contain
                     />
-                    <h3 class="mb-3">Fiverr</h3>
-                    <p class="mb-4">Connect your Fiverr account (Coming Soon)</p>
-                    <v-btn variant="outlined" disabled>
+                    <h3 class="mb-3">
+                      Fiverr
+                    </h3>
+                    <p class="mb-4">
+                      Connect your Fiverr account (Coming Soon)
+                    </p>
+                    <v-btn
+                      variant="outlined"
+                      disabled
+                    >
                       Coming Soon
                     </v-btn>
                   </v-card-text>
@@ -73,23 +115,53 @@
             </v-row>
 
             <!-- Integration Stats -->
-            <v-row v-if="stats" class="mt-8" justify="center">
-              <v-col cols="12" md="8">
+            <v-row
+              v-if="stats"
+              class="mt-8"
+              justify="center"
+            >
+              <v-col
+                cols="12"
+                md="8"
+              >
                 <v-card variant="outlined">
-                  <v-card-title class="text-center">Integration Statistics</v-card-title>
+                  <v-card-title class="text-center">
+                    Integration Statistics
+                  </v-card-title>
                   <v-card-text>
                     <v-row>
-                      <v-col cols="4" class="text-center">
-                        <div class="stat-number text-primary">{{ stats.connectedPlatforms }}</div>
-                        <div class="stat-label">Connected Platforms</div>
+                      <v-col
+                        cols="4"
+                        class="text-center"
+                      >
+                        <div class="stat-number text-primary">
+                          {{ stats.connectedPlatforms }}
+                        </div>
+                        <div class="stat-label">
+                          Connected Platforms
+                        </div>
                       </v-col>
-                      <v-col cols="4" class="text-center">
-                        <div class="stat-number text-primary">{{ stats.syncedProjects }}</div>
-                        <div class="stat-label">Synced Projects</div>
+                      <v-col
+                        cols="4"
+                        class="text-center"
+                      >
+                        <div class="stat-number text-primary">
+                          {{ stats.syncedProjects }}
+                        </div>
+                        <div class="stat-label">
+                          Synced Projects
+                        </div>
                       </v-col>
-                      <v-col cols="4" class="text-center">
-                        <div class="stat-number text-primary">{{ stats.lastSyncTime ? formatLastSync(stats.lastSyncTime) : 'Never' }}</div>
-                        <div class="stat-label">Last Sync</div>
+                      <v-col
+                        cols="4"
+                        class="text-center"
+                      >
+                        <div class="stat-number text-primary">
+                          {{ stats.lastSyncTime ? formatLastSync(stats.lastSyncTime) : 'Never' }}
+                        </div>
+                        <div class="stat-label">
+                          Last Sync
+                        </div>
                       </v-col>
                     </v-row>
                   </v-card-text>

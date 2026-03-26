@@ -1,12 +1,17 @@
 <template>
   <v-container fluid>
     <v-row class="mb-4">
-      <v-col cols="12" class="d-flex justify-space-between align-center">
-        <h2 class="text-h4">Sales Pipeline</h2>
+      <v-col
+        cols="12"
+        class="d-flex justify-space-between align-center"
+      >
+        <h2 class="text-h4">
+          Sales Pipeline
+        </h2>
         <v-btn
           color="primary"
-          @click="openDealDialog()"
           prepend-icon="mdi-plus"
+          @click="openDealDialog()"
         >
           Add Deal
         </v-btn>
@@ -15,35 +20,75 @@
 
     <!-- Pipeline Stats -->
     <v-row class="mb-4">
-      <v-col cols="12" md="3">
-        <v-card color="primary" variant="flat">
+      <v-col
+        cols="12"
+        md="3"
+      >
+        <v-card
+          color="primary"
+          variant="flat"
+        >
           <v-card-text class="text-center">
-            <div class="text-h4 font-weight-bold text-white">{{ pipelineStats.totalDeals }}</div>
-            <div class="text-white">Total Deals</div>
+            <div class="text-h4 font-weight-bold text-white">
+              {{ pipelineStats.totalDeals }}
+            </div>
+            <div class="text-white">
+              Total Deals
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
-      <v-col cols="12" md="3">
-        <v-card color="success" variant="flat">
+      <v-col
+        cols="12"
+        md="3"
+      >
+        <v-card
+          color="success"
+          variant="flat"
+        >
           <v-card-text class="text-center">
-            <div class="text-h4 font-weight-bold text-white">${{ formatCurrency(pipelineStats.totalValue) }}</div>
-            <div class="text-white">Pipeline Value</div>
+            <div class="text-h4 font-weight-bold text-white">
+              ${{ formatCurrency(pipelineStats.totalValue) }}
+            </div>
+            <div class="text-white">
+              Pipeline Value
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
-      <v-col cols="12" md="3">
-        <v-card color="warning" variant="flat">
+      <v-col
+        cols="12"
+        md="3"
+      >
+        <v-card
+          color="warning"
+          variant="flat"
+        >
           <v-card-text class="text-center">
-            <div class="text-h4 font-weight-bold text-white">{{ pipelineStats.avgProbability }}%</div>
-            <div class="text-white">Avg. Probability</div>
+            <div class="text-h4 font-weight-bold text-white">
+              {{ pipelineStats.avgProbability }}%
+            </div>
+            <div class="text-white">
+              Avg. Probability
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
-      <v-col cols="12" md="3">
-        <v-card color="info" variant="flat">
+      <v-col
+        cols="12"
+        md="3"
+      >
+        <v-card
+          color="info"
+          variant="flat"
+        >
           <v-card-text class="text-center">
-            <div class="text-h4 font-weight-bold text-white">${{ formatCurrency(pipelineStats.expectedValue) }}</div>
-            <div class="text-white">Expected Value</div>
+            <div class="text-h4 font-weight-bold text-white">
+              ${{ formatCurrency(pipelineStats.expectedValue) }}
+            </div>
+            <div class="text-white">
+              Expected Value
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
@@ -51,7 +96,10 @@
 
     <!-- Filters -->
     <v-row class="mb-4">
-      <v-col cols="12" md="4">
+      <v-col
+        cols="12"
+        md="4"
+      >
         <v-text-field
           v-model="searchQuery"
           label="Search deals..."
@@ -61,7 +109,10 @@
           clearable
         />
       </v-col>
-      <v-col cols="12" md="2">
+      <v-col
+        cols="12"
+        md="2"
+      >
         <v-select
           v-model="stageFilter"
           :items="stageOptions"
@@ -71,7 +122,10 @@
           clearable
         />
       </v-col>
-      <v-col cols="12" md="2">
+      <v-col
+        cols="12"
+        md="2"
+      >
         <v-select
           v-model="statusFilter"
           :items="statusOptions"
@@ -81,7 +135,10 @@
           clearable
         />
       </v-col>
-      <v-col cols="12" md="2">
+      <v-col
+        cols="12"
+        md="2"
+      >
         <v-select
           v-model="clientFilter"
           :items="clientOptions"
@@ -91,12 +148,24 @@
           clearable
         />
       </v-col>
-      <v-col cols="12" md="2">
-        <v-btn-toggle v-model="viewMode" mandatory>
-          <v-btn value="kanban" size="small">
+      <v-col
+        cols="12"
+        md="2"
+      >
+        <v-btn-toggle
+          v-model="viewMode"
+          mandatory
+        >
+          <v-btn
+            value="kanban"
+            size="small"
+          >
             <v-icon>mdi-view-column</v-icon>
           </v-btn>
-          <v-btn value="table" size="small">
+          <v-btn
+            value="table"
+            size="small"
+          >
             <v-icon>mdi-table</v-icon>
           </v-btn>
         </v-btn-toggle>
@@ -113,7 +182,10 @@
           md="2"
           class="kanban-column"
         >
-          <v-card class="h-100" variant="outlined">
+          <v-card
+            class="h-100"
+            variant="outlined"
+          >
             <v-card-title class="text-center pa-2">
               <div class="d-flex align-center justify-center">
                 <v-chip
@@ -136,7 +208,9 @@
               >
                 <v-card-text class="pa-3">
                   <div class="d-flex align-center justify-space-between mb-2">
-                    <div class="text-body-2 font-weight-medium">{{ deal.title }}</div>
+                    <div class="text-body-2 font-weight-medium">
+                      {{ deal.title }}
+                    </div>
                     <v-menu>
                       <template #activator="{ props }">
                         <v-btn
@@ -152,14 +226,20 @@
                           <v-list-item-title>Edit</v-list-item-title>
                         </v-list-item>
                         <v-list-item @click="deleteDeal(deal)">
-                          <v-list-item-title class="text-error">Delete</v-list-item-title>
+                          <v-list-item-title class="text-error">
+                            Delete
+                          </v-list-item-title>
                         </v-list-item>
                       </v-list>
                     </v-menu>
                   </div>
-                  <div class="text-caption text-grey mb-2">{{ getClientName(deal.clientId) }}</div>
+                  <div class="text-caption text-grey mb-2">
+                    {{ getClientName(deal.clientId) }}
+                  </div>
                   <div class="d-flex align-center justify-space-between">
-                    <div class="text-h6 font-weight-bold">${{ formatCurrency(deal.value) }}</div>
+                    <div class="text-h6 font-weight-bold">
+                      ${{ formatCurrency(deal.value) }}
+                    </div>
                     <v-chip
                       :color="getProbabilityColor(deal.probability)"
                       size="x-small"
@@ -190,8 +270,12 @@
     >
       <template #item.title="{ item }">
         <div>
-          <div class="font-weight-medium">{{ item.title }}</div>
-          <div class="text-caption text-grey">{{ item.description }}</div>
+          <div class="font-weight-medium">
+            {{ item.title }}
+          </div>
+          <div class="text-caption text-grey">
+            {{ item.description }}
+          </div>
         </div>
       </template>
 
@@ -209,7 +293,9 @@
       </template>
 
       <template #item.value="{ item }">
-        <div class="font-weight-bold">${{ formatCurrency(item.value) }}</div>
+        <div class="font-weight-bold">
+          ${{ formatCurrency(item.value) }}
+        </div>
       </template>
 
       <template #item.probability="{ item }">
@@ -258,14 +344,20 @@
               <v-list-item-title>Edit</v-list-item-title>
             </v-list-item>
             <v-list-item @click="markAsWon(item)">
-              <v-list-item-title class="text-success">Mark as Won</v-list-item-title>
+              <v-list-item-title class="text-success">
+                Mark as Won
+              </v-list-item-title>
             </v-list-item>
             <v-list-item @click="markAsLost(item)">
-              <v-list-item-title class="text-error">Mark as Lost</v-list-item-title>
+              <v-list-item-title class="text-error">
+                Mark as Lost
+              </v-list-item-title>
             </v-list-item>
             <v-divider />
             <v-list-item @click="deleteDeal(item)">
-              <v-list-item-title class="text-error">Delete</v-list-item-title>
+              <v-list-item-title class="text-error">
+                Delete
+              </v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -273,7 +365,11 @@
     </v-data-table>
 
     <!-- Deal Dialog -->
-    <v-dialog v-model="dealDialog" max-width="800px" persistent>
+    <v-dialog
+      v-model="dealDialog"
+      max-width="800px"
+      persistent
+    >
       <v-card>
         <v-card-title>
           <span class="text-h5">{{ editingDeal ? 'Edit Deal' : 'Add New Deal' }}</span>
@@ -281,7 +377,10 @@
         <v-card-text>
           <v-container>
             <v-row>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-text-field
                   v-model="dealForm.title"
                   label="Deal Title*"
@@ -289,7 +388,10 @@
                   :rules="[v => !!v || 'Title is required']"
                 />
               </v-col>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-select
                   v-model="dealForm.clientId"
                   :items="clientOptions"
@@ -306,7 +408,10 @@
                   rows="3"
                 />
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col
+                cols="12"
+                md="4"
+              >
                 <v-text-field
                   v-model="dealForm.value"
                   label="Deal Value*"
@@ -316,7 +421,10 @@
                   :rules="[v => !!v || 'Value is required', v => v > 0 || 'Value must be positive']"
                 />
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col
+                cols="12"
+                md="4"
+              >
                 <v-select
                   v-model="dealForm.stage"
                   :items="stageOptions"
@@ -326,7 +434,10 @@
                   @update:model-value="updateProbabilityFromStage"
                 />
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col
+                cols="12"
+                md="4"
+              >
                 <v-slider
                   v-model="dealForm.probability"
                   label="Probability"
@@ -338,7 +449,10 @@
                   tick-size="2"
                 />
               </v-col>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-text-field
                   v-model="dealForm.expectedCloseDate"
                   label="Expected Close Date*"
@@ -347,7 +461,10 @@
                   :rules="[v => !!v || 'Expected close date is required']"
                 />
               </v-col>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-select
                   v-model="dealForm.status"
                   :items="statusOptions"
@@ -357,8 +474,13 @@
               </v-col>
               <v-col cols="12">
                 <v-divider class="my-2" />
-                <h3 class="text-h6 mb-2">Activities</h3>
-                <div v-if="dealForm.activities.length === 0" class="text-grey text-center py-4">
+                <h3 class="text-h6 mb-2">
+                  Activities
+                </h3>
+                <div
+                  v-if="dealForm.activities.length === 0"
+                  class="text-grey text-center py-4"
+                >
                   No activities yet
                 </div>
                 <v-card
@@ -370,9 +492,15 @@
                   <v-card-text class="pa-3">
                     <div class="d-flex justify-space-between align-center">
                       <div>
-                        <div class="font-weight-medium">{{ activity.type }}</div>
-                        <div class="text-caption text-grey">{{ formatDateTime(activity.date) }}</div>
-                        <div class="text-body-2 mt-1">{{ activity.description }}</div>
+                        <div class="font-weight-medium">
+                          {{ activity.type }}
+                        </div>
+                        <div class="text-caption text-grey">
+                          {{ formatDateTime(activity.date) }}
+                        </div>
+                        <div class="text-body-2 mt-1">
+                          {{ activity.description }}
+                        </div>
                       </div>
                       <v-btn
                         icon="mdi-delete"
@@ -397,10 +525,18 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="grey" variant="text" @click="closeDealDialog">
+          <v-btn
+            color="grey"
+            variant="text"
+            @click="closeDealDialog"
+          >
             Cancel
           </v-btn>
-          <v-btn color="primary" variant="flat" @click="saveDeal">
+          <v-btn
+            color="primary"
+            variant="flat"
+            @click="saveDeal"
+          >
             {{ editingDeal ? 'Update' : 'Create' }}
           </v-btn>
         </v-card-actions>
@@ -408,7 +544,10 @@
     </v-dialog>
 
     <!-- Activity Dialog -->
-    <v-dialog v-model="activityDialog" max-width="500px">
+    <v-dialog
+      v-model="activityDialog"
+      max-width="500px"
+    >
       <v-card>
         <v-card-title>Add Activity</v-card-title>
         <v-card-text>
@@ -428,10 +567,18 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="grey" variant="text" @click="activityDialog = false">
+          <v-btn
+            color="grey"
+            variant="text"
+            @click="activityDialog = false"
+          >
             Cancel
           </v-btn>
-          <v-btn color="primary" variant="flat" @click="addActivity">
+          <v-btn
+            color="primary"
+            variant="flat"
+            @click="addActivity"
+          >
             Add
           </v-btn>
         </v-card-actions>
@@ -439,18 +586,31 @@
     </v-dialog>
 
     <!-- Delete Confirmation Dialog -->
-    <v-dialog v-model="deleteDialog" max-width="400px">
+    <v-dialog
+      v-model="deleteDialog"
+      max-width="400px"
+    >
       <v-card>
-        <v-card-title class="text-h5">Confirm Delete</v-card-title>
+        <v-card-title class="text-h5">
+          Confirm Delete
+        </v-card-title>
         <v-card-text>
           Are you sure you want to delete "{{ dealToDelete?.title }}"? This action cannot be undone.
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="grey" variant="text" @click="deleteDialog = false">
+          <v-btn
+            color="grey"
+            variant="text"
+            @click="deleteDialog = false"
+          >
             Cancel
           </v-btn>
-          <v-btn color="error" variant="flat" @click="confirmDelete">
+          <v-btn
+            color="error"
+            variant="flat"
+            @click="confirmDelete"
+          >
             Delete
           </v-btn>
         </v-card-actions>

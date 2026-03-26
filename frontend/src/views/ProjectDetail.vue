@@ -10,8 +10,14 @@
     <!-- Main Content -->
     <v-main class="main-content">
       <!-- Loading State -->
-      <div v-if="loading" class="loading-container">
-        <v-container fluid class="px-6 py-8">
+      <div
+        v-if="loading"
+        class="loading-container"
+      >
+        <v-container
+          fluid
+          class="px-6 py-8"
+        >
           <div class="loading-content">
             <v-progress-circular
               :size="70"
@@ -19,24 +25,41 @@
               color="primary"
               indeterminate
             />
-            <h2 class="loading-text">Loading project details...</h2>
+            <h2 class="loading-text">
+              Loading project details...
+            </h2>
           </div>
         </v-container>
       </div>
 
       <!-- Error State -->
-      <div v-else-if="error" class="error-container">
-        <v-container fluid class="px-6 py-8">
+      <div
+        v-else-if="error"
+        class="error-container"
+      >
+        <v-container
+          fluid
+          class="px-6 py-8"
+        >
           <div class="error-content">
-            <v-icon size="64" color="error">mdi-alert-circle</v-icon>
-            <h2 class="error-title">{{ error }}</h2>
+            <v-icon
+              size="64"
+              color="error"
+            >
+              mdi-alert-circle
+            </v-icon>
+            <h2 class="error-title">
+              {{ error }}
+            </h2>
             <v-btn 
               color="primary" 
               variant="elevated" 
-              @click="$router.push('/projects')"
               class="mt-4"
+              @click="$router.push('/projects')"
             >
-              <v-icon class="mr-2">mdi-arrow-left</v-icon>
+              <v-icon class="mr-2">
+                mdi-arrow-left
+              </v-icon>
               Back to Projects
             </v-btn>
           </div>
@@ -44,20 +67,28 @@
       </div>
 
       <!-- Project Details -->
-      <div v-else-if="project" class="project-detail-container">
+      <div
+        v-else-if="project"
+        class="project-detail-container"
+      >
         <!-- Hero Section -->
         <div class="hero-section">
-          <v-container fluid class="px-6 py-8">
+          <v-container
+            fluid
+            class="px-6 py-8"
+          >
             <div class="hero-content">
               <div class="title-section">
                 <div class="breadcrumb">
                   <v-btn 
                     variant="text" 
                     color="white" 
-                    @click="$router.push('/projects')"
                     class="breadcrumb-btn"
+                    @click="$router.push('/projects')"
                   >
-                    <v-icon class="mr-2">mdi-arrow-left</v-icon>
+                    <v-icon class="mr-2">
+                      mdi-arrow-left
+                    </v-icon>
                     Projects
                   </v-btn>
                   <span class="breadcrumb-divider">/</span>
@@ -75,7 +106,9 @@
                     variant="elevated" 
                     class="status-chip"
                   >
-                    <v-icon class="mr-2">{{ getStatusIcon(project.status) }}</v-icon>
+                    <v-icon class="mr-2">
+                      {{ getStatusIcon(project.status) }}
+                    </v-icon>
                     {{ formatStatus(project.status) }}
                   </v-chip>
                   <v-chip 
@@ -83,28 +116,52 @@
                     variant="elevated" 
                     class="priority-chip"
                   >
-                    <v-icon class="mr-2">mdi-flag</v-icon>
+                    <v-icon class="mr-2">
+                      mdi-flag
+                    </v-icon>
                     {{ formatPriority(project.priority) }}
                   </v-chip>
-                  <v-chip v-if="project.deadline" variant="outlined" color="white" class="deadline-chip">
-                    <v-icon class="mr-2">mdi-calendar</v-icon>
+                  <v-chip
+                    v-if="project.deadline"
+                    variant="outlined"
+                    color="white"
+                    class="deadline-chip"
+                  >
+                    <v-icon class="mr-2">
+                      mdi-calendar
+                    </v-icon>
                     Due {{ formatDeadline(project.deadline) }}
                   </v-chip>
                 </div>
               </div>
               <div class="hero-actions">
+                <ShareProjectDialog
+                  v-if="project && isProjectOwner"
+                  :project-id="project.id"
+                  :project-name="project.title"
+                  :team-members="project.teamMembers || []"
+                  :owner-name="currentUserName"
+                  :owner-email="currentUserEmail"
+                  @member-added="handleMemberAdded"
+                  @member-removed="handleMemberRemoved"
+                  @permission-updated="handlePermissionUpdated"
+                />
                 <v-btn 
+                  v-if="canEdit"
                   color="white"
                   variant="elevated"
                   size="large"
                   rounded="lg"
-                  class="hero-btn"
+                  class="hero-btn ml-3"
                   @click="editProject"
                 >
-                  <v-icon class="mr-2">mdi-pencil</v-icon>
+                  <v-icon class="mr-2">
+                    mdi-pencil
+                  </v-icon>
                   Edit Project
                 </v-btn>
                 <v-btn 
+                  v-if="isProjectOwner"
                   color="white"
                   variant="outlined"
                   size="large"
@@ -112,7 +169,9 @@
                   class="hero-btn-outline ml-3"
                   @click="deleteProject"
                 >
-                  <v-icon class="mr-2">mdi-delete</v-icon>
+                  <v-icon class="mr-2">
+                    mdi-delete
+                  </v-icon>
                   Delete
                 </v-btn>
               </div>
@@ -120,13 +179,23 @@
           </v-container>
         </div>
 
-        <v-container fluid class="content-container px-6 pb-8">
+        <v-container
+          fluid
+          class="content-container px-6 pb-8"
+        >
           <!-- Project Overview Cards -->
           <div class="tool-section">
             <div class="section-header">
               <div class="section-title">
-                <v-icon class="section-icon" color="primary">mdi-chart-donut</v-icon>
-                <h2 class="section-heading">Project Overview</h2>
+                <v-icon
+                  class="section-icon"
+                  color="primary"
+                >
+                  mdi-chart-donut
+                </v-icon>
+                <h2 class="section-heading">
+                  Project Overview
+                </h2>
               </div>
             </div>
             
@@ -135,14 +204,23 @@
               <div class="overview-item">
                 <div class="overview-card status-card">
                   <div class="overview-icon-wrapper status-icon">
-                    <v-icon class="overview-icon" color="white">
+                    <v-icon
+                      class="overview-icon"
+                      color="white"
+                    >
                       {{ getStatusIcon(project.status) }}
                     </v-icon>
                   </div>
                   <div class="overview-info">
-                    <h3 class="overview-title">Status</h3>
-                    <div class="overview-amount">{{ formatStatus(project.status) }}</div>
-                    <div class="overview-description">Current state</div>
+                    <h3 class="overview-title">
+                      Status
+                    </h3>
+                    <div class="overview-amount">
+                      {{ formatStatus(project.status) }}
+                    </div>
+                    <div class="overview-description">
+                      Current state
+                    </div>
                   </div>
                 </div>
               </div>
@@ -151,12 +229,23 @@
               <div class="overview-item">
                 <div class="overview-card priority-card">
                   <div class="overview-icon-wrapper priority-icon">
-                    <v-icon class="overview-icon" color="white">mdi-flag</v-icon>
+                    <v-icon
+                      class="overview-icon"
+                      color="white"
+                    >
+                      mdi-flag
+                    </v-icon>
                   </div>
                   <div class="overview-info">
-                    <h3 class="overview-title">Priority</h3>
-                    <div class="overview-amount">{{ formatPriority(project.priority) }}</div>
-                    <div class="overview-description">Project importance</div>
+                    <h3 class="overview-title">
+                      Priority
+                    </h3>
+                    <div class="overview-amount">
+                      {{ formatPriority(project.priority) }}
+                    </div>
+                    <div class="overview-description">
+                      Project importance
+                    </div>
                   </div>
                 </div>
               </div>
@@ -165,12 +254,23 @@
               <div class="overview-item">
                 <div class="overview-card created-card">
                   <div class="overview-icon-wrapper created-icon">
-                    <v-icon class="overview-icon" color="white">mdi-calendar-plus</v-icon>
+                    <v-icon
+                      class="overview-icon"
+                      color="white"
+                    >
+                      mdi-calendar-plus
+                    </v-icon>
                   </div>
                   <div class="overview-info">
-                    <h3 class="overview-title">Created</h3>
-                    <div class="overview-amount">{{ formatDate(project.createdAt) }}</div>
-                    <div class="overview-description">Project start date</div>
+                    <h3 class="overview-title">
+                      Created
+                    </h3>
+                    <div class="overview-amount">
+                      {{ formatDate(project.createdAt) }}
+                    </div>
+                    <div class="overview-description">
+                      Project start date
+                    </div>
                   </div>
                 </div>
               </div>
@@ -179,10 +279,17 @@
               <div class="overview-item">
                 <div class="overview-card deadline-card">
                   <div class="overview-icon-wrapper deadline-icon">
-                    <v-icon class="overview-icon" color="white">mdi-calendar-clock</v-icon>
+                    <v-icon
+                      class="overview-icon"
+                      color="white"
+                    >
+                      mdi-calendar-clock
+                    </v-icon>
                   </div>
                   <div class="overview-info">
-                    <h3 class="overview-title">Deadline</h3>
+                    <h3 class="overview-title">
+                      Deadline
+                    </h3>
                     <div class="overview-amount">
                       {{ project.deadline ? formatDate(project.deadline) : 'No deadline' }}
                     </div>
@@ -195,21 +302,112 @@
             </div>
           </div>
 
+          <!-- Project Lead & Owner Section -->
+          <div class="tool-section">
+            <div class="section-header">
+              <div class="section-title">
+                <v-icon
+                  class="section-icon"
+                  color="purple"
+                >
+                  mdi-account-star
+                </v-icon>
+                <h2 class="section-heading">
+                  Project Leadership
+                </h2>
+              </div>
+            </div>
+            
+            <div class="leadership-grid">
+              <!-- Project Owner -->
+              <div class="leader-card owner-card">
+                <div class="leader-badge">
+                  <v-icon size="20" color="white">mdi-crown</v-icon>
+                </div>
+                <div class="leader-avatar">
+                  <v-icon size="48" color="purple">
+                    mdi-account-circle
+                  </v-icon>
+                </div>
+                <div class="leader-info">
+                  <div class="leader-role">Project Owner</div>
+                  <h3 class="leader-name">
+                    {{ getOwnerName() }}
+                  </h3>
+                  <p class="leader-email">
+                    {{ getOwnerEmail() }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Team Lead -->
+              <div v-if="project.teamLead" class="leader-card lead-card">
+                <div class="leader-badge">
+                  <v-icon size="20" color="white">mdi-star</v-icon>
+                </div>
+                <div class="leader-avatar">
+                  <v-icon size="48" color="blue">
+                    mdi-account-circle
+                  </v-icon>
+                </div>
+                <div class="leader-info">
+                  <div class="leader-role">Team Lead</div>
+                  <h3 class="leader-name">
+                    {{ project.teamLead }}
+                  </h3>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Project Details Section -->
           <div class="tool-section">
             <div class="section-header">
               <div class="section-title">
-                <v-icon class="section-icon" color="warning">mdi-clipboard-text</v-icon>
-                <h2 class="section-heading">Project Details</h2>
+                <v-icon
+                  class="section-icon"
+                  color="warning"
+                >
+                  mdi-clipboard-text
+                </v-icon>
+                <h2 class="section-heading">
+                  Project Details
+                </h2>
               </div>
             </div>
             
             <v-row>
               <!-- Main Details -->
-              <v-col cols="12" md="8">
+              <v-col
+                cols="12"
+                md="8"
+              >
+                <!-- Thumbnail Image -->
+                <div
+                  v-if="projectThumbnail"
+                  class="project-card"
+                >
+                  <div class="card-header">
+                    <h3 class="card-title">
+                      Project Image
+                    </h3>
+                  </div>
+                  <div class="card-content">
+                    <div class="thumbnail-display">
+                      <img 
+                        :src="`http://localhost:3002${projectThumbnail.path}`" 
+                        :alt="project.title"
+                        class="project-thumbnail"
+                      >
+                    </div>
+                  </div>
+                </div>
+
                 <div class="project-card">
                   <div class="card-header">
-                    <h3 class="card-title">Description</h3>
+                    <h3 class="card-title">
+                      Description
+                    </h3>
                   </div>
                   <div class="card-content">
                     <div class="description-content">
@@ -221,36 +419,59 @@
                 <!-- Project Timeline -->
                 <div class="project-card">
                   <div class="card-header">
-                    <h3 class="card-title">Timeline</h3>
+                    <h3 class="card-title">
+                      Timeline
+                    </h3>
                   </div>
                   <div class="card-content">
                     <div class="timeline-item">
                       <div class="timeline-icon created">
-                        <v-icon color="white">mdi-calendar-plus</v-icon>
+                        <v-icon color="white">
+                          mdi-calendar-plus
+                        </v-icon>
                       </div>
                       <div class="timeline-content">
-                        <h4 class="timeline-title">Project Created</h4>
-                        <p class="timeline-date">{{ formatFullDate(project.createdAt) }}</p>
+                        <h4 class="timeline-title">
+                          Project Created
+                        </h4>
+                        <p class="timeline-date">
+                          {{ formatFullDate(project.createdAt) }}
+                        </p>
                       </div>
                     </div>
                     
                     <div class="timeline-item">
                       <div class="timeline-icon updated">
-                        <v-icon color="white">mdi-pencil</v-icon>
+                        <v-icon color="white">
+                          mdi-pencil
+                        </v-icon>
                       </div>
                       <div class="timeline-content">
-                        <h4 class="timeline-title">Last Updated</h4>
-                        <p class="timeline-date">{{ formatFullDate(project.updatedAt) }}</p>
+                        <h4 class="timeline-title">
+                          Last Updated
+                        </h4>
+                        <p class="timeline-date">
+                          {{ formatFullDate(project.updatedAt) }}
+                        </p>
                       </div>
                     </div>
                     
-                    <div v-if="project.deadline" class="timeline-item">
+                    <div
+                      v-if="project.deadline"
+                      class="timeline-item"
+                    >
                       <div class="timeline-icon deadline">
-                        <v-icon color="white">mdi-calendar-clock</v-icon>
+                        <v-icon color="white">
+                          mdi-calendar-clock
+                        </v-icon>
                       </div>
                       <div class="timeline-content">
-                        <h4 class="timeline-title">Deadline</h4>
-                        <p class="timeline-date">{{ formatFullDate(project.deadline) }}</p>
+                        <h4 class="timeline-title">
+                          Deadline
+                        </h4>
+                        <p class="timeline-date">
+                          {{ formatFullDate(project.deadline) }}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -258,89 +479,155 @@
               </v-col>
 
               <!-- Sidebar Information -->
-              <v-col cols="12" md="4">
+              <v-col
+                cols="12"
+                md="4"
+              >
                 <div class="project-card">
                   <div class="card-header">
-                    <h3 class="card-title">Project Information</h3>
+                    <h3 class="card-title">
+                      Project Information
+                    </h3>
                   </div>
                   <div class="card-content">
                     <div class="info-item">
-                      <div class="info-label">Project ID</div>
-                      <div class="info-value">{{ project.id }}</div>
+                      <div class="info-label">
+                        Project ID
+                      </div>
+                      <div class="info-value">
+                        {{ project.id }}
+                      </div>
                     </div>
                     
                     <div class="info-item">
-                      <div class="info-label">Status</div>
+                      <div class="info-label">
+                        Status
+                      </div>
                       <div class="info-value">
-                        <v-chip :color="getStatusColor(project.status)" size="small" variant="tonal">
+                        <v-chip
+                          :color="getStatusColor(project.status)"
+                          size="small"
+                          variant="tonal"
+                        >
                           {{ formatStatus(project.status) }}
                         </v-chip>
                       </div>
                     </div>
                     
                     <div class="info-item">
-                      <div class="info-label">Priority</div>
+                      <div class="info-label">
+                        Priority
+                      </div>
                       <div class="info-value">
-                        <v-chip :color="getPriorityColor(project.priority)" size="small" variant="tonal">
+                        <v-chip
+                          :color="getPriorityColor(project.priority)"
+                          size="small"
+                          variant="tonal"
+                        >
                           {{ formatPriority(project.priority) }}
                         </v-chip>
                       </div>
                     </div>
                     
                     <div class="info-item">
-                      <div class="info-label">Created</div>
-                      <div class="info-value">{{ formatDate(project.createdAt) }}</div>
+                      <div class="info-label">
+                        Created
+                      </div>
+                      <div class="info-value">
+                        {{ formatDate(project.createdAt) }}
+                      </div>
                     </div>
                     
                     <div class="info-item">
-                      <div class="info-label">Last Modified</div>
-                      <div class="info-value">{{ formatDate(project.updatedAt) }}</div>
+                      <div class="info-label">
+                        Last Modified
+                      </div>
+                      <div class="info-value">
+                        {{ formatDate(project.updatedAt) }}
+                      </div>
                     </div>
                     
-                    <div v-if="project.deadline" class="info-item">
-                      <div class="info-label">Deadline</div>
-                      <div class="info-value">{{ formatDate(project.deadline) }}</div>
+                    <div
+                      v-if="project.deadline"
+                      class="info-item"
+                    >
+                      <div class="info-label">
+                        Deadline
+                      </div>
+                      <div class="info-value">
+                        {{ formatDate(project.deadline) }}
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 <!-- Actions Card -->
-                <div class="project-card">
+                <div v-if="project && !canOnlyView" class="project-card actions-card">
                   <div class="card-header">
-                    <h3 class="card-title">Actions</h3>
+                    <h3 class="card-title">
+                      Actions
+                    </h3>
                   </div>
                   <div class="card-content">
                     <div class="action-buttons">
+                      <!-- Primary Action: Edit -->
                       <v-btn 
                         color="primary" 
                         variant="elevated" 
                         block 
-                        class="mb-3"
+                        size="large"
+                        class="action-btn primary-btn mb-3"
                         @click="editProject"
                       >
-                        <v-icon class="mr-2">mdi-pencil</v-icon>
+                        <v-icon class="mr-2">
+                          mdi-pencil
+                        </v-icon>
                         Edit Project
                       </v-btn>
                       
+                      <!-- Share Project Dialog -->
+                      <ShareProjectDialog
+                        v-if="project && isProjectOwner"
+                        :project-id="project.id"
+                        :project-name="project.title"
+                        :team-members="project.teamMembers || []"
+                        :owner-name="currentUserName"
+                        :owner-email="currentUserEmail"
+                        @member-added="handleMemberAdded"
+                        @member-removed="handleMemberRemoved"
+                        @permission-updated="handlePermissionUpdated"
+                        block
+                        class="mb-3"
+                      />
+                      
+                      <!-- Complete Project -->
                       <v-btn 
                         color="success" 
                         variant="outlined" 
                         block 
-                        class="mb-3"
-                        @click="changeStatus('completed')"
+                        size="large"
+                        class="action-btn success-btn mb-3"
                         :disabled="project.status === 'completed'"
+                        @click="changeStatus('completed')"
                       >
-                        <v-icon class="mr-2">mdi-check</v-icon>
+                        <v-icon class="mr-2">
+                          mdi-check-circle
+                        </v-icon>
                         Mark Complete
                       </v-btn>
                       
+                      <!-- Delete Project -->
                       <v-btn 
                         color="error" 
                         variant="outlined" 
                         block
+                        size="large"
+                        class="action-btn danger-btn"
                         @click="deleteProject"
                       >
-                        <v-icon class="mr-2">mdi-delete</v-icon>
+                        <v-icon class="mr-2">
+                          mdi-trash-can
+                        </v-icon>
                         Delete Project
                       </v-btn>
                     </div>
@@ -350,12 +637,161 @@
             </v-row>
           </div>
 
-          <!-- Project Files Section -->
-          <div v-if="project.files && project.files.length > 0" class="tool-section">
+          <!-- Team Members Section -->
+          <div class="tool-section">
             <div class="section-header">
               <div class="section-title">
-                <v-icon class="section-icon" color="info">mdi-file-multiple</v-icon>
-                <h2 class="section-heading">Project Files</h2>
+                <v-icon
+                  class="section-icon"
+                  color="success"
+                >
+                  mdi-account-group
+                </v-icon>
+                <h2 class="section-heading">
+                  Team Members
+                </h2>
+                <v-chip
+                  size="small"
+                  color="primary"
+                  variant="flat"
+                  class="ml-2"
+                >
+                  {{ project.teamMembers?.length || 0 }}
+                </v-chip>
+              </div>
+            </div>
+            
+            <div v-if="project.teamMembers && project.teamMembers.length > 0" class="team-members-grid">
+              <div 
+                v-for="member in project.teamMembers" 
+                :key="member.userId || member.email" 
+                class="team-member-card"
+                :class="{ 'pending-member': member.status === 'pending' }"
+              >
+                <div class="member-info">
+                  <div class="member-avatar">
+                    <v-avatar 
+                      :color="member.status === 'pending' ? 'grey-lighten-1' : 'primary'"
+                      size="40"
+                    >
+                      <v-icon v-if="member.status === 'pending'" color="grey-darken-1">
+                        mdi-account-outline
+                      </v-icon>
+                      <span v-else class="text-white font-weight-bold">
+                        {{ member.name.charAt(0).toUpperCase() }}
+                      </span>
+                    </v-avatar>
+                  </div>
+                  <div class="member-details">
+                    <h4 class="member-name">
+                      {{ member.name }}
+                      <v-chip
+                        v-if="member.status === 'pending'"
+                        size="x-small"
+                        color="warning"
+                        variant="elevated"
+                        class="ml-2"
+                        prepend-icon="mdi-clock-outline"
+                      >
+                        Pending
+                      </v-chip>
+                    </h4>
+                    <p class="member-email">
+                      {{ member.email }}
+                    </p>
+                    <v-chip
+                      :color="member.permission === 'view_and_edit' || member.role === 'edit' ? 'success' : 'info'"
+                      size="small"
+                      variant="tonal"
+                      class="mt-2"
+                    >
+                      <v-icon size="16" class="mr-1">
+                        {{ (member.permission === 'view_and_edit' || member.role === 'edit') ? 'mdi-pencil' : 'mdi-eye' }}
+                      </v-icon>
+                      {{ (member.permission === 'view_and_edit' || member.role === 'edit') ? 'Can Edit' : 'Can View' }}
+                    </v-chip>
+                  </div>
+                </div>
+                
+                <div v-if="isProjectOwner" class="member-actions">
+                  <v-menu v-if="member.status !== 'pending'">
+                    <template #activator="{ props }">
+                      <v-btn
+                        icon="mdi-dots-vertical"
+                        variant="text"
+                        size="small"
+                        v-bind="props"
+                      />
+                    </template>
+                    <v-list>
+                      <v-list-item
+                        @click="changePermission(member.userId, member.permission === 'view_only' ? 'view_and_edit' : 'view_only')"
+                      >
+                        <v-list-item-title>
+                          <v-icon class="mr-2">
+                            {{ member.permission === 'view_only' ? 'mdi-pencil' : 'mdi-eye' }}
+                          </v-icon>
+                          {{ member.permission === 'view_only' ? 'Allow Edit' : 'View Only' }}
+                        </v-list-item-title>
+                      </v-list-item>
+                      <v-list-item
+                        @click="removeMember(member.userId)"
+                      >
+                        <v-list-item-title class="text-error">
+                          <v-icon class="mr-2">
+                            mdi-delete
+                          </v-icon>
+                          Remove
+                        </v-list-item-title>
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
+                  <v-btn
+                    v-else
+                    icon="mdi-delete"
+                    variant="text"
+                    size="small"
+                    color="error"
+                    @click="removeMember(member.userId || member.email)"
+                    title="Cancel invitation"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <!-- Empty state for no team members -->
+            <div v-else class="empty-state">
+              <v-icon size="64" color="grey-lighten-1">
+                mdi-account-multiple-outline
+              </v-icon>
+              <h3 class="empty-state-title">No team members yet</h3>
+              <p class="empty-state-text">
+                Click the <strong>Share</strong> button at the top to invite team members to this project.
+              </p>
+            </div>
+          </div>
+
+          <!-- Project Chat Section -->
+          <div v-if="project._id" class="tool-section">
+            <ProjectChat :project-id="project._id" />
+          </div>
+
+          <!-- Project Files Section -->
+          <div
+            v-if="project.files && project.files.length > 0"
+            class="tool-section"
+          >
+            <div class="section-header">
+              <div class="section-title">
+                <v-icon
+                  class="section-icon"
+                  color="info"
+                >
+                  mdi-file-multiple
+                </v-icon>
+                <h2 class="section-heading">
+                  Project Files
+                </h2>
               </div>
             </div>
             
@@ -366,46 +802,65 @@
                 class="file-card"
               >
                 <div class="file-preview">
-                  <div v-if="isImage(file.mimetype)" class="image-preview">
+                  <div
+                    v-if="isImage(file.mimetype)"
+                    class="image-preview"
+                  >
                     <img 
-                      :src="`http://localhost:3030${file.path}`" 
+                      :src="`http://localhost:3002${file.path}`" 
                       :alt="file.originalName"
                       class="preview-image"
-                    />
+                    >
                   </div>
-                  <div v-else class="file-icon-preview">
-                    <v-icon :color="getFileIconColor(file.mimetype)" size="48">
+                  <div
+                    v-else
+                    class="file-icon-preview"
+                  >
+                    <v-icon
+                      :color="getFileIconColor(file.mimetype)"
+                      size="48"
+                    >
                       {{ getFileIcon(file.mimetype) }}
                     </v-icon>
                   </div>
                 </div>
                 
                 <div class="file-info">
-                  <h4 class="file-name">{{ file.originalName }}</h4>
-                  <p class="file-size">{{ formatFileSize(file.size) }}</p>
-                  <p class="file-date">{{ formatFileDate(file.uploadedAt) }}</p>
+                  <h4 class="file-name">
+                    {{ file.originalName }}
+                  </h4>
+                  <p class="file-size">
+                    {{ formatFileSize(file.size) }}
+                  </p>
+                  <p class="file-date">
+                    {{ formatFileDate(file.uploadedAt) }}
+                  </p>
                 </div>
                 
                 <div class="file-actions">
                   <v-btn 
-                    :href="`http://localhost:3030${file.path}`" 
+                    :href="`http://localhost:3002${file.path}`" 
                     target="_blank"
                     color="primary" 
                     variant="outlined" 
                     size="small"
                     class="mr-2"
                   >
-                    <v-icon class="mr-1">mdi-download</v-icon>
+                    <v-icon class="mr-1">
+                      mdi-download
+                    </v-icon>
                     Download
                   </v-btn>
                   <v-btn 
-                    :href="`http://localhost:3030${file.path}`" 
+                    :href="`http://localhost:3002${file.path}`" 
                     target="_blank"
                     color="secondary" 
                     variant="text" 
                     size="small"
                   >
-                    <v-icon class="mr-1">mdi-eye</v-icon>
+                    <v-icon class="mr-1">
+                      mdi-eye
+                    </v-icon>
                     View
                   </v-btn>
                 </div>
@@ -417,16 +872,33 @@
     </v-main>
 
     <!-- Delete Confirmation Dialog -->
-    <v-dialog v-model="deleteDialog" max-width="500">
+    <v-dialog
+      v-model="deleteDialog"
+      max-width="500"
+    >
       <v-card>
-        <v-card-title class="headline">Delete Project</v-card-title>
+        <v-card-title class="headline">
+          Delete Project
+        </v-card-title>
         <v-card-text>
           Are you sure you want to delete "{{ project?.title }}"? This action cannot be undone.
         </v-card-text>
         <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="grey" variant="text" @click="deleteDialog = false">Cancel</v-btn>
-          <v-btn color="error" variant="elevated" @click="confirmDelete">Delete</v-btn>
+          <v-spacer />
+          <v-btn
+            color="grey"
+            variant="text"
+            @click="deleteDialog = false"
+          >
+            Cancel
+          </v-btn>
+          <v-btn
+            color="error"
+            variant="elevated"
+            @click="confirmDelete"
+          >
+            Delete
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -439,7 +911,9 @@
       location="top right"
     >
       <div class="d-flex align-center">
-        <v-icon class="mr-2">{{ snackbarIcon }}</v-icon>
+        <v-icon class="mr-2">
+          {{ snackbarIcon }}
+        </v-icon>
         {{ snackbarText }}
       </div>
     </v-snackbar>
@@ -447,10 +921,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import LeftMenu from '@/dashboard/LeftMenu.vue';
 import SearchBar from '@/dashboard/SearchBar.vue';
+import ShareProjectDialog from '@/components/ShareProjectDialog.vue';
+import ProjectChat from '@/components/ProjectChat.vue';
 import { ProjectApiService } from '@/services/projectApi.service.js';
 
 const route = useRoute();
@@ -465,6 +941,42 @@ const snackbar = ref(false);
 const snackbarText = ref('');
 const snackbarColor = ref('success');
 const snackbarIcon = ref('mdi-check');
+// eslint-disable-next-line no-unused-vars
+const showAddMemberDialog = ref(false);
+
+// Computed property for project thumbnail
+const projectThumbnail = computed(() => {
+  if (!project.value?.files || project.value.files.length === 0) {
+    return null;
+  }
+  // Find the first image file as thumbnail
+  return project.value.files.find(file => 
+    file.mimetype && file.mimetype.startsWith('image/')
+  );
+});
+
+// User role from backend (set when project is fetched)
+const backendUserRole = ref('VIEW'); // Default to VIEW
+
+// Computed property to check if current user is project owner
+const isProjectOwner = computed(() => {
+  return backendUserRole.value === 'OWNER';
+});
+
+// Computed property to get current user's role in the project (lowercase for compatibility)
+const userRole = computed(() => {
+  return backendUserRole.value.toLowerCase();
+});
+
+// Computed property to check if user can edit (owner or edit permission)
+const canEdit = computed(() => {
+  return backendUserRole.value === 'OWNER' || backendUserRole.value === 'EDIT';
+});
+
+// Computed property to check if user can only view
+const canOnlyView = computed(() => {
+  return backendUserRole.value === 'VIEW';
+});
 
 // Fetch project details
 const fetchProject = async () => {
@@ -479,6 +991,12 @@ const fetchProject = async () => {
     
     const response = await ProjectApiService.getById(projectId);
     project.value = response;
+    
+    // Get user role from backend response
+    if (response.userRole) {
+      backendUserRole.value = response.userRole;
+      console.log('User role from backend:', backendUserRole.value);
+    }
     
   } catch (err) {
     console.error('Error fetching project:', err);
@@ -632,6 +1150,25 @@ const formatFileDate = (dateString) => {
   });
 };
 
+// Project Owner helpers
+const getOwnerName = () => {
+  if (!project.value?.projectOwner) return 'Unknown';
+  const owner = project.value.projectOwner;
+  if (typeof owner === 'object' && owner.firstName) {
+    return `${owner.firstName} ${owner.lastName || ''}`.trim();
+  }
+  return 'Unknown';
+};
+
+const getOwnerEmail = () => {
+  if (!project.value?.projectOwner) return '';
+  const owner = project.value.projectOwner;
+  if (typeof owner === 'object' && owner.email) {
+    return owner.email;
+  }
+  return '';
+};
+
 // Actions
 const editProject = () => {
   router.push(`/project-create?edit=${project.value.id}`);
@@ -671,6 +1208,104 @@ const showSnackbar = (text, color, icon) => {
   snackbarColor.value = color;
   snackbarIcon.value = icon;
   snackbar.value = true;
+};
+
+// Current user data for ShareProjectDialog
+const currentUserName = computed(() => {
+  const firstName = localStorage.getItem('firstName') || '';
+  const lastName = localStorage.getItem('lastName') || '';
+  return `${firstName} ${lastName}`.trim() || 'Unknown User';
+});
+
+const currentUserEmail = computed(() => {
+  return localStorage.getItem('email') || '';
+});
+
+// Share dialog event handlers
+const handleMemberAdded = async () => {
+  // Refresh project data to get updated team members
+  await fetchProject();
+  showSnackbar('Team member invitation sent successfully', 'success', 'mdi-check');
+};
+
+const handleMemberRemoved = async () => {
+  // Refresh project data to get updated team members
+  await fetchProject();
+  showSnackbar('Team member removed successfully', 'success', 'mdi-check');
+};
+
+const handlePermissionUpdated = async () => {
+  // Refresh project data to get updated permissions
+  await fetchProject();
+  showSnackbar('Permission updated successfully', 'success', 'mdi-check');
+};
+
+// Team member management
+const changePermission = async (memberId, newPermission) => {
+  try {
+    const response = await fetch(
+      `http://localhost:3002/api/projects/${project.value.id}/team-members/${memberId}/permission`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        },
+        body: JSON.stringify({ permission: newPermission })
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to update permission');
+    }
+
+    // Update local state
+    const member = project.value.teamMembers.find(m => m.userId === memberId);
+    if (member) {
+      member.permission = newPermission;
+    }
+
+    showSnackbar(
+      `Permission updated to ${newPermission === 'view_and_edit' ? 'Edit' : 'View Only'}`, 
+      'success', 
+      'mdi-check'
+    );
+  } catch (err) {
+    console.error('Error updating permission:', err);
+    showSnackbar('Failed to update permission', 'error', 'mdi-alert');
+  }
+};
+
+const removeMember = async (memberId) => {
+  if (!confirm('Are you sure you want to remove this team member?')) {
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `http://localhost:3002/api/projects/${project.value.id}/team-members/${memberId}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to remove team member');
+    }
+
+    // Update local state
+    project.value.teamMembers = project.value.teamMembers.filter(
+      m => m.userId !== memberId
+    );
+
+    showSnackbar('Team member removed successfully', 'success', 'mdi-check');
+  } catch (err) {
+    console.error('Error removing team member:', err);
+    showSnackbar('Failed to remove team member', 'error', 'mdi-alert');
+  }
 };
 
 // Load project on component mount
@@ -1040,6 +1675,23 @@ onMounted(() => {
   padding: 1.5rem;
 }
 
+/* Thumbnail Display */
+.thumbnail-display {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.project-thumbnail {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: cover;
+  display: block;
+  border-radius: 12px;
+}
+
 /* Description Content */
 .description-content {
   font-size: 1rem;
@@ -1132,6 +1784,51 @@ onMounted(() => {
   gap: 0.75rem;
 }
 
+.action-btn {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+}
+
+.primary-btn:hover {
+  background: linear-gradient(135deg, #1565c0 0%, #1565c0 100%);
+}
+
+.success-btn {
+  border: 2px solid #4caf50;
+  color: #4caf50;
+}
+
+.success-btn:hover {
+  background-color: rgba(76, 175, 80, 0.08);
+}
+
+.danger-btn {
+  border: 2px solid #f44336;
+  color: #f44336;
+}
+
+.danger-btn:hover {
+  background-color: rgba(244, 67, 54, 0.08);
+}
+
+.actions-card {
+  border-top: 4px solid #1976d2;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .hero-title {
@@ -1209,6 +1906,186 @@ onMounted(() => {
     width: 100%;
     min-width: unset;
   }
+}
+
+/* Project Leadership Section */
+.leadership-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+
+.leader-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.4);
+  transition: all 0.3s;
+}
+
+.leader-card.owner-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.leader-card.lead-card {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+}
+
+.leader-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px -5px rgba(102, 126, 234, 0.5);
+}
+
+.leader-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+}
+
+.leader-avatar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+}
+
+.leader-info {
+  text-align: center;
+  color: white;
+}
+
+.leader-role {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.9;
+  margin-bottom: 0.5rem;
+}
+
+.leader-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  color: white;
+}
+
+.leader-email {
+  font-size: 0.875rem;
+  opacity: 0.8;
+  margin: 0;
+  word-break: break-word;
+}
+
+/* Team Members Section */
+.team-members-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 16px;
+  border: 2px dashed #cbd5e1;
+  margin-top: 1rem;
+}
+
+.empty-state-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #475569;
+  margin: 1rem 0 0.5rem 0;
+}
+
+.empty-state-text {
+  font-size: 1rem;
+  color: #64748b;
+  margin: 0;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.team-member-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  transition: all 0.2s;
+}
+
+.team-member-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transform: translateY(-2px);
+}
+
+.team-member-card.pending-member {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border-color: #fbbf24;
+  opacity: 0.95;
+}
+
+.team-member-card.pending-member:hover {
+  border-color: #f59e0b;
+  box-shadow: 0 4px 12px -1px rgba(245, 158, 11, 0.2);
+}
+
+.member-info {
+  display: flex;
+  gap: 1rem;
+  flex: 1;
+}
+
+.member-avatar {
+  flex-shrink: 0;
+}
+
+.member-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.member-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.member-email {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0.25rem 0 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.member-actions {
+  flex-shrink: 0;
 }
 
 /* Files Section */

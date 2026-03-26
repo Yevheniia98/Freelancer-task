@@ -87,6 +87,15 @@ const ExternalSourceSchema = new mongoose_1.Schema({
     },
     syncError: { type: String }
 });
+const FileSchema = new mongoose_1.Schema({
+    filename: { type: String, required: true },
+    originalName: { type: String, required: true },
+    path: { type: String, required: true },
+    mimetype: { type: String, required: true },
+    size: { type: Number, required: true },
+    uploadedAt: { type: Date, default: Date.now },
+    uploadedBy: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User', required: true }
+});
 const ProjectSchema = new mongoose_1.Schema({
     title: {
         type: String,
@@ -146,6 +155,7 @@ const ProjectSchema = new mongoose_1.Schema({
             trim: true
         }],
     externalSource: ExternalSourceSchema,
+    files: [FileSchema],
     userId: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: 'User',

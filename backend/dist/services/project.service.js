@@ -26,16 +26,42 @@ class ProjectService {
             if (!createProjectDto.description?.trim()) {
                 throw new Error('Project description is required');
             }
-            // Validate deadline if provided
-            if (createProjectDto.deadline && new Date(createProjectDto.deadline) <= new Date()) {
-                throw new Error('Deadline must be in the future');
+            // Validate deadline if provided - only validate if it's a valid date string
+            if (createProjectDto.deadline) {
+                const deadlineDate = new Date(createProjectDto.deadline);
+                if (isNaN(deadlineDate.getTime())) {
+                    // Invalid date, skip the deadline
+                    createProjectDto.deadline = undefined;
+                }
+                // Note: We removed the "must be in the future" validation as users may want to set deadlines that passed
             }
+            // Filter and validate team members - only include those with valid userId
+            const validTeamMembers = (createProjectDto.teamMembers || []).filter(member => {
+                // Check if userId exists and is a valid ObjectId or can be converted to one
+                if (!member.userId)
+                    return false;
+                try {
+                    // Try to create ObjectId to validate format
+                    new mongoose_1.default.Types.ObjectId(member.userId);
+                    return true;
+                }
+                catch {
+                    console.warn(`Invalid userId for team member ${member.name}: ${member.userId}`);
+                    return false;
+                }
+            });
             const project = new project_entity_1.ProjectEntity({
                 title: createProjectDto.title.trim(),
+                name: createProjectDto.name?.trim() || createProjectDto.title.trim(),
                 description: createProjectDto.description.trim(),
                 status: createProjectDto.status || project_entity_1.ProjectStatus.PENDING,
                 priority: createProjectDto.priority || project_entity_1.ProjectPriority.MEDIUM,
-                deadline: createProjectDto.deadline
+                deadline: createProjectDto.deadline,
+                privacy: createProjectDto.privacy,
+                category: createProjectDto.category,
+                skills: createProjectDto.skills || [],
+                teamLead: createProjectDto.teamLead,
+                teamMembers: validTeamMembers
             });
             const savedProject = await project.save();
             return savedProject;
@@ -102,7 +128,9 @@ class ProjectService {
             if (!mongoose_1.default.Types.ObjectId.isValid(id)) {
                 throw new Error('Invalid project ID');
             }
-            const project = await project_entity_1.ProjectEntity.findById(id).exec();
+            const project = await project_entity_1.ProjectEntity.findById(id)
+                .populate('projectOwner', 'firstName lastName email')
+                .exec();
             return project;
         }
         catch (error) {

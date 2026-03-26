@@ -210,11 +210,17 @@
               :key="client.id"
               class="client-item"
             >
-              <v-card class="client-profile-card" elevation="3">
+              <v-card
+                class="client-profile-card"
+                elevation="3"
+              >
                 <v-card-text class="pa-8">
                   <div class="client-content">
                     <div class="client-avatar-section">
-                      <v-avatar size="80" :color="getPlatformColor(client.platform)">
+                      <v-avatar
+                        size="80"
+                        :color="getPlatformColor(client.platform)"
+                      >
                         <span class="text-h4 white--text">{{ client.name.charAt(0) }}</span>
                       </v-avatar>
                       <v-chip
@@ -227,34 +233,66 @@
                       </v-chip>
                     </div>
                     <div class="client-info-section">
-                      <h3 class="client-profile-name">{{ client.name }}</h3>
-                      <p class="client-status">Active Client</p>
+                      <h3 class="client-profile-name">
+                        {{ client.name }}
+                      </h3>
+                      <p class="client-status">
+                        Active Client
+                      </p>
                       <div class="client-details">
                         <div class="client-detail-item">
-                          <v-icon class="mr-2" size="small">mdi-email</v-icon>
+                          <v-icon
+                            class="mr-2"
+                            size="small"
+                          >
+                            mdi-email
+                          </v-icon>
                           <span>{{ client.email }}</span>
                         </div>
                         <div class="client-detail-item">
-                          <v-icon class="mr-2" size="small">mdi-phone</v-icon>
+                          <v-icon
+                            class="mr-2"
+                            size="small"
+                          >
+                            mdi-phone
+                          </v-icon>
                           <span>{{ client.phone }}</span>
                         </div>
                         <div class="client-detail-item">
-                          <v-icon class="mr-2" size="small">mdi-briefcase-check</v-icon>
+                          <v-icon
+                            class="mr-2"
+                            size="small"
+                          >
+                            mdi-briefcase-check
+                          </v-icon>
                           <span>{{ client.projects }} projects completed</span>
                         </div>
                         <div class="client-detail-item">
-                          <v-icon class="mr-2" size="small" :color="getActiveTasksForClient(client.id).length > 0 ? 'success' : 'grey'">mdi-clock-outline</v-icon>
+                          <v-icon
+                            class="mr-2"
+                            size="small"
+                            :color="getActiveTasksForClient(client.id).length > 0 ? 'success' : 'grey'"
+                          >
+                            mdi-clock-outline
+                          </v-icon>
                           <span :class="getActiveTasksForClient(client.id).length > 0 ? 'text-success font-weight-medium' : ''">{{ getActiveTasksText(client.id) }}</span>
                         </div>
                       </div>
                     </div>
                     <div class="client-stats-section">
                       <div class="stat-item">
-                        <div class="stat-value">{{ client.projects }}</div>
-                        <div class="stat-label">Projects</div>
+                        <div class="stat-value">
+                          {{ client.projects }}
+                        </div>
+                        <div class="stat-label">
+                          Projects
+                        </div>
                       </div>
                       <div class="stat-item earnings-stat">
-                        <div class="stat-value-editable" v-if="!client.editingEarnings">
+                        <div
+                          v-if="!client.editingEarnings"
+                          class="stat-value-editable"
+                        >
                           €{{ client.earn.toLocaleString() }}
                           <v-btn 
                             icon 
@@ -263,10 +301,15 @@
                             class="ml-1"
                             @click="startEditingEarnings(client)"
                           >
-                            <v-icon size="12">mdi-pencil</v-icon>
+                            <v-icon size="12">
+                              mdi-pencil
+                            </v-icon>
                           </v-btn>
                         </div>
-                        <div v-else class="earnings-edit">
+                        <div
+                          v-else
+                          class="earnings-edit"
+                        >
                           <v-text-field
                             v-model="client.tempEarnings"
                             prefix="€"
@@ -283,7 +326,9 @@
                               variant="text"
                               @click="saveEarnings(client)"
                             >
-                              <v-icon size="12">mdi-check</v-icon>
+                              <v-icon size="12">
+                                mdi-check
+                              </v-icon>
                             </v-btn>
                             <v-btn 
                               size="x-small" 
@@ -291,21 +336,36 @@
                               variant="text"
                               @click="cancelEditingEarnings(client)"
                             >
-                              <v-icon size="12">mdi-close</v-icon>
+                              <v-icon size="12">
+                                mdi-close
+                              </v-icon>
                             </v-btn>
                           </div>
                         </div>
-                        <div class="stat-label">Total Earned</div>
+                        <div class="stat-label">
+                          Total Earned
+                        </div>
                       </div>
                       <div class="stat-item">
-                        <div class="stat-value">Active</div>
-                        <div class="stat-label">Status</div>
+                        <div class="stat-value">
+                          Active
+                        </div>
+                        <div class="stat-label">
+                          Status
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div class="client-review mt-4" v-if="client.review">
-                    <h4 class="review-title">Review & Notes</h4>
-                    <p class="review-text">{{ client.review }}</p>
+                  <div
+                    v-if="client.review"
+                    class="client-review mt-4"
+                  >
+                    <h4 class="review-title">
+                      Review & Notes
+                    </h4>
+                    <p class="review-text">
+                      {{ client.review }}
+                    </p>
                   </div>
                   <div class="client-actions-bottom mt-4">
                     <v-btn
@@ -314,7 +374,12 @@
                       size="small"
                       @click="openClientDialog(client)"
                     >
-                      <v-icon class="mr-1" size="small">mdi-pencil</v-icon>
+                      <v-icon
+                        class="mr-1"
+                        size="small"
+                      >
+                        mdi-pencil
+                      </v-icon>
                       Edit
                     </v-btn>
                     <v-btn
@@ -323,7 +388,12 @@
                       size="small"
                       @click="confirmDeleteDialog(client)"
                     >
-                      <v-icon class="mr-1" size="small">mdi-delete</v-icon>
+                      <v-icon
+                        class="mr-1"
+                        size="small"
+                      >
+                        mdi-delete
+                      </v-icon>
                       Delete
                     </v-btn>
                   </div>
@@ -820,6 +890,7 @@ export default defineComponent({
 .main-content {
   background: linear-gradient(135deg, #064E47 0%, #0D7C66 50%, #41B3A2 100%);
   min-height: 100vh;
+  margin-top: 72px;
 }
 
 /* Hero Section - Same as Design Tools */

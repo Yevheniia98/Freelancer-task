@@ -1,12 +1,17 @@
 <template>
   <v-container fluid>
     <v-row class="mb-4">
-      <v-col cols="12" class="d-flex justify-space-between align-center">
-        <h2 class="text-h4">Clients</h2>
+      <v-col
+        cols="12"
+        class="d-flex justify-space-between align-center"
+      >
+        <h2 class="text-h4">
+          Clients
+        </h2>
         <v-btn
           color="primary"
-          @click="openClientDialog()"
           prepend-icon="mdi-plus"
+          @click="openClientDialog()"
         >
           Add Client
         </v-btn>
@@ -15,7 +20,10 @@
 
     <!-- Search and Filter -->
     <v-row class="mb-4">
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-text-field
           v-model="searchQuery"
           label="Search clients..."
@@ -25,7 +33,10 @@
           clearable
         />
       </v-col>
-      <v-col cols="12" md="3">
+      <v-col
+        cols="12"
+        md="3"
+      >
         <v-select
           v-model="statusFilter"
           :items="statusOptions"
@@ -35,7 +46,10 @@
           clearable
         />
       </v-col>
-      <v-col cols="12" md="3">
+      <v-col
+        cols="12"
+        md="3"
+      >
         <v-select
           v-model="priorityFilter"
           :items="priorityOptions"
@@ -68,8 +82,12 @@
             </span>
           </v-avatar>
           <div>
-            <div class="font-weight-medium">{{ item.name }}</div>
-            <div class="text-caption text-grey">{{ item.email }}</div>
+            <div class="font-weight-medium">
+              {{ item.name }}
+            </div>
+            <div class="text-caption text-grey">
+              {{ item.email }}
+            </div>
           </div>
         </div>
       </template>
@@ -99,12 +117,28 @@
       <!-- Contact Info Column -->
       <template #item.contact="{ item }">
         <div>
-          <div v-if="item.phone" class="d-flex align-center mb-1">
-            <v-icon size="small" class="mr-1">mdi-phone</v-icon>
+          <div
+            v-if="item.phone"
+            class="d-flex align-center mb-1"
+          >
+            <v-icon
+              size="small"
+              class="mr-1"
+            >
+              mdi-phone
+            </v-icon>
             <span class="text-caption">{{ item.phone }}</span>
           </div>
-          <div v-if="item.address" class="d-flex align-center">
-            <v-icon size="small" class="mr-1">mdi-map-marker</v-icon>
+          <div
+            v-if="item.address"
+            class="d-flex align-center"
+          >
+            <v-icon
+              size="small"
+              class="mr-1"
+            >
+              mdi-map-marker
+            </v-icon>
             <span class="text-caption">{{ item.address.city }}, {{ item.address.country }}</span>
           </div>
         </div>
@@ -113,10 +147,17 @@
       <!-- Last Contact Column -->
       <template #item.lastContact="{ item }">
         <div v-if="item.lastContact">
-          <div class="text-caption">{{ formatDate(item.lastContact) }}</div>
-          <div class="text-caption text-grey">{{ getTimeSince(item.lastContact) }}</div>
+          <div class="text-caption">
+            {{ formatDate(item.lastContact) }}
+          </div>
+          <div class="text-caption text-grey">
+            {{ getTimeSince(item.lastContact) }}
+          </div>
         </div>
-        <span v-else class="text-grey">Never</span>
+        <span
+          v-else
+          class="text-grey"
+        >Never</span>
       </template>
 
       <!-- Actions Column -->
@@ -133,32 +174,45 @@
           <v-list density="compact">
             <v-list-item @click="openClientDialog(item)">
               <v-list-item-title>
-                <v-icon class="mr-2">mdi-pencil</v-icon>
+                <v-icon class="mr-2">
+                  mdi-pencil
+                </v-icon>
                 Edit
               </v-list-item-title>
             </v-list-item>
             <v-list-item @click="viewClientDetails(item)">
               <v-list-item-title>
-                <v-icon class="mr-2">mdi-eye</v-icon>
+                <v-icon class="mr-2">
+                  mdi-eye
+                </v-icon>
                 View Details
               </v-list-item-title>
             </v-list-item>
             <v-list-item @click="addCommunication(item)">
               <v-list-item-title>
-                <v-icon class="mr-2">mdi-message-plus</v-icon>
+                <v-icon class="mr-2">
+                  mdi-message-plus
+                </v-icon>
                 Add Communication
               </v-list-item-title>
             </v-list-item>
             <v-list-item @click="createInvoice(item)">
               <v-list-item-title>
-                <v-icon class="mr-2">mdi-file-plus</v-icon>
+                <v-icon class="mr-2">
+                  mdi-file-plus
+                </v-icon>
                 Create Invoice
               </v-list-item-title>
             </v-list-item>
             <v-divider />
-            <v-list-item @click="deleteClient(item)" class="text-error">
+            <v-list-item
+              class="text-error"
+              @click="deleteClient(item)"
+            >
               <v-list-item-title>
-                <v-icon class="mr-2">mdi-delete</v-icon>
+                <v-icon class="mr-2">
+                  mdi-delete
+                </v-icon>
                 Delete
               </v-list-item-title>
             </v-list-item>
@@ -168,7 +222,11 @@
     </v-data-table>
 
     <!-- Client Dialog -->
-    <v-dialog v-model="clientDialog" max-width="800px" persistent>
+    <v-dialog
+      v-model="clientDialog"
+      max-width="800px"
+      persistent
+    >
       <v-card>
         <v-card-title>
           <span class="text-h5">{{ editingClient ? 'Edit Client' : 'Add New Client' }}</span>
@@ -176,7 +234,10 @@
         <v-card-text>
           <v-container>
             <v-row>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-text-field
                   v-model="clientForm.name"
                   label="Company/Client Name*"
@@ -184,7 +245,10 @@
                   :rules="[v => !!v || 'Name is required']"
                 />
               </v-col>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-text-field
                   v-model="clientForm.email"
                   label="Email*"
@@ -193,21 +257,30 @@
                   :rules="[v => !!v || 'Email is required', v => /.+@.+\..+/.test(v) || 'Email must be valid']"
                 />
               </v-col>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-text-field
                   v-model="clientForm.phone"
                   label="Phone"
                   variant="outlined"
                 />
               </v-col>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-text-field
                   v-model="clientForm.website"
                   label="Website"
                   variant="outlined"
                 />
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col
+                cols="12"
+                md="4"
+              >
                 <v-select
                   v-model="clientForm.status"
                   :items="statusOptions"
@@ -215,7 +288,10 @@
                   variant="outlined"
                 />
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col
+                cols="12"
+                md="4"
+              >
                 <v-select
                   v-model="clientForm.priority"
                   :items="priorityOptions"
@@ -223,7 +299,10 @@
                   variant="outlined"
                 />
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col
+                cols="12"
+                md="4"
+              >
                 <v-select
                   v-model="clientForm.type"
                   :items="typeOptions"
@@ -234,37 +313,54 @@
               <!-- Address Fields -->
               <v-col cols="12">
                 <v-divider class="my-2" />
-                <h3 class="text-h6 mb-2">Address Information</h3>
+                <h3 class="text-h6 mb-2">
+                  Address Information
+                </h3>
               </v-col>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-text-field
                   v-model="clientForm.address.street"
                   label="Street Address"
                   variant="outlined"
                 />
               </v-col>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-text-field
                   v-model="clientForm.address.city"
                   label="City"
                   variant="outlined"
                 />
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col
+                cols="12"
+                md="4"
+              >
                 <v-text-field
                   v-model="clientForm.address.state"
                   label="State/Province"
                   variant="outlined"
                 />
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col
+                cols="12"
+                md="4"
+              >
                 <v-text-field
                   v-model="clientForm.address.zipCode"
                   label="ZIP/Postal Code"
                   variant="outlined"
                 />
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col
+                cols="12"
+                md="4"
+              >
                 <v-text-field
                   v-model="clientForm.address.country"
                   label="Country"
@@ -284,10 +380,18 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="grey" variant="text" @click="closeClientDialog">
+          <v-btn
+            color="grey"
+            variant="text"
+            @click="closeClientDialog"
+          >
             Cancel
           </v-btn>
-          <v-btn color="primary" variant="flat" @click="saveClient">
+          <v-btn
+            color="primary"
+            variant="flat"
+            @click="saveClient"
+          >
             {{ editingClient ? 'Update' : 'Create' }}
           </v-btn>
         </v-card-actions>
@@ -295,18 +399,31 @@
     </v-dialog>
 
     <!-- Delete Confirmation Dialog -->
-    <v-dialog v-model="deleteDialog" max-width="400px">
+    <v-dialog
+      v-model="deleteDialog"
+      max-width="400px"
+    >
       <v-card>
-        <v-card-title class="text-h5">Confirm Delete</v-card-title>
+        <v-card-title class="text-h5">
+          Confirm Delete
+        </v-card-title>
         <v-card-text>
           Are you sure you want to delete "{{ clientToDelete?.name }}"? This action cannot be undone.
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="grey" variant="text" @click="deleteDialog = false">
+          <v-btn
+            color="grey"
+            variant="text"
+            @click="deleteDialog = false"
+          >
             Cancel
           </v-btn>
-          <v-btn color="error" variant="flat" @click="confirmDelete">
+          <v-btn
+            color="error"
+            variant="flat"
+            @click="confirmDelete"
+          >
             Delete
           </v-btn>
         </v-card-actions>
@@ -317,10 +434,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { clientService } from '../../services/crmService.js'
-
-const router = useRouter()
 
 // Data
 const clients = ref([])

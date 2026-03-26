@@ -1,23 +1,115 @@
-[dotenv@17.2.1] injecting env (20) from .env -- tip: 📡 auto-backup env with Radar: https://dotenvx.com/radar
+[dotenv@17.2.1] injecting env (20) from .env -- tip: ⚙️  enable debug logging with { debug: true }
 📧 Real email service initialized with: freelancetasker0@gmail.com
 📧 Real email service initialized with: freelancetasker0@gmail.com
 📧 Real email service initialized with: freelancetasker0@gmail.com
 ✅ TeamManagementController initialized
-⚠️ MongoDB connection skipped - running in email-only mode
+📧 Real email service initialized with: freelancetasker0@gmail.com
+(node:45162) [MONGOOSE] Warning: Duplicate schema index on {"userId":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:45162) [MONGOOSE] Warning: Duplicate schema index on {"expiresAt":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+✅ MongoDB connected
+✅ MongoDB connected
+✅ Redis connected
 🚀 Server running on port 3002
 📊 Environment: development
 🌐 Frontend URL: http://localhost:3030
-Error: Not Found - /
+Auth middleware: Token found, verifying...
+Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
+Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
+::1 - - [20/Dec/2025:11:12:32 +0000] "GET /api/auth/me HTTP/1.1" 304 - "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Error: Not Found - /api/api/finance/summary
     at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
     at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
     at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
     at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
     at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
     at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
-    at session (/Users/evgenya/freelancer-task/backend/node_modules/express-session/index.js:487:7)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:688:15
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:276:14)
+    at Function.handle (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:186:3)
+    at router (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:60:12)
+::1 - - [20/Dec/2025:11:20:54 +0000] "GET /api/api/finance/summary HTTP/1.1" 404 1044 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Error: Not Found - /api/api/finance/summary
+    at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
     at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
     at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
     at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
-::ffff:127.0.0.1 - - [27/Oct/2025:15:15:11 +0000] "GET / HTTP/1.1" 404 1022 "-" "curl/7.77.0"
-✅ Email sent: <09cedd0f-fa9f-12f8-081b-ad8732bb77b7@localhost>
-::ffff:127.0.0.1 - - [27/Oct/2025:15:16:21 +0000] "POST /api/meeting-invitations/send-multiple HTTP/1.1" 200 204 "http://localhost:3030/dashboard" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+    at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:688:15
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:276:14)
+    at Function.handle (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:186:3)
+    at router (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:60:12)
+::1 - - [20/Dec/2025:11:20:54 +0000] "GET /api/api/finance/summary HTTP/1.1" 404 1044 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Error: Not Found - /api/api/finance/summary
+    at notFound (/Users/evgenya/freelancer-task/backend/src/middleware/notFound.middleware.ts:4:17)
+    at Layer.handleRequest (/Users/evgenya/freelancer-task/backend/node_modules/router/lib/layer.js:152:17)
+    at trimPrefix (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:342:13)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:297:9
+    at processParams (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:582:12)
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:291:5)
+    at /Users/evgenya/freelancer-task/backend/node_modules/router/index.js:688:15
+    at next (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:276:14)
+    at Function.handle (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:186:3)
+    at router (/Users/evgenya/freelancer-task/backend/node_modules/router/index.js:60:12)
+::1 - - [20/Dec/2025:11:20:54 +0000] "GET /api/api/finance/summary HTTP/1.1" 404 1044 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Auth middleware: Token found, verifying...
+Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
+Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
+::1 - - [20/Dec/2025:11:21:11 +0000] "GET /api/projects?limit=50 HTTP/1.1" 304 - "http://localhost:3030/projects" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Auth middleware: Token found, verifying...
+Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
+Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
+::1 - - [20/Dec/2025:11:21:11 +0000] "GET /api/integrations/projects HTTP/1.1" 304 - "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Auth middleware: Token found, verifying...
+Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
+Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
+::1 - - [20/Dec/2025:11:21:27 +0000] "PUT /api/projects/6945c2ecac10fceba68f55e9 HTTP/1.1" 200 780 "http://localhost:3030/projects" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Auth middleware: Token found, verifying...
+Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
+Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
+::1 - - [20/Dec/2025:11:21:30 +0000] "GET /api/projects/6945ba29ac10fceba68f55c1 HTTP/1.1" 200 1199 "http://localhost:3030/projects/6945ba29ac10fceba68f55c1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+::1 - - [20/Dec/2025:11:21:30 +0000] "GET /uploads/file-1766177321479-376434104-0.jpg HTTP/1.1" 200 121842 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+::1 - - [20/Dec/2025:11:21:30 +0000] "GET /uploads/file-1766177321546-646937882-0.jpg HTTP/1.1" 200 121842 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Auth middleware: Token found, verifying...
+Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
+Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
+✅ Email sent: <844c2684-dc5a-4371-c9a0-e93ded95db09@localhost>
+📧 Invite email sent to: suprun.jen@gmail.com
+✅ Invite created: {
+  email: 'suprun.jen@gmail.com',
+  role: 'view',
+  projectId: '6945ba29ac10fceba68f55c1',
+  token: 'a9a292d4-d747-4d84-875f-676dd22add13',
+  expiresAt: 2025-12-27T11:21:48.239Z
+}
+::1 - - [20/Dec/2025:11:21:49 +0000] "POST /api/invites/send HTTP/1.1" 201 282 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Auth middleware: Token found, verifying...
+Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
+Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
+::1 - - [20/Dec/2025:11:21:50 +0000] "GET /api/projects/6945ba29ac10fceba68f55c1 HTTP/1.1" 200 1437 "http://localhost:3030/projects/6945ba29ac10fceba68f55c1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+::1 - - [20/Dec/2025:11:21:50 +0000] "GET /uploads/file-1766177321479-376434104-0.jpg HTTP/1.1" 200 121842 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+::1 - - [20/Dec/2025:11:21:50 +0000] "GET /uploads/file-1766177321546-646937882-0.jpg HTTP/1.1" 200 121842 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Auth middleware: Token found, verifying...
+Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
+Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
+✅ Email sent: <f1c75b59-210b-ffd9-56e3-227e59588b61@localhost>
+📧 Invite email sent to: vickyjosh94@gmail.com
+✅ Invite created: {
+  email: 'vickyjosh94@gmail.com',
+  role: 'edit',
+  projectId: '6945ba29ac10fceba68f55c1',
+  token: 'b6ef690a-e5f6-4a5d-b9b7-2728e2df14d1',
+  expiresAt: 2025-12-27T11:22:21.554Z
+}
+::1 - - [20/Dec/2025:11:22:22 +0000] "POST /api/invites/send HTTP/1.1" 201 283 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Auth middleware: Token found, verifying...
+Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
+Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
+::1 - - [20/Dec/2025:11:22:23 +0000] "GET /api/projects/6945ba29ac10fceba68f55c1 HTTP/1.1" 200 1678 "http://localhost:3030/projects/6945ba29ac10fceba68f55c1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+::1 - - [20/Dec/2025:11:22:23 +0000] "GET /uploads/file-1766177321479-376434104-0.jpg HTTP/1.1" 200 121842 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+::1 - - [20/Dec/2025:11:22:23 +0000] "GET /uploads/file-1766177321546-646937882-0.jpg HTTP/1.1" 200 121842 "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Auth middleware: Token found, verifying...
+Auth middleware: Token decoded: { userId: '688f4821a200b136e245d179', id: undefined }
+Auth middleware: User authenticated: new ObjectId('688f4821a200b136e245d179')
+::1 - - [20/Dec/2025:11:24:06 +0000] "GET /api/auth/me HTTP/1.1" 304 - "http://localhost:3030/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"

@@ -8,9 +8,16 @@
         <h1>Welcome Back!</h1>
         <p>Sign in to your account to access your project management dashboard.</p>
           
-        <form @submit.prevent="submitForm" method="post" novalidate>
+        <form
+          method="post"
+          novalidate
+          @submit.prevent="submitForm"
+        >
           <!-- Error Messages -->
-          <div v-if="errors.length > 0" class="error-messages">
+          <div
+            v-if="errors.length > 0"
+            class="error-messages"
+          >
             <div 
               v-for="error in errors" 
               :key="error" 
@@ -21,7 +28,10 @@
           </div>
 
           <!-- Success Message -->
-          <div v-if="successMessage" class="success-message">
+          <div
+            v-if="successMessage"
+            class="success-message"
+          >
             {{ successMessage }}
           </div>
 
@@ -32,7 +42,7 @@
             placeholder="Enter your email address"
             :disabled="isLoading"
             autocomplete="email"
-          />
+          >
   
           <label>Enter your password</label>
           <div class="password-field">
@@ -42,13 +52,13 @@
               placeholder="Enter your password"
               :disabled="isLoading"
               autocomplete="current-password"
-            />
+            >
             <img 
               :src="showPassword ? '/eye-open.svg' : '/eye-close.svg'" 
               class="eye-icon" 
               alt="Toggle password visibility" 
               @click="togglePassword"
-            />
+            >
           </div>
 
           <div class="forgot-password">

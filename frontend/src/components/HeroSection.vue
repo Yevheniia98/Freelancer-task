@@ -91,6 +91,7 @@
     <!-- Modern Product Showcase -->
     <div
       class="product-showcase"
+      :style="{ transform: `translateY(${parallaxOffset}px)` }"
       data-aos="fade-up"
       data-aos-delay="500"
     >
@@ -246,14 +247,25 @@ export default {
           ]
         }
       ],
-      activeTab: 0
+      activeTab: 0,
+      parallaxOffset: 0
     };
   },
   mounted() {
     // Initialize AOS animations
     this.initScrollAnimations();
+    // Add parallax scroll listener
+    window.addEventListener('scroll', this.handleParallaxScroll);
+  },
+  beforeUnmount() {
+    // Clean up scroll listener
+    window.removeEventListener('scroll', this.handleParallaxScroll);
   },
   methods: {
+    handleParallaxScroll() {
+      const scrolled = window.pageYOffset;
+      this.parallaxOffset = scrolled * 0.5; // Move at 50% speed of scroll
+    },
     switchTab(index) {
       this.activeTab = index;
     },
@@ -505,6 +517,8 @@ export default {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 2rem;
+  will-change: transform;
+  transition: transform 0.1s ease-out;
 }
 
 .tab-navigation {

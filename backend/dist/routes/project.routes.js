@@ -8,6 +8,7 @@ const express_validator_1 = require("express-validator");
 const project_controller_1 = require("../controllers/project.controller");
 const project_entity_1 = require("../models/project.entity");
 const auth_middleware_1 = require("../middleware/auth.middleware");
+const multer_config_1 = require("../config/multer.config");
 const router = express_1.default.Router();
 const projectController = new project_controller_1.ProjectController();
 // Apply auth middleware to all project routes
@@ -120,4 +121,13 @@ router.post('/', createProjectValidation, projectController.create);
 router.put('/:id', updateProjectValidation, projectController.update);
 router.patch('/bulk/status', bulkUpdateValidation, projectController.bulkUpdateStatus);
 router.delete('/:id', idValidation, projectController.delete);
+// File upload route
+router.post('/:id/files', (0, express_validator_1.param)('id').isMongoId().withMessage('Invalid project ID'), multer_config_1.upload.single('file'), projectController.uploadFile);
+// Team member management routes
+router.post('/:id/team-members', (0, express_validator_1.param)('id').isMongoId().withMessage('Invalid project ID'), (0, express_validator_1.body)('email').isEmail().withMessage('Valid email is required'), (0, express_validator_1.body)('permission').optional().isIn(['view_only', 'view_and_edit']).withMessage('Invalid permission'), projectController.addTeamMember);
+router.put('/:projectId/team-members/:memberId/permission', (0, express_validator_1.param)('projectId').isMongoId().withMessage('Invalid project ID'), (0, express_validator_1.param)('memberId').isMongoId().withMessage('Invalid member ID'), (0, express_validator_1.body)('permission').isIn(['view_only', 'view_and_edit']).withMessage('Invalid permission'), projectController.updateTeamMemberPermission);
+router.delete('/:projectId/team-members/:memberId', (0, express_validator_1.param)('projectId').isMongoId().withMessage('Invalid project ID'), (0, express_validator_1.param)('memberId').isMongoId().withMessage('Invalid member ID'), projectController.removeTeamMember);
+// Project invitation routes (no auth required for verification)
+router.post('/accept-invitation', (0, express_validator_1.body)('token').notEmpty().withMessage('Invitation token is required'), projectController.acceptInvitation);
+router.get('/verify-invitation/:token', (0, express_validator_1.param)('token').notEmpty().withMessage('Invitation token is required'), projectController.verifyInvitation);
 exports.default = router;

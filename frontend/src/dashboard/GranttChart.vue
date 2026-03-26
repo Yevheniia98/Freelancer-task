@@ -180,8 +180,8 @@
                 <div class="row-actions">
                   <button
                     class="edit-btn"
-                    @click="openEditDialog(task)"
                     title="Edit task"
+                    @click="openEditDialog(task)"
                   >
                     <v-icon small>
                       mdi-pencil
@@ -189,8 +189,8 @@
                   </button>
                   <button
                     class="delete-btn"
-                    @click="deleteTask(task)"
                     title="Delete task"
+                    @click="deleteTask(task)"
                   >
                     <v-icon small>
                       mdi-delete
@@ -206,11 +206,11 @@
       <!-- Resizer handle -->
       <div 
         class="resizer" 
+        title="Drag to resize columns"
         @mousedown="startResize"
         @touchstart="startResize"
-        title="Drag to resize columns"
       >
-        <div class="resizer-grip"></div>
+        <div class="resizer-grip" />
       </div>
 
       <!-- Right side timeline -->

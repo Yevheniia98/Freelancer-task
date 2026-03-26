@@ -9,11 +9,12 @@ const email_service_1 = require("../services/email.service");
 const password_validator_1 = require("../utils/password.validator");
 const user_model_1 = require("../models/user.model");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 class AuthController {
     constructor() {
         this.register = async (req, res) => {
             try {
-                const { fullName, email, password, confirmPassword } = req.body;
+                const { fullName, email, password, confirmPassword, phoneNumber, country } = req.body;
                 // Input validation
                 if (!fullName || !email || !password || !confirmPassword) {
                     res.status(400).json({
@@ -87,7 +88,10 @@ class AuthController {
                     email: email.toLowerCase(),
                     password,
                     firstName,
-                    lastName
+                    lastName,
+                    fullName,
+                    phoneNumber,
+                    country
                 });
                 // Log successful registration
                 console.log('User registered successfully:', result.user.email);
@@ -218,13 +222,32 @@ class AuthController {
                     });
                     return;
                 }
+                // Find user by email
+                const user = await user_model_1.User.findOne({ email: email.toLowerCase() });
+                if (!user) {
+                    // For security, don't reveal if email exists
+                    res.status(200).json({
+                        success: true,
+                        message: 'If an account with this email exists, a reset code will be sent'
+                    });
+                    return;
+                }
                 // Generate verification code (6 digits)
                 const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
                 console.log(`🔑 Generated verification code for ${email}: ${verificationCode}`);
+                // Hash the verification code before storing
+                const hashedCode = await bcryptjs_1.default.hash(verificationCode, 10);
+                // Save the hashed code and expiration to user
+                user.resetPasswordToken = hashedCode;
+                user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+                await user.save();
                 // Send reset email
-                const emailSent = await this.emailService.sendPasswordResetEmail(email.toLowerCase(), verificationCode, 'User' // Default name for demo mode
-                );
+                const emailSent = await this.emailService.sendPasswordResetEmail(email.toLowerCase(), verificationCode, user.firstName || 'User');
                 if (!emailSent) {
+                    // Clear the token if email fails
+                    user.resetPasswordToken = undefined;
+                    user.resetPasswordExpires = undefined;
+                    await user.save();
                     res.status(500).json({
                         success: false,
                         message: 'Failed to send reset email',
@@ -238,7 +261,8 @@ class AuthController {
                     data: {
                         email: email.toLowerCase(),
                         // For demo purposes, also include the code in response (remove in production)
-                        verificationCode: verificationCode
+                        verificationCode: verificationCode,
+                        expiresIn: '15 minutes'
                     }
                 });
             }
@@ -338,11 +362,20 @@ class AuthController {
                 user.resetPasswordToken = undefined;
                 user.resetPasswordExpires = undefined;
                 await user.save();
+                // Generate JWT token for automatic login
+                const token = jsonwebtoken_1.default.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET || 'your-secret-key', { expiresIn: '24h' });
                 res.status(200).json({
                     success: true,
                     message,
                     data: {
-                        action: action
+                        action: action,
+                        token: token,
+                        user: {
+                            id: user._id,
+                            email: user.email,
+                            firstName: user.firstName,
+                            lastName: user.lastName
+                        }
                     }
                 });
             }
@@ -352,6 +385,148 @@ class AuthController {
                     success: false,
                     message: 'An error occurred while resetting password',
                     errors: ['Please try again later']
+                });
+            }
+        };
+        /**
+         * Get current authenticated user
+         */
+        this.getCurrentUser = async (req, res) => {
+            try {
+                const user = req.user;
+                if (!user) {
+                    res.status(401).json({
+                        success: false,
+                        message: 'Not authenticated'
+                    });
+                    return;
+                }
+                res.status(200).json({
+                    success: true,
+                    user: {
+                        id: user._id,
+                        email: user.email,
+                        name: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.email.split('@')[0],
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        fullName: user.fullName,
+                        username: user.username || user.email.split('@')[0],
+                        phoneNumber: user.phoneNumber,
+                        country: user.country,
+                        profileImage: user.profileImage
+                    }
+                });
+            }
+            catch (error) {
+                console.error('Get current user error:', error);
+                res.status(500).json({
+                    success: false,
+                    message: 'An error occurred while fetching user data'
+                });
+            }
+        };
+        /**
+         * Update user profile
+         */
+        this.updateProfile = async (req, res) => {
+            try {
+                const userId = req.user?._id;
+                const { fullName, phoneNumber, country, profileImage } = req.body;
+                if (!userId) {
+                    res.status(401).json({
+                        success: false,
+                        message: 'Not authenticated'
+                    });
+                    return;
+                }
+                // Update user in database
+                const updatedUser = await user_model_1.User.findByIdAndUpdate(userId, {
+                    fullName,
+                    phoneNumber,
+                    country,
+                    profileImage
+                }, { new: true, runValidators: true });
+                if (!updatedUser) {
+                    res.status(404).json({
+                        success: false,
+                        message: 'User not found'
+                    });
+                    return;
+                }
+                res.status(200).json({
+                    success: true,
+                    message: 'Profile updated successfully',
+                    user: {
+                        id: updatedUser._id,
+                        email: updatedUser.email,
+                        fullName: updatedUser.fullName,
+                        phoneNumber: updatedUser.phoneNumber,
+                        country: updatedUser.country,
+                        profileImage: updatedUser.profileImage
+                    }
+                });
+            }
+            catch (error) {
+                console.error('Update profile error:', error);
+                res.status(500).json({
+                    success: false,
+                    message: 'An error occurred while updating profile'
+                });
+            }
+        };
+        /**
+         * Delete user account
+         */
+        this.deleteAccount = async (req, res) => {
+            try {
+                const userId = req.user?._id;
+                const { password } = req.body;
+                if (!userId) {
+                    res.status(401).json({
+                        success: false,
+                        message: 'Not authenticated'
+                    });
+                    return;
+                }
+                if (!password) {
+                    res.status(400).json({
+                        success: false,
+                        message: 'Password is required to delete account'
+                    });
+                    return;
+                }
+                // Find user with password field
+                const user = await user_model_1.User.findById(userId).select('+password');
+                if (!user) {
+                    res.status(404).json({
+                        success: false,
+                        message: 'User not found'
+                    });
+                    return;
+                }
+                // Verify password
+                const bcrypt = require('bcrypt');
+                const isValidPassword = await bcrypt.compare(password, user.password);
+                if (!isValidPassword) {
+                    res.status(401).json({
+                        success: false,
+                        message: 'Invalid password'
+                    });
+                    return;
+                }
+                // Delete user account
+                await user_model_1.User.findByIdAndDelete(userId);
+                console.log('Account deleted successfully:', user.email);
+                res.status(200).json({
+                    success: true,
+                    message: 'Account deleted successfully'
+                });
+            }
+            catch (error) {
+                console.error('Delete account error:', error);
+                res.status(500).json({
+                    success: false,
+                    message: 'An error occurred while deleting account'
                 });
             }
         };

@@ -2,12 +2,25 @@
   <div class="crm-dashboard">
     <h1>CRM Dashboard</h1>
     
-    <v-tabs v-model="activeTab" color="primary">
-      <v-tab value="clients">Clients</v-tab>
-      <v-tab value="communications">Communications</v-tab>
-      <v-tab value="deals">Deals</v-tab>
-      <v-tab value="invoices">Invoices</v-tab>
-      <v-tab value="notes">Notes</v-tab>
+    <v-tabs
+      v-model="activeTab"
+      color="primary"
+    >
+      <v-tab value="clients">
+        Clients
+      </v-tab>
+      <v-tab value="communications">
+        Communications
+      </v-tab>
+      <v-tab value="deals">
+        Deals
+      </v-tab>
+      <v-tab value="invoices">
+        Invoices
+      </v-tab>
+      <v-tab value="notes">
+        Notes
+      </v-tab>
     </v-tabs>
 
     <v-tab-window v-model="activeTab">

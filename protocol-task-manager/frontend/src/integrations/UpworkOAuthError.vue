@@ -2,9 +2,16 @@
   <div class="oauth-error">
     <v-container>
       <v-row justify="center">
-        <v-col cols="12" md="6">
+        <v-col
+          cols="12"
+          md="6"
+        >
           <v-card class="text-center pa-8">
-            <v-icon color="error" size="64" class="mb-4">
+            <v-icon
+              color="error"
+              size="64"
+              class="mb-4"
+            >
               mdi-alert-circle
             </v-icon>
             
@@ -17,10 +24,15 @@
                 {{ errorMessage || 'There was an error connecting your Upwork account.' }}
               </p>
               
-              <v-expansion-panels v-if="errorDetails" class="mb-6">
+              <v-expansion-panels
+                v-if="errorDetails"
+                class="mb-6"
+              >
                 <v-expansion-panel>
                   <v-expansion-panel-title>
-                    <v-icon left>mdi-information</v-icon>
+                    <v-icon left>
+                      mdi-information
+                    </v-icon>
                     Error Details
                   </v-expansion-panel-title>
                   <v-expansion-panel-text>
@@ -29,7 +41,11 @@
                 </v-expansion-panel>
               </v-expansion-panels>
 
-              <v-alert type="info" variant="tonal" class="mb-6">
+              <v-alert
+                type="info"
+                variant="tonal"
+                class="mb-6"
+              >
                 <v-alert-title>Troubleshooting Tips</v-alert-title>
                 <ul class="text-left mt-2">
                   <li>Make sure you have a valid Upwork account</li>
@@ -45,7 +61,9 @@
                   variant="elevated"
                   @click="retryConnection"
                 >
-                  <v-icon left>mdi-refresh</v-icon>
+                  <v-icon left>
+                    mdi-refresh
+                  </v-icon>
                   Try Again
                 </v-btn>
                 
